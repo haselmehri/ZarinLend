@@ -1,0 +1,1 @@
+A web-based platform that handles all the steps of requesting a facility by the customer, providing collateral, approving or rejecting it by Zarrinland and bank experts, and finally granting the loan to the customer.
