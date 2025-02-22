@@ -1,0 +1,65 @@
+﻿@model RequestFacilityStepWizardModel
+
+@if (Model != null)
+{
+    <div class="mb-1 py-2 px-1 rounded-lg bg-white">
+        <div class="d-flex align-items-center overflow-auto">
+            @{
+                var lastStepInRejectedOrNotResponsed = false;
+                var manualSteps = Model.WorkFlowSteps.Where(p => p.StepIsManual).ToList();
+                for (var i = 0; i < manualSteps.Count; i++)
+                {
+                    if (Model.CompletedWorkFlowStepModels != null && !lastStepInRejectedOrNotResponsed)
+                    {
+                        var stepClassNameIcon = "bx bx-circle mr-25 light";
+                        var stepClassNameBorder = "border border-2 rounded mb-50";
+
+                        var lastStepCompleted = Model.CompletedWorkFlowStepModels.Where(p => p.WorkFlowStepId.Equals(manualSteps[i].Id))
+                        .OrderByDescending(p => p.CreateDate)
+                        .FirstOrDefault();
+                        if (lastStepCompleted != null)
+                        {
+                            if (!lastStepCompleted.StatusId.HasValue)
+                            {
+                                lastStepInRejectedOrNotResponsed = true;
+                                stepClassNameIcon = "bx bxs-time-five zl-text-secondary-light mr-25";//not response
+                                stepClassNameBorder = "zl-border-secondary-light border-2 rounded mb-50";//not response
+                            }
+                            else if (lastStepCompleted.StatusId == (short)StatusEnum.Approved)
+                            {
+                                stepClassNameIcon = "bx bxs-check-circle zl-text-primary mr-25";//approved
+                                stepClassNameBorder = "zl-border-primary border-2 rounded mb-50";//approved
+                            }
+                            else if (lastStepCompleted.StatusId == (short)StatusEnum.Rejected)
+                            {
+                                lastStepInRejectedOrNotResponsed = true;
+                                stepClassNameIcon = "bx bxs-check-circle zl-text-danger mr-25";//rejected
+                                stepClassNameBorder = "zl-border-danger border-2 rounded mb-50";//rejected
+                            }
+                        }
+                        <div class="d-flex flex-column @(i >0 ? "ml-1":string.Empty)">
+                            <div class="@stepClassNameBorder"></div>
+                            <div class="d-flex align-items-center text-nowrap mb-75">
+                                <i class="@stepClassNameIcon"></i>
+                                @manualSteps[i].Name
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="d-flex flex-column @(i >0 ? "ml-1":string.Empty)">
+                            <div class="@(i==0 ? "zl-border-secondary-light border-2 rounded mb-50":"border border-2 rounded mb-50")"></div>
+                            <div class="d-flex align-items-center text-nowrap mb-75">
+                                <i class="@(i==0 ? "bx bxs-time-five mr-1 zl-text-secondary-light":"bx bx-circle mr-25 light")"></i>
+                                @manualSteps[i].Name
+                            </div>
+                        </div>
+                    }
+                }
+            }
+        </div>
+    </div>
+    <script on-content-loaded="true">
+
+    </script>
+}

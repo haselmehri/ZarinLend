@@ -1,0 +1,98 @@
+﻿@model RequestFacilityCardIssuanceModel
+
+<style type="text/css">
+    .vertical-line {
+        border-left: 1px solid #6c757d; 
+        height: 30px;
+        margin: 8px; 
+    }
+</style>
+
+<div class="mt-2 p-2 bg-white rounded-lg h-100">
+    <div class="text-bold-900 secondary darken-4 font-medium-2">
+        اطلاعات بن کارت
+    </div>
+    <div class="border rounded mt-3">
+        <div class="d-flex align-items-center p-2">
+            <span class="font-small-2 w-50 text-bold-500">شماره بن کارت</span><span class="dark w-50 text-bold-400">@(Model != null ? Model.CardNumber : "-")</span>
+        </div>
+        <hr class="my-0" />
+        <div class="d-flex align-items-center p-2">
+            <span class="font-small-2 w-50 text-bold-500">شماره حساب</span><span class="dark w-50 text-bold-400">@(Model != null ? Model.AccountNumber : "-")</span>
+        </div>
+        <hr class="my-0" />
+        @if (User.IsInRole(RoleEnum.SuperAdmin.ToString()) || User.IsInRole(RoleEnum.Admin.ToString()) || User.IsInRole(RoleEnum.ZarinLendExpert.ToString()) || User.IsInRole(RoleEnum.BankLeasing.ToString()) || User.IsInRole(RoleEnum.SupervisorLeasing.ToString()) || User.IsInRole(RoleEnum.AdminBankLeasing.ToString()))
+        {
+            <hr class="my-0" />
+            <div class="d-flex align-items-center p-2">
+                <span class="font-small-2 w-50 text-bold-500">شماره تسهیلات</span><span class="dark w-50 text-bold-400">@(ViewBag.FacilityNumber != null ? ViewBag.FacilityNumber : "-")</span>
+            </div>
+            <hr class="my-0" />
+            <div class="d-flex align-items-center p-2">
+                <span class="font-small-2 w-50 text-bold-500">شماره انتطامی</span><span class="dark w-50 text-bold-400">@(ViewBag.PoliceNumber != null ? ViewBag.PoliceNumber : "-")</span>
+            </div>
+        }
+        <hr class="my-0" />
+        @if (User.IsInRole(RoleEnum.SuperAdmin.ToString()) || User.IsInRole(RoleEnum.Admin.ToString()) || User.IsInRole(RoleEnum.ZarinLendExpert.ToString()) || User.IsInRole(RoleEnum.Buyer.ToString()))
+        {
+            @*      <hr class="my-0" />
+        <div class="d-flex flex-column flex-sm-row">
+        <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+        <span class="font-small-2 text-bold-500">@Html.DisplayNameFor(p => p.ExpireMonth)</span>
+        <span class="dark mt-50 text-bold-400">@Model.ExpireMonth</span>
+        </div>
+        <div class="border-left border-top"></div>
+        <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+        <span class="font-small-2 text-bold-500">@Html.DisplayNameFor(p => p.ExpireYear)</span>
+        <span class="dark mt-50 text-bold-400">@Model.ExpireYear</span>
+        </div>
+        <div class="border-left border-top"></div>
+        <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+        <span class="font-small-2 text-bold-500">@Html.DisplayNameFor(p => p.Cvv)</span>
+        <span class="dark mt-50 text-bold-400">@Model.Cvv</span>
+        </div>
+        </div> *@
+            <hr class="my-0" />
+                <div class="d-flex align-items-center p-2">
+                    <span class="font-small-2 text-bold-500">ماه انقضاء :</span>
+                    <span class="dark text-bold-400 ms-2">@(Model != null ? Model.ExpireMonth : "-")</span>
+
+                    <div class="vertical-line"></div>
+
+                    <span class="font-small-2 text-bold-500">سال انقضاء :</span>
+                    <span class="dark text-bold-400 ms-2">@(Model != null ? Model.ExpireYear : "-")</span> 
+
+                    <div class="vertical-line"></div>
+
+                    <span class="font-small-2 text-bold-500">CVV :</span>
+                    <span class="dark text-bold-400 ms-2">@(Model != null ? Model.Cvv : "-")</span> 
+
+                    <div class="vertical-line"></div> 
+
+                    <div class="d-flex align-items-center">
+                        <span class="font-small-2 text-bold-500">رمز دوم :</span>
+                        <span id="secondPassword" class="text-dark fw-bold mx-2" style="display: none;">
+                            @(Model?.SecondPassword ?? "-")
+                        </span>
+                        <a class="btn btn-sm btn-outline-primary" onclick="togglePassword(event)">نمایش</a>
+                    </div>
+            </div>
+        }
+    </div>
+</div>
+<script on-content-loaded="true">
+</script>
+<script>
+    function togglePassword(event) {
+        var passwordSpan = document.getElementById("secondPassword");
+        var button = event.target;
+
+        if (passwordSpan.style.display === "none" || passwordSpan.style.display === "") {
+            passwordSpan.style.display = "inline";
+            button.textContent = "مخفی کن";
+        } else {
+            passwordSpan.style.display = "none";
+            button.textContent = "نمایش";
+        }
+    }
+</script>

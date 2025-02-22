@@ -1,0 +1,604 @@
+﻿@model RequestFacilityFilterModel
+
+@{
+    ViewData["Title"] = ViewBag.Title;
+    var CardRechargeWorkFlowStepId = ViewBag.PendingWorkFlowId;//مرحله واریز تسهیلات
+    Layout = "~/Views/Shared/_NewLayout.cshtml";
+    var ajaxUrl = "/api/v1/RequestFacility/SearchLeasingRequest";
+}
+@section styles {
+    <link href="~/persianDatePicker/css/persianDatepicker-lightorang.css" rel="stylesheet" />
+    <style type="text/css">
+    </style>
+}
+<div id="requestGridDiv" class="p-2 bg-white rounded-lg">
+    <div class="font-medium-3 secondary darken-4 text-bold-800 d-flex align-items-center">
+        <i class="bx bx-align-right zl-text-secondary mr-25"></i>
+        <span>@ViewBag.Title</span>
+    </div>
+    <div class="p-2 rounded-lg">
+        <form id="filterForm" method="post">
+            @await Component.InvokeAsync("RequestFacilityFilter", new { showWaitingStepsFilter = false, showFacilityStatus = false })            
+            <div class="row my-0 my-md-1">                
+                <div class=" col-md-5 col-xs-12" style="text-align:left">
+                    <button type="button" id="btnSearch" class="btn btn-zl-primary">
+                        <span>جستجو</span>
+                    </button>
+                    <button id="btnExportToExcel" tabindex="5" class="btn btn-outline-info">
+                        خروجی اکسل<i class="fal fa-file-excel-o"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+        <div class="mt-2">
+            <table id="requestList" class="display" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th >اعتبار درخواستی(ريال)</th>
+                        <th >بازه پرداخت</th>
+                        <th >درخواست کننده</th>
+                        <th >کد ملی/شناسه ملی</th>
+                        <th >تاریخ درخواست</th>
+                        <th >تاریخ آخرین اقدام</th>
+                        <th >وضعیت</th>
+                        <th >اقدام</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+<form id="frmVerifyBuyer" method="post">
+    <div class="modal fade text-left" id="pendingRequestModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel18" style="display: none;" data-backdrop="static" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-md" role="document">
+            <div class="modal-content rounded-xl modal-md">
+                <div class="modal-header">
+                    <h4 class="modal-title dark" id="myModalLabel18">
+                        شارژ بن کارت مشتری
+                    </h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="بستن">
+                        <i class="bx bx-x"></i>
+                    </button>
+                </div>
+                <div class="modal-body line-height-2">
+                    <div class="border rounded">
+                        <div class="d-flex align-items-center p-1">
+                            <span class="font-small-2 w-50 text-bold-500">مبلغ تسهیلات(شارژ)</span><span class="dark w-50 text-bold-400" id="amount"></span>
+                        </div>
+                        <hr class="my-0" />
+                        <div class="d-flex align-items-center p-1">
+                            <span class="font-small-2 w-50 text-bold-500">شماره بن کارت</span><span class="dark w-50 text-bold-400" id="cardNumber"></span>
+                        </div>
+                        <hr class="my-0" />
+                        <div class="d-flex align-items-center p-1">
+                            <span class="font-small-2 w-50 text-bold-500">شماره حساب</span><span class="dark w-50 text-bold-400" id="accountNumber"></span>
+                        </div>
+                        <hr class="my-0" />
+                        <div class="d-flex align-items-center p-1">
+                            <span class="font-small-2 w-50 text-bold-500">درخواست دهنده تسهیلات</span><span class="dark w-50 text-bold-400" id="requesterFullName"></span>
+                        </div>
+                        <hr class="my-0" />
+                        <div class="d-flex align-items-center p-1">
+                            <span class="font-small-2 w-50 text-bold-500">تاریخ</span><span class="dark w-50 text-bold-400">@ViewBag.PersianEndDate</span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <fieldset>
+                                <div class="checkbox checkbox-success checkbox-glow checkbox-sm">
+                                    <input type="checkbox" name="cardRechargeCheckBox" id="cardRechargeCheckBox" />
+                                    <label class="font-small-3 success darken-4 text-bold-400 line-height-23" for="cardRechargeCheckBox">آیا برای شارژ بن کارت مطمئن هستید؟</label>
+                                </div>
+                            </fieldset>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group form-group-ex">
+                                <label class="control-label">توضیحات نهاد مالی</label>
+                                <textarea id="description_admin" name="description_admin" class="form-control" placeholder="توضیحات نهاد مالی"></textarea>
+                                <span class="text-danger field-validation-valid" data-valmsg-for="description_admin" data-valmsg-replace="true"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="text-right">
+                        <a href="#" class="btn btn-outline-secondary" data-dismiss="modal">
+                            <span>انصراف</span>
+                        </a>
+                        <button id="btnEditBonCardInfo" class="btn btn-zl-primary white">
+                            <span>شارژ بن کارت مشتری</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+@section scripts {
+    @{
+        await Html.RenderPartialAsync("~/Views/Shared/_ValidationScriptsPartial.cshtml");
+    }
+    <script src="~/persianDatePicker/js/persianDatepicker.min.js"></script>
+    <script>
+        let dataTableResponsive;
+        // let startDate = null;
+        // let endDate = null;
+        // $('#StartDate').val('@ViewBag.StartDate');
+        // $('#txtStartDate').val('@ViewBag.PersianStartDate');
+
+        // $('#EndDate').val('@ViewBag.EndDate');
+        // $('#txtEndDate').val('@ViewBag.PersianEndDate');
+        let parentGridElementId = 'activeFacilityDiv';
+        $(document).ready(function () {
+            $('div').removeClass('zl-active');
+            $('#pendingCompleteBonCardRequests').addClass('zl-active');
+
+            loadLeasingRequest();
+        });
+
+        $('#btnEditBonCardInfo').click(function (e) {
+            e.preventDefault();
+            debugger;
+            const formIsValid = $('#frmVerifyBuyer').valid();
+
+            if (formIsValid) {
+                showWaiting('frmVerifyBuyer', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                //const postData = {
+                //    RequestFacilityId: $(e.currentTarget).data('request-facility-id'),
+                //    Status: requestStatus,
+                //    FacilityNumber: requestStatus == 2 ? $('#FacilityNumber').val() : null,
+                //    StatusDescription: $('#description_admin').val()
+                //};
+
+                $.ajax({
+                    type: 'post',
+                    //data: JSON.stringify(postData),
+                    datatype: "json",
+                    contentType: "application/json; charset=utf-8",
+                    url: `/api/v1/RequestFacility/CardRecharge/${$(e.currentTarget).data('request-facility-id')}`,
+                    success: function (result) {
+                        hideWaiting('frmVerifyBuyer');
+                        debugger;
+                        if (result.isSuccess) {
+                            dataTableResponsive.page(0);
+                            dataTableResponsive.ajax.reload(null, false);
+
+                            $('#pendingRequestModal').modal('hide');
+                            showMessage('@ResourceFile.InfoTitle', 'شماره قرارداد/تسهیلات با موفقیت ثبت شد!', icons.success, '@ResourceFile.Close');
+                        }
+                    },
+                    error: function (error) {
+                        hideWaiting('frmVerifyBuyer');
+                        const exception = getExceptionMessageFromError(error);
+                        if (exception != null)
+                            showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                        else
+                            showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                    }
+                });
+            }
+            else {
+                scrollToFirstError();
+            }
+        });
+
+        $('#btnSearch').click((e) => {
+            e.preventDefault();
+            dataTableResponsive.page(0);
+            dataTableResponsive.ajax.reload(null, false);
+        });
+
+        // $('#btnUploadResultUploadCardRechargeResultRequestsExcel').click((e) => {
+        //     e.preventDefault();
+        //     debugger;
+
+        //     const CardRechargeResultFile = $("#CardRechargeResultFile")[0];
+        //     if (CardRechargeResultFile.files.length == 0) {
+        //         showMessage('@ResourceFile.InfoTitle', 'لطفا فایل اکسل جهت ثبت نتیجه واریز تسهیلات را انتخاب کنید', icons.warning, '@ResourceFile.Close');
+        //         return;
+        //     }
+        //     showWaiting('requestGridDiv', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+        //     let data = new FormData();
+        //     data.append('cardRechargeResultFile', CardRechargeResultFile.files[0]);
+        //     $.ajax({
+        //         type: 'post',
+        //         data: data,
+        //         processData: false,
+        //         contentType: false,
+        //         //datatype: "json",
+        //         //contentType: "application/json; charset=utf-8",
+        //         url: '/api/v1/RequestFacility/UploadCardRechargeResult',
+        //         success: function (result) {
+        //             hideWaiting('requestGridDiv');
+        //             debugger;
+        //             if (result !== undefined && result !== null && result.data != null && result.isSuccess === true) {
+        //                 dataTableResponsive.page(0);
+        //                 dataTableResponsive.ajax.reload(null, false);
+
+        //                 showMessage('@ResourceFile.InfoTitle', 'با توجه به اطلاعات اکسل درخواست های شارژ بن کارت انجام شدند', icons.info, '@ResourceFile.Close');
+        //             }
+        //         },
+        //         error: function (error) {
+        //             dataTableResponsive.page(0);
+        //             dataTableResponsive.ajax.reload(null, false);
+
+        //             hideWaiting('requestGridDiv');;
+        //             const exception = getExceptionMessageFromError(error);
+        //             if (exception != null)
+        //                 showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+        //             else
+        //                 showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+        //         }
+        //     });
+        // });
+
+        const loadLeasingRequest = () => {
+            dataTableResponsive = $('#requestList')
+                .on('preXhr.dt', function (e, settings, data, a, b) {
+                    //trigger before ajax call
+                    //debugger;
+                    //alert('preXhr');
+                    showWaiting('requestList', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                })
+                .on('xhr.dt', function (e, settings, json, xhr) {
+                    //trigger after ajax call
+                    //debugger;
+                    //alert('xhr');
+                })
+                .DataTable({
+                    order: [],
+                    processing: true,
+                    serverSide: true,
+                    responsive: true,
+                    rowReorder: false,
+                    select: true,
+                    searching: false,
+                    paging: true,
+                    ordering: false,
+                    searching: false,
+                    filtering: false,
+                    info: true,
+                    lengthMenu: [
+                        [5, 10, 25, 50],
+                        [5, 10, 25, 50]
+                    ],
+                    pageLength: 5,
+                    columnDefs: [
+                        {
+                            details: false,
+                            breakpoints: [
+                                { name: 'desktop', width: Infinity },
+                                { name: 'tablet-l', width: 1200 },
+                                { name: 'tablet-p', width: 992 },
+                                { name: 'mobile-l', width: 576 },
+                                { name: 'mobile-p', width: 320 }
+                            ]
+                        },
+                        {
+                            targets: [0, 1, 2, 3, 4, 5, 6, 7, 8],
+                            className: 'dt-center',
+                        },
+                        {
+                            targets: 1,
+                            render: function (data, type, row, meta) {
+                                return splitNumber(data);
+                            }
+                        },
+                        {
+                            targets: 7,
+                            render: function (data, type, row, meta) {
+                                let waitingStep = '';
+                                if (data.cancelByUser) {
+                                    const cancelByUserDescription = "<span style='color:red'>انصراف توسط کاربر</span>";
+                                    if ('@((short)StatusEnum.Approved)' == data.statusId)
+                                        waitingStep = `${data.lastStatusDescription}(${cancelByUserDescription})`;
+                                    else if ('@((short)StatusEnum.Rejected)' == data.statusId)
+                                        waitingStep = `${data.lastStatusDescription}(${cancelByUserDescription})`;
+                                    else
+                                        waitingStep = `${data.lastStatusDescription}(${cancelByUserDescription})`;
+                                }
+                                else {
+                                    if ('@((short)StatusEnum.Approved)' == data.statusId)
+                                        waitingStep += data.lastStatusDescription;
+                                    else if ('@((short)StatusEnum.Rejected)' == data.statusId)
+                                        waitingStep = data.lastStatusDescription;
+                                    else {
+                                        waitingStep = data.lastStatusDescription;
+                                    }
+                                }
+                                return `<div class="badge badge-pill zl-badge-upload-document"><div class="d-flex align-items-center"><i class="bx bxs-circle font-size-xxsmall mr-25"></i>${waitingStep}</div></div>`;
+                            }
+                        },
+                        {
+                            targets: 8,
+                            responsivePriority: 3,
+                            data: { aa: 'bb' },
+                            render: function (data, type, row, meta) {
+                                let buttonsHtml = `<a class="dropdown-item change-status" href='@Url.Action("Detail", "RequestFacility")/${data.id}'><i class="bx bx-detail font-medium-5 secondary darken-4 mr-75"></i>جزئیات</a>`;
+
+                                if (!data.cancelByUser) {
+                                    if (data.formUrl != null) {
+                                        buttonsHtml = `<a href='javascript:void(0)' class='dropdown-item complete-bon-card' data-request-facility-id='${data.id}'>
+                                                                                    <i class="bx bx-news font-medium-5 secondary darken-4 mr-75"></i>تکمیل اطلاعات بن کارت
+                                                                               </a>
+                                                                               <a href='${data.formUrl}' class='dropdown-item change-status'>
+                                                                                    <i class="bx bx-news font-medium-5 secondary darken-4 mr-75"></i>اقدام
+                                                                               </a>` + buttonsHtml;
+                                    }
+                                }
+                                buttonsHtml = buttonsHtml + `<a id='requestHistory' class="dropdown-item request-history" data-request-facility-id='${data.id}' href='javascript:void(0)'><i class="bx bx-detail font-medium-5 secondary darken-4 mr-75"></i>تاریخچه مراحل تسهیلات</a>`;
+
+                                return `<div class="btn-group dropright"><a href="#" class="dark" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="bx bx-dots-horizontal"></i></a><div class="dropdown-menu">${buttonsHtml}</div></div>`;
+                            }
+                        }],
+                    rowCallback: function (row, data) {
+                        //$('td:eq(0)', row).css('text-align', 'center');
+                        //$('td', row).eq(1).css('color', 'red');
+                    },
+                    //ajax: {
+                    //    url: `/api/v1/RequestFacilityInstallment/SelectInstallment2/${$('#drpApprovalFacility').val()}`,
+                    //    type: 'POST',
+                    //    dataSrc: function(data) {
+                    //        data.recordsTotal = data.data.length;
+                    //        data.recordsFiltered = data.data.length;
+                    //        return data.data;
+                    //    },
+                    //    datatype: "json",
+                    //    //contentType: "application/json",
+                    //    contentType: "application/json; charset=utf-8",
+                    //    data: function(input) {
+                    //        debugger;
+                    //        //if ($('#FacilityTypeId').val() != '')
+                    //        //    input.FacilityTypeId = $('#FacilityTypeId').val();
+
+                    //        return JSON.stringify(input);
+                    //    },
+                    //},
+                    ajax: (data, callback, setting) => {
+                        getLeasingRequestFacilities(data).then(function (_data) {
+                            callback(_data);
+                        });
+                    },
+                    drawCallback: function (settings) {
+                        hideWaiting('requestList');
+                    },
+                    initComplete: function (settings, json) {
+                    },
+                    rowCallback: (row, data, displayNum, displayIndex, dataIndex) => {
+                        $('td:eq(0)', row).html(displayIndex + 1);
+                        return row;
+                    },
+                    columns: [
+                        { "data": null },
+                        { "data": "amount" },
+                        { "data": "monthCountTitle" },
+                        { "data": "requester" },
+                        { "data": "nationalCode" },
+                        { "data": "shamsiCreateDate" },
+                        { "data": "shamsiLastActionDate" },
+                        { "data": null },
+                        { "data": null }
+                    ],
+                    language: {
+                        url: '/new-layout/datatables.net/fa.json'
+                    }
+                });
+
+            const getLeasingRequestFacilities = (data) => {
+                const postData = {
+                    Page: Math.floor(data.start / data.length) + 1,
+                    PageSize: data.length,
+                    SortDirection: null,
+                    SortOrder: null,
+                    FilterList: []
+                };
+
+                fillFilter(postData);
+
+                return new Promise(function (resolve, reject) {
+                    console.log('Loading data');
+
+                    $.ajax({
+                        type: 'post',
+                        datatype: "json",
+                        data: JSON.stringify(postData),
+                        contentType: "application/json; charset=utf-8",
+                        url: `@ajaxUrl`,
+                        success: function (result) {
+                            if (result != undefined && result.isSuccess == true) {
+                                resolve({
+                                    data: result.data.data,
+                                    recordsTotal: result.data.totalRowCount,
+                                    recordsFiltered: result.data.totalRowCount
+                                });
+                            }
+                        },
+                        error: function (error) {
+                            debugger;
+                            const exception = getExceptionMessageFromError(error);
+                            if (exception != null)
+                                showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                            else
+                                showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                        },
+                        complete: function () {
+
+                        },
+                    });
+                });
+            }
+
+            $('#requestList tbody').on('click', 'a#requestHistory', function (e) {
+                e.preventDefault();
+                let data = dataTableResponsive.row(this).data();
+                if (data == undefined)
+                    data = dataTableResponsive.row($(this).parents('tr')).data();
+
+                loadRequestFacilitySteps(data.id);
+                $('#requestFacilityStepsHistoryModal').modal();
+            });
+
+            $('#requestList tbody').on('click', 'a.complete-bon-card', function (e) {
+                e.preventDefault();
+                let data = dataTableResponsive.row(this).data();
+                if (data == undefined)
+                    data = dataTableResponsive.row($(this).parents('tr')).data();
+
+                showWaiting('requestGridDiv', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                $.ajax({
+                    type: 'post',
+                    datatype: "json",
+                    contentType: "application/json; charset=utf-8",
+                    url: `/api/v1/RequestFacilityCardIssuance/GetCardIssuance/${data.id}`,
+                    success: function (result) {
+                        hideWaiting('requestGridDiv');
+                        debugger;
+                        if (result !== undefined && result !== null && result.isSuccess === true && result.data != null) {
+                            $('#requesterFullName').html(data.requester);
+                            $('#amount').html(splitNumber(data.amount));
+                            $('#cardNumber').html(result.data.cardNumber);
+                            $('#accountNumber').html(result.data.accountNumber);
+                            $('#pendingRequestModal').modal();
+                            $('#btnEditBonCardInfo').data('request-facility-id', data.id);
+                        }
+                    },
+                    error: function (error) {
+                        debugger;
+                        hideWaiting('requestGridDiv');
+                        const exception = getExceptionMessageFromError(error);
+                        if (exception != null)
+                            showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                        else
+                            showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                    },
+                    complete: function () {
+
+                    },
+                });
+            });
+        }
+
+        $('#btnExportToExcel').click((e) => {
+            e.preventDefault();
+            // if (!$('#filterForm').valid())
+            //     return;
+
+            showWaiting('requestGridDiv', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');;
+
+            const postData = {
+                Page: -1,
+                PageSize: -1,
+                SortDirection: null,
+                SortOrder: null,
+                FilterList: []
+            };
+
+            fillFilter(postData);
+            debugger;
+
+            $.ajax({
+                type: 'post',
+                data: JSON.stringify(postData),
+                datatype: "json",
+                contentType: "application/json; charset=utf-8",
+                url: '/api/v1/RequestFacility/SearchLeasingRequestExport',
+                success: function (result) {
+                    hideWaiting('requestGridDiv');;
+                    if (result !== undefined && result !== null && result.data != null && result.isSuccess === true) {
+                        debugger;
+                        const downloadJsonLink = document.createElement("a");
+                        downloadJsonLink.href = `data:application/vnd.ms-excel;base64,${result.data}`;
+                        downloadJsonLink.download = "PendingResultCardRechargeRequests.xlsx";
+                        downloadJsonLink.click();
+                    }
+                },
+                error: function (error) {
+                    hideWaiting('requestGridDiv');;
+                    if (error.responseJSON != undefined && error.responseJSON.Message != undefined && error.responseJSON.Message != '') {
+                        const exception = JSON.parse(error.responseJSON.Message).Exception;
+                        showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                    }
+                    else {
+                        showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                    }
+                }
+            });
+        });
+
+        const fillFilter = (postData) => {
+            if ($('#FName').val() != undefined && $('#FName').val() != null && $('#FName').val() != '')
+                postData.FilterList.push({
+                    PropertyName: 'FName',
+                    Operator: @((int)Operator.Contain),
+                    PropertyValue: $('#FName').val()
+                });
+
+            if ($('#LName').val() != undefined && $('#LName').val() != null && $('#LName').val() != '')
+                postData.FilterList.push({
+                    PropertyName: 'LName',
+                    Operator: @((int)Operator.Contain),
+                    PropertyValue: $('#LName').val()
+                });
+
+            if ($('#StartDate').val() != undefined && $('#StartDate').val() != null && $('#StartDate').val() != '')
+                postData.FilterList.push({
+                    PropertyName: 'StartDate',
+                    Operator: @((int)Operator.GreaterThanOrEqual),
+                    PropertyValue: $('#StartDate').val()
+                });
+
+            if ($('#EndDate').val() != undefined && $('#EndDate').val() != null && $('#EndDate').val() != '')
+                postData.FilterList.push({
+                    PropertyName: 'EndDate',
+                    Operator: @((int)Operator.LesserThanOrEqual),
+                    PropertyValue: $('#EndDate').val()
+                });
+
+            if ($('#NationalCode').val() != undefined && $('#NationalCode').val() != null && $('#NationalCode').val() != '')
+                postData.FilterList.push({
+                    PropertyName: 'NationalCode',
+                    Operator: @((int)Operator.Equal),
+                    PropertyValue: $('#NationalCode').val()
+                });
+
+            //if ($('#WaitingStepId').val() != undefined && $('#WaitingStepId').val() != null && $('#WaitingStepId').val() != '')
+            postData.FilterList.push({
+                PropertyName: 'WaitingStepId',
+                Operator: @((int)Operator.Equal),
+                PropertyValue: @CardRechargeWorkFlowStepId
+                    });
+
+            if ($('#StartAmountThousandSeparator').val() != undefined && $('#StartAmountThousandSeparator').val() != null && $('#StartAmountThousandSeparator').val() != '')
+                postData.FilterList.push({
+                    PropertyName: 'StartAmount',
+                    Operator: @((int)Operator.GreaterThanOrEqual),
+                    PropertyValue: parseInt($('#StartAmountThousandSeparator').val().replaceAll(',', ''))
+                });
+
+            if ($('#EndAmountThousandSeparator').val() != undefined && $('#EndAmountThousandSeparator').val() != null && $('#EndAmountThousandSeparator').val() != '')
+                postData.FilterList.push({
+                    PropertyName: 'EndAmount',
+                    Operator: @((int)Operator.LesserThanOrEqual),
+                    PropertyValue: parseInt($('#EndAmountThousandSeparator').val().replaceAll(',', ''))
+                });
+
+            //let facilityStatusValue = $('input[type="radio"][name="facilityStatus"]:checked').val();
+            postData.FilterList.push({
+                PropertyName: 'FacilityStatus',
+                Operator: @((int)Operator.Equal),
+                PropertyValue: 1
+            });
+
+            if ('@User.IsInRole(RoleEnum.BankLeasing.ToString())' == 'True') {
+                postData.FilterList.push({
+                    PropertyName: 'OperatorId',
+                    Operator: @((int)Operator.Equal),
+                    PropertyValue: '@User.Identity!.GetUserId()'
+                });
+            }
+        }
+    </script>
+}

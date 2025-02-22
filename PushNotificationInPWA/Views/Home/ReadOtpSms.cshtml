@@ -1,0 +1,46 @@
+﻿@model PushNotificationInPWA.Models.LoginModel
+@{
+    ViewData["Title"] = "Notify Page";
+}
+
+<h1>Read Otp Sms Automatically</h1>
+
+<form asp-action="SendSms">
+    <label for="message">Mobile: </label>
+    <input asp-for="Mobile" /><br />
+    <hr />
+    <label for="message">Otp: </label>
+    <input asp-for="Otp" autocomplete="one-time-code" /><br />
+
+    <button type="submit">Send Sms</button>
+</form>
+@section Scripts {
+    <script>
+        if ('OTPCredential' in window) {
+            window.addEventListener('DOMContentLoaded', e => {
+                const input = document.querySelector('input[autocomplete="one-time-code"]');
+                if (!input) return;
+                const ac = new AbortController();
+                const form = input.closest('form');
+                //if (form) {
+                //    form.addEventListener('submit', e => {
+                //        alert('cancel submit');
+                //        ac.abort();
+                //    });
+                //}
+                navigator.credentials.get({
+                    otp: { transport: ['sms'] },
+                    signal: ac.signal
+                }).then(otp => {
+                    debugger;
+                    input.value = otp.code;
+                    alert('Success');
+                }).catch(err => {
+                    debugger;
+                    console.error(err);
+                    alert(err);
+                });
+            });
+        }
+    </script>
+}

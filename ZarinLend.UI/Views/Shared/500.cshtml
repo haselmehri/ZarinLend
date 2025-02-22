@@ -1,0 +1,137 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" sizes="180x180" href="/fav.png">
+    <title>500 - Internal Server Error</title>
+    <link rel="stylesheet" type="text/css" href="/css/fonts.css" />
+    <style id="" media="all">
+
+        * {
+            -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+        }
+
+        body {
+            direction: rtl;
+            padding: 0;
+            margin: 0;
+            font-family: Vazir;
+        }
+
+        #unauthorized {
+            position: relative;
+            height: 100vh;
+        }
+
+            #unauthorized .unauthorized {
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                -webkit-transform: translate(-50%, -50%);
+                -ms-transform: translate(-50%, -50%);
+                transform: translate(-50%, -50%);
+            }
+
+        .unauthorized {
+            /*max-width: 410px;*/
+            width: 100%;
+            text-align: center;
+        }
+
+            .unauthorized .unauthorized-401 {
+                height: 280px;
+                position: relative;
+                z-index: -1;
+            }
+
+                .unauthorized .unauthorized-401 h1 {
+                    font-size: 200px;
+                    margin: 0px;
+                    font-weight: 900;
+                    position: absolute;
+                    left: 50%;
+                    -webkit-transform: translateX(-50%);
+                    -ms-transform: translateX(-50%);
+                    transform: translateX(-50%);
+                    background: url('/images/bg401.jpg') no-repeat;
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                    background-size: cover;
+                    background-position: center;
+                }
+
+
+            .unauthorized h2 {
+                color: #000;
+                font-size: 22px;
+                font-weight: 700;
+                text-transform: uppercase;
+                margin-top: 10px;
+            }
+
+            .unauthorized p {
+                color: #000;
+                font-size: 18px;
+                font-weight: 400;
+                margin-bottom: 20px;
+                margin-top: 0px;
+            }
+
+            .unauthorized a {
+                font-size: 14px;
+                text-decoration: none;
+                text-transform: uppercase;
+                background: #0046d5;
+                display: inline-block;
+                padding: 15px 30px;
+                border-radius: 40px;
+                color: #fff;
+                font-weight: 700;
+                -webkit-box-shadow: 0px 4px 15px -5px #0046d5;
+                box-shadow: 0px 4px 15px -5px #0046d5;
+            }
+
+
+        @@media only screen and (max-width: 767px) {
+            .unauthorized .unauthorized-401 {
+                height: 142px;
+            }
+
+                .unauthorized .unauthorized-401 h1 {
+                    font-size: 112px;
+                }
+        }
+    </style>
+
+    @*<link type="text/css" rel="stylesheet" href="css/style.css" />*@
+    <!--[if lt IE 9]>
+              <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+              <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+            <![endif]-->
+    <meta name="robots" content="noindex, follow">
+</head>
+<body>
+    <div id="unauthorized">
+        <div class="unauthorized">
+            <div class="unauthorized-401">
+                <h1>Oops!</h1>
+            </div>
+            <h2>500 - Internal Server Error - خطای</h2>
+            @*<p>You are not permitted to this resource.</p>*@
+            <p>خطایی رخ داده است.</p>
+            @if(ViewBag.ErrorMessage != null)
+            {
+                <p style="color:red">@Html.Raw(ViewBag.ErrorMessage)</p>
+            }
+            <a asp-action="index" asp-controller="home">صفحه داشبورد</a>
+            <a asp-route="login">صفحه ورود</a>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,759 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AccountInfo" xml:space="preserve">
+    <value>اطلاعات حساب کاربری</value>
+  </data>
+  <data name="AccountIsDisable" xml:space="preserve">
+    <value>حساب کاربری شما غیر فعال می باشد،لطفا با مدیر سایت تماس بگیرید!</value>
+  </data>
+  <data name="AccountNumber" xml:space="preserve">
+    <value>شماره حساب</value>
+  </data>
+  <data name="AccountNumberMessage" xml:space="preserve">
+    <value>شماره حساب بن باید 13 رقمی باشد</value>
+  </data>
+  <data name="ActiveBalance" xml:space="preserve">
+    <value>اعتبار در دسترس</value>
+  </data>
+  <data name="Address" xml:space="preserve">
+    <value>آدرس</value>
+  </data>
+  <data name="AddressCityName" xml:space="preserve">
+    <value>شهر محل سکونت</value>
+  </data>
+  <data name="AddressDocument" xml:space="preserve">
+    <value>اجاره نامه یا سند مالکیت</value>
+  </data>
+  <data name="AddressProvinceName" xml:space="preserve">
+    <value>استان محل سکونت</value>
+  </data>
+  <data name="Amount" xml:space="preserve">
+    <value>مبلغ شارژ(ريال ایران)</value>
+  </data>
+  <data name="AmountRequest" xml:space="preserve">
+    <value>مبلغ درخواستی</value>
+  </data>
+  <data name="Attachments" xml:space="preserve">
+    <value>پیوست(ها)</value>
+  </data>
+  <data name="AyandehBankCardNumberWithDashMessage" xml:space="preserve">
+    <value>شماره کارت باید با فرمت صحیح &lt;spna style="direction: ltr;unicode-bidi: embed;"&gt;6362-14__-____-____&lt;/span&gt; وارد شود</value>
+  </data>
+  <data name="Bank" xml:space="preserve">
+    <value>بانک</value>
+  </data>
+  <data name="BankAndAccountInfo" xml:space="preserve">
+    <value>اطلاعات شماره حساب</value>
+  </data>
+  <data name="BankCardType" xml:space="preserve">
+    <value>بانک صادر کننده کارت</value>
+  </data>
+  <data name="BankName" xml:space="preserve">
+    <value>نام بانک</value>
+  </data>
+  <data name="BirthCertificate" xml:space="preserve">
+    <value>تصاویر شناسنامه</value>
+  </data>
+  <data name="birthCertificateDescription" xml:space="preserve">
+    <value>تصویر توضیحات شناسنامه</value>
+  </data>
+  <data name="BirthCertificatePage1_Info" xml:space="preserve">
+    <value>-تصویر صفحه اول شناسنامه را بارگذاری کنید&lt;br/&gt;
+-حجم فایل بارگذاری شده نباید بیشتر از 1 مگابایت باشد&lt;br/&gt;
+-تمام مشخصات روی تصویر باید با اطلاعات هویتی که در هنگام ثبت نام وارد کرده اید،یکسان باشد&lt;br/&gt;
+-مشخصات روی تصویر باید خوانا باشد</value>
+  </data>
+  <data name="BirthCertificatePage2" xml:space="preserve">
+    <value>تصویر صفحه دوم شناسنامه</value>
+  </data>
+  <data name="BirthCertificatePage2_Info" xml:space="preserve">
+    <value>-تصویر صفحه دوم شناسنامه را بارگذاری کنید&lt;br/&gt;
+-حجم فایل بارگذاری شده نباید بیشتر از 1 مگابایت باشد&lt;br/&gt;
+-مشخصات روی تصویر باید خوانا باشد</value>
+  </data>
+  <data name="BirthCertificateSerial" xml:space="preserve">
+    <value>سریال شناسنامه</value>
+  </data>
+  <data name="BirthCertificateSerial1" xml:space="preserve">
+    <value>سریال شناسنامه</value>
+  </data>
+  <data name="BirthDate" xml:space="preserve">
+    <value>تاریخ تولد</value>
+  </data>
+  <data name="BirthPlaceCity" xml:space="preserve">
+    <value>شهر محل تولد</value>
+  </data>
+  <data name="BirthPlaceProvince" xml:space="preserve">
+    <value>استان محل تولد</value>
+  </data>
+  <data name="BlockBalance" xml:space="preserve">
+    <value>اعتبار بلوکه شده</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>انصراف</value>
+  </data>
+  <data name="CardChargeRequestModel_Amount" xml:space="preserve">
+    <value>مبلغ شارژ کارت(ريال ایران)</value>
+  </data>
+  <data name="CardChargeValue" xml:space="preserve">
+    <value>مبلغ شارژ کارت</value>
+  </data>
+  <data name="CardDetail" xml:space="preserve">
+    <value>اطلاعات کارت</value>
+  </data>
+  <data name="CardNumber" xml:space="preserve">
+    <value>شماره کارت</value>
+  </data>
+  <data name="CardType" xml:space="preserve">
+    <value>نوع کارت</value>
+  </data>
+  <data name="CardTypes" xml:space="preserve">
+    <value>انواع کارت ها</value>
+  </data>
+  <data name="ChargeAmount" xml:space="preserve">
+    <value>مبلغ شارژ(ريال ایران)</value>
+  </data>
+  <data name="ChargeWage" xml:space="preserve">
+    <value>کارمزد شارژ(%)</value>
+  </data>
+  <data name="City" xml:space="preserve">
+    <value>شهر</value>
+  </data>
+  <data name="CityOfBirth" xml:space="preserve">
+    <value>شهر محل تولد</value>
+  </data>
+  <data name="CityOfIssue" xml:space="preserve">
+    <value>شهر محل صدور</value>
+  </data>
+  <data name="CivilRegistryNotDone" xml:space="preserve">
+    <value>استعلام ثبت احوال انجام نشده است</value>
+  </data>
+  <data name="ClientId" xml:space="preserve">
+    <value>شماره مشتری</value>
+  </data>
+  <data name="Close" xml:space="preserve">
+    <value>بستن</value>
+  </data>
+  <data name="ConfirmPassword" xml:space="preserve">
+    <value>تکرار کلمه عبور</value>
+  </data>
+  <data name="CorrectionRequest" xml:space="preserve">
+    <value>اصلاح درخواست</value>
+  </data>
+  <data name="CreateDate" xml:space="preserve">
+    <value>تاریخ درخواست</value>
+  </data>
+  <data name="Creator" xml:space="preserve">
+    <value>ایجاد کننده</value>
+  </data>
+  <data name="CustomerFName" xml:space="preserve">
+    <value>نام مشتری</value>
+  </data>
+  <data name="CustomerFullName" xml:space="preserve">
+    <value>نام و نام خانوادگی مشتری</value>
+  </data>
+  <data name="CustomerInfo" xml:space="preserve">
+    <value>اطلاعات مشتری(صاحب کارت)</value>
+  </data>
+  <data name="CustomerLName" xml:space="preserve">
+    <value>نام خانوادگی مشتری</value>
+  </data>
+  <data name="CustomerNumber" xml:space="preserve">
+    <value>شماره مشتری</value>
+  </data>
+  <data name="Cvv" xml:space="preserve">
+    <value>Cvv</value>
+  </data>
+  <data name="DeliveryAgent" xml:space="preserve">
+    <value>انتخاب محل تحویل(نمایندگی)</value>
+  </data>
+  <data name="Deposit" xml:space="preserve">
+    <value>واریز</value>
+  </data>
+  <data name="DepositOwners" xml:space="preserve">
+    <value>صاحبان حساب/وضعیت</value>
+  </data>
+  <data name="DepositStatus" xml:space="preserve">
+    <value>وضعیت حساب</value>
+  </data>
+  <data name="Description" xml:space="preserve">
+    <value>توضیحات</value>
+  </data>
+  <data name="Detail" xml:space="preserve">
+    <value>جزئیات</value>
+  </data>
+  <data name="DocNumber" xml:space="preserve">
+    <value>سند شماره</value>
+  </data>
+  <data name="DownloadGroupOctetExcel" xml:space="preserve">
+    <value>دانلود اکسل استعلام  8 گانه-بصورت گروهی</value>
+  </data>
+  <data name="DownloadOctetExcel" xml:space="preserve">
+    <value>دانلود اکسل استعلام  8 گانه</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>ویرایش اطلاعات</value>
+  </data>
+  <data name="EditIdentityInformation" xml:space="preserve">
+    <value>ویرایش اطلاعات هویتی</value>
+  </data>
+  <data name="Email" xml:space="preserve">
+    <value>ایمیل</value>
+  </data>
+  <data name="Email(Username)" xml:space="preserve">
+    <value>ایمیل(نام کاربری)</value>
+  </data>
+  <data name="EnglishAndNumberRegularExpressionMessage" xml:space="preserve">
+    <value>{0} را فقط با حروف انگلیسی و اعداد وارد کنید</value>
+  </data>
+  <data name="EnglishRegularExpressionMessage" xml:space="preserve">
+    <value>{0} را فقط با حروف انگلیسی وارد کنید</value>
+  </data>
+  <data name="ErrorTitle" xml:space="preserve">
+    <value>خطا</value>
+  </data>
+  <data name="ExpireMonth" xml:space="preserve">
+    <value>ماه انقضاء</value>
+  </data>
+  <data name="ExpireYear" xml:space="preserve">
+    <value>سال انقضاء</value>
+  </data>
+  <data name="FacilityNumber" xml:space="preserve">
+    <value>شماره تسهیلات</value>
+  </data>
+  <data name="FatherName" xml:space="preserve">
+    <value>نام پدر</value>
+  </data>
+  <data name="Fee" xml:space="preserve">
+    <value>کارمزد</value>
+  </data>
+  <data name="Female" xml:space="preserve">
+    <value>زن</value>
+  </data>
+  <data name="First" xml:space="preserve">
+    <value>اول</value>
+  </data>
+  <data name="FloatRegularExpression" xml:space="preserve">
+    <value>{0} باید عددی حداکثر دو رقم اعشار باشد</value>
+  </data>
+  <data name="FName" xml:space="preserve">
+    <value>نام</value>
+  </data>
+  <data name="ForgotPassword" xml:space="preserve">
+    <value>فراموشی کلمه عبور؟</value>
+  </data>
+  <data name="FreeCardCount" xml:space="preserve">
+    <value>تعداد کارت فعال</value>
+  </data>
+  <data name="FromDate" xml:space="preserve">
+    <value>از تاریخ</value>
+  </data>
+  <data name="FullName" xml:space="preserve">
+    <value>نام و نام خانوادگی</value>
+  </data>
+  <data name="Gender" xml:space="preserve">
+    <value>جنسیت</value>
+  </data>
+  <data name="HistoryDate" xml:space="preserve">
+    <value>تاریخ عملیات</value>
+  </data>
+  <data name="HistoryStatus" xml:space="preserve">
+    <value>نوع عملیات</value>
+  </data>
+  <data name="IBAN" xml:space="preserve">
+    <value>شماره شبا</value>
+  </data>
+  <data name="IdentityDocuments" xml:space="preserve">
+    <value>اطلاعات/اسناد هویتی</value>
+  </data>
+  <data name="IfYouHaveRegisteredLogIn" xml:space="preserve">
+    <value>اگر ثبت نام کرده اید،وارد شوید</value>
+  </data>
+  <data name="InfoTitle" xml:space="preserve">
+    <value>پیام</value>
+  </data>
+  <data name="IntegerRegularExpression" xml:space="preserve">
+    <value>{0} باید عددی باشد</value>
+  </data>
+  <data name="InvalidUsernameOrPassword" xml:space="preserve">
+    <value>نام کاربری یا کلمه عبور اشتباه است!</value>
+  </data>
+  <data name="JobDocumentUploadInfo" xml:space="preserve">
+    <value>تصویر مدرک شغلی</value>
+  </data>
+  <data name="JobDocument_Description" xml:space="preserve">
+    <value>-تصویر مدرک شغلی را بارگذاری کنید&lt;br/&gt;
+-حجم فایل باگذاری شده نباید بیشتر از 1 مگابایت باشد&lt;br/&gt;
+-مشخصات روی تصویر باید خوانا باشد</value>
+  </data>
+  <data name="Last" xml:space="preserve">
+    <value>آخر</value>
+  </data>
+  <data name="Leasing" xml:space="preserve">
+    <value>نهاد مالی</value>
+  </data>
+  <data name="LName" xml:space="preserve">
+    <value>نام خانوادگی</value>
+  </data>
+  <data name="Loading" xml:space="preserve">
+    <value>در حال بارگذاری</value>
+  </data>
+  <data name="Login" xml:space="preserve">
+    <value>ورود به سیستم</value>
+  </data>
+  <data name="LoginTitle" xml:space="preserve">
+    <value>ورود به حساب کاربری زرین لند</value>
+  </data>
+  <data name="Male" xml:space="preserve">
+    <value>مرد</value>
+  </data>
+  <data name="MessageCardIsInActive" xml:space="preserve">
+    <value>کارت فوق غیرفعال/مسدود می باشد</value>
+  </data>
+  <data name="MessageErrorExistEmail" xml:space="preserve">
+    <value>ایمیل تکراری می باشد!</value>
+  </data>
+  <data name="MessageErrorExistMobile" xml:space="preserve">
+    <value>شماره موبایل تکراری می باشد!</value>
+  </data>
+  <data name="MessageErrorExistNationalCode" xml:space="preserve">
+    <value>کد ملی تکراری میباشد!</value>
+  </data>
+  <data name="MessageErrorExistUsername" xml:space="preserve">
+    <value>نام کاربری تکراری می باشد!</value>
+  </data>
+  <data name="MessageSuccess" xml:space="preserve">
+    <value>ثبت اطلاعات با موفقیت انجام شد</value>
+  </data>
+  <data name="MinMaxLengthValidationMessage" xml:space="preserve">
+    <value>{0} باید حداقل {1} و حداکثر {2} حرف/عدد باشد!</value>
+  </data>
+  <data name="Mobile" xml:space="preserve">
+    <value>شماره موبایل</value>
+  </data>
+  <data name="Money" xml:space="preserve">
+    <value>مبلغ تراکنش</value>
+  </data>
+  <data name="MonthCountTitle" xml:space="preserve">
+    <value>بازه پرداخت</value>
+  </data>
+  <data name="NationalCard" xml:space="preserve">
+    <value>تصاویر کارت ملی</value>
+  </data>
+  <data name="NationalCardBack" xml:space="preserve">
+    <value>تصویر پشت کارت ملی</value>
+  </data>
+  <data name="NationalCardBack_Info" xml:space="preserve">
+    <value>-تصویر پشت کارت ملی را بارگذاری کنید&lt;br/&gt;
+-حجم فایل باگذاری شده نباید بیشتر از 1 مگابایت باشد&lt;br/&gt;
+-مشخصات روی تصویر باید خوانا باشد</value>
+  </data>
+  <data name="NationalCardFront" xml:space="preserve">
+    <value>تصویر روی کارت ملی</value>
+  </data>
+  <data name="NationalCardFront_Info" xml:space="preserve">
+    <value>-تصویر روی کارت ملی را بارگذاری کنید&lt;br/&gt;
+-حجم فایل باگذاری شده نباید بیشتر از 1 مگابایت باشد&lt;br/&gt;
+-تمام مشخصات روی تصویر باید با اطلاعات هویتی که در هنگام ثبت نام وارد کرده اید،یکسان باشد&lt;br/&gt;
+-مشخصات روی تصویر باید خوانا باشد</value>
+  </data>
+  <data name="NationalCode" xml:space="preserve">
+    <value>کد ملی</value>
+  </data>
+  <data name="Nationality" xml:space="preserve">
+    <value>ملیت</value>
+  </data>
+  <data name="NationlCardUploadInfo" xml:space="preserve">
+    <value>بارگذاری تصاویر کارت ملی</value>
+  </data>
+  <data name="Next" xml:space="preserve">
+    <value>بعد</value>
+  </data>
+  <data name="NoRows" xml:space="preserve">
+    <value>رکوردی برای نمایش وجود ندارد</value>
+  </data>
+  <data name="OperatorId" xml:space="preserve">
+    <value>کاربر اقدام کننده</value>
+  </data>
+  <data name="PassportID" xml:space="preserve">
+    <value>شماره پاسپورت</value>
+  </data>
+  <data name="Password" xml:space="preserve">
+    <value>کلمه عبور</value>
+  </data>
+  <data name="PasswordCompareError" xml:space="preserve">
+    <value>کلمه عبور و تکرار کلمه عبور باید یکسان باشند</value>
+  </data>
+  <data name="PasswordMinLength" xml:space="preserve">
+    <value>{0} باید حداقل  {2} کاراکتر باشد.</value>
+  </data>
+  <data name="PaymentPeriod" xml:space="preserve">
+    <value>مدت زمان پرداخت</value>
+  </data>
+  <data name="PersianRegularExpressionMessage" xml:space="preserve">
+    <value>{0} را فقط با حروف فارسی وارد کنید</value>
+  </data>
+  <data name="PersonInfo" xml:space="preserve">
+    <value>اطلاعات هویتی</value>
+  </data>
+  <data name="PhoneNumber" xml:space="preserve">
+    <value>شماره تلفن</value>
+  </data>
+  <data name="PlaceOfIssue" xml:space="preserve">
+    <value>محل صدور</value>
+  </data>
+  <data name="PleaseInpuCardNumberToInccorectFormat" xml:space="preserve">
+    <value>شماره کارت را با فرمت صحیح وارد کنید :</value>
+  </data>
+  <data name="PleaseSelectAttachment" xml:space="preserve">
+    <value>لطفا اسناد خود را برای افزایش اعتبار بارگذاری کنید</value>
+  </data>
+  <data name="PleaseWait" xml:space="preserve">
+    <value>لطفا صبر کنید</value>
+  </data>
+  <data name="PoliceNumber" xml:space="preserve">
+    <value>شماره انتظامی</value>
+  </data>
+  <data name="PostalCode" xml:space="preserve">
+    <value>کد پستی</value>
+  </data>
+  <data name="Prev" xml:space="preserve">
+    <value>قبل</value>
+  </data>
+  <data name="PrivateId" xml:space="preserve">
+    <value>شماره فراگیر(اختصاصی)</value>
+  </data>
+  <data name="PrivateIdMinMaxLength" xml:space="preserve">
+    <value>شماره فراگیر باید عددی بین 8 تا 12 رقمی باشد</value>
+  </data>
+  <data name="PrivateNumber" xml:space="preserve">
+    <value>شماره فراگیر</value>
+  </data>
+  <data name="Profile" xml:space="preserve">
+    <value>پروفایل من</value>
+  </data>
+  <data name="Province" xml:space="preserve">
+    <value>استان</value>
+  </data>
+  <data name="ProvinceOfBirth" xml:space="preserve">
+    <value>استان محل تولد</value>
+  </data>
+  <data name="ProvinceOfIssue" xml:space="preserve">
+    <value>استان محل صدور</value>
+  </data>
+  <data name="RangeValidationMessage" xml:space="preserve">
+    <value>{0} باید عددی بین {1} تا {2} باشد</value>
+  </data>
+  <data name="RealBalance" xml:space="preserve">
+    <value>اعتبار واقعی</value>
+  </data>
+  <data name="Register" xml:space="preserve">
+    <value>ثبت نام کنید!</value>
+  </data>
+  <data name="RegisterRequest" xml:space="preserve">
+    <value>ثبت درخواست</value>
+  </data>
+  <data name="RegisterSellerBuyer" xml:space="preserve">
+    <value>ثبت نام خریدار/فروشنده</value>
+  </data>
+  <data name="RegularExpression" xml:space="preserve">
+    <value>{0} را با فرمت صحیح وارد کنید</value>
+  </data>
+  <data name="RememberMe" xml:space="preserve">
+    <value>مرا بخاطر بسپار</value>
+  </data>
+  <data name="RequestAmount" xml:space="preserve">
+    <value>مبلغ درخواستی</value>
+  </data>
+  <data name="RequestDate" xml:space="preserve">
+    <value>تاریخ درخواست</value>
+  </data>
+  <data name="RequestFacility" xml:space="preserve">
+    <value>درخواست تسهیلات(اعتبار)</value>
+  </data>
+  <data name="RequestFacilityAdd" xml:space="preserve">
+    <value>ثبت درخواست جدید</value>
+  </data>
+  <data name="RequestFacilityList" xml:space="preserve">
+    <value>لیست درخواست ها</value>
+  </data>
+  <data name="RequestHistory" xml:space="preserve">
+    <value>تاریخچه در خواست</value>
+  </data>
+  <data name="RequestList" xml:space="preserve">
+    <value>لیست درخواست ها</value>
+  </data>
+  <data name="RequestStatus" xml:space="preserve">
+    <value>وضعیت درخواست</value>
+  </data>
+  <data name="RequestType" xml:space="preserve">
+    <value>نوع درخواست</value>
+  </data>
+  <data name="RequiredMessageAddressDocument" xml:space="preserve">
+    <value>لطفا تصویر اجاره نامه یا سند مالکیت محل سکونت را بارگذاری کنید!</value>
+  </data>
+  <data name="RequiredMessageBirthCertificateDescription" xml:space="preserve">
+    <value>لطفا تصویر توضیحات شناسنامه را بارگذاری کنید!</value>
+  </data>
+  <data name="RequiredMessageBirthCertificatePage1" xml:space="preserve">
+    <value>لطفا تصویر صفحه اول شناسنامه را باگذاری کنید!</value>
+  </data>
+  <data name="RequiredMessageBirthCertificatePage2" xml:space="preserve">
+    <value>لطفا تصویر صفحه دوم شناسنامه را باگذاری کنید!</value>
+  </data>
+  <data name="RequiredMessageJobDocument" xml:space="preserve">
+    <value>لطفا تصویر مدرک شغلی را بارگذاری کنید!</value>
+  </data>
+  <data name="RequiredMessageNationalCardBack" xml:space="preserve">
+    <value>لطفا تصویر پشت کارت ملی را بارگذاری کنید!</value>
+  </data>
+  <data name="RequiredMessageNationalCardFront" xml:space="preserve">
+    <value>لطفا تصویر روی کارت ملی را بارگذاری کنید!</value>
+  </data>
+  <data name="RequiredValidationMessage" xml:space="preserve">
+    <value>{0} اجباری است!</value>
+  </data>
+  <data name="Rial" xml:space="preserve">
+    <value>ريال</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>ثبت اطلاعات</value>
+  </data>
+  <data name="Search" xml:space="preserve">
+    <value>جستجو</value>
+  </data>
+  <data name="Search_to_CardNumber" xml:space="preserve">
+    <value>جستجوی براساس شماره کارت</value>
+  </data>
+  <data name="SecondPassword" xml:space="preserve">
+    <value>رمز دوم</value>
+  </data>
+  <data name="SelectBank" xml:space="preserve">
+    <value>بانک را انتخاب کنید</value>
+  </data>
+  <data name="SelectCity" xml:space="preserve">
+    <value>شهر محل سکونت را انتخاب کنید</value>
+  </data>
+  <data name="SelectCityOfBirth" xml:space="preserve">
+    <value>شهر محل تولد را انتخاب کنید</value>
+  </data>
+  <data name="SelectCityOfIssue" xml:space="preserve">
+    <value>شهر محل صدور شناسنامه را انتخاب کنید</value>
+  </data>
+  <data name="SelectGender" xml:space="preserve">
+    <value>جنسیت را انتخاب کنید</value>
+  </data>
+  <data name="SelectLeasing" xml:space="preserve">
+    <value>نهاد مالی را انتخاب کنید</value>
+  </data>
+  <data name="SelectNationality" xml:space="preserve">
+    <value>ملیت را انتخاب کنید</value>
+  </data>
+  <data name="SelectPaymentPeriod" xml:space="preserve">
+    <value>مدت زمان پرداخت را انتخاب کنید</value>
+  </data>
+  <data name="SelectProvince" xml:space="preserve">
+    <value>استان محل سکونت را انتخاب کنید</value>
+  </data>
+  <data name="SelectProvinceOfBirth" xml:space="preserve">
+    <value>استان محل تولد را انتخاب کنید</value>
+  </data>
+  <data name="SelectProvinceOfIssue" xml:space="preserve">
+    <value>استان محل صدرو شناسنامه تولد را انتخاب کنید</value>
+  </data>
+  <data name="SignOut" xml:space="preserve">
+    <value>خروج از سیستم</value>
+  </data>
+  <data name="SiteTitle" xml:space="preserve">
+    <value>زرین لند</value>
+  </data>
+  <data name="SSID" xml:space="preserve">
+    <value>شماره شناسنامه</value>
+  </data>
+  <data name="StatusDescription" xml:space="preserve">
+    <value>توضیحات مدیر</value>
+  </data>
+  <data name="StatusUpdate" xml:space="preserve">
+    <value>تاریخ بروزرسانی وضعیت</value>
+  </data>
+  <data name="StringLengthMessage" xml:space="preserve">
+    <value>{0} حداکثر میتواند {1}  کاراکتر باشد</value>
+  </data>
+  <data name="ToDate" xml:space="preserve">
+    <value>تا تاریخ</value>
+  </data>
+  <data name="Toman" xml:space="preserve">
+    <value>ريال</value>
+  </data>
+  <data name="TotalRowCount" xml:space="preserve">
+    <value>تعداد کل رکوردها</value>
+  </data>
+  <data name="TransactionDate" xml:space="preserve">
+    <value>تاریخ-ساعت تراکنش</value>
+  </data>
+  <data name="TransactionList" xml:space="preserve">
+    <value>تراکنش ها</value>
+  </data>
+  <data name="TransactionTypeEnum" xml:space="preserve">
+    <value>نوع تراکنش</value>
+  </data>
+  <data name="UnhandledError" xml:space="preserve">
+    <value>خطایی نامشخص رخ داده است</value>
+  </data>
+  <data name="UploadGroupOctetExcelResult" xml:space="preserve">
+    <value>بارگذاری نتیجه اکسل استعلام 8 گانه - گروهی</value>
+  </data>
+  <data name="UploadIdentityDocuments" xml:space="preserve">
+    <value>بارگذاری مدارک هویتی</value>
+  </data>
+  <data name="UploadOctetExcelResult" xml:space="preserve">
+    <value>بارگذاری نتیجه اکسل استعلام 8 گانه </value>
+  </data>
+  <data name="UserList" xml:space="preserve">
+    <value>لیست نمایندگان/کاربران</value>
+  </data>
+  <data name="UserName" xml:space="preserve">
+    <value>نام کاربری</value>
+  </data>
+  <data name="Users" xml:space="preserve">
+    <value>کاربران سیستم</value>
+  </data>
+  <data name="Wage" xml:space="preserve">
+    <value>کارمزد</value>
+  </data>
+  <data name="WalletCharge" xml:space="preserve">
+    <value>افزایش اعتبار</value>
+  </data>
+  <data name="WalletChargeAmount" xml:space="preserve">
+    <value>مبلغ افزایش اعتبار(ريال ایران)</value>
+  </data>
+  <data name="WalletChargeList" xml:space="preserve">
+    <value>درخواست های افزایش اعتبار</value>
+  </data>
+  <data name="WalletChargeRegister" xml:space="preserve">
+    <value>ثبت درخواست افزایش اعتبار</value>
+  </data>
+  <data name="Withdraw" xml:space="preserve">
+    <value>برداشت</value>
+  </data>
+  <data name="ZP_Id" xml:space="preserve">
+    <value>شناسه زرین پال</value>
+  </data>
+</root>

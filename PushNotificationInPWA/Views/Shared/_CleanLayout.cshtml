@@ -1,0 +1,138 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - PushNotificationInPWA3</title>
+    <link rel="manifest" href="/manifest.json">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/PushNotificationInPWA3.styles.css" asp-append-version="true" />
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body>
+    @RenderBody()
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        let installPrompt = null;
+        const btnInstallApp = $('#btnInstallApp');
+
+        window.addEventListener("beforeinstallprompt", (event) => {
+            alert("beforeinstallprompt");
+            debugger;
+            event.preventDefault();
+            installPrompt = event;
+            $('#installAppBox').show();
+        });
+
+        btnInstallApp.click(async (event) => {
+            event.preventDefault();
+            alert("install app button click");
+            if (!installPrompt) {
+                return;
+            }
+            const result = await installPrompt.prompt();
+            console.log(`Install prompt was: ${result.outcome}`);
+            disableInAppInstallPrompt();
+        });
+
+        window.addEventListener("appinstalled", () => {
+            alert("appinstalled");
+            disableInAppInstallPrompt();
+        });
+
+        function disableInAppInstallPrompt() {
+            installPrompt = null;
+            $('#installAppBox').hide();
+        }
+        //====================================================
+        //Service Workers supported?
+        if ('serviceWorker' in navigator) {
+            window.addEventListener("load", () => {
+                navigator.serviceWorker.register("/serviceWorker.js")
+                    .then((reg) => {
+                        debugger;
+                        if (Notification.permission === "granted") {
+                            $("#form").show();
+                            getSubscription(reg);
+                        } else if (Notification.permission === "blocked") {
+                            unSubscription(reg);
+                            $("#NoSupport").show();
+                        } else {
+                            $("#giveNotificationAccess").show();
+                            $("#PromptForAccessBtn").click(() => requestNotificationAccess(reg));
+                        }
+                    });
+            });
+        } else {
+            $("#NoSupport").show();
+        }
+
+        function requestNotificationAccess(reg) {
+            Notification.requestPermission(function (status) {
+                alert(status);
+                $("#giveNotificationAccess").hide();
+                if (status == "granted") {
+                    $("#form").show();
+                    getSubscription(reg);
+                }
+                else if (status == 'denied') {
+                    unSubscription(reg);
+                } else {
+                    $("#NoSupport").show();
+                }
+            });
+        }
+
+        function unSubscription(reg) {
+            reg.pushManager.getSubscription().then(function (sub) {
+                if (sub != null) {
+                    sub.unsubscribe()
+                        .then(function (sub) {
+                            alert(sub.endpoint);
+                        }).catch(function (e) {
+                            alert('Unable to unsubscribe to push');
+                            console.error("Unable to unsubscribe to push", e);
+                        });
+                }
+            });
+        }
+        function getSubscription(reg) {
+            reg.pushManager.getSubscription().then(function (sub) {
+                if (sub === null) {
+                    reg.pushManager.subscribe({
+                        userVisibleOnly: true,
+                        applicationServerKey: "@ViewBag.applicationServerKey"
+                    }).then(function (sub) {
+                        fillSubscribeFields(sub);
+                    }).catch(function (e) {
+                        console.error("Unable to subscribe to push", e);
+                    });
+                } else {
+                    debugger;
+                    fillSubscribeFields(sub);
+                }
+            });
+        }
+
+        function fillSubscribeFields(sub) {
+            $("#endpoint").val(sub.endpoint);
+            $("#p256dh").val(arrayBufferToBase64(sub.getKey("p256dh")));
+            $("#auth").val(arrayBufferToBase64(sub.getKey("auth")));
+        }
+
+        function arrayBufferToBase64(buffer) {
+            var binary = '';
+            var bytes = new Uint8Array(buffer);
+            var len = bytes.byteLength;
+            for (var i = 0; i < len; i++) {
+                binary += String.fromCharCode(bytes[i]);
+            }
+            return window.btoa(binary);
+        }
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

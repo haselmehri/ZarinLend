@@ -1,0 +1,159 @@
+﻿@model int
+@{
+    ViewData["Title"] = "امضای قرارداد تسهیلات";
+    Layout = "~/Views/Shared/_NewLayout.cshtml";
+}
+@section styles{
+
+}
+    @await Component.InvokeAsync("WorkFlowStepWizardHorizental", new {workFlow = WorkFlowEnum.RequestFacility, requestId =  Model })
+    <form id="frmSignContract">
+        <div class="p-2 bg-white rounded-lg">
+            <div class="d-flex align-items-center">
+                <a href="@Url.Action("List","RequestFacility")" class="dark bg-white rounded-lg px-50 py-25 mr-50 d-flex align-items-center" title="بازگشت">
+                    <i class="bx bx-arrow-back rotate-180 font-medium-4"></i>
+                </a>
+                <div class="ml-1">
+                    <div class="font-medium-3 secondary darken-4 text-bold-700">
+                        امضای قرارداد
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white mt-2 p-1 rounded-lg">
+                <div class="alert zl-bg-alert-warning border-warning border-accent-4 alert-dismissible" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="بستن">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                    <div class="d-flex">
+                        <i class="bx bx-error-circle font-large-1"></i>
+                        <div class="text-muted text-bold-400 font-small-3 text-justify tab-content">
+                            @if (ViewBag.SendSignContractNotification)
+                        {
+                            <ul>
+                                کاربر گرامی در صورتی که قبلا این مرحله را انجام داده اید،ولی با توجه به دلایلی همچون : 
+                                <li>-انقضای نوتیفیکیش ارسالی به اپلیکیشن امضای قرارداد</li>
+                                <li>-عدم نمایش نمایش نوتیفیکیشن در اپلیکیشن امضای قرارداد و ...</li>
+                                موفق به امضاء قرارداد نشده اید در این قسمت میتوانید فرآیند امضا قرارداد را مجددا انجام دهید.
+                            </ul>
+                        }
+                        else
+                        {
+                            <ul>
+                                <li>کاربر گرامی لطفا اپلیکیشن آینده ساین را دانلود نمایید و فرآیند تعریف امضای دیجیتال را در آن تکمیل نمایید</li>
+                                <li>سپس روی دکمه <b>امضاء قرارداد(آینده ساین)</b> کلیک کنید تا نوتیفیکیشنی جهت مشاهده و امضای قرارداد برای شما ارسال گردد!</li>
+                            </ul>
+                        }
+                    </div>
+                </div>
+            </div>
+            <hr class="mt-1 mb-1" />
+            <div class="row">
+                <div class="col-md-12">
+                    <a class="btn btn-outline-info" asp-controller="Report" asp-action="DownloadPDF" asp-route-requestFacilityId="@Model">
+                        مشاهده قرارداد تسهیلات&nbsp;<i class="fal fa-file-pdf"></i>
+                    </a>
+                </div>
+            </div>
+            <hr class="mt-1 mb-1" />
+            <div class="text-right">
+                <a class="btn btn-outline-secondary" asp-controller="RequestFacility" asp-action="List">
+                    <span>بازگشت به لیست تسهیلات</span>
+                </a>
+                @* <button id="btnSignByNeoZarin" class="btn btn-zl-primary white">
+                    امضاء قرارداد(نئو زرین)&nbsp;<i class="fal fa-upload"></i>
+                </button> *@
+                <button id="btnSignByAyandehSign" class="btn btn-zl-primary white">
+                    امضاء قرارداد(آینده ساین)&nbsp;<i class="fal fa-upload"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</form>
+<a id="callbackUrl" style="display:none">شبیه سازی فرآیند امضای دیجیتال</a>
+@section scripts{
+    @*<partia name="_ValidationScriptsPartial" />*@
+    @{
+        await Html.RenderPartialAsync("~/Views/Shared/_ValidationScriptsPartial.cshtml");
+    }
+    <script>
+        $(document).ready(function() {
+
+        });
+
+        // $('#btnSignByNeoZarin').click(function(e) {
+        //     e.preventDefault();
+        //     debugger;
+        //     if ($('#frmSignContract').valid()) {
+        //         showWaiting('frmSignContract', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+        //         $.ajax({
+        //             type: 'post',
+        //             //dataType: 'json',
+        //             //contentType: "application/json; charset=utf-8",
+        //             processData: false,
+        //             contentType: false,
+        //             url: '/api/v1/SignContract/SignContractByNeoZarin/@Model',
+        //             success: function(result) {
+        //                 hideWaiting('frmSignContract');
+        //                 debugger;
+        //                 if (result.isSuccess) {
+        //                     showMessage('@ResourceFile.InfoTitle', 'کاربر گرامی<br/>درخواست امضاء دیجیتال قرارداد تسهیلات به برنامه نئو زرین ارسال گردید،لطفا اقدام به امضاء قرارداد نمایید تا فرآیند درخواست تسهیلات شما بصورت اتوماتیک به مرحله بعد ارجاع داده شود', icons.success, '@ResourceFile.Close',
+        //                         () => { window.location.replace('@Url.Action("List","RequestFacility")'); });
+        //                     //$("#callbackUrl").show();
+        //                     //$("#callbackUrl").attr("href", result.data.replace("ContractSignatureCallback", "TestContractSignatureCallback"));
+        //                 }
+        //             },
+        //             error: function(error) {
+        //                 hideWaiting('frmSignContract');
+        //                 const exception = getExceptionMessageFromError(error);
+        //                 if (exception != null)
+        //                     showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+        //                 else
+        //                     showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+        //             }
+        //         });
+        //     }
+        //     else {
+        //         scrollToFirstError();
+        //     }
+        // });
+
+        $('#btnSignByAyandehSign').click(function(e) {
+            e.preventDefault();
+            debugger;
+            const formIsValid = $('#frmSignContract').valid();
+
+            if (formIsValid) {
+                showWaiting('frmSignContract', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+
+                $.ajax({
+                    type: 'post',
+                    //dataType: 'json',
+                    //contentType: "application/json; charset=utf-8",
+                    processData: false,
+                    contentType: false,
+                    url: '/api/v1/SignContract/SignContractByAyandehSign/@Model',
+                    success: function(result) {
+                        hideWaiting('frmSignContract');
+                        debugger;
+                        if (result.isSuccess) {
+                            showMessage('@ResourceFile.InfoTitle', 'کاربر گرامی<br/>درخواست امضاء دیجیتال قرارداد تسهیلات به برنامه آینده ساین ارسال گردید،لطفا اقدام به امضاء قرارداد نمایید تا فرآیند درخواست تسهیلات شما بصورت اتوماتیک به مرحله بعد ارجاع داده شود', icons.success, '@ResourceFile.Close',
+                                () => { window.location.replace('@Url.Action("List","RequestFacility")'); });
+                        }
+                    },
+                    error: function(error) {
+                        hideWaiting('frmSignContract');
+                        const exception = getExceptionMessageFromError(error);
+                        if (exception != null)
+                            showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                        else
+                            showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                    }
+                });
+            }
+            else {
+                scrollToFirstError();
+            }
+        });
+
+    </script>
+}

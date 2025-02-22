@@ -1,0 +1,413 @@
+﻿@model Services.Model.Invoice.InvoiceImageUploadModel
+@{
+    ViewData["Title"] = "فاکتورها";
+    Layout = "~/Views/Shared/_NewLayout.cshtml";
+}
+@section styles {
+    <link href="~/persianDatePicker/css/persianDatepicker-lightorang.css" rel="stylesheet" />
+    <style type="text/css">
+    </style>
+}
+<div id="requestGridDiv" class="p-2 bg-white rounded-lg">
+    <div class="font-medium-3 secondary darken-4 text-bold-800 d-flex align-items-center">
+        <i class="bx bx-align-right zl-text-secondary mr-25"></i>
+        <span>فاکتورها</span>
+    </div>
+    <div class="p-2 rounded-lg">
+        <form id="filterForm" method="post">
+            @await Component.InvokeAsync("InvoiceFilter")
+            <div class="row my-0 my-md-1">
+                <div class=" col-md-12" style="text-align:left">
+                    <button type="button" id="btnSearch" class="btn btn-zl-primary">
+                        جستجو&nbsp;<i class="fal fa-search"></i>
+                    </button>
+                    @* <button id="btnExportToExcel" tabindex="5" class="btn btn-outline-info">
+                        خروجی اکسل&nbsp;<i class="fal fa-file-excel-o"></i>
+                    </button> *@
+                </div>
+            </div>
+        </form>
+        <table id="invoiceTable" class="display" style="width:100%">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th >نام فروشگاه</th>
+                    <th >مبلغ فاکتور(ريال)</th>
+                    <th >وضعیت فعلی</th>
+                    <th >شماره فاکتور</th>
+                    <th >ایجاد کننده<br />تاریخ ایجاد</th>
+                    <th >توضیحات</th>
+                    <th >تصویر فاکتور</th>
+                    <th >عملیات</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+<form id="frmUploadInvoiceDocument" method="post" enctype="multipart/form-data">
+    <div class="modal fade text-left" id="uploadInvoiceDocumentModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel18" style="display: none;" data-backdrop="static" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-md" role="document">
+            <div class="modal-content rounded-lg modal-md">
+                <div class="modal-header">
+                    <h4 class="modal-title dark" id="myModalLabel18">
+                        بارگذاری تصویر فاکتور
+                    </h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="بستن">
+                        <i class="bx bx-x"></i>
+                    </button>
+                </div>
+                <div class="modal-body line-height-2" id="modalContent">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="control-label" asp-for="Number"></label>
+                                <input asp-for="Number" class="form-control" style="text-align:center;direction:ltr" />
+                                <span asp-validation-for="Number" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="control-label">تصویر فاکتور</label>
+                                <input type="file" asp-for="InvoiceFile" class="form-control" accept="image/*;capture=camera">
+                                <span asp-validation-for="InvoiceFile" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="text-right">
+                        <a href="#" class="btn btn-outline-secondary" data-dismiss="modal">
+                            <span>انصراف</span>
+                        </a>
+                        <button id="btnSave" class="btn btn-outline-success" data-invoice-id="-1">
+                            @ResourceFile.Save&nbsp;<i class="fal fa-save"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+@section scripts {
+    @{
+        await Html.RenderPartialAsync("~/Views/Shared/_ValidationScriptsPartial.cshtml");
+        <script src = "~/persianDatePicker/js/persianDatepicker.min.js" ></script>
+    }
+    <script>
+        let dataTableResponsive;
+        $(document).ready(() => {
+            $('div').removeClass('zl-active');
+            $('#searchInvoice').addClass('zl-active');
+            searchInvoice();
+        });
+
+        $('#btnSearch').click((e) => {
+            e.preventDefault();
+            dataTableResponsive.page(0);
+            dataTableResponsive.ajax.reload(null, false);
+        });
+
+        const searchInvoice = () => {
+            dataTableResponsive = $('#invoiceTable')
+                .on('preXhr.dt', function (e, settings, data, a, b) {
+                    //trigger before ajax call
+                    //debugger;
+                    //alert('preXhr');
+                    showWaiting('invoiceTable', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                })
+                .on('xhr.dt', function (e, settings, json, xhr) {
+                    //trigger after ajax call
+                    //debugger;
+                    //alert('xhr');
+                })
+                .DataTable({
+                    order: [],
+                    processing: true,
+                    serverSide: true,
+                    responsive: true,
+                    rowReorder: false,
+                    select: true,
+                    searching: false,
+                    paging: true,
+                    ordering: false,
+                    searching: false,
+                    filtering: false,
+                    info: true,
+                    lengthMenu: [
+                        [5, 10, 25, 50],
+                        [5, 10, 25, 50]
+                    ],
+                    pageLength: 10,
+                    columnDefs: [
+                        //{ "visible": false, "targets": 0 },
+                        //and in this case the < a href="//legacy.datatables.net/ref#bStateSave" > bStateSave</a> works regularly ....but then I would like to have responsive columns indicating responsive: {
+                        {
+                            details: false,
+                            breakpoints: [
+                                { name: 'desktop', width: Infinity },
+                                { name: 'tablet-l', width: 1200 },
+                                { name: 'tablet-p', width: 992 },
+                                { name: 'mobile-l', width: 576 },
+                                { name: 'mobile-p', width: 320 }
+                            ]
+                        },
+                        {
+                            targets: [0, 1, 2, 3, 4, 5, 6, 7, 8],
+                            className: 'dt-center',
+                        },
+                        {
+                            responsivePriority: 0,
+                            targets: 1,
+                            render: function (data, type, row, meta) {
+                                return data;
+                            }
+                        },
+                        {
+                            targets: 2,
+                            render: function (data, type, row, meta) {
+                                if (data != undefined)
+                                    return splitNumber(data);
+                                else
+                                    return '';
+                            }
+                        },
+                        {
+                            targets: 3,
+                            render: function (data, type, row, meta) {
+                                return `<div class="badge badge-pill zl-badge-upload-document"><div class="d-flex align-items-center"><i class="bx bxs-circle font-size-xxsmall mr-25"></i>${data}</div></div>`;
+                            }
+                        },
+                        {
+                            targets: 5,
+                            render: function (data, type, row, meta) {
+                                return `${row.creator}<br/>${data}`;
+                            }
+                        },
+                        {
+                            targets: 7,
+                            render: function (data, type, row, meta) {
+                                return generateDocumentsLink(data);
+                            }
+                        },
+                        {
+                            responsivePriority: 1,
+                            targets: 8,
+                            render: function (data, type, row, meta) {
+                                if (row.status == @((int)InvoiceStatus.WaitingVerify))
+                                    return `<button class="btn btn-outline-primary verifyInvoice" style="width:150px">بررسی فاکتور</button>`;
+                                else
+                                    return `<div class="badge badge-pill zl-badge-upload-document"><div class="d-flex align-items-center"><i class="bx bxs-circle font-size-xxsmall mr-25"></i>${row.statusDescription}</div></div>`;
+                            }
+                        }],
+                    rowCallback: function (row, data) {
+                        //$('td:eq(0)', row).css('text-align', 'center');
+                    },
+                    //ajax: {
+                    //    url: `/api/v1/RequestFacilityInstallment/SelectInstallment2/${$('#drpApprovalFacility').val()}`,
+                    //    type: 'POST',
+                    //    dataSrc: function(data) {
+                    //        data.recordsTotal = data.data.length;
+                    //        data.recordsFiltered = data.data.length;
+                    //        return data.data;
+                    //    },
+                    //    datatype: "json",
+                    //    //contentType: "application/json",
+                    //    contentType: "application/json; charset=utf-8",
+                    //    data: function(input) {
+                    //        debugger;
+                    //        //if ($('#FacilityTypeId').val() != '')
+                    //        //    input.FacilityTypeId = $('#FacilityTypeId').val();
+
+                    //        return JSON.stringify(input);
+                    //    },
+                    //},
+                    ajax: (data, callback, setting) => {
+                        getData(data).then(function (_data) {
+                            callback(_data);
+                        });
+                    },
+                    drawCallback: function (settings) {
+                        hideWaiting('invoiceTable');
+                    },
+                    initComplete: function (settings, json) {
+                        $('#invoiceTable tbody').on('click', 'button.uploadInvoiceImage', function () {
+                            debugger;
+                            let data = dataTableResponsive.row(this).data();
+                            if (data == undefined)
+                                data = dataTableResponsive.row($(this).parents('tr')).data();
+
+                            debugger;
+                            $('#btnSave').data('invoice-id', data.id);
+                            $("#Number").val(data.number);
+                            $('#uploadInvoiceDocumentModal').modal();
+                        });
+                    },
+                    rowCallback: (row, data, displayNum, displayIndex, dataIndex) => {
+                        $('td:eq(0)', row).html(displayIndex + 1);
+                        return row;
+                    },
+                    columns: [
+                        { "data": null },
+                        { "data": "organizationName" },
+                        { "data": "amount" },
+                        { "data": "statusDescription" },
+                        { "data": "number" },
+                        { "data": "shamsiCreateDate" },
+                        { "data": "description" },
+                        { "data": "invoiceDocuments" },
+                        { "data": "id" }
+                    ],
+                    language: {
+                        url: '/new-layout/datatables.net/fa.json'
+                    }
+                });
+
+            const getData = (data) => {
+                const postData = {
+                    Page: Math.floor(data.start / data.length) + 1,
+                    PageSize: data.length,
+                    SortDirection: null,
+                    SortOrder: null,
+                    FilterList: []
+                };
+
+                fillFilter(postData);
+                return new Promise(function (resolve, reject) {
+                    console.log('Loading data');
+
+                    $.ajax({
+                        type: 'post',
+                        datatype: "json",
+                        data: JSON.stringify(postData),
+                        contentType: "application/json; charset=utf-8",
+                        url: `/api/v1/Invoice/SearchInvoice`,
+                        success: function (result) {
+                            if (result != undefined && result.isSuccess == true) {
+                                resolve({
+                                    data: result.data.data,
+                                    recordsTotal: result.data.totalRowCount,
+                                    recordsFiltered: result.data.totalRowCount
+                                });
+                            }
+                        },
+                        error: function (error) {
+                            debugger;
+                            const exception = getExceptionMessageFromError(error);
+                            if (exception != null)
+                                showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                            else
+                                showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                        }
+                    });
+                });
+            }
+        }
+
+        const fillFilter = (postData) => {
+            if ($('#StartDate').val() != undefined && $('#StartDate').val() != null && $('#StartDate').val() != '')
+                postData.FilterList.push({
+                    PropertyName: 'StartDate',
+                    Operator: @((int)Operator.GreaterThanOrEqual),
+                    PropertyValue: $('#StartDate').val()
+                });
+
+            if ($('#EndDate').val() != undefined && $('#EndDate').val() != null && $('#EndDate').val() != '')
+                postData.FilterList.push({
+                    PropertyName: 'EndDate',
+                    Operator: @((int)Operator.LesserThanOrEqual),
+                    PropertyValue: $('#EndDate').val()
+                });
+
+            if ($('#OrganizationId').val() != undefined && $('#OrganizationId').val() != null && $('#OrganizationId').val() != '')
+                postData.FilterList.push({
+                    PropertyName: 'OrganizationId',
+                    Operator: @((int)Operator.Equal),
+                    PropertyValue: parseInt($('#OrganizationId').val())
+                });
+
+            if ($('#StatusId').val() != undefined && $('#StatusId').val() != null && $('#StatusId').val() != '')
+                postData.FilterList.push({
+                    PropertyName: 'Status',
+                    Operator: @((int)Operator.Equal),
+                    PropertyValue: parseInt($('#StatusId').val())
+                });
+
+            if ($('#StartAmountThousandSeparator').val() != undefined && $('#StartAmountThousandSeparator').val() != null && $('#StartAmountThousandSeparator').val() != '')
+                postData.FilterList.push({
+                    PropertyName: 'StartAmount',
+                    Operator: @((int)Operator.GreaterThanOrEqual),
+                    PropertyValue: parseInt($('#StartAmountThousandSeparator').val().replaceAll(',', ''))
+                });
+
+            if ($('#EndAmountThousandSeparator').val() != undefined && $('#EndAmountThousandSeparator').val() != null && $('#EndAmountThousandSeparator').val() != '')
+                postData.FilterList.push({
+                    PropertyName: 'EndAmount',
+                    Operator: @((int)Operator.LesserThanOrEqual),
+                    PropertyValue: parseInt($('#EndAmountThousandSeparator').val().replaceAll(',', ''))
+                });
+        }
+
+        $('#btnSave').click(function (e) {
+            e.preventDefault();
+            debugger;
+            const formIsValid = $('#frmUploadInvoiceDocument').valid();
+
+            if (formIsValid) {
+                const file = $("#InvoiceFile")[0];
+                if (file.files.length == 0) {
+                    showMessage('@ResourceFile.InfoTitle', 'لطفا تصویر فاکتور را بارگذاری کنید', icons.warning, '@ResourceFile.Close');
+                    return;
+                }
+
+                showWaiting('modalContent', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                let data = new FormData();
+                // if (file.files.length > 0) {
+                //     data.append('InvoiceFile', file.files[0]);
+                // }
+
+                data.append('Id', $('#btnSave').data('invoice-id'));
+                data.append('Number', $("#Number").val());
+                data.append('InvoiceFile', file.files[0]);
+
+                $.ajax({
+                    type: 'post',
+                    //dataType: 'json',
+                    //contentType: "application/json; charset=utf-8",
+                    //enctype: 'multipart/form-data',
+                    contentType: false,
+                    processData: false,
+                    url: "/api/v1/Invoice/UploadInvoiceFile",
+                    //data: JSON.stringify(model),
+                    data: data,
+                    success: function (result) {
+                        $('#btnSave').data('invoice-id', -1);
+                        debugger;
+                        if (result.isSuccess) {
+                            dataTableResponsive.page(0);
+                            dataTableResponsive.ajax.reload(null, false);
+                            hideWaiting('modalContent');
+                            showMessage('@ResourceFile.InfoTitle', '@ResourceFile.MessageSuccess', icons.success, '@ResourceFile.Close');
+                            $('#uploadInvoiceDocumentModal').modal('hide');
+                        }
+                        else if (!result.isSuccess) {
+                            showMessage('@ResourceFile.ErrorTitle', result.message, icons.error, '@ResourceFile.Close');
+                        }
+                    },
+                    error: function (error) {
+                        hideWaiting('modalContent');
+                        const exception = getExceptionMessageFromError(error);
+                        if (exception != null)
+                            showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                        else
+                            showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                    }
+                });
+            }
+            else {
+                scrollToFirstError();
+            }
+        });
+    </script>
+}

@@ -1,0 +1,866 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon32x32.svg">
+    @*    <link rel="icon" type="image/png" sizes="180x180" href="/images/favicon32x32.svg">
+        <link rel="icon" type="image/png" sizes="192x192" href="/images/favicon32x32.svg">*@
+
+    <link rel="manifest" href="/manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
+    <meta name="theme-color" content="#6748fe">
+
+    <title>@ViewData["Title"] - @_loc["SiteTitle"]</title>
+
+    <meta name="theme-color" content="#5A8DEE" />
+    <link rel="stylesheet" type="text/css" href="~/new-layout/vendor/vendors.min.css" />
+    <link rel="stylesheet" type="text/css" href="~/new-layout/css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="~/new-layout/css/bootstrap-extended.css" />
+    <link rel="stylesheet" type="text/css" href="~/new-layout/css/colors.css" />
+    <link rel="stylesheet" type="text/css" href="~/new-layout/css/components.css" />
+    <link href="~/Vendor/sweetalert2/sweetalert2.min.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="/new-layout/css/style.css" />
+    <link rel="stylesheet" href="~/font-awesome/css/font-awesome.css" />
+    <link rel="stylesheet" href="~/font-awesome/css/font-awesome-animation.min.css" />
+    <link href="~/css/all.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/site-@(cultureAccessor.GetCultureDirection()).css" asp-append-version="true" />
+    <style>
+        @if (User.IsInRole(Core.Entities.RoleEnum.Buyer.ToString()))
+        {
+            <text>
+                    .zl-app-content {
+                        padding-right: 1rem !important;
+                        padding-left: 1rem !important;
+                    }
+            </text>
+        }
+        else
+        {
+            <text>
+                    .zl-app-content {
+                        padding-right: 1rem !important;
+                        padding-left: 1rem !important;
+                    }
+            </text>
+        }
+    </style>
+
+    @await RenderSectionAsync("styles", required: false)
+    <script type="text/javascript">
+        !(function () {
+            window.IMBER_LANG = "fa";
+            var a = window, d = document;
+            function im() {
+                window.IMBER_ID = "u3v741blqwlia1iuww";
+                window.IMBER_TOKEN = localStorage.getItem("imber_token");
+                var i = document.createElement("div"); i.id = "imber-top-parent"; var x = document;
+                var s = x.createElement("script");
+                s.src = "https://widget.imber.live/imber?id=" + window.IMBER_ID + "&token=" + (window.IMBER_AUTH ? "null&auth=" + JSON.stringify(window.IMBER_AUTH) : window.IMBER_TOKEN);
+                s.async = 1;
+                x.getElementsByTagName("head")[0].appendChild(s);
+                x.getElementsByTagName("body")[0].appendChild(i);
+                window.$imber = {};
+            } "complete" === d.readyState ? im() : a.attachEvent ? a.attachEvent("onload", im) : a.addEventListener("load", im, !1);
+        })();
+    </script>
+</head>
+<body class="container-fluid container-fluid-zero-padding">
+    <nav class="px-50 px-md-2 navbar fixed-top navbar-expand-lg navbar-light bg-white zl-app-content">
+        <div class="d-flex flex-row justify-content-between w-100">
+            <div class="d-flex">
+                <button class="navbar-toggler"
+                        type="button"
+                        data-toggle="collapse"
+                        data-target="#navbarNav"
+                        aria-controls="navbarNav"
+                        aria-expanded="false"
+                        aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <a class="navbar-brand mr-auto mr-lg-1" href='@Url.Action("index","Home")'>
+                    <img class="ml-1 ml-lg-0 logo-image" src="~/new-layout/images/ZarinLend-Logo.svg?v=1" alt="زرین‌لند" />
+                </a>
+                <ul class="navbar-nav flex-row d-none d-lg-flex">
+                    <li class="nav-item">
+                        <a class="nav-link dark text-bold-500" href="#">راهنمای گرفتن تسهیلات</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link dark text-bold-500" href="#">سوالات متداول</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="ml-auto d-block d-lg-none">
+                <ul class="navbar-nav d-flex flex-row">
+                    <li class="nav-item mr-1">
+                        <a class="nav-link" href="#">
+                            <i class="bx bx-bell font-medium-5"></i>
+                            <span class="new-message responsive-new-message-count">+10</span>
+                        </a>
+                    </li>
+                    <li class="nav-item mr-1">
+                        <a class="nav-link" href="#"><i class="bx bx-user font-medium-5" style="color:green"></i></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="@Url.Action("Logout","Account")"><i class="bx bx-log-out font-medium-5" style="color:red"></i></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        @{
+            var requestList = string.Empty;
+            var userType = string.Empty;
+            string userFullName = string.Empty;
+            if (User.Identity.IsAuthenticated)
+            {
+                if (User.IsInRole(RoleEnum.Admin.ToString()) || User.IsInRole(RoleEnum.SuperAdmin.ToString()))
+                    requestList = Url.Action("SearchRequest", "RequestFacility");
+                else if (User.IsInRole(RoleEnum.AdminBankLeasing.ToString()) || User.IsInRole(RoleEnum.SupervisorLeasing.ToString()) || User.IsInRole(RoleEnum.BankLeasing.ToString()))
+                    requestList = Url.Action("LeasingRequests", "RequestFacility");
+                if (User.IsInRole(RoleEnum.Buyer.ToString()))
+                    requestList = Url.Action("List", "RequestFacility");
+
+                if (User.IsInRole(RoleEnum.Admin.ToString()) || User.IsInRole(RoleEnum.SuperAdmin.ToString()))
+                    userType = "کاربرادمین(مدیر)";
+                else if (User.IsInRole(RoleEnum.AdminBankLeasing.ToString()))
+                    userType = "مدیر بانک";
+                else if (User.IsInRole(RoleEnum.ZarinLendExpert.ToString()))
+                    userType = "کارشناس زرین لند";
+                else if (User.IsInRole(RoleEnum.SupervisorLeasing.ToString()))
+                    userType = "کارشناس بانک";
+                else if (User.IsInRole(RoleEnum.BankLeasing.ToString()))
+                    userType = "کارشناس ارشد بانک";
+                else if (User.IsInRole(RoleEnum.Seller.ToString()))
+                    userType = "کاربر فروشگاه";
+                else if (User.IsInRole(RoleEnum.Buyer.ToString()))
+                    userType = "کاربر خریدار";
+
+                userFullName = @User.Identity.GetFullName();
+            }
+
+        }
+        <div class="collapse navbar-collapse d-lg-flex justify-content-between align-items-center" id="navbarNav">
+            <ul class="navbar-nav d-flex d-lg-none mt-1 mt-lg-0">
+                @if (User.IsInRole(Core.Entities.RoleEnum.SuperAdmin.ToString()) || 
+                     User.IsInRole(Core.Entities.RoleEnum.Admin.ToString()) ||
+                     User.IsInRole(Core.Entities.RoleEnum.ZarinLendExpert.ToString()))
+                {
+                    <li class="nav-item">
+                        <a class="nav-link dark text-bold-500" href='@Url.Action("Index", "Home")'>
+                            <span class="d-flex align-items-center">
+                                <i class="bx bx-dashboard font-medium-5 mr-1"></i>داشبورد من
+                            </span>
+                        </a>
+                    </li>
+                    @*<li class="nav-item">
+                        <a class="nav-link dark text-bold-500" href="@requestList">
+                            <span class="d-flex align-items-center">
+                                <i class="bx bx-book-content font-medium-5 mr-1"></i>لیست درخواست ها
+                            </span>
+                        </a>
+                    </li>*@
+                    <li class="nav-item">
+                        <a class="nav-link dark text-bold-500" href='@Url.Action("SearchRequest","RequestFacility")'>
+                            <span class="d-flex align-items-center">
+                                <i class="bx bx-pie-chart-alt font-medium-5 mr-1"></i>لیست درخواست ها
+                            </span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link dark text-bold-500" href="@Url.Action("AllRequests","RequestFacilityGuarantor")">
+                            <span class="d-flex align-items-center">
+                                <i class="bx bx-book-content font-medium-5 mr-1"></i>لیست درخواست های ضامن
+                            </span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link dark text-bold-500" href="@Url.Action("Search","RequestFacilityInstallment")">
+                            <span class="d-flex align-items-center">
+                                <i class="bx bx-book-content font-medium-5 mr-1"></i>گزارش اقساط
+                            </span>
+                        </a>
+                    </li>
+                     <li class="nav-item">
+                        <a class="nav-link dark text-bold-500" href="@Url.Action("Search","Payment")">
+                            <span class="d-flex align-items-center">
+                                <i class="bx bx-book-content font-medium-5 mr-1"></i>گزارش پرداخت ها
+                            </span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link dark text-bold-500" href="@Url.Action("accountstatement","Finotech")">
+                            <span class="d-flex align-items-center">
+                                <i class="bx bx-book-content font-medium-5 mr-1"></i>دریافت صورتحساب
+                            </span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link dark text-bold-500" href="#">
+                            <span class="d-flex align-items-center">
+                                <i class="bx bx-message-dots font-medium-5 mr-1"></i>تیکت‌ها
+                            </span>
+                        </a>
+                    </li>
+                    <li class="navigation-header border-top"></li>
+                    <li class="nav-item">
+                        <a class="nav-link dark text-bold-500" href='@Url.Action("List", "Organization")'>
+                            <span class="d-flex align-items-center">
+                                <i class="bx bx-message-dots font-medium-5 mr-1"></i>لیست سازمان ها
+                            </span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link dark text-bold-500" href='@Url.Action("List", "Plan")'>
+                            <span class="d-flex align-items-center">
+                                <i class="bx bx-message-dots font-medium-5 mr-1"></i>طرح های تسهیلات
+                            </span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link dark text-bold-500" href='@Url.Action("List", "User")'>
+                            <span class="d-flex align-items-center">
+                                <i class="bx bx-message-dots font-medium-5 mr-1"></i>لیست کاربران
+                            </span>
+                        </a>
+                    </li>
+                    <li class="navigation-header border-top"></li>
+                    <li class="nav-item">
+                        <a class="nav-link dark text-bold-500" href='@Url.Action("GlobalSetting", "Home")'>
+                            <span class="d-flex align-items-center"><i class="bx bx-bell font-medium-5 mr-1"></i>تنظیمات کلی</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link dark text-bold-500" href="#">
+                            <span class="d-flex align-items-center"><i class="bx bx-bell font-medium-5 mr-1"></i>اعلان ها</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link dark text-bold-500 change-password" href="javascript:void(0)">
+                            <span class="d-flex align-items-center">
+                                <i class="bx bx-key font-medium-5 mr-1"></i>تغییر کلمه عبور
+                            </span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link dark text-bold-500" href="@Url.Action("Logout","Account")">
+                            <span class="d-flex align-items-center">
+                                <i class="bx bx-log-out font-medium-5 mr-1"></i>خروج از حساب کاربری
+                            </span>
+                        </a>
+                    </li>
+                }
+                else if (User.IsInRole(Core.Entities.RoleEnum.AdminBankLeasing.ToString()) ||
+                         User.IsInRole(Core.Entities.RoleEnum.SupervisorLeasing.ToString()) ||
+                         User.IsInRole(Core.Entities.RoleEnum.BankLeasing.ToString()))
+                {
+                    <li class="nav-item">
+                        <a class="nav-link dark text-bold-500" href='@Url.Action("Index", "Home")'>
+                            <span class="d-flex align-items-center">
+                                <i class="bx bx-dashboard font-medium-5 mr-1"></i>داشبورد من
+                            </span>
+                        </a>
+                    </li>
+                    <li class="navigation-header border-top"></li>
+                    <li class="nav-item">
+                        <a class="nav-link dark text-bold-500" href="@Url.Action("PendingInquiryRequests","RequestFacility")">
+                            <span class="d-flex align-items-center">
+                                <i class="bx bx-book-content font-medium-5 mr-1"></i>درخواست های در انتظار استعلام
+                            </span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link dark text-bold-500" href="@Url.Action("PendingResultInquiryRequests","RequestFacility")">
+                            <span class="d-flex align-items-center">
+                                <i class="bx bx-book-content font-medium-5 mr-1"></i>درخواست های در انتظار نتیجه استعلام
+                            </span>
+                        </a>
+                    </li>
+                    <li class="navigation-header border-top"></li>
+                    <li class="nav-item">
+                        <a class="nav-link dark text-bold-500" href="@Url.Action("PendingEnterFacilityNumberRequests","RequestFacility")">
+                            <span class="d-flex align-items-center">
+                                <i class="bx bx-book-content font-medium-5 mr-1"></i>درخواست های در انتظار ثبت شماره قرارداد
+                            </span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link dark text-bold-500" href="@Url.Action("PendingResultEnterFacilityNumberRequests","RequestFacility")">
+                            <span class="d-flex align-items-center">
+                                <i class="bx bx-book-content font-medium-5 mr-1"></i>درخواست های در انتظار نتیجه شماره قرارداد
+                            </span>
+                        </a>
+                    </li>
+                    <li class="navigation-header border-top"></li>
+                    <li class="nav-item">
+                        <a class="nav-link dark text-bold-500" href="@Url.Action("PendingBankLeasingInquiryRequests","RequestFacility")">
+                            <span class="d-flex align-items-center">
+                                <i class="bx bx-book-content font-medium-5 mr-1"></i>درخواست های در انتظار ثبت شماره انتظامی
+                            </span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link dark text-bold-500" href="@Url.Action("PendingResultBankLeasingInquiryRequests","RequestFacility")">
+                            <span class="d-flex align-items-center">
+                                <i class="bx bx-book-content font-medium-5 mr-1"></i>درخواست های در انتظار نتیجه ثبت شماره انتظامی
+                            </span>
+                        </a>
+                    </li>
+
+                    <li class="navigation-header border-top"></li>
+                    <li class="nav-item">
+                        <a class="nav-link dark text-bold-500" href="@Url.Action("PendingDepositFacilityAmountRequests","RequestFacility")">
+                            <span class="d-flex align-items-center">
+                                <i class="bx bx-book-content font-medium-5 mr-1"></i>درخواست های در انتظار واریز تسهیلات
+                            </span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link dark text-bold-500" href="@Url.Action("PendingCardRechargeRequests","RequestFacility")">
+                            <span class="d-flex align-items-center">
+                                <i class="bx bx-book-content font-medium-5 mr-1"></i>درخواست های در انتظار شارژ بن کارت
+                            </span>
+                        </a>
+                    </li>
+                    if (User.IsInRole(Core.Entities.RoleEnum.AdminBankLeasing.ToString()))
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link dark text-bold-500" href="@Url.Action("PendingConfirmAndSignatureRequests","RequestFacility")">
+                                <span class="d-flex align-items-center">
+                                    <i class="bx bx-key font-medium-5 mr-1"></i>درخواست های منتظر تایید و امضاء
+                                </span>
+                            </a>
+                        </li>
+                    }
+                    <li class="nav-item">
+                        <a class="nav-link dark text-bold-500" href="@Url.Action("VerifyResultExcelHistory","RequestFacility")">
+                            <span class="d-flex align-items-center">
+                                <i class="bx bx-archive font-medium-5 mr-1"></i>تاریخچه استعلامات گروهی
+                            </span>
+                        </a>
+                    </li>
+
+                    <li class="navigation-header border-top"></li>
+                    <li class="nav-item">
+                        <a class="nav-link dark text-bold-500" href='@Url.Action("SearchLeasingRequest","RequestFacility")'>
+                            <span class="d-flex align-items-center">
+                                <i class="bx bx-search-alt font-medium-5 mr-1"></i>جستجوی پیشرفته
+                            </span>
+                        </a>
+                    </li>
+                    @if (User.IsInRole(Core.Entities.RoleEnum.AdminBankLeasing.ToString()) || User.IsInRole(Core.Entities.RoleEnum.SupervisorLeasing.ToString()))
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link dark text-bold-500" href='@Url.Action("AssignRequestFacilityToUser","RequestFacility")'>
+                                <span class="d-flex align-items-center">
+                                    <i class="bx bx-checkbox-checked font-medium-5 mr-1"></i>اختصاص درخواست ها به کارشناسان
+                                </span>
+                            </a>
+                        </li>
+                    }
+                    <li class="navigation-header border-top"></li>
+                    <li class="nav-item">
+                        <a class="nav-link dark text-bold-500 change-password" href="javascript:void(0)">
+                            <span class="d-flex align-items-center">
+                                <i class="bx bx-key font-medium-5 mr-1"></i>تغییر کلمه عبور
+                            </span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link dark text-bold-500" href="@Url.Action("Logout","Account")">
+                            <span class="d-flex align-items-center">
+                                <i class="bx bx-log-out font-medium-5 mr-1"></i>خروج از حساب کاربری
+                            </span>
+                        </a>
+                    </li>
+                }
+                else if (User.IsInRole(Core.Entities.RoleEnum.Buyer.ToString()))
+                {
+                    <li class="nav-item">
+                        <a class="nav-link dark text-bold-500" href='@Url.Action("Index", "Home")'>
+                            <span class="d-flex align-items-center">
+                                <i class="bx bx-dashboard font-medium-5 mr-1"></i>داشبورد من
+                            </span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link dark text-bold-500" href="@requestList">
+                            <span class="d-flex align-items-center">
+                                <i class="bx bx-book-content font-medium-5 mr-1"></i>درخواست های من
+                            </span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link dark text-bold-500" href='@Url.Action("InstallmentList","RequestFacilityInstallment")'>
+                            <span class="d-flex align-items-center">
+                                <i class="bx bx-wallet-alt font-medium-5 mr-1"></i>اقساط
+                                من
+                            </span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link dark text-bold-500" href="@Url.Action("Edit", "User")">
+                            <span class="d-flex align-items-center">
+                                <i class="bx bxs-user-detail font-medium-5 mr-1"></i>اطلاعات کاربری من
+                            </span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link dark text-bold-500"
+                           href="@Url.Action("UploadIdentityDocuments", "User")">
+                            <span class="d-flex align-items-center">
+                                <i class="bx bx-cloud-upload font-medium-5 mr-1"></i>بارگذاری مدارک
+                            </span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link dark text-bold-500" href="@Url.Action("List", "RequestFacilityGuarantor")">
+                            <span class="d-flex align-items-center">
+                                <i class="bx bxs-user-detail font-medium-5 mr-1"></i>میخواهم ضامن شوم
+                            </span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link dark text-bold-500" href="@Url.Action("accountstatement","Finotech")">
+                            <span class="d-flex align-items-center">
+                                <i class="bx bx-book-content font-medium-5 mr-1"></i>دریافت صورتحساب
+                            </span>
+                        </a>
+                    </li>
+                    <li class="navigation-header border-top"></li>
+                    <li class="nav-item">
+                        <a class="nav-link dark text-bold-500" target="_blank" href="https://talk.imber.live/u3v741blqwlia1iuww">
+                            <span class="d-flex align-items-center">
+                                <i class="bx bx-message-dots font-medium-5 mr-1"></i>تیکت‌ها
+                            </span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link dark text-bold-500 change-password" href="javascript:void(0)">
+                            <span class="d-flex align-items-center">
+                                <i class="bx bx-key font-medium-5 mr-1"></i>تغییر کلمه عبور
+                            </span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link dark text-bold-500" href="@Url.Action("Logout","Account")">
+                            <span class="d-flex align-items-center">
+                                <i class="bx bx-log-out font-medium-5 mr-1"></i>خروج از حساب کاربری
+                            </span>
+                        </a>
+                    </li>
+                }
+            </ul>
+            <ul class="navbar-nav d-none d-lg-flex">
+                <li class="nav-item mr-1">
+                    <a class="nav-link" href="#">
+                        <i class="bx bx-bell font-medium-5"></i>
+                        <span class="new-message new-message-count">+10</span>
+                    </a>
+                </li>
+                <li class="nav-item mr-1">
+                    <a class="nav-link" href="#"><i class="bx bx-user font-medium-5" style="color:green"></i></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="@Url.Action("Logout","Account")"><i class="bx bx-log-out font-medium-5" style="color:red"></i></a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="zl-app-content py-5">
+        <div class="my-2 px-md-3 px-lg-0">
+            <div class="row">
+                <div class="d-none d-lg-flex col-12 col-lg-3">
+                    <div class="d-flex flex-column w-100 p-1 rounded-lg bg-white">
+                        @if (User.IsInRole(Core.Entities.RoleEnum.SuperAdmin.ToString()) || 
+                             User.IsInRole(Core.Entities.RoleEnum.Admin.ToString()) ||
+                             User.IsInRole(Core.Entities.RoleEnum.ZarinLendExpert.ToString()))
+                        {
+                            <div class="d-flex flex-row align-items-center justify-content-between w-100">
+                                <div class="d-flex flex-row align-items-center py-50">
+                                    <div class="mr-75">
+                                        <img src="~/new-layout/images/icons/Avatar.svg" alt="@User.Identity.GetFullName()" />
+                                    </div>
+                                    <div class="d-flex flex-column">
+                                        <span class="primary darken-4 font-small-4 text-bold-400">@userType</span>
+                                        <span class="font-small-2 text-bold-400">@User.Identity.GetFullName()</span>
+                                    </div>
+                                </div>
+                                <a href="#">
+                                    <i class="bx bx-chevron-left dark"></i>
+                                </a>
+                            </div>
+                            <div class="px-xl-75">
+                                <div id="myDashboard" class="rounded-lg zl-menu-item">
+                                    <a class="nav-link dark text-bold-500" href='@Url.Action("Index", "Home")'>
+                                        <span class="d-flex align-items-center">
+                                            <i class="bx bx-dashboard font-medium-5 mr-1"></i><span class="font-small-3 secondary darken-4 text-bold-500">داشبورد من</span>
+                                        </span>
+                                    </a>
+                                </div>
+                                <div id="reportPage" class="rounded-lg zl-menu-item">
+                                    <a class="nav-link dark text-bold-500" href='@Url.Action("SearchRequest","RequestFacility")'>
+                                        <span class="d-flex align-items-center">
+                                            <i class="bx bx-pie-chart-alt font-medium-5 mr-1"></i><span class="font-small-3 secondary darken-4 text-bold-500">لیست درخواست ها</span>
+                                        </span>
+                                    </a>
+                                </div>
+                                <div id="allRequestGuarantor" class="rounded-lg zl-menu-item">
+                                    <a class="nav-link dark text-bold-500" href="@Url.Action("AllRequests","RequestFacilityGuarantor")">
+                                        <span class="d-flex align-items-center">
+                                            <i class="bx bx-book-content font-medium-5 mr-1"></i><span class="font-small-3 secondary darken-4 text-bold-500">لیست درخواست ها ضامن</span>
+                                        </span>
+                                    </a>
+                                </div>
+                                <div id="searchInstallment" class="rounded-lg zl-menu-item">
+                                    <a class="nav-link dark text-bold-500" href="@Url.Action("Search","RequestFacilityInstallment")">
+                                        <span class="d-flex align-items-center">
+                                            <i class="bx bx-book-content font-medium-5 mr-1"></i><span class="font-small-3 secondary darken-4 text-bold-500">گزارش اقساط</span>
+                                        </span>
+                                    </a>
+                                </div>
+                                <div id="samanIpgReportPage" class="rounded-lg zl-menu-item">
+                                    <a class="nav-link dark text-bold-500" href="@Url.Action("Search","Payment")">
+                                        <span class="d-flex align-items-center">
+                                            <i class="bx bx-book-content font-medium-5 mr-1"></i><span class="font-small-3 secondary darken-4 text-bold-500">گزارش پرداخت ها</span>
+                                        </span>
+                                    </a>
+                                </div>
+                                <div id="accountStatement" class="rounded-lg zl-menu-item">
+                                    <a class="nav-link dark text-bold-500" href='@Url.Action("AccountStatement","Finotech")'>
+                                        <span class="d-flex align-items-center">
+                                            <i class="bx bx-pie-chart-alt font-medium-5 mr-1"></i><span class="font-small-3 secondary darken-4 text-bold-500">دریافت صورتحساب</span>
+                                        </span>
+                                    </a>
+                                </div>                                
+                                <div class="rounded-lg zl-menu-item">
+                                    <a class="nav-link dark text-bold-500" href="#">
+                                        <span class="d-flex align-items-center">
+                                            <i class="bx bx-message-dots font-medium-5 mr-1"></i><span class="font-small-3 secondary darken-4 text-bold-500">تیکت‌ها</span>
+                                        </span>
+                                    </a>
+                                </div>
+                                <hr />
+                                <div id="organizationList" class="rounded-lg zl-menu-item">
+                                    <a class="nav-link dark text-bold-500" href='@Url.Action("List", "Organization")'>
+                                        <span class="d-flex align-items-center">
+                                            <i class="bx bx-message-dots font-medium-5 mr-1"></i><span class="font-small-3 secondary darken-4 text-bold-500">لیست سازمان ها</span>
+                                        </span>
+                                    </a>
+                                </div>
+                                <div id="plans" class="rounded-lg zl-menu-item">
+                                    <a class="nav-link dark text-bold-500" href='@Url.Action("List", "Plan")'>
+                                        <span class="d-flex align-items-center">
+                                            <i class="bx bx-message-dots font-medium-5 mr-1"></i><span class="font-small-3 secondary darken-4 text-bold-500">طرح های تسهیلات</span>
+                                        </span>
+                                    </a>
+                                </div>
+                                <div id="userList" class="rounded-lg zl-menu-item">
+                                    <a class="nav-link dark text-bold-500" href='@Url.Action("List", "User")'>
+                                        <span class="d-flex align-items-center">
+                                            <i class="bx bx-message-dots font-medium-5 mr-1"></i><span class="font-small-3 secondary darken-4 text-bold-500">لیست کاربران</span>
+                                        </span>
+                                    </a>
+                                </div>
+                                <hr />
+                                <div id="globalSetting" class="rounded-lg zl-menu-item">
+                                    <a class="nav-link dark text-bold-500" href='@Url.Action("GlobalSetting", "Home")'>
+                                        <span class="d-flex align-items-center">
+                                            <i class="bx bx-message-dots font-medium-5 mr-1"></i><span class="font-small-3 secondary darken-4 text-bold-500">تنظیمات کلی</span>
+                                        </span>
+                                    </a>
+                                </div>
+                                <div id="alerts" class="rounded-lg zl-menu-item">
+                                    <a class="nav-link dark text-bold-500" href="#">
+                                        <span class="d-flex align-items-center">
+                                            <i class="bx bx-bell font-medium-5 mr-1"></i><span class="font-small-3 secondary darken-4 text-bold-500">اعلان ها</span>
+                                        </span>
+                                    </a>
+                                </div>
+                                <div class="rounded-lg zl-menu-item">
+                                    <a class="nav-link dark text-bold-500 change-password" href='javascript:void(0)'>
+                                        <span class="d-flex align-items-center">
+                                            <i class="bx bx-key font-medium-5 mr-1"></i><span class="font-small-3 secondary darken-4 text-bold-500">تغییر کلمه عبور</span>
+                                        </span>
+                                    </a>
+                                </div>
+                                <div class="rounded-lg zl-menu-item">
+                                    <a class="nav-link dark text-bold-500" href='@Url.Action("Logout","Account")'>
+                                        <span class="d-flex align-items-center">
+                                            <i class="bx bx-log-out font-medium-5 mr-1"></i><span class="font-small-3 secondary darken-4 text-bold-500">خروج از حساب کاربری</span>
+                                        </span>
+                                    </a>
+                                </div>
+                            </div>
+                        }
+                        else if (User.IsInRole(Core.Entities.RoleEnum.AdminBankLeasing.ToString()) ||
+                                 User.IsInRole(Core.Entities.RoleEnum.SupervisorLeasing.ToString()) ||
+                                 User.IsInRole(Core.Entities.RoleEnum.BankLeasing.ToString()))
+                        {
+                            <div class="d-flex flex-row align-items-center justify-content-between w-100">
+                                <div class="d-flex flex-row align-items-center py-50">
+                                    <div class="mr-75">
+                                        <img src="~/new-layout/images/icons/Avatar.svg" alt="@User.Identity.GetFullName()" />
+                                    </div>
+                                    <div class="d-flex flex-column">
+                                        <span class="primary darken-4 font-small-4 text-bold-400">@userType</span>
+                                        <span class="font-small-2 text-bold-400">@User.Identity.GetFullName()</span>
+                                    </div>
+                                </div>
+                                <a href="#">
+                                    <i class="bx bx-chevron-left dark"></i>
+                                </a>
+                            </div>
+                            <div class="px-xl-75">
+                                <div id="myDashboard" class="rounded-lg zl-menu-item">
+                                    <a class="nav-link dark text-bold-500" href='@Url.Action("Index", "Home")'>
+                                        <span class="d-flex align-items-center">
+                                            <i class="bx bx-dashboard font-medium-5 mr-1"></i><span class="font-small-3 secondary darken-4 text-bold-500">داشبورد من</span>
+                                        </span>
+                                    </a>
+                                </div>
+                                @*<div id="myRequests" class="rounded-lg zl-menu-item">
+                                        <a class="nav-link dark text-bold-500" href="@requestList">
+                                            <span class="d-flex align-items-center">
+                                                <i class="bx bx-book-content font-medium-5 mr-1"></i><span class="font-small-3 secondary darken-4 text-bold-500">لیست درخواست ها</span>
+                                            </span>
+                                        </a>
+                                    </div>*@
+                                <div id="pendingInquiryRequests" class="rounded-lg zl-menu-item">
+                                    <a class="nav-link dark text-bold-500" href="@Url.Action("PendingInquiryRequests","RequestFacility")">
+                                        <span class="d-flex align-items-center">
+                                            <i class="bx bx-book-content font-medium-5 mr-1"></i><span class="font-small-3 secondary darken-4 text-bold-500">درخواست های در انتظار استعلام</span>
+                                        </span>
+                                    </a>
+                                </div>
+                                <div id="pendingResultInquiryRequests" class="rounded-lg zl-menu-item">
+                                    <a class="nav-link dark text-bold-500" href="@Url.Action("PendingResultInquiryRequests","RequestFacility")">
+                                        <span class="d-flex align-items-center">
+                                            <i class="bx bx-book-content font-medium-5 mr-1"></i><span class="font-small-3 secondary darken-4 text-bold-500">درخواست های در انتظار نتیجه استعلام</span>
+                                        </span>
+                                    </a>
+                                </div>
+                                <hr class="no-margin" />
+                                <div id="pendingEnterFacilityNumberRequests" class="rounded-lg zl-menu-item">
+                                    <a class="nav-link dark text-bold-500" href="@Url.Action("PendingEnterFacilityNumberRequests","RequestFacility")">
+                                        <span class="d-flex align-items-center">
+                                            <i class="bx bx-book-content font-medium-5 mr-1"></i><span class="font-small-3 secondary darken-4 text-bold-500">درخواست های در انتظار ثبت شماره قرارداد</span>
+                                        </span>
+                                    </a>
+                                </div>
+                                <div id="pendingResultEnterFacilityNumberRequests" class="rounded-lg zl-menu-item">
+                                    <a class="nav-link dark text-bold-500" href="@Url.Action("PendingResultEnterFacilityNumberRequests","RequestFacility")">
+                                        <span class="d-flex align-items-center">
+                                            <i class="bx bx-book-content font-medium-5 mr-1"></i><span class="font-small-3 secondary darken-4 text-bold-500">درخواست های در انتظار نتیجه شماره قرارداد</span>
+                                        </span>
+                                    </a>
+                                </div>
+                                <hr class="no-margin" />
+                                <div id="pendingBankLeasingInquiryRequests" class="rounded-lg zl-menu-item">
+                                    <a class="nav-link dark text-bold-500" href="@Url.Action("PendingBankLeasingInquiryRequests","RequestFacility")">
+                                        <span class="d-flex align-items-center">
+                                            <i class="bx bx-book-content font-medium-5 mr-1"></i><span class="font-small-3 secondary darken-4 text-bold-500">درخواست های در انتظار ثبت شماره انتظامی</span>
+                                        </span>
+                                    </a>
+                                </div>
+                                <div id="pendingResultBankLeasingInquiryRequests" class="rounded-lg zl-menu-item">
+                                    <a class="nav-link dark text-bold-500" href="@Url.Action("PendingResultBankLeasingInquiryRequests","RequestFacility")">
+                                        <span class="d-flex align-items-center">
+                                            <i class="bx bx-book-content font-medium-5 mr-1"></i><span class="font-small-3 secondary darken-4 text-bold-500">درخواست های در انتظار نتیجه ثبت شماره انتظامی</span>
+                                        </span>
+                                    </a>
+                                </div>
+                                <hr class="no-margin" />
+                                <div id="pendingDepositFacilityAmountRequests" class="rounded-lg zl-menu-item">
+                                    <a class="nav-link dark text-bold-500" href="@Url.Action("PendingDepositFacilityAmountRequests","RequestFacility")">
+                                        <span class="d-flex align-items-center">
+                                            <i class="bx bx-book-content font-medium-5 mr-1"></i><span class="font-small-3 secondary darken-4 text-bold-500">درخواست های در انتظار واریز تسهیلات</span>
+                                        </span>
+                                    </a>
+                                </div>
+                                <div id="pendingCardRechargeRequests" class="rounded-lg zl-menu-item">
+                                    <a class="nav-link dark text-bold-500" href="@Url.Action("PendingCardRechargeRequests","RequestFacility")">
+                                        <span class="d-flex align-items-center">
+                                            <i class="bx bx-book-content font-medium-5 mr-1"></i><span class="font-small-3 secondary darken-4 text-bold-500">درخواست های در انتظار شارژ بن کارت</span>
+                                        </span>
+                                    </a>
+                                </div>
+                                @if (User.IsInRole(Core.Entities.RoleEnum.AdminBankLeasing.ToString()))
+                                {
+                                    <div id="pendingConfirmAndSignatureRequests" class="rounded-lg zl-menu-item">
+                                        <a class="nav-link dark text-bold-500" href="@Url.Action("PendingConfirmAndSignatureRequests","RequestFacility")">
+                                            <span class="d-flex align-items-center">
+                                                <i class="bx bx-key font-medium-5 mr-1"></i><span class="font-small-3 secondary darken-4 text-bold-500">درخواست های منتظر تایید و امضاء</span>
+                                            </span>
+                                        </a>
+                                    </div>
+                                }
+                                <div id="groupVerifyHistory" class="rounded-lg zl-menu-item">
+                                    <a class="nav-link dark text-bold-500" href="@Url.Action("VerifyResultExcelHistory","RequestFacility")">
+                                        <span class="d-flex align-items-center">
+                                            <i class="bx bx-archive font-medium-5 mr-1"></i><span class="font-small-3 secondary darken-4 text-bold-500">تاریخچه استعلامات گروهی</span>
+                                        </span>
+                                    </a>
+                                </div>
+                                <div id="reportPage" class="rounded-lg zl-menu-item">
+                                    <a class="nav-link dark text-bold-500" href='@Url.Action("SearchLeasingRequest","RequestFacility")'>
+                                        <span class="d-flex align-items-center">
+                                            <i class="bx bx-search-alt font-medium-5 mr-1"></i><span class="font-small-3 secondary darken-4 text-bold-500">جستجوی پیشرفته</span>
+                                        </span>
+                                    </a>
+                                </div>
+                                @if (User.IsInRole(Core.Entities.RoleEnum.AdminBankLeasing.ToString()) || User.IsInRole(Core.Entities.RoleEnum.SupervisorLeasing.ToString()))
+                                {
+                                    <div id="assignRequestFacilityToUser" class="rounded-lg zl-menu-item">
+                                        <a class="nav-link dark text-bold-500" href='@Url.Action("AssignRequestFacilityToUser","RequestFacility")'>
+                                            <span class="d-flex align-items-center">
+                                                <i class="bx bx-checkbox-checked font-medium-5 mr-1"></i><span class="font-small-3 secondary darken-4 text-bold-500">اختصاص درخواست ها به کارشناسان</span>
+                                            </span>
+                                        </a>
+                                    </div>
+                                }
+                                <hr class="no-margin" />
+                                <div class="rounded-lg zl-menu-item">
+                                    <a class="nav-link dark text-bold-500 change-password" href='javascript:void(0)'>
+                                        <span class="d-flex align-items-center">
+                                            <i class="bx bx-key font-medium-5 mr-1"></i><span class="font-small-3 secondary darken-4 text-bold-500">تغییر کلمه عبور</span>
+                                        </span>
+                                    </a>
+                                </div>
+                                <div class="rounded-lg zl-menu-item">
+                                    <a class="nav-link dark text-bold-500" href='@Url.Action("Logout","Account")'>
+                                        <span class="d-flex align-items-center">
+                                            <i class="bx bx-log-out font-medium-5 mr-1"></i><span class="font-small-3 secondary darken-4 text-bold-500">خروج از حساب کاربری</span>
+                                        </span>
+                                    </a>
+                                </div>
+                            </div>
+                        }
+                        else if (User.IsInRole(Core.Entities.RoleEnum.Buyer.ToString()))
+                        {
+                            <div class="d-flex flex-row align-items-center justify-content-between w-100">
+                                <div class="d-flex flex-row align-items-center py-50">
+                                    <div class="mr-75">
+                                        <img src="~/new-layout/images/icons/Avatar.svg" alt="@User.Identity.GetFullName()" />
+                                    </div>
+                                    <div class="d-flex flex-column">
+                                        <span class="primary darken-4 font-small-4 text-bold-400">@User.Identity.GetUserName()</span>
+                                        <span class="font-small-2 text-bold-400">@User.Identity.GetFullName()</span>
+                                    </div>
+                                </div>
+                                <a href="#">
+                                    <i class="bx bx-chevron-left dark"></i>
+                                </a>
+                            </div>
+                            <div class="px-xl-75">
+                                <div id="myDashboard" class="rounded-lg zl-menu-item">
+                                    <a class="nav-link dark text-bold-500" href='@Url.Action("Index", "Home")'>
+                                        <span class="d-flex align-items-center">
+                                            <i class="bx bx-dashboard font-medium-5 mr-1"></i><span class="font-small-3 secondary darken-4 text-bold-500">داشبورد من</span>
+                                        </span>
+                                    </a>
+                                </div>
+                                <div id="myRequests" class="rounded-lg zl-menu-item">
+                                    <a class="nav-link dark text-bold-500" href="@requestList">
+                                        <span class="d-flex align-items-center">
+                                            <i class="bx bx-book-content font-medium-5 mr-1"></i><span class="font-small-3 secondary darken-4 text-bold-500">درخواست های من</span>
+                                        </span>
+                                    </a>
+                                </div>
+                                <div id="myInstallment" class="rounded-lg zl-menu-item">
+                                    <a class="nav-link dark text-bold-500" href='@Url.Action("InstallmentList","RequestFacilityInstallment")'>
+                                        <span class="d-flex align-items-center">
+                                            <i class="bx bx-wallet-alt font-medium-5 mr-1"></i><span class="font-small-3 secondary darken-4 text-bold-500">اقساط من</span>
+                                        </span>
+                                    </a>
+                                </div>
+                                <div id="myProfile" class="rounded-lg zl-menu-item">
+                                    <a class="nav-link dark text-bold-500" href='@Url.Action("Edit", "User")'>
+                                        <span class="d-flex align-items-center">
+                                            <i class="bx bxs-user-detail font-medium-5 mr-1"></i><span class="font-small-3 secondary darken-4 text-bold-500">اطلاعات کاربری من</span>
+                                        </span>
+                                    </a>
+                                </div>
+                                <div id='uploadDocumentsMenu' class="rounded-lg zl-menu-item">
+                                    <a class="nav-link dark text-bold-500" href='@Url.Action("UploadIdentityDocuments", "User")'>
+                                        <span class="d-flex align-items-center">
+                                            <i class="bx bx-cloud-upload font-medium-5 mr-1"></i><span class="font-small-3 secondary darken-4 text-bold-500">بارگذاری مدارک</span>
+                                        </span>
+                                    </a>
+                                </div>
+                                <div id='guarantorList' class="rounded-lg zl-menu-item">
+                                    <a class="nav-link dark text-bold-500" href='@Url.Action("List", "RequestFacilityGuarantor")'>
+                                        <span class="d-flex align-items-center">
+                                            <i class="bx bx-cloud-upload font-medium-5 mr-1"></i><span class="font-small-3 secondary darken-4 text-bold-500">میخواهم ضامن شوم</span>
+                                        </span>
+                                    </a>
+                                </div>
+                                <div id="accountStatement" class="rounded-lg zl-menu-item">
+                                    <a class="nav-link dark text-bold-500" href='@Url.Action("AccountStatement","Finotech")'>
+                                        <span class="d-flex align-items-center">
+                                            <i class="bx bx-pie-chart-alt font-medium-5 mr-1"></i><span class="font-small-3 secondary darken-4 text-bold-500">دریافت صورتحساب</span>
+                                        </span>
+                                    </a>
+                                </div>
+                                <hr />
+                                <div class="rounded-lg zl-menu-item">
+                                    <a class="nav-link dark text-bold-500" href="https://talk.imber.live/u3v741blqwlia1iuww" target="_blank">
+                                        <span class="d-flex align-items-center">
+                                            <i class="bx bx-message-dots font-medium-5 mr-1"></i><span class="font-small-3 secondary darken-4 text-bold-500">تیکت‌ها</span>
+                                        </span>
+                                    </a>
+                                </div>
+                                <div class="rounded-lg zl-menu-item">
+                                    <a class="nav-link dark text-bold-500 change-password" href='javascript:void(0)'>
+                                        <span class="d-flex align-items-center">
+                                            <i class="bx bx-key font-medium-5 mr-1"></i><span class="font-small-3 secondary darken-4 text-bold-500">تغییر کلمه عبور</span>
+                                        </span>
+                                    </a>
+                                </div>
+                                <div class="rounded-lg zl-menu-item">
+                                    <a class="nav-link dark text-bold-500" href='@Url.Action("Logout","Account")'>
+                                        <span class="d-flex align-items-center">
+                                            <i class="bx bx-log-out font-medium-5 mr-1"></i><span class="font-small-3 secondary darken-4 text-bold-500">خروج از حساب کاربری</span>
+                                        </span>
+                                    </a>
+                                </div>
+                            </div>
+                        }
+
+                    </div>
+                </div>
+                <div class="col-12 col-lg-9">
+                    @RenderBody()
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="~/new-layout/vendor/vendors.min.js"></script>
+    <script src="~/new-layout/dataTables.net/datatables.min.js"></script>
+    @*<script src="~/new-layout/js/dataTables.buttons.min.js"></script>*@
+    <script src="~/js/jquery.unobtrusive-ajax.min.js"></script>
+    <script src="~/js/wordifyfa.js"></script>
+    <script src="~/vendor/wordify/wordifyfa.js"></script>
+    <script src="~/js/json2.js"></script>
+    <script src="~/Vendor/sweetalert2/sweetalert2.all.min.js" type="text/javascript"></script>
+    <script src="/js/jquery.blockUI.min.js"></script>
+    <script src="/js/moment.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script asp-append-version="true">
+        $(function() {
+            $.ajaxSetup({
+                beforeSend: function(xhr) {
+                    if ('@($"{CookieManager.Get(Context, CookieManager.CookieKeys.JwtToken)}")' != '') {
+                        xhr.setRequestHeader("Authorization", 'Bearer @($"{CookieManager.Get(Context, CookieManager.CookieKeys.JwtToken)}")');
+                    }
+                }
+            });
+        });
+    </script>
+    @{await Html.RenderPartialAsync("~/Views/Account/_ChangePassword.cshtml", new SetNewPasswordModel()); }
+    @{await Html.RenderPartialAsync("~/Views/RequestFacility/_RequestFacilityWorkFlowStepsHistoryOld.cshtml", -1); }
+    @await RenderSectionAsync("scripts", required: false)
+</body>
+</html>

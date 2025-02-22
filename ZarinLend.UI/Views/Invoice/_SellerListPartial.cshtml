@@ -1,0 +1,230 @@
+﻿@model int
+<style type="text/css">
+</style>
+
+<table id="invoiceTable" class="display" style="width:100%">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th >مبلغ فاکتور(ريال)</th>
+            <th >وضعیت فعلی</th>
+            <th >شماره فاکتور</th>
+            <th >ایجاد کننده<br />تاریخ ایجاد</th>
+            <th >توضیحات</th>
+            <th >تصویر فاکتور</th>
+            <th >عملیات</th>
+        </tr>
+    </thead>
+</table>
+
+<script on-content-loaded="true">
+    let dataTableResponsive;
+    $(() => {
+        loadData();
+    });
+    const loadData = () => {
+        dataTableResponsive = $('#invoiceTable')
+            .on('preXhr.dt', function (e, settings, data, a, b) {
+                //trigger before ajax call
+                //debugger;
+                //alert('preXhr');
+                showWaiting('invoiceTable', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+            })
+            .on('xhr.dt', function (e, settings, json, xhr) {
+                //trigger after ajax call
+                //debugger;
+                //alert('xhr');
+            })
+            .DataTable({
+                order: [],
+                processing: true,
+                serverSide: true,
+                responsive: true,
+                rowReorder: false,
+                select: true,
+                searching: false,
+                paging: true,
+                ordering: false,
+                searching: false,
+                filtering: false,
+                info: true,
+                lengthMenu: [
+                    [5, 10, 25, 50],
+                    [5, 10, 25, 50]
+                ],
+                pageLength: @Model,
+                columnDefs: [
+                    //{ "visible": false, "targets": 0 },
+                    //and in this case the < a href="//legacy.datatables.net/ref#bStateSave" > bStateSave</a> works regularly ....but then I would like to have responsive columns indicating responsive: {
+                    {
+                        details: false,
+                        breakpoints: [
+                            { name: 'desktop', width: Infinity },
+                            { name: 'tablet-l', width: 1200 },
+                            { name: 'tablet-p', width: 992 },
+                            { name: 'mobile-l', width: 576 },
+                            { name: 'mobile-p', width: 320 }
+                        ]
+                    },
+                    {
+                        targets: [0, 1, 2, 3, 4, 5, 6, 7],
+                        className: 'dt-center',
+                    },
+                    {
+                        responsivePriority: 0,
+                        targets: 1,
+                        render: function (data, type, row, meta) {
+                            if (data != undefined)
+                                return splitNumber(data);
+                            else
+                                return '';
+                        }
+                    },
+                    {
+                        targets: 2,
+                        render: function (data, type, row, meta) {
+                            return data;
+                        }
+                    },
+                    {
+                        targets: 4,
+                        render: function (data, type, row, meta) {
+                            return `${row.creator}<br/>${data}`;
+                        }
+                    },
+                    {
+                        targets: 6,
+                        render: function (data, type, row, meta) {
+                            return generateDocumentsLink(data);
+                        }
+                    },
+                    {
+                        responsivePriority: 1,
+                        targets: 7,
+                        render: function (data, type, row, meta) {
+                            if (row.status == @((int)InvoiceStatus.Register))
+                                return `<button class="btn btn-outline-primary uploadInvoiceImage" style="width:150px">بارگذاری تصویر فاکتور</button>`;
+                            else if (row.status == @((int)InvoiceStatus.UploadInvoice))
+                                return `<button class="btn btn-outline-info checkout" style="width:150px">درخواست تسویه</button>`;
+                            else
+                                return `<button class="btn btn-outline-primary" disabled style="width:150px">در انتظار پاسخ</button>`;
+                        }
+                    }],
+                rowCallback: function (row, data) {
+                    //$('td:eq(0)', row).css('text-align', 'center');
+                },
+                //ajax: {
+                //    url: `/api/v1/RequestFacilityInstallment/SelectInstallment2/${$('#drpApprovalFacility').val()}`,
+                //    type: 'POST',
+                //    dataSrc: function(data) {
+                //        data.recordsTotal = data.data.length;
+                //        data.recordsFiltered = data.data.length;
+                //        return data.data;
+                //    },
+                //    datatype: "json",
+                //    //contentType: "application/json",
+                //    contentType: "application/json; charset=utf-8",
+                //    data: function(input) {
+                //        debugger;
+                //        //if ($('#FacilityTypeId').val() != '')
+                //        //    input.FacilityTypeId = $('#FacilityTypeId').val();
+
+                //        return JSON.stringify(input);
+                //    },
+                //},
+                ajax: (data, callback, setting) => {
+                    getData(data).then(function (_data) {
+                        callback(_data);
+                    });
+                },
+                drawCallback: function (settings) {
+                    hideWaiting('invoiceTable');
+                },
+                initComplete: function (settings, json) {
+                    $('#invoiceTable tbody').on('click', 'button.uploadInvoiceImage', function () {
+                        debugger;
+                        let data = dataTableResponsive.row(this).data();
+                        if (data == undefined)
+                            data = dataTableResponsive.row($(this).parents('tr')).data();
+
+                        debugger;
+                        $('#btnSave').data('invoice-id', data.id);
+                        $('#btnSaveAndVerifyInvoice').data('invoice-id', data.id);
+                        $("#Number").val(data.number);
+                        $('#uploadInvoiceDocumentModal').modal();
+                    });
+
+                    $('#invoiceTable tbody').on('click', 'button.checkout', function () {
+                        debugger;
+                        showMessage('@ResourceFile.InfoTitle', 'در دست انجام', icons.warning, '@ResourceFile.Close');
+                        // let data = dataTableResponsive.row(this).data();
+                        // if (data == undefined)
+                        //     data = dataTableResponsive.row($(this).parents('tr')).data();
+
+                        // debugger;
+                        // $('#btnSave').data('invoice-id', data.id);
+                        // $('#btnSaveAndVerifyInvoice').data('invoice-id', data.id);
+                        // $("#Number").val(data.number);
+                        // $('#uploadInvoiceDocumentModal').modal();
+                    });
+                },
+                rowCallback: (row, data, displayNum, displayIndex, dataIndex) => {
+                    $('td:eq(0)', row).html(displayIndex + 1);
+                    return row;
+                },
+                columns: [
+                    { "data": null },
+                    { "data": "amount" },
+                    { "data": "statusDescription" },
+                    { "data": "number" },
+                    { "data": "shamsiCreateDate" },
+                    { "data": "description" },
+                    { "data": "invoiceDocuments" },
+                    { "data": "id" }
+                ],
+                language: {
+                    url: '/new-layout/datatables.net/fa.json'
+                }
+            });
+
+        const getData = (data) => {
+            const postData = {
+                Page: Math.floor(data.start / data.length) + 1,
+                PageSize: data.length,
+                SortDirection: null,
+                SortOrder: null,
+                FilterList: []
+            };
+
+            return new Promise(function (resolve, reject) {
+                console.log('Loading data');
+
+                $.ajax({
+                    type: 'post',
+                    datatype: "json",
+                    data: JSON.stringify(postData),
+                    contentType: "application/json; charset=utf-8",
+                    url: `/api/v1/Invoice/ShopInvoices`,
+                    success: function (result) {
+                        if (result != undefined && result.isSuccess == true) {
+                            resolve({
+                                data: result.data.data,
+                                recordsTotal: result.data.totalRowCount,
+                                recordsFiltered: result.data.totalRowCount
+                            });
+                        }
+                    },
+                    error: function (error) {
+                        debugger;
+                        const exception = getExceptionMessageFromError(error);
+                        if (exception != null)
+                            showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                        else
+                            showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                    }
+                });
+            });
+        }
+    }
+
+</script>

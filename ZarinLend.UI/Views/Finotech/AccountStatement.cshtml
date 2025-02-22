@@ -1,0 +1,389 @@
+﻿@model Services.Model.AccountStatement.AccountStatementInput
+@{
+    ViewData["Title"] = "مشاهده صورتحساب";
+    Layout = "~/Views/Shared/_NewLayout.cshtml";
+}
+@section styles{
+    <link href="~/persianDatePicker/css/persianDatepicker-lightorang.css" rel="stylesheet" />
+    <style type="text/css">
+        /*.zl-app-content {
+                                                                                                            padding-right: 1rem !important;
+                                                                                                            padding-left: 1rem !important;
+                                                                                                            }*/
+    </style>
+}
+<div id="requestGridDiv" class="p-2 bg-white rounded-lg">
+    <div class="font-medium-3 secondary darken-4 text-bold-800 d-flex align-items-center">
+        <i class="bx bx-align-right zl-text-secondary mr-25"></i>
+        <span>صورتحساب</span>
+    </div>
+    <form id="frmFilter">
+        <div class="row my-0 my-md-1">
+            <div class="col-md-3">
+                <div class="form-group">
+                    <input type="text" class="form-control bg-transparent" asp-for="deposit" placeholder="شماره حساب" style="text-align:center;direction:ltr;letter-spacing:3px" />
+                    <span asp-validation-for="deposit" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <fieldset class="form-group position-relative has-icon-left">
+                    <input class="form-control bg-transparent shamsi-datepicker" autocomplete="off" asp-for="fromDate" maxlength="10" placeholder="از تاریخ" style="text-align:center;direction:ltr"
+                           type="text" data-fromdate="" data-jdate="@ViewBag.PersianFromDate" data-gdate="@ViewBag.FromDate" />
+                    <div class="form-control-position">
+                        <i class="bx bx-calendar"></i>
+                    </div>
+                    <span asp-validation-for="fromDate" class="text-danger"></span>
+                </fieldset>
+                @*<input asp-for="fromDate" type="hidden" />*@
+            </div>
+            <div class="col-md-3">
+                <fieldset class="form-group position-relative has-icon-left">
+                    <input class="form-control bg-transparent shamsi-datepicker" autocomplete="off" asp-for="toDate" maxlength="10" placeholder="تا تاریخ" style="text-align:center;direction:ltr"
+                           type="text" data-fromdate="" data-jdate="@ViewBag.PersianToDate" data-gdate="@ViewBag.ToDate" />
+                    <div class="form-control-position">
+                        <i class="bx bx-calendar"></i>
+                    </div>
+                    <span asp-validation-for="toDate" class="text-danger"></span>
+                </fieldset>
+                @*<input asp-for="toDate" type="hidden" />*@
+            </div>
+            <div class="col-md-3" style="text-align:left">
+                @if (!string.IsNullOrEmpty(Model.Json))
+                {
+                    <a download="transactions.json" href="data:text/json;base64,@Model.Json" target="_blank" class="btn btn-info">دانلود Json</a>
+                }
+                <button type="button" id="btnSearch" class="btn btn-zl-primary">
+                    <span>جستجو</span>
+                </button>
+            </div>
+        </div>
+    </form>
+    @if (Model.AccountStatementModel != null && Model.AccountStatementModel.Result != null)
+    {
+        <div class="border rounded mt-2 mb-2">
+            <div class="d-flex flex-column flex-sm-row">
+                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                    <span class="font-small-2 text-bold-500">شماره شبا</span>
+                    <span id="fatherNameValue" class="dark mt-50 text-bold-400">@Model.AccountStatementModel.Result.Iban</span>
+                </div>
+                <div class="border-left border-top"></div>
+                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                    <span class="font-small-2 text-bold-500">موجودی</span>
+                    <span id="nationalCodeValue" class="dark mt-50 text-bold-400">@Model.AccountStatementModel.Result.AccountAvailableBalanceLong.ToString("N0")</span>
+                </div>
+            </div>
+        </div>
+        if (Model.AccountStatementModel.Result.Transactions != null)
+        {
+            <table id="transactionList" class="display nowrap" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th >برداشت(ريال)</th>
+                        <th >واریز(ريال)</th>
+                        <th >موجودی(ريال)</th>
+                        <th >تاریخ</th>
+                        <th >زمان</th>
+                        <th >شرح تراکنش</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.AccountStatementModel.Result.Transactions)
+                    {
+                        <tr>
+                            <td>1</td>
+                            <td style="color:red">@item.TransactionAmountDebitLong.ToString("N0")</td>
+                            <td style="color:forestgreen">@item.TransactionAmountCreditLong.ToString("N0")</td>
+                            <td style="color:black">@item.BalanceLong.ToString("N0")</td>
+                            <td>@($"{item.FullDate.Substring(0, 4)}/{item.FullDate.Substring(4, 2)}/{item.FullDate.Substring(6)}")</td>
+                            <td>@($"{item.RequestTime.Substring(0, 2)}:{item.RequestTime.Substring(2, 2)}:{item.RequestTime.Substring(4)}")</td>
+                            <td>@item.OperationCode.Message</td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot class="text-bold-600 black">
+                    <tr>
+                        <td>مجموع</td>
+                        <td style="color:red">@Model.AccountStatementModel.Result.Transactions.Sum(p=> p.TransactionAmountDebitLong).ToString("N0")</td>
+                        <td style="color:forestgreen">@Model.AccountStatementModel.Result.Transactions.Sum(p=> p.TransactionAmountCreditLong).ToString("N0")</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+        }
+    }
+</div>
+
+@section scripts{
+    @{
+        await Html.RenderPartialAsync("~/Views/Shared/_ValidationScriptsPartial.cshtml");
+    }
+    <script src="~/persianDatePicker/js/persianDatepicker.min.js"></script>
+    <script>
+        let dataTableResponsive;
+        $(document).ready(function () {
+            $('div').removeClass('zl-active');
+            $('#accountStatement').addClass('zl-active');
+
+            //$('#fromDate').val('@ViewBag.FromDate');
+            $('#fromDate').val('@ViewBag.PersianFromDate');
+            $("#fromDate").persianDatepicker({
+                //startDate: '1300/01/01',
+                //endDate: new persianDate().now().addYear(-18).toString("YYYY/MM/DD"),
+                months: ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"],
+                dowTitle: ["شنبه", "یکشنبه", "دوشنبه", "سه شنبه", "چهارشنبه", "پنج شنبه", "جمعه"],
+                shortDowTitle: ["ش", "ی", "د", "س", "چ", "پ", "ج"],
+                theme: 'lightorang',
+                showGregorianDate: !1,
+                persianNumbers: !0,
+                formatDate: "YYYY/0M/0D",
+                selectedBefore: 0,
+                selectedDate: '@ViewBag.PersianFromDate',
+                prevArrow: '\u25c4',
+                nextArrow: '\u25ba',
+                alwaysShow: !1,
+                selectableYears: null,
+                selectableMonths: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                cellWidth: 35, // by px
+                cellHeight: 30, // by px
+                fontSize: 14, // by px
+                isRTL: !1,
+                calendarPosition: {
+                    x: 0,
+                    y: 0,
+                },
+                onSelect: function () {
+                    //alert($("#ShamsiFromDate").attr("data-gdate"));
+                    debugger;
+                    if (moment($("#toDate").attr("data-gdate")).diff($("#fromDate").attr("data-gdate"), 'days') > 31) {
+                        showMessage("اخطار", "حداکثر بازه زمانی برای نمایش صورتحساب 31 میتواند باشد!", icons.warning, 'متوجه شدم');
+                    }
+                    //$('#FromDate').val($("#ShamsiFromDate").attr("data-gdate"));
+                },
+                onShow: function () { },
+                onHide: function () { },
+                onRender: function () { }
+            });
+
+            $('#toDate').val('@ViewBag.PersianToDate');
+            $("#toDate").persianDatepicker({
+                //startDate: '1300/01/01',
+                //endDate: new persianDate().now().addYear(-18).toString("YYYY/MM/DD"),
+                months: ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"],
+                dowTitle: ["شنبه", "یکشنبه", "دوشنبه", "سه شنبه", "چهارشنبه", "پنج شنبه", "جمعه"],
+                shortDowTitle: ["ش", "ی", "د", "س", "چ", "پ", "ج"],
+                theme: 'lightorang',
+                showGregorianDate: !1,
+                persianNumbers: !0,
+                formatDate: "YYYY/0M/0D",
+                selectedBefore: 0,
+                selectedDate: '@ViewBag.PersianToDate',
+                prevArrow: '\u25c4',
+                nextArrow: '\u25ba',
+                alwaysShow: !1,
+                selectableYears: null,
+                selectableMonths: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                cellWidth: 35, // by px
+                cellHeight: 30, // by px
+                fontSize: 14, // by px
+                isRTL: !1,
+                calendarPosition: {
+                    x: 0,
+                    y: 0,
+                },
+                onSelect: function () {
+                    //alert($("#ShamsiFromDate").attr("data-gdate"));
+                    debugger;
+                    if (moment($("#toDate").attr("data-gdate")).diff($("#fromDate").attr("data-gdate"), 'days') > 31) {
+                        showMessage("اخطار", "حداکثر بازه زمانی برای نمایش صورتحساب 31 میتواند باشد!", icons.warning, 'متوجه شدم');
+                    }
+                    //$('#FromDate').val($("#ShamsiFromDate").attr("data-gdate"));
+                },
+                onShow: function () { },
+                onHide: function () { },
+                onRender: function () { }
+            });
+
+            initializeAccountStatementsTable();
+        });
+
+        $('#btnSearch').click(function (e) {
+            e.preventDefault();
+            debugger;
+            const formIsValid = $('#frmFilter').valid();
+
+            if (moment($("#toDate").attr("data-gdate")).diff($("#fromDate").attr("data-gdate"), 'days') > 31) {
+                showMessage("اخطار", "حداکثر بازه زمانی برای نمایش صورتحساب 31 میتواند باشد!", icons.warning, 'متوجه شدم');
+                return;
+            }
+            if (formIsValid) {
+                const filter = {
+                    fromDate: $("#fromDate").attr("data-jdate"),
+                    toDate: $("#toDate").attr("data-jdate"),
+                    deposit: $("#deposit").val()
+                    //deposit:'0201706363006'
+                };
+                $.ajax({
+                    type: 'post',
+                    dataType: 'json',
+                    contentType: "application/json; charset=utf-8",
+                    url: '/api/v1/Finotech/GenerateUrlToGetAuthorizationCode',
+                    data: JSON.stringify(filter),
+                    success: function (result) {
+                        hideWaiting('contentDiv');
+                        debugger;
+                        if (result.isSuccess) {
+                            window.location.replace(result.data);
+                        }
+                    },
+                    error: function (error) {
+                        hideWaiting('contentDiv');
+                        const exception = getExceptionMessageFromError(error);
+                        if (exception != null)
+                            showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                        else
+                            showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                    }
+                });
+            }
+        });
+
+        const initializeAccountStatementsTable = () => {
+            dataTableResponsive = $('#transactionList')
+                .DataTable({
+                    order: [],
+                    processing: true,
+                    serverSide: false,
+                    responsive: true,
+                    rowReorder: false,
+                    select: true,
+                    searching: false,
+                    paging: true,
+                    ordering: false,
+                    searching: false,
+                    filtering: false,
+                    info: true,
+                    lengthMenu: [
+                        [10, 25, 50, -1],
+                        [10, 25, 50, 'همه']
+                    ],
+                    pageLength: 25,
+                    //fixedHeader: {
+                    //    header: true,
+                    //    footer: true
+                    //},
+                    //columnDefs: [{
+                    //    targets: 0,
+                    //    Id: function (td, cellData, rowData, row, col) {
+                    //        debugger;
+                    //        if (rowData[5] === 'Inactive') {
+                    //            $(td).css('color', 'red');
+                    //        }
+                    //    }
+                    //}],
+                    columnDefs: [
+                        //{ "visible": false, "targets": 0 },
+                        //and in this case the < a href="//legacy.datatables.net/ref#bStateSave" > bStateSave</a> works regularly ....but then I would like to have responsive columns indicating responsive: {
+                        {
+                            details: false,
+                            breakpoints: [
+                                { name: 'desktop', width: Infinity },
+                                { name: 'tablet-l', width: 1200 },
+                                { name: 'tablet-p', width: 992 },
+                                { name: 'mobile-l', width: 576 },
+                                { name: 'mobile-p', width: 320 }
+                            ]
+                        },
+                        {
+                            targets: [0, 1, 2, 3, 4, 5, 6],
+                            className: 'dt-center',
+                        }],
+                    rowCallback: function (row, data) {
+                        $('td:eq(0)', row).css('text-align', 'center');
+                        $('td:eq(1)', row).css('text-align', 'center');
+                        $('td:eq(2)', row).css('text-align', 'center');
+                        $('td:eq(3)', row).css('text-align', 'center');
+                        $('td:eq(4)', row).css('text-align', 'center');
+                        $('td:eq(5)', row).css('text-align', 'center');
+                        $('td:eq(6)', row).css('text-align', 'center');
+                        //$('td', row).eq(1).css('color', 'red');
+                    },
+                    //ajax: {
+                    //    url: `/api/v1/RequestFacilityInstallment/SelectInstallment2/${$('#drpApprovalFacility').val()}`,
+                    //    type: 'POST',
+                    //    dataSrc: function(data) {
+                    //        data.recordsTotal = data.data.length;
+                    //        data.recordsFiltered = data.data.length;
+                    //        return data.data;
+                    //    },
+                    //    datatype: "json",
+                    //    //contentType: "application/json",
+                    //    contentType: "application/json; charset=utf-8",
+                    //    data: function(input) {
+                    //        debugger;
+                    //        //if ($('#FacilityTypeId').val() != '')
+                    //        //    input.FacilityTypeId = $('#FacilityTypeId').val();
+
+                    //        return JSON.stringify(input);
+                    //    },
+                    //},
+                    //ajax: (data, callback, setting) => {
+                    //    //getInstallmentData(data).then(function (_data) {
+                    //    //    callback(_data);
+                    //    //});
+                    //},
+                    drawCallback: function (settings) {
+
+                    },
+                    initComplete: function (settings, json) {
+                    },
+                    rowCallback: (row, data, displayNum, displayIndex, dataIndex) => {
+
+                        $('td:eq(0)', row).html(displayIndex + 1);
+                        return row;
+                    },
+                    //columns: [
+                    //    //{
+                    //    //    "data": "Id",
+                    //    //    render: function (data, type, row, meta) {
+                    //    //        return meta.settings.oAjaxData.start + meta.row + 1;
+                    //    //    }
+                    //    //},
+                    //    //{
+                    //    //    "data": "PersonFirstName",
+                    //    //    render: function (data, type) {
+                    //    //        //debugger;
+                    //    //        //if (type === 'display') {
+                    //    //        //    let link = 'http://datatables.net';
+
+                    //    //        //    if (data[0] < 'H') {
+                    //    //        //        link = 'http://cloudtables.com';
+                    //    //        //    } else if (data[0] < 'S') {
+                    //    //        //        link = 'http://editor.datatables.net';
+                    //    //        //    }
+
+                    //    //        //    return '<a href="' + link + '">' + data + '</a>';
+                    //    //        //}
+
+                    //    //        return data;
+                    //    //    },
+                    //    //},
+                    //    //{ "data": null },
+                    //    //{ "data": "amount" },
+                    //    //{ "data": "shamsiDueDate" },
+                    //    //{ "data": "penaltyDays" },
+                    //    //{ "data": "penaltyAmount" },
+                    //    //{ "data": "realPayAmount" },
+                    //    //{ "data": "shamsiRealPayDate" },
+                    //    //{ "data": "paid" }
+                    //],
+                    language: {
+                        url: '/new-layout/datatables.net/fa.json'
+                    }
+                });
+        }
+    </script>
+}

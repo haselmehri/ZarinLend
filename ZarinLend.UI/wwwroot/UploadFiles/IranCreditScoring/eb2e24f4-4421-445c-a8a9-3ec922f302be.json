@@ -1,0 +1,580 @@
+{
+  "reportTypes": [
+    "Base",
+    "Standard",
+    "Score",
+    "Judiciary",
+    "Tax"
+  ],
+  "score": {
+    "personInformation": {
+      "name": "ريحانه سادات",
+      "nationalCode": "0014619229",
+      "address": "-",
+      "contacts": [],
+      "hasBlockedContract": true,
+      "dateOfBirth": "1370/12/28",
+      "family": "حسيني اراني",
+      "fatherName": "سيد محمود",
+      "maritalStatus": "مجرد",
+      "placeOfBirth": "تهران",
+      "sex": "زن",
+      "companyType": null,
+      "registrationNumber": null,
+      "percent": 0,
+      "gradeDescription": "ریسک پایین"
+    },
+    "scoreCodes": [
+      {
+        "code": "NTX1",
+        "description": "تعداد کم سال‌های دارای سابقه پرداخت مالیات حقوق و دستمزد طی 4 سال اخیر",
+        "order": 1
+      },
+      {
+        "code": "AGE2",
+        "description": "رده سنی جوان",
+        "order": 2
+      },
+      {
+        "code": "DPD7",
+        "description": "دارای تعدادی ماه با تاخیر در بازپرداخت یا وضعیت منفی طی 5 سال اخیر",
+        "order": 3
+      },
+      {
+        "code": "BCM4",
+        "description": "دارای یک وام‌ با سابقه بدهی پرداخت نشده در سررسید طی 3 سال اخیر",
+        "order": 4
+      }
+    ],
+    "score": 634,
+    "description": "ریسک پایین",
+    "risk": "B1",
+    "inquiryCreatedDate": "1403/11/26 19:33:341",
+    "perviouScoreDate": null,
+    "perviouScore": false
+  },
+  "report": {
+    "personInformation": {
+      "name": "ريحانه سادات",
+      "nationalCode": "0014619229",
+      "address": "-",
+      "contacts": [
+        {
+          "title": "تلفن همراه",
+          "value": " 09351481154 "
+        },
+        {
+          "title": "تلفن ثابت",
+          "value": " 09351481154 "
+        },
+        {
+          "title": "تلفن ثابت",
+          "value": " - "
+        },
+        {
+          "title": "تلفن ثابت",
+          "value": " مطابق توضیحات آدرس "
+        }
+      ],
+      "hasBlockedContract": false,
+      "dateOfBirth": "1370/12/28",
+      "family": "حسيني اراني",
+      "fatherName": "سيد محمود",
+      "maritalStatus": "مجرد",
+      "placeOfBirth": "تهران",
+      "sex": "زن",
+      "companyType": null,
+      "registrationNumber": null
+    },
+    "inquiryStats": [
+      {
+        "organizationType": "بانک مرکزی",
+        "organizationTypeCode": "0102533",
+        "lastMonthInquiryCount": 0,
+        "lastYearInquiryCount": 0,
+        "personNegativeStatusCount": 0,
+        "contractNegativeStatusCount": 0
+      },
+      {
+        "organizationType": "بانک ها و موسسات اعتباری",
+        "organizationTypeCode": "010333",
+        "lastMonthInquiryCount": 0,
+        "lastYearInquiryCount": 0,
+        "personNegativeStatusCount": 0,
+        "contractNegativeStatusCount": 0
+      },
+      {
+        "organizationType": "تلکام/سازمان هاي خدماتی",
+        "organizationTypeCode": "0108933",
+        "lastMonthInquiryCount": 0,
+        "lastYearInquiryCount": 0,
+        "personNegativeStatusCount": 0,
+        "contractNegativeStatusCount": 0
+      },
+      {
+        "organizationType": "سازمان های خرده فروشی",
+        "organizationTypeCode": "0106633",
+        "lastMonthInquiryCount": 0,
+        "lastYearInquiryCount": 0,
+        "personNegativeStatusCount": 0,
+        "contractNegativeStatusCount": 0
+      },
+      {
+        "organizationType": "سازمان های عمومی/دولتی",
+        "organizationTypeCode": "01010233",
+        "lastMonthInquiryCount": 0,
+        "lastYearInquiryCount": 0,
+        "personNegativeStatusCount": 0,
+        "contractNegativeStatusCount": 0
+      },
+      {
+        "organizationType": "سازمان های قضايی",
+        "organizationTypeCode": "01012233",
+        "lastMonthInquiryCount": 0,
+        "lastYearInquiryCount": 0,
+        "personNegativeStatusCount": 0,
+        "contractNegativeStatusCount": 0
+      },
+      {
+        "organizationType": "مصرف کنندگان",
+        "organizationTypeCode": "01010033",
+        "lastMonthInquiryCount": 0,
+        "lastYearInquiryCount": 0,
+        "personNegativeStatusCount": 0,
+        "contractNegativeStatusCount": 0
+      },
+      {
+        "organizationType": "موسسات اعتباري غير متشکل",
+        "organizationTypeCode": "0103033",
+        "lastMonthInquiryCount": 0,
+        "lastYearInquiryCount": 0,
+        "personNegativeStatusCount": 0,
+        "contractNegativeStatusCount": 0
+      },
+      {
+        "organizationType": "موسسات صادر کننده کارت اعتباری",
+        "organizationTypeCode": "0104433",
+        "lastMonthInquiryCount": 0,
+        "lastYearInquiryCount": 0,
+        "personNegativeStatusCount": 0,
+        "contractNegativeStatusCount": 0
+      }
+    ],
+    "personRoles": [
+      {
+        "title": "متقاضی اصلی",
+        "numberOfContracts": 3,
+        "code": "0101333"
+      },
+      {
+        "title": "ضامن",
+        "numberOfContracts": 0,
+        "code": "0109433"
+      }
+    ],
+    "summaryInformationRelatedToContracts": [
+      {
+        "organizationName": "بانک ملل",
+        "organizationNameCode": "0204171",
+        "currency": "ریال",
+        "currencyCode": "0102933",
+        "inProgressContractsCount": 1,
+        "terminatedContractsCount": 0,
+        "outstandingAmount": 125000000.0,
+        "overdueAmount": 0.0,
+        "typeOfFinancing": "ضمانت نامه",
+        "typeOfFinancingCode": "0104933",
+        "roleType": 0,
+        "totalAmount": 125000000.0,
+        "organizationId": 41
+      },
+      {
+        "organizationName": "بانک ملل",
+        "organizationNameCode": "0204171",
+        "currency": "ریال",
+        "currencyCode": "0102933",
+        "inProgressContractsCount": 1,
+        "terminatedContractsCount": 0,
+        "outstandingAmount": 330468747.0,
+        "overdueAmount": 0.0,
+        "typeOfFinancing": "تسهیلات",
+        "typeOfFinancingCode": "0104233",
+        "roleType": 0,
+        "totalAmount": 625000000.0,
+        "organizationId": 41
+      },
+      {
+        "organizationName": "بانک ملت",
+        "organizationNameCode": "0201271",
+        "currency": "ریال",
+        "currencyCode": "0102933",
+        "inProgressContractsCount": 1,
+        "terminatedContractsCount": 0,
+        "outstandingAmount": 1003628000.0,
+        "overdueAmount": 0.0,
+        "typeOfFinancing": "تسهیلات",
+        "typeOfFinancingCode": "01010533",
+        "roleType": 0,
+        "totalAmount": 1463998200.0,
+        "organizationId": 12
+      }
+    ],
+    "summaryInformationRelatedToContractsSum": [
+      {
+        "currency": "ریال",
+        "currencyCode": "0102933",
+        "outstandingAmount": 1459096747.0,
+        "overdueAmount": 0.0,
+        "inProgressContractsCount": 3,
+        "terminatedContractsCount": 0,
+        "totalAmount": 2213998200.0
+      }
+    ],
+    "directContracts": [
+      {
+        "contractId": 0,
+        "organizationName": "بانک ملل",
+        "organizationNameCode": "0104133",
+        "organizationType": "بانک ها و موسسات اعتباری",
+        "organizationTypeCode": "010333",
+        "contractNumber": "052850875000010144",
+        "contractCurrency": "ریال",
+        "contractCurrencyCode": "0102933",
+        "installmentsCurrency": "ریال",
+        "installmentsCurrencyCode": "0102933",
+        "customerRoleTilte": "متقاضی اصلی",
+        "customerRole": 13,
+        "customerRoleCode": "0101333",
+        "expectedEndDate": "1405/05/02",
+        "instalmentAmount": 18359375.0,
+        "paymentMethod": "اختیار برداشت از حساب",
+        "paymentMethodCode": "0107433",
+        "negativeContractStatus": "فاقد وضعیت منفی",
+        "negativeContractStatusCode": "0104033",
+        "outstandingAmount": 330468747.0,
+        "overdueAmount": 0.0,
+        "paymentPeriodicity": "ماهانه",
+        "paymentPeriodicityCode": "0105633",
+        "phaseOfOperationTitle": "درجریان",
+        "phaseOfOperation": 69,
+        "phaseOfOperationCode": "0106933",
+        "purposeOfTheCredit": "خرید لوازم مصرفی",
+        "purposeOfTheCreditCode": "01010633",
+        "accountingDate": "1403/10/30",
+        "startDate": "1401/05/02",
+        "totalAmount": 625000000.0,
+        "typeOfFinancingTitle": "مرابحه",
+        "typeOfFinancing": 42,
+        "typeOfFinancingCode": "0104233",
+        "typeofInstallments": "اقساط ثابت",
+        "typeofInstallmentsCode": "0105733",
+        "realEndDate": null,
+        "totalNumberOfInstallments": 48,
+        "totalNumberOfOverdue": 0,
+        "totalNumberOfOutstanding": 18,
+        "guarantees": [
+          {
+            "value": 125000000.0,
+            "type": "ضمانت نامه",
+            "typeCode": "01016133",
+            "currency": "ریال",
+            "currencyCode": "0102933"
+          },
+          {
+            "value": 976000000.0,
+            "type": "برات و سفته",
+            "typeCode": "01016633",
+            "currency": "ریال",
+            "currencyCode": "0102933"
+          },
+          {
+            "value": 885000000.0,
+            "type": "سایر",
+            "typeCode": "01017233",
+            "currency": "ریال",
+            "currencyCode": "0102933"
+          }
+        ],
+        "relatedPersons": [],
+        "repayments": [
+          {
+            "date": "1403/10",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": 0,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1403/9",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": 0,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1403/8",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": 0,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1403/7",
+            "overdueAmount": null,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1403/6",
+            "overdueAmount": null,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1403/5",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": 0,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1403/4",
+            "overdueAmount": null,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1403/3",
+            "overdueAmount": null,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1403/2",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": 0,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1403/1",
+            "overdueAmount": null,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1402/12",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": 0,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1402/11",
+            "overdueAmount": null,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          }
+        ],
+        "contractStartDateIsTransactionType": false
+      },
+      {
+        "contractId": 0,
+        "organizationName": "بانک ملت",
+        "organizationNameCode": "0101233",
+        "organizationType": "بانک ها و موسسات اعتباری",
+        "organizationTypeCode": "010333",
+        "contractNumber": "1401236122980",
+        "contractCurrency": "ریال",
+        "contractCurrencyCode": "0102933",
+        "installmentsCurrency": "ریال",
+        "installmentsCurrencyCode": "0102933",
+        "customerRoleTilte": "متقاضی اصلی",
+        "customerRole": 13,
+        "customerRoleCode": "0101333",
+        "expectedEndDate": "1411/06/17",
+        "instalmentAmount": 10909000.0,
+        "paymentMethod": "حساب جاری",
+        "paymentMethodCode": "01011133",
+        "negativeContractStatus": "فاقد وضعیت منفی",
+        "negativeContractStatusCode": "0104033",
+        "outstandingAmount": 1003628000.0,
+        "overdueAmount": 0.0,
+        "paymentPeriodicity": "ماهانه",
+        "paymentPeriodicityCode": "0105633",
+        "phaseOfOperationTitle": "درجریان",
+        "phaseOfOperation": 69,
+        "phaseOfOperationCode": "0106933",
+        "purposeOfTheCredit": "سایر",
+        "purposeOfTheCreditCode": "0107933",
+        "accountingDate": "1403/10/30",
+        "startDate": "1401/06/17",
+        "totalAmount": 1463998200.0,
+        "typeOfFinancingTitle": "قرض الحسنه",
+        "typeOfFinancing": 105,
+        "typeOfFinancingCode": "01010533",
+        "typeofInstallments": "اقساط ثابت",
+        "typeofInstallmentsCode": "0105733",
+        "realEndDate": null,
+        "totalNumberOfInstallments": 120,
+        "totalNumberOfOverdue": 0,
+        "totalNumberOfOutstanding": 92,
+        "guarantees": [
+          {
+            "value": 1463998200.0,
+            "type": "سایر",
+            "typeCode": "01017233",
+            "currency": "ریال",
+            "currencyCode": "0102933"
+          }
+        ],
+        "relatedPersons": [
+          {
+            "customerRole": "ضامن",
+            "customerRoleCode": "0109433",
+            "nationalCode": "0039983560"
+          }
+        ],
+        "repayments": [
+          {
+            "date": "1403/10",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": 0,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1403/9",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": 0,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1403/8",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": 0,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1403/7",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": 0,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1403/6",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": 0,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1403/5",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": 0,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1403/4",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": 0,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1403/3",
+            "overdueAmount": null,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1403/2",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": 0,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1403/1",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": 0,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1402/12",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": 0,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1402/11",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": 0,
+            "negativeContractStatus": 0
+          }
+        ],
+        "contractStartDateIsTransactionType": false
+      },
+      {
+        "contractId": 0,
+        "organizationName": "بانک ملل",
+        "organizationNameCode": "0104133",
+        "organizationType": "بانک ها و موسسات اعتباری",
+        "organizationTypeCode": "010333",
+        "contractNumber": "0528BG737000012764",
+        "contractCurrency": "ریال",
+        "contractCurrencyCode": null,
+        "installmentsCurrency": "ریال",
+        "installmentsCurrencyCode": null,
+        "customerRoleTilte": "متقاضی اصلی",
+        "customerRole": 13,
+        "customerRoleCode": "0101333",
+        "expectedEndDate": "1404/05/02",
+        "instalmentAmount": 125000000.0,
+        "paymentMethod": "پرداخت مستقیم (نقدی)",
+        "paymentMethodCode": null,
+        "negativeContractStatus": "فاقد وضعیت منفی",
+        "negativeContractStatusCode": "0104033",
+        "outstandingAmount": 125000000.0,
+        "overdueAmount": 0.0,
+        "paymentPeriodicity": "نامنظم",
+        "paymentPeriodicityCode": null,
+        "phaseOfOperationTitle": "درجریان",
+        "phaseOfOperation": 69,
+        "phaseOfOperationCode": "0106933",
+        "purposeOfTheCredit": "سایر",
+        "purposeOfTheCreditCode": "0107933",
+        "accountingDate": "1403/10/30",
+        "startDate": "1401/05/02",
+        "totalAmount": 125000000.0,
+        "typeOfFinancingTitle": "ضمانت نامه",
+        "typeOfFinancing": 49,
+        "typeOfFinancingCode": "0104933",
+        "typeofInstallments": "اقساط پلکانی",
+        "typeofInstallmentsCode": null,
+        "realEndDate": null,
+        "totalNumberOfInstallments": null,
+        "totalNumberOfOverdue": 0,
+        "totalNumberOfOutstanding": 1,
+        "guarantees": [],
+        "relatedPersons": [],
+        "repayments": [],
+        "contractStartDateIsTransactionType": false
+      }
+    ],
+    "indirectContracts": [],
+    "contractNegativeStatus": [],
+    "personNegativeStatus": [
+      {
+        "organizationName": "بانک ملت",
+        "organizationNameCode": "0101233",
+        "organizationType": "بانک ها و موسسات اعتباری",
+        "organizationTypeCode": "010333",
+        "date": "1403/10/30",
+        "state": "فاقد وضعیت منفی",
+        "stateCode": "01015633"
+      },
+      {
+        "organizationName": "بانک ملل",
+        "organizationNameCode": "0104133",
+        "organizationType": "بانک ها و موسسات اعتباری",
+        "organizationTypeCode": "010333",
+        "date": "1403/10/30",
+        "state": "فاقد وضعیت منفی",
+        "stateCode": "01015633"
+      }
+    ],
+    "inquiryCreatedDate": "1403/11/26 19:33:00",
+    "reportUniqueId": "0000 8080 0000 0369 5604"
+  }
+}

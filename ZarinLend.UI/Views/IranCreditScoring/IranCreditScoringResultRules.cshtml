@@ -1,0 +1,549 @@
+﻿@model Services.Model.IranCreditScoring.IranCreditScoringResultRuleAddEditModel
+@{
+    ViewData["Title"] = "قوانین اعتبارسنجی";
+    Layout = "~/Views/Shared/_NewLayout.cshtml";
+}
+@section styles
+    {
+    <style type="text/css">
+    </style>
+}
+<div id="requestGridDiv" class="p-2 bg-white rounded-lg">
+    <div class="font-medium-3 secondary darken-4 text-bold-800 d-flex align-items-center">
+        <i class="bx bx-align-right zl-text-secondary mr-25"></i>
+        <span>قوانین اعتبارسنجی</span>
+    </div>
+    <div class="row mt-1">
+        <div class="col-md-12">
+            <div class="form-group">
+                <button type="button" id="btnAdd" class="btn btn-outline-info">
+                    ثبت جدبد&nbsp;<i class="fal fa-plus"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    <table id="iranCreditScoringRuleList" class="display" style="width:100%">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th >جامعه هدف/محل استفاده</th>
+                <th >امتیاز</th>
+                <th >حداقل مبلغ قابل درخواست</th>
+                <th >حداکثر مبلغ قابل درخواست</th>
+                <th >نیاز به ضامن؟</th>
+                <th >ایجاد کننده<br />تاریخ ایجاد</th>
+                <th >ویرایش کننده<br />تاریخ ویرایش</th>
+                <th >وضعیت</th>
+                <th >عملیات</th>
+            </tr>
+        </thead>
+    </table>
+</div>
+<form id="frmAddEdit" method="post" enctype="multipart/form-data">
+    <div class="modal fade text-left" id="addEditModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel18" style="display: none;" data-backdrop="static" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl" role="document">
+            <div class="modal-content rounded-lg modal-xl">
+                <div class="modal-header">
+                    <h4 class="modal-title dark" id="myModalLabel18">
+                        ثبت/ویرایش قانون جدید
+                    </h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="بستن">
+                        <i class="bx bx-x"></i>
+                    </button>
+                </div>
+                <div class="modal-body line-height-2" id="modalContent">
+                    <div class="row">
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-group">
+                                <label class="control-label" asp-for="IranCreditScoringResultRuleType"></label>
+                                <div class="d-flex align-items-center justify-content-around">
+                                    <fieldset>
+                                        <div class="radio radio-success radio-glow radio-sm">
+                                            <input type="radio" name="IranCreditScoringResultRuleType" value="@((int)IranCreditScoringResultRuleType.ForRequestFacility)" @(Model.IranCreditScoringResultRuleType == IranCreditScoringResultRuleType.ForRequestFacility ? "checked='checked'" : "") id="ForRequestFacility" />
+                                            <label class="font-small success darken-4 text-bold-400 line-height-23" for="ForRequestFacility">تسهیلات گیرنده</label>
+                                        </div>
+                                    </fieldset>
+                                    <fieldset>
+                                        <div class="radio radio-success radio-glow radio-sm">
+                                            <input type="radio" name="IranCreditScoringResultRuleType" value="@((int)IranCreditScoringResultRuleType.ForRequestFacilityGuarantor)" @(!(Model.IranCreditScoringResultRuleType == IranCreditScoringResultRuleType.ForRequestFacilityGuarantor) ? "checked='checked'" : "") id="ForRequestFacilityGuarantor" />
+                                            <label class="font-small success darken-4 text-bold-400 line-height-23" for="ForRequestFacilityGuarantor">ضامن</label>
+                                        </div>
+                                    </fieldset>
+                                </div>
+                                <span asp-validation-for="IranCreditScoringResultRuleType" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-group">
+                                <label asp-for="Risk" class="control-label"></label>
+                                <input asp-for="Risk" type="text" class="form-control" />
+                                <span asp-validation-for="Risk" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-group">
+                                <label asp-for="MinimumAmount" class="control-label"></label>
+                                <input asp-for="MinimumAmountThousandSeparator" type="text" class="form-control number-thousand-separator" />
+                                <span asp-validation-for="MinimumAmountThousandSeparator" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-group">
+                                <label asp-for="MaximumAmount" class="control-label"></label>
+                                <input asp-for="MaximumAmountThousandSeparator" type="text" class="form-control number-thousand-separator" />
+                                <span asp-validation-for="MaximumAmountThousandSeparator" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-group">
+                                <label class="control-label" asp-for="GuarantorIsRequired"></label>
+                                <div class="d-flex align-items-center justify-content-around">
+                                    <fieldset>
+                                        <div class="radio radio-primary radio-glow radio-sm">
+                                            <input type="radio" name="GuarantorIsRequired" value="true" @(Model.GuarantorIsRequired ? "checked='checked'" : "") id="GuarantorIsRequired" />
+                                            <label class="font-small primary darken-4 text-bold-400 line-height-23" for="GuarantorIsRequired">بله</label>
+                                        </div>
+                                    </fieldset>
+                                    <fieldset>
+                                        <div class="radio radio-primary radio-glow radio-sm">
+                                            <input type="radio" name="GuarantorIsRequired" value="false" @(!Model.GuarantorIsRequired ? "checked='checked'" : "") id="GuarantorIsNotRequired" />
+                                            <label class="font-small primary darken-4 text-bold-400 line-height-23" for="GuarantorIsNotRequired">خیر</label>
+                                        </div>
+                                    </fieldset>
+                                </div>
+                                <span asp-validation-for="GuarantorIsRequired" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-group">
+                                <label class="control-label" asp-for="IsActive"></label>
+                                <div class="d-flex align-items-center justify-content-around">
+                                    <fieldset>
+                                        <div class="radio radio-danger radio-glow radio-sm">
+                                            <input type="radio" name="IsActive" value="true" @(Model.IsActive ? "checked='checked'" : "") id="IsActive" />
+                                            <label class="font-small danger darken-4 text-bold-400 line-height-23" for="IsActive">فعال</label>
+                                        </div>
+                                    </fieldset>
+                                    <fieldset>
+                                        <div class="radio radio-warning radio-glow radio-sm">
+                                            <input type="radio" name="IsActive" value="false" @(!Model.IsActive ? "checked='checked'" : "") id="IsDisable" />
+                                            <label class="font-small danger darken-4 text-bold-400 line-height-23" for="IsDisable">غیر فعال</label>
+                                        </div>
+                                    </fieldset>
+                                </div>
+                                <span asp-validation-for="IsActive" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="text-right">
+                        <a href="#" class="btn btn-outline-secondary" data-dismiss="modal">
+                            <span>انصراف</span>
+                        </a>
+                        <button id="btnSave" class="btn btn-outline-success" data-request-id="-1">
+                            @ResourceFile.Save&nbsp;<i class="fal fa-save"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+@section scripts{
+    @{
+        await Html.RenderPartialAsync("~/Views/Shared/_ValidationScriptsPartial.cshtml");
+    }
+    <script>
+        let dataTableResponsive;
+        $(document).ready(() => {
+            $('div').removeClass('zl-active');
+            $('#iranCreditScoringResultRulesMenu').addClass('zl-active');
+            loadData();
+        });
+
+        //$('#btnAddGlobalSetting').click(function (e) {
+        //    e.preventDefault();
+        //    $('#globalSettingModal').modal();
+        //});
+        const loadData = () => {
+            dataTableResponsive = $('#iranCreditScoringRuleList')
+                .on('preXhr.dt', function (e, settings, data, a, b) {
+                    //trigger before ajax call
+                    //debugger;
+                    //alert('preXhr');
+                    showWaiting('iranCreditScoringRuleList', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                })
+                .on('xhr.dt', function (e, settings, json, xhr) {
+                    //trigger after ajax call
+                    //debugger;
+                    //alert('xhr');
+                })
+                .DataTable({
+                    order: [],
+                    processing: true,
+                    serverSide: true,
+                    responsive: true,
+                    rowReorder: false,
+                    select: true,
+                    searching: false,
+                    paging: true,
+                    ordering: false,
+                    searching: false,
+                    filtering: false,
+                    info: true,
+                    lengthMenu: [
+                        [5, 10, 25, 50],
+                        [5, 10, 25, 50]
+                    ],
+                    pageLength: 10,
+                    //columnDefs: [{
+                    //    targets: 0,
+                    //    Id: function (td, cellData, rowData, row, col) {
+                    //        debugger;
+                    //        if (rowData[5] === 'Inactive') {
+                    //            $(td).css('color', 'red');
+                    //        }
+                    //    }
+                    //}],
+                    columnDefs: [
+                        //{ "visible": false, "targets": 0 },
+                        //and in this case the < a href="//legacy.datatables.net/ref#bStateSave" > bStateSave</a> works regularly ....but then I would like to have responsive columns indicating responsive: {
+                        {
+                            details: false,
+                            breakpoints: [
+                                { name: 'desktop', width: Infinity },
+                                { name: 'tablet-l', width: 1200 },
+                                { name: 'tablet-p', width: 992 },
+                                { name: 'mobile-l', width: 576 },
+                                { name: 'mobile-p', width: 320 }
+                            ]
+                        },
+                        {
+                            targets: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+                            className: 'dt-center',
+                        },
+                        {
+                            responsivePriority: 0,
+                            targets: 1,
+                            render: function (data, type, row, meta) {
+                                return '@((int)IranCreditScoringResultRuleType.ForRequestFacility)' == data ? 'تسهیلات گیرنده' : 'ضامن';
+                            }
+                        },
+                        {
+                            targets: [3,4],
+                            render: function (data, type, row, meta) {
+                                if (data != undefined)
+                                    return splitNumber(data);
+                                else
+                                    return '';
+                            }
+                        },
+                        {
+                            targets: 5,
+                            render: function (data, type, row, meta) {
+                                return `${data ? '<span style="color:green">بله</span>' : '<span style="color:red">خیر</span>'}`;
+                            }
+                        },
+                        {
+                            targets: 6,
+                            render: function (data, type, row, meta) {
+                                return `${row.creator}<br/>${data}`;
+                            }
+                        },
+                        {
+                            targets: 7,
+                            render: function (data, type, row, meta) {
+                                return `${row.updater}<br/>${data}`;
+                            }
+                        },
+                        {
+                            targets: 8,
+                            render: function (data, type, row, meta) {
+                                return `${data ? '<span style="color:green">فعال</span>' : '<span style="color:red">غیرفعال</span>'}`;
+                            }
+                        },
+                        {
+                            responsivePriority: 1,
+                            targets: 9,
+                            render: function (data, type, row, meta) {
+                                return (`<button class="btn btn-outline-primary" id="btnEdit" style="width:80px">ویرایش</button> 
+                                         <button class="btn btn-outline-danger" id="btnDelete" style="width:80px">حذف</button>`);
+                            }
+                        }],
+                    rowCallback: function (row, data) {
+                        //$('td:eq(0)', row).css('text-align', 'center');
+                    },
+                    //ajax: {
+                    //    url: `/api/v1/RequestFacilityInstallment/SelectInstallment2/${$('#drpApprovalFacility').val()}`,
+                    //    type: 'POST',
+                    //    dataSrc: function(data) {
+                    //        data.recordsTotal = data.data.length;
+                    //        data.recordsFiltered = data.data.length;
+                    //        return data.data;
+                    //    },
+                    //    datatype: "json",
+                    //    //contentType: "application/json",
+                    //    contentType: "application/json; charset=utf-8",
+                    //    data: function(input) {
+                    //        debugger;
+                    //        //if ($('#FacilityTypeId').val() != '')
+                    //        //    input.FacilityTypeId = $('#FacilityTypeId').val();
+
+                    //        return JSON.stringify(input);
+                    //    },
+                    //},
+                    ajax: (data, callback, setting) => {
+                        getData(data).then(function (_data) {
+                            callback(_data);
+                        });
+                    },
+                    drawCallback: function (settings) {
+                        hideWaiting('iranCreditScoringRuleList');
+                    },
+                    initComplete: function (settings, json) {
+                        $('#iranCreditScoringRuleList tbody').on('click', 'button#btnEdit', function () {
+                            debugger;
+                            let data = dataTableResponsive.row(this).data();
+                            if (data == undefined)
+                                data = dataTableResponsive.row($(this).parents('tr')).data();
+
+                            debugger;
+                            $('#btnSave').data('request-id', data.id);
+                            $("#MinimumAmountThousandSeparator").val(data.minimumAmount != undefined ? splitNumber(data.minimumAmount) : '');
+                            $("#MaximumAmountThousandSeparator").val(data.maximumAmount != undefined ? splitNumber(data.maximumAmount) : '');
+                            $("#MinimumAmount").val(data.minimumAmount != undefined ? data.minimumAmount : '');
+                            $("#MaximumAmount").val(data.maximumAmount != undefined ? data.maximumAmount : '');
+                            $("#Risk").val(data.risk);
+                            $('#ForRequestFacility').prop('checked',data.iranCreditScoringResultRuleType == @((int)IranCreditScoringResultRuleType.ForRequestFacility));
+                            $('#ForRequestFacilityGuarantor').prop('checked', data.iranCreditScoringResultRuleType == @((int)IranCreditScoringResultRuleType.ForRequestFacilityGuarantor));
+
+                            $('#GuarantorIsRequired').prop('checked', data.guarantorIsRequired);
+                            $('#GuarantorIsNotRequired').prop('checked', !data.guarantorIsRequired);
+
+                            $('#IsActive').prop('checked', data.isActive);
+                            $('#IsDisable').prop('checked', !data.isActive);
+
+                            $('#addEditModal').modal();                            
+                        });
+                    },
+                    rowCallback: (row, data, displayNum, displayIndex, dataIndex) => {
+                        $('td:eq(0)', row).html(displayIndex + 1);
+                        return row;
+                    },
+                    columns: [
+                        { "data": null },
+                        { "data": "iranCreditScoringResultRuleType" },
+                        { "data": "risk" },
+                        { "data": "minimumAmount" },
+                        { "data": "maximumAmount" },
+                        { "data": "guarantorIsRequired" },
+                        { "data": "shamsiCreateDate" },
+                        { "data": "shamsiUpdateDate" },
+                        { "data": "isActive" },
+                        { "data": "id" }
+                    ],
+                    language: {
+                        url: '/new-layout/datatables.net/fa.json'
+                    }
+                });
+
+            const getData = (data) => {
+                const postData = {
+                    Page: Math.floor(data.start / data.length) + 1,
+                    PageSize: data.length,
+                    SortDirection: null,
+                    SortOrder: null,
+                    FilterList: []
+                };
+
+                return new Promise(function (resolve, reject) {
+                    console.log('Loading data');
+
+                    $.ajax({
+                        type: 'post',
+                        datatype: "json",
+                        data: JSON.stringify(postData),
+                        contentType: "application/json; charset=utf-8",
+                        url: `/api/v1/IranCreditScoringResultRule/List`,
+                        success: function (result) {
+                            if (result != undefined && result.isSuccess == true) {
+                                resolve({
+                                    data: result.data.data,
+                                    recordsTotal: result.data.totalRowCount,
+                                    recordsFiltered: result.data.totalRowCount
+                                });
+                            }
+                        },
+                        error: function (error) {
+                            debugger;
+                            const exception = getExceptionMessageFromError(error);
+                            if (exception != null)
+                                showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                            else
+                                showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                        }
+                    });
+                });
+            }
+
+            $('#iranCreditScoringRuleList tbody').on('click', 'button#btnDelete', function (e) {
+                debugger;
+                e.preventDefault();
+                let data = dataTableResponsive.row(this).data();
+                if (data == undefined)
+                    data = dataTableResponsive.row($(this).parents('tr')).data();
+
+                Swal.fire({
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    title: 'هشدار',
+                    //text: message,
+                    html: 'آیا برای حذف مطمئن هستید؟',
+                    icon: icons.warning,
+                    confirmButtonText: 'بله،مطمئنم',
+                    confirmButtonClass: 'btn btn-danger',
+                    cancelButtonText: "خیر،مطمئن نیستم",
+                    cancelButtonClass: "btn btn-warning",
+                    showCancelButton: true,
+                    closeOnConfirm: false,
+                    closeOnCancel: false,
+                }).then((result) => {
+                    if (result.value) {
+                        debugger;
+                        showWaiting('iranCreditScoringRuleList', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                        $.ajax({
+                            type: 'delete',
+                            //data: JSON.stringify(postData),
+                            datatype: "json",
+                            contentType: "application/json; charset=utf-8",
+                            url: `/api/v1/IranCreditScoringResultRule/Delete/${data.id}`,
+                            success: function (result) {
+                                hideWaiting('iranCreditScoringRuleList');
+                                if (result !== undefined && result !== null && result.isSuccess === true) {
+                                    dataTableResponsive.page(0);
+                                    dataTableResponsive.ajax.reload(null, false);
+                                    showMessage('پیغام', 'عملیات با موفقیت انجام شد!', icons.info, '@ResourceFile.Close');
+                                }
+                                else {
+                                    showMessage('خطا', result.message, icons.error, '@ResourceFile.Close');
+                                }
+                            },
+                            error: function (error) {
+                                debugger;
+                                hideWaiting('iranCreditScoringRuleList');
+                                const exception = getExceptionMessageFromError(error);
+                                if (exception != null)
+                                    showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                                else
+                                    showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                            }
+                        });
+                    }
+                });
+            });
+        }
+
+        $('#btnAdd').on('click', e => {
+            e.preventDefault();
+            $("#MinimumAmountThousandSeparator").val('');
+            $("#MaximumAmountThousandSeparator").val('');
+            $("#MinimumAmount").val('');
+            $("#MaximumAmount").val('');
+            $("#Risk").val('');
+            $('input[name=IsActive]').prop('checked', false);
+            $('input[name=GuarantorIsRequired]').prop('checked', false);
+            $('input[name=IranCreditScoringResultRuleType]').prop('checked', false);
+            $('#btnSave').data('request-id', -1);
+            $('#addEditModal').modal();
+        });
+
+        $('#btnSave').click(function (e) {
+            e.preventDefault();
+            debugger;
+            const formIsValid = $('#frmAddEdit').valid();
+            const minimumAmount = parseInt(replaceAllComma($('#MinimumAmountThousandSeparator').val()));
+            const maximumAmount = parseInt(replaceAllComma($('#MaximumAmountThousandSeparator').val()));
+            @*if (amount <= 0) {
+                showMessage('@ResourceFile.ErrorTitle', 'هزینه اعتبار سنجی باید بزرگتر از صفر باشد', icons.error, '@ResourceFile.Close');
+                return;
+            }*@
+            const isActive = $('input[name=IsActive]:checked').val();
+            if (isActive == undefined) {
+                showMessage('@ResourceFile.InfoTitle', 'لطفا وضعیت <b>وضعیت(فعال/غیر فعال)</b> را انتخاب کنید!', icons.warning, '@ResourceFile.Close');
+                return;
+            }
+            const guarantorIsRequired = $('input[name=GuarantorIsRequired]:checked').val();
+            if (guarantorIsRequired == undefined) {
+                showMessage('@ResourceFile.InfoTitle', 'لطفا وضعیت <b>نیاز به ضامن دارد؟</b>  را مشخص کنید!', icons.warning, '@ResourceFile.Close');
+                return;
+            }
+            const iranCreditScoringResultRuleType = $('input[name=IranCreditScoringResultRuleType]:checked').val();
+            if (iranCreditScoringResultRuleType == undefined) {
+                showMessage('@ResourceFile.InfoTitle', 'لطفا وضعیت <b>جامعه هدف</b>  را مشخص کنید!', icons.warning, '@ResourceFile.Close');
+                return;
+            }
+
+            if (formIsValid) {
+                let data = new FormData();
+                let ajaxUrl = '/api/v1/IranCreditScoringResultRule/Add';
+                if ($('#btnSave').data('request-id') != -1) {
+                    data.append('Id', $('#btnSave').data('request-id'));
+                    ajaxUrl = '/api/v1/IranCreditScoringResultRule/Edit';
+                }
+
+                showWaiting('modalContent', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+
+                
+                data.append('MinimumAmountThousandSeparator', $("#MinimumAmountThousandSeparator").val());
+                data.append('MinimumAmount', minimumAmount);
+                data.append('MaximumAmountThousandSeparator', $("#MaximumAmountThousandSeparator").val());
+                data.append('MaximumAmount', maximumAmount);
+                data.append('Risk', $('#Risk').val());
+                data.append('IsActive', isActive);
+                data.append('GuarantorIsRequired', guarantorIsRequired);
+                data.append('IranCreditScoringResultRuleType', iranCreditScoringResultRuleType);
+
+                $.ajax({
+                    type: 'post',
+                    //dataType: 'json',
+                    //contentType: "application/json; charset=utf-8",
+                    //enctype: 'multipart/form-data',
+                    contentType: false,
+                    processData: false,
+                    url: ajaxUrl,
+                    //data: JSON.stringify(model),
+                    data: data,
+                    success: function (result) {
+                        $('#btnSave').data('request-id', -1);
+                        if (result.isSuccess) {
+                            dataTableResponsive.page(0);
+                            dataTableResponsive.ajax.reload(null, false);
+                            hideWaiting('modalContent');
+                            showMessage('@ResourceFile.InfoTitle', '@ResourceFile.MessageSuccess', icons.success, '@ResourceFile.Close');
+                            $('#addEditModal').modal('hide');
+                        }
+                        else if (!result.isSuccess) {
+                            showMessage('@ResourceFile.ErrorTitle', result.message, icons.error, '@ResourceFile.Close');
+                        }
+                    },
+                    error: function (error) {
+                        hideWaiting('modalContent');
+                        const exception = getExceptionMessageFromError(error);
+                        if (exception != null)
+                            showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                        else
+                            showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                    }
+                });
+            }
+            else {
+                scrollToFirstError();
+            }
+        });
+    </script>
+}

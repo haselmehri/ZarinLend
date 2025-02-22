@@ -1,0 +1,331 @@
+﻿@{
+    ViewData["Title"] = ViewBag.Title;
+    Layout = "~/Views/Shared/_NewLayout.cshtml";
+    var ajaxUrl = "/api/v1/RequestFacility/SearchRequest";
+}
+@section styles
+    {
+    <style type="text/css">
+        /*    .zl-app-content {
+                                    padding-right: 5rem !important;
+                                    padding-left: 5rem !important;
+                                }*/
+    </style>
+}
+@section scripts
+    {
+    <script src="~/new-layout/chart/chart.min.js"></script>
+    <script src="~/new-layout/chart/chartjs-gauge.js"></script>
+    <script>
+        $(() => {
+            $('div').removeClass('zl-active');
+            $('#myDashboard').addClass('zl-active');
+            loadRequests();
+        });
+
+        const loadRequests = () => {
+            responsiveDatatable = $('#requestList')
+                .on('preXhr.dt', function (e, settings, data, a, b) {
+                    //trigger before ajax call
+                    //debugger;
+                    //alert('preXhr');
+                    showWaiting('requestList', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                })
+                .on('xhr.dt', function (e, settings, json, xhr) {
+                    //trigger after ajax call
+                    //debugger;
+                    //alert('xhr');
+                })
+                .DataTable({
+                    order: [],
+                    processing: true,
+                    serverSide: true,
+                    responsive: true,
+                    rowReorder: false,
+                    select: true,
+                    searching: false,
+                    paging: true,
+                    ordering: false,
+                    searching: false,
+                    filtering: false,
+                    info: true,
+                    lengthMenu: [
+                        [5, 10, 25, 50],
+                        [5, 10, 25, 50]
+                    ],
+                    pageLength: 10,
+                    //columnDefs: [{
+                    //    targets: 0,
+                    //    Id: function (td, cellData, rowData, row, col) {
+                    //        debugger;
+                    //        if (rowData[5] === 'Inactive') {
+                    //            $(td).css('color', 'red');
+                    //        }
+                    //    }
+                    //}],
+                    columnDefs: [
+                        //{ "visible": false, "targets": 0 },
+                        //and in this case the < a href="//legacy.datatables.net/ref#bStateSave" > bStateSave</a> works regularly ....but then I would like to have responsive columns indicating responsive: {
+                        {
+                            details: false,
+                            breakpoints: [
+                                { name: 'desktop', width: Infinity },
+                                { name: 'tablet-l', width: 1200 },
+                                { name: 'tablet-p', width: 992 },
+                                { name: 'mobile-l', width: 576 },
+                                { name: 'mobile-p', width: 320 }
+                            ]
+                        },
+                        {
+                            targets: [0, 1, 2, 3, 4, 5, 6, 7, 8],
+                            className: 'dt-center',
+                        },
+                        {
+                            targets: 1,
+                            render: function (data, type, row, meta) {
+                                return `${splitNumber(data)}<br/>${row.monthCountTitle}`;
+                            }
+                        },
+                        {
+                            targets: 2,
+                            render: function (data, type, row, meta) {
+                                return `${data}<br/>${row.nationalCode}`;
+                            }
+                        },
+                        {
+                            targets: 4,
+                            render: function (data, type, row, meta) {
+                                let guarantorDesc = 'خیر';
+                                if (data) {
+                                    guarantorDesc = 'بله';
+                                    if (row.lastGuarantorFullName != null)
+                                        guarantorDesc += `<br/>${row.lastGuarantorFullName}`;
+                                }
+                                return `<span style='color:red'>${guarantorDesc}</span>`;
+                            }
+                        },
+                        {
+                            targets: 7,
+                            responsivePriority: 2,
+                            render: function (data, type, row, meta) {
+                                let waitingStep = '';
+                                if (data.cancelByUser) {
+                                    const cancelByUserDescription = "<span style='color:red'>انصراف توسط کاربر</span>";
+                                    if ('@((short)StatusEnum.Approved)' == data.statusId)
+                                        waitingStep = `${data.lastStatusDescription}(${cancelByUserDescription})`;
+                                    else if ('@((short)StatusEnum.Rejected)' == data.statusId)
+                                        waitingStep = `${data.lastStatusDescription}(${cancelByUserDescription})`;
+                                    else
+                                        waitingStep = `${data.lastStatusDescription}(${cancelByUserDescription})`;
+                                }
+                                else {
+                                    if ('@((short)StatusEnum.Approved)' == data.statusId)
+                                        waitingStep += data.lastStatusDescription;
+                                    else if ('@((short)StatusEnum.Rejected)' == data.statusId)
+                                        waitingStep = data.lastStatusDescription;
+                                    else {
+                                        waitingStep = data.lastStatusDescription;
+                                    }
+                                }
+                                return `<div class="badge badge-pill zl-badge-upload-document"><div class="d-flex align-items-center"><i class="bx bxs-circle font-size-xxsmall mr-25"></i>${waitingStep}</div></div>`;
+                            }
+                        },
+                        {
+                            targets: 8,
+                            responsivePriority: 3,
+                            render: function (data, type, row, meta) {
+                                let cancelButtonHtml = '';
+                                let buttonsHtml = `<a class="dropdown-item change-status" href='@Url.Action("Detail","RequestFacility")/${data.id}'><i class="bx bx-detail font-medium-5 secondary darken-4 mr-75"></i>جزئیات</a>`;
+
+                                if (!data.cancelByUser) {
+                                    if (data.formUrl != null)
+                                        buttonsHtml = `<a href='${data.formUrl}' class='dropdown-item change-status'><i class="bx bx-news font-medium-5 secondary darken-4 mr-75"></i>اقدام</a>` + buttonsHtml;
+
+                                }
+                                buttonsHtml += `<a id='requestHistory' class="dropdown-item request-history" data-request-facility-id='${data.id}' href='javascript:void(0)'><i class="bx bx-detail font-medium-5 secondary darken-4 mr-75"></i>تاریخچه مراحل تسهیلات</a>`;
+                                buttonsHtml += `<a class="dropdown-item"  href='@Url.Action("Edit","User")/${data.reguesterId}'><i class="bx bx-detail font-medium-5 secondary darken-4 mr-75"></i>ویرایش اطلاعات هویتی</a>`;
+
+                                return `<div class="btn-group dropright"><a href="#" class="dark" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="bx bx-dots-horizontal"></i></a><div class="dropdown-menu">${buttonsHtml}</div></div>`;
+                            }
+                        }],
+                    rowCallback: function (row, data) {
+                    },
+                    ajax: (data, callback, setting) => {
+                        getFacilityRequestData(data).then(function (_data) {
+                            callback(_data);
+                        });
+                    },
+                    drawCallback: function (settings) {
+                        hideWaiting('requestList');
+                    },
+                    initComplete: function (settings, json) {
+                    },
+                    rowCallback: (row, data, displayNum, displayIndex, dataIndex) => {
+                        $('td:eq(0)', row).html(displayIndex + 1);
+                        return row;
+                    },
+                    columns: [
+                        //{
+                        //    //For Row Number
+                        //    "data": "Id",
+                        //    render: function (data, type, row, meta) {
+                        //        return meta.settings.oAjaxData.start + meta.row + 1;
+                        //    }
+                        //},
+                        //{
+                        //    "data": "PersonFirstName",
+                        //    render: function (data, type) {
+                        //        //debugger;
+                        //        //if (type === 'display') {
+                        //        //    let link = 'http://datatables.net';
+
+                        //        //    if (data[0] < 'H') {
+                        //        //        link = 'http://cloudtables.com';
+                        //        //    } else if (data[0] < 'S') {
+                        //        //        link = 'http://editor.datatables.net';
+                        //        //    }
+
+                        //        //    return '<a href="' + link + '">' + data + '</a>';
+                        //        //}
+
+                        //        return data;
+                        //    },
+                        //},
+                        { "data": null },
+                        { "data": "amount" },
+                        { "data": "requester" },
+                        { "data": "leasingName" },
+                        { "data": "guarantorIsRequired" },
+                        { "data": "shamsiCreateDate" },
+                        { "data": "shamsiLastActionDate" },
+                        { "data": null },
+                        { "data": null },
+                    ],
+                    language: {
+                        url: '/new-layout/datatables.net/fa.json'
+                    }
+                });
+
+            const getFacilityRequestData = (data) => {
+                const postData = {
+                    Page: Math.floor(data.start / data.length) + 1,
+                    PageSize: data.length,
+                    SortDirection: null,
+                    SortOrder: null,
+                    FilterList: []
+                };
+
+                postData.FilterList.push({
+                    PropertyName: 'FacilityStatus',
+                    Operator: @((int)Services.Dto.Operator.Equal),
+                    PropertyValue: @((int)FacilityStatus.WaitingRequest)
+                });
+
+                return new Promise(function (resolve, reject) {
+                    console.log('Loading data');
+
+                    $.ajax({
+                        type: 'post',
+                        datatype: "json",
+                        data: JSON.stringify(postData),
+                        contentType: "application/json; charset=utf-8",
+                        url: '@ajaxUrl',
+                        success: function (result) {
+                            if (result != undefined && result.isSuccess == true) {
+                                resolve({
+                                    data: result.data.data,
+                                    recordsTotal: result.data.totalRowCount,
+                                    recordsFiltered: result.data.totalRowCount
+                                });
+                            }
+                        },
+                        error: function (error) {
+                            debugger;
+                            const exception = getExceptionMessageFromError(error);
+                            if (exception != null)
+                                showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                            else
+                                showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                        },
+                        complete: function () {
+
+                        },
+                    });
+                });
+            }
+
+            $('#requestList tbody').on('click', 'a#requestHistory', function (e) {
+                e.preventDefault();
+                let data = responsiveDatatable.row(this).data();
+                if (data == undefined)
+                    data = responsiveDatatable.row($(this).parents('tr')).data();
+                loadRequestFacilitySteps(data.id);
+                $('#requestFacilityStepsHistoryModal').modal();
+            });
+        }
+    </script>
+}
+<div class="row">
+    <div class="col-12 col-lg-7">
+        <div class="p-1 rounded-lg bg-white">
+            <div class="font-medium-1 secondary darken-4 text-bold-700 mb-2">
+                ماشین حساب محاسبه وام
+            </div>
+            <div class="font-medium-1 secondary darken-4 text-bold-700 mt-3">
+                حداکثر مبلغ قسطی را که در ماه توان پرداخت دارید را وارد
+                کنید:
+            </div>
+            <div class="mt-3 mb-1">
+                <input type="number"
+                       class="form-control-lg border w-100"
+                       placeholder="حداکثر مبلغ قابل پرداخت" />
+            </div>
+            <div class="text-bold-450 text-center font-medium-5 mt-3">
+                حداکثر سقف وام دریافتی
+            </div>
+            <div class="w-100 d-flex align-items-center justify-content-center mb-n25">
+                <span class="font-large-25 text-bold-500 secondary darken-4">400,000,000</span>
+                <span class="font-small-75 ml-2">ریال</span>
+            </div>
+            <div class="text-center mt-3">
+                <a class="btn btn-zl-primary btn-lg" href='@Url.Action("Add","RequestFacility")'>
+                    درخواست تسهیلات
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-lg-5 mt-1 mt-lg-0">
+        <div class="rounded-lg bg-white p-1">
+            @await Component.InvokeAsync("UserIranCreditScoringHistory", new { userId =  new Guid(User.Identity.GetUserId()),showFileLinks=false })
+        </div>
+    </div>
+    <div class="col-12 mt-1">
+        <div class="rounded-lg bg-white p-1 pt-2">
+            <div class="d-flex align-items-center justify-content-between">
+                <div class="font-medium-1 secondary darken-4 text-bold-700">
+                    درخواست های اخیر
+                </div>
+                <div>
+                    <a href="@Url.Action("SearchRequest","RequestFacility")" class="rounded dark border px-1 py-50">مشاهده همه</a>
+                </div>
+            </div>
+            <div class="mt-2">
+                <table id="requestList" class="display" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th >اعتبار درخواستی(ريال)<br />بازه پرداخت</th>
+                            <th >درخواست کننده<br />کد ملی/شناسه ملی</th>
+                            <th >نهاد مالی</th>
+                            <th >ضامن نیاز دارد<br />نام ضامن</th>
+                            <th >تاریخ درخواست</th>
+                            <th >تاریخ آخرین اقدام</th>
+                            <th >وضعیت</th>
+                            <th scope="col" >اقدام</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

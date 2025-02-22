@@ -1,0 +1,438 @@
+﻿@model Services.Model.AgentRequestModel
+@{
+    ViewData["Title"] = _loc["AddCardIssuanceRequest_Title"];
+}
+@section styles
+{
+    <style type="text/css">
+        textarea {
+            height: 120px !important;
+        }
+
+        .table-custom th,
+        .table-custom td {
+            text-align: center !important;
+            vertical-align: middle !important;
+        }
+
+        .button-columns {
+            padding-top: 7px !important;
+            width: 100px;
+            text-align: center;
+        }
+
+        .form-check-input {
+            margin-right: 3px !important;
+        }
+    </style>
+}
+
+<form id="frmAgentRequest" method="post">
+    <div class="card">
+        <div class="card-header" localize-content>AddCardIssuanceRequest_Title</div>
+        <div class="card-body">
+            @if (Model.IsEditMode && Model.RequestHistory.Any())
+            {
+                <div class="row">
+                    <div class="col-md-12">
+                        <partial name="_History" model="Model.RequestHistory"/>
+                    </div>
+                </div>
+            }
+            <fieldset>
+                <legend localize-content>
+                    SelectCardType
+                </legend>
+                @if (!Model.IsEditMode)
+                {
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="control-label" asp-for="CardTypeId"></label>
+                                <select name="CardTypeId" asp-for="CardTypeId" class="custom-select form-control"
+                                        asp-items="Model.CardTypes">
+                                    <option value="" localize-content>SelectCardType</option>
+                                </select>
+                                <span asp-validation-for="CardTypeId" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <input type="hidden" asp-for="JsonListCardTypes" />
+                        <div class="col-md-6" id="cardTypeInfo">
+
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="row">
+                        <div class="col-md-12">
+                            @_loc["CardType"] : <b>@Model.CardTypeTitle</b> <br />
+                            @_loc["Wage"] : <b>@Model.CardTypeWage.ToString("N0")</b> @_loc["RialIran"] <br />
+                            @_loc["Description"] : <b>@(Model.CardTypeDescrition == null ? "-" : Model.CardTypeDescrition)</b><br />
+                        </div>
+                    </div>
+                }
+            </fieldset>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="control-label" asp-for="FName"></label>
+                        <input asp-for="FName" class="form-control" />
+                        <span asp-validation-for="FName" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="control-label" asp-for="LName"></label>
+                        <input asp-for="LName" class="form-control" />
+                        <span asp-validation-for="LName" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="control-label" asp-for="PassportId"></label>
+                        <input asp-for="PassportId" class="form-control" style="text-align:center; direction:ltr" />
+                        <span asp-validation-for="PassportId" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="control-label" asp-for="PrivateNumber"></label>
+                        <input asp-for="PrivateNumber" class="form-control" style="text-align:center; direction:ltr" />
+                        <span asp-validation-for="PrivateNumber" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="control-label" asp-for="Mobile"></label>
+                        <input asp-for="Mobile" class="form-control" style="text-align:center; direction:ltr" />
+                        <span asp-validation-for="Mobile" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="control-label" asp-for="Email"></label>
+                        <input asp-for="Email" class="form-control" style="text-align:center; direction:ltr" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="control-label" asp-for="CountryId"></label>
+                        <select name="CountryId" asp-for="CountryId" class="custom-select form-control"
+                                asp-items="Model.Countries">
+                            <option value="" localize-content>SelectNationality</option>
+                        </select>
+                        <span asp-validation-for="CountryId" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="control-label" localize-content>Attachments</label>
+                        <input type="file" name="PostedFiles" id="PostedFiles" class="form-control-file" multiple>
+                        @if (Model.IsEditMode && Model.Documents != null &&
+Model.Documents.Any(p => !p.IsDeleted && p.DocumentType != DocumentType.CustomerSelfiToCard))
+                        {
+                            for (var index = 0; index < Model.Documents.Count; index++)
+                            {
+                                if (index > 0)
+                                {
+                                    <br />
+                                }
+                                <a target='_blank' href='@Model.Documents[index].FilePath'>@_loc["DocNumber"] @(index + 1) </a>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" '@(Model.IsEditMode && Model.DeliveryAgentId.HasValue ? "checked" : "")'
+                               id="chkDelivereCardOtherLocation">
+                        <label class="form-check-label" for="flexCheckDefault" localize-content>
+                            DeliverCardOtherLocation
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="control-label" asp-for="DeliveryAgentId"></label>
+                        <select name="DeliveryAgentId" asp-for="DeliveryAgentId" class="custom-select form-control"
+                                asp-items="Model.Agents" disabled='@(Model.IsEditMode && Model.DeliveryAgentId.HasValue ? "" : "disabled")'>
+                            <option value="" style="color:red" localize-content>SelectDeliveryAgent</option>
+                        </select>
+                        <span asp-validation-for="DeliveryAgentId" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            @if (Model.IsEditMode)
+            {
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <p style="color:blueviolet" localize-content>UploadCustomerSelfiToCard_Info</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="control-label" localize-content>UploadCustomerSelfiToCard_Title</label>
+                            <input type="file" name="SelfiToCard" id="SelfiToCard" class="form-control-file" accept="image/*">
+                            @if (Model.IsEditMode && Model.Documents != null && Model.Documents.Any(p => !p.IsDeleted && p.DocumentType == DocumentType.CustomerSelfiToCard))
+                            {
+                                var selfiImage = Model.Documents.First(p => !p.IsDeleted && p.DocumentType == DocumentType.CustomerSelfiToCard);
+                                <a target='_blank' href='@selfiImage.FilePath'><img src='@selfiImage.FilePath' style='width:100px;' alt='@_loc["SelfiPhotoToCard"]' /></a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="card-footer" style="text-align:left">
+            @if (Model.IsEditMode)
+            {
+                <button id="btnEditRequest" class="btn btn-outline-success">
+                    @_loc["RegisterRequest"]&nbsp;<i class="fal fa-edit"></i>
+                </button>
+                <a class="btn btn-outline-secondary" href='@Url.Action("CardIssuanceList","AgentRequest")'>
+                    @_loc["Cancel"]&nbsp;<i class="fal fa-close"></i>
+                </a>
+            }
+            else
+            {
+                <button id="btnSaveRequest" class="btn btn-outline-success">
+                    @_loc["RegisterRequest"]&nbsp;<i class="fal fa-save"></i>
+                </button>
+                <a class="btn btn-outline-secondary" href='@Url.Action("CardIssuanceList","AgentRequest")'>
+                    @_loc["Cancel"]&nbsp;<i class="fal fa-close"></i>
+                </a>
+            }
+        </div>
+    </div>
+</form>
+@section scripts{
+    @*<partia name="_ValidationScriptsPartial" />*@
+    @{
+        await Html.RenderPartialAsync("~/Views/Shared/_ValidationScriptsPartial.cshtml");
+    }
+    <script>
+
+        $(document).ready(function () {
+            @if (Model.IsEditMode)
+                {
+                <text>
+            $('#CardTypeId').val(@Model.CardTypeId);
+            $('#CardTypeId').change();
+            </text>
+                }
+        });
+
+        @if (!Model.IsEditMode)
+        {
+            <text>
+        const cardTypeListInfo = $('#JsonListCardTypes').val() !== '' ? JSON.parse($('#JsonListCardTypes').val()) : [];
+        $('#CardTypeId').change((e) => {
+            $('#cardTypeInfo').html('');
+            if ($(e.target).val() !== '') {
+                $.map(cardTypeListInfo, (item) => {
+                    debugger;
+                    if (item.CardTypeId == $(e.target).val()) {
+                        const freeCardCountHtml = item.FreeCardCount > 0
+                            ? `<b style='color:green'>${item.FreeCardCount}</b>`
+                            : `<b style='color:red'>${item.FreeCardCount}</b>`;
+                        $('#cardTypeInfo').html(`@_loc["Wage"] : <b>${splitNumber(item.Wage)}</b> @_loc["RialIran"]<br/>
+                                                 @_loc["Description"] : <b>${item.Description == null ? '-' : item.Description}</b><br/>
+                                                 @_loc["FreeCardCount"] : ${freeCardCountHtml}`);
+                        return;
+                    }
+                });
+            }
+        });
+            </text>
+            }
+
+        $("#chkDelivereCardOtherLocation").change((e) => {
+         debugger;
+         if ($(e.target).prop('checked')) {
+                $("#DeliveryAgentId").prop('disabled', false);
+            }
+            else {
+                $("#DeliveryAgentId").prop('disabled', 'true');
+                $("#DeliveryAgentId").val('');
+            }
+        });
+        @if (!Model.IsEditMode) {
+            <text>
+        $('#btnSaveRequest').click(function (e) {
+            e.preventDefault();
+            debugger;
+            const formIsValid = $('#frmAgentRequest').valid();
+            const fileUpload = $("#PostedFiles")[0];
+            if ($("#chkDelivereCardOtherLocation").prop('checked') && $("#DeliveryAgentId").val() == '') {
+                showMessage('@_loc["ErrorTitle"]', '@_loc["SelectDeliverAgentCard"]', icons.error, '@_loc["Close"]');
+                return;
+            }
+
+            if (formIsValid) {
+                showWaiting('frmAgentRequest', '@_loc["PleaseWait"]', '@_loc["Loading"]');
+                //const postdata = $('#frmAgentRequest').serialize();
+                //const model = {
+                //    FName: $("#FName").val(),
+                //    LName: $("#LName").val(),
+                //    PassportId: $("#PassportId").val(),
+                //    Mobile: $("#Mobile").val(),
+                //    PrivateNumber: $("#PrivateNumber").val(),
+                //    Email: $("#Email").val(),
+                //    Amount: $("#Amount").val(),
+                //    CountryId: $('#CountryId').val(),
+                //    CardTypeId: $('#CardTypeId').val()
+                //};
+                let data = new FormData();
+                $.map(fileUpload.files, (item) => {
+                    data.append('AddCardIssuanceFiles', item);
+                });
+                data.append('FName', $("#FName").val());
+                data.append('LName', $("#LName").val());
+                data.append('PassportId', $("#PassportId").val());
+                data.append('Mobile', $("#Mobile").val());
+                data.append('PrivateNumber', $("#PrivateNumber").val());
+                data.append('Email', $("#Email").val());
+                //data.append('Amount', $("#Amount").val());
+                data.append('Amount', 0);
+                data.append('Email', $("#Email").val());
+                data.append('CountryId', $("#CountryId").val());
+                data.append('CardTypeId', $("#CardTypeId").val());
+                if ($("#chkDelivereCardOtherLocation").prop('checked'))
+                    data.append('DeliveryAgentId', $('#DeliveryAgentId').val());
+                $.ajax({
+                    type: 'post',
+                    //dataType: 'json',
+                    //contentType: "application/json; charset=utf-8",
+                    processData: false,
+                    contentType: false,
+                    url: '/api/v1/AgentRequest/AddCardIssuance',
+                    data: data,// JSON.stringify(model),
+                    success: function (result) {
+                        hideWaiting('frmAgentRequest');
+                        debugger;
+                        if (result.isSuccess) {
+                            showMessage('@_loc["InfoTitle"]', '@_loc["MessageSuccess_NowUploadCustomerSelfiToCard"]', icons.success, '@_loc["Close"]');
+                            setTimeout(function () {
+                                window.location.replace('@Url.Action("UploadCustomerSelfiToCard","AgentRequest")/' + result.data);
+                            }, 2500);
+                        }
+                    },
+                    error: function (error) {
+                        hideWaiting('frmAgentRequest');
+                        if (error.responseJSON != undefined && error.responseJSON.Message != undefined && error.responseJSON.Message != '') {
+                            if (IsJsonString(error.responseJSON.Message)) {
+                                const exception = JSON.parse(error.responseJSON.Message).Exception;
+                                showMessage('@_loc["ErrorTitle"]', exception, icons.error, '@_loc["Close"]');
+                            }
+                            else
+                                showMessage('@_loc["ErrorTitle"]', error.responseJSON.Message, icons.error, '@_loc["Close"]');
+                        }
+                        else {
+                            showMessage('@_loc["ErrorTitle"]', '@_loc["UnhandledError"]', icons.error, '@_loc["Close"]');
+                        }
+                    }
+                });
+            }
+            else {
+                scrollToFirstError();
+            }
+        });
+            </text>
+        }
+        else
+        {
+          <text>
+        $('#btnEditRequest').click(function (e) {
+            e.preventDefault();
+            debugger;
+            const formIsValid = $('#frmAgentRequest').valid();
+            const fileUpload = $("#PostedFiles")[0];
+            const SelfiToCardFileUpload = $("#SelfiToCard")[0];
+
+            @*if (SelfiToCardFileUpload == undefined || SelfiToCardFileUpload.files.length == 0) {
+                showMessage('@_loc["ErrorTitle"]', '@_loc["MessageUploadCustomerSelfiToCard"]', icons.error,'@_loc["Close"]');
+                return;
+            }*@
+            if ($("#chkDelivereCardOtherLocation").prop('checked') && $("#DeliveryAgentId").val() == '') {
+                showMessage('@_loc["ErrorTitle"]', '@_loc["SelectDeliverAgentCard"]', icons.error, '@_loc["Close"]');
+                return;
+            }
+            if (formIsValid) {
+                showWaiting('frmAgentRequest', '@_loc["PleaseWait"]', '@_loc["Loading"]');
+                let data = new FormData();
+                $.map(fileUpload.files, (item) => {
+                    data.append('cardIssuanceFiles', item);
+                });
+                if (SelfiToCardFileUpload.files.length > 0)
+                    data.append('customerSelfiToCard', SelfiToCardFileUpload.files[0]);
+
+                data.append('FName', $("#FName").val());
+                data.append('LName', $("#LName").val());
+                data.append('PassportId', $("#PassportId").val());
+                data.append('Mobile', $("#Mobile").val());
+                data.append('PrivateNumber', $("#PrivateNumber").val());
+                data.append('Email', $("#Email").val());
+                data.append('Amount', 0);
+                data.append('Email', $("#Email").val());
+                data.append('CountryId', $("#CountryId").val());
+                if ($("#chkDelivereCardOtherLocation").prop('checked'))
+                    data.append('DeliveryAgentId', $('#DeliveryAgentId').val());
+                data.append('Id', @ViewContext.RouteData.Values["Id"]);
+
+                //data.append('CardTypeId', $("#CardTypeId").val());Don't Edit
+                $.ajax({
+                    type: 'post',
+                    //dataType: 'json',
+                    //contentType: "application/json; charset=utf-8",
+                    processData: false,
+                    contentType: false,
+                    url: '/api/v1/AgentRequest/EditCardIssuance',
+                    data: data,// JSON.stringify(model),
+                    success: function (result) {
+                        hideWaiting('frmAgentRequest');
+                        if (result.isSuccess) {
+                            showMessage('@_loc["InfoTitle"]', '@_loc["MessageSuccess"]', icons.success, '@_loc["Close"]');
+                            setTimeout(function () {
+                                window.location.replace('@Url.Action("CardIssuanceList","AgentRequest")/' + result.data);
+                            }, 2500);
+                        }
+                    },
+                    error: function (error) {
+                        hideWaiting('frmAgentRequest');
+                        if (error.responseJSON != undefined && error.responseJSON.Message != undefined && error.responseJSON.Message != '') {
+                            if (IsJsonString(error.responseJSON.Message)) {
+                                const exception = JSON.parse(error.responseJSON.Message).Exception;
+                                showMessage('@_loc["ErrorTitle"]', exception, icons.error, '@_loc["Close"]');
+                            }
+                            else
+                                showMessage('@_loc["ErrorTitle"]', error.responseJSON.Message, icons.error, '@_loc["Close"]');
+                        }
+                        else {
+                            showMessage('@_loc["ErrorTitle"]', '@_loc["UnhandledError"]', icons.error, '@_loc["Close"]');
+                        }
+                    }
+                });
+            }
+            else {
+                scrollToFirstError();
+            }
+        });
+          </text>
+        }
+    </script>
+}

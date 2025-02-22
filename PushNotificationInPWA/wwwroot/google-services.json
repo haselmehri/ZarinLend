@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "383995737204",
+    "project_id": "honar-71e36",
+    "storage_bucket": "honar-71e36.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:383995737204:android:e9d7c774351be2e963cd21",
+        "android_client_info": {
+          "package_name": "com.honar.gram"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "383995737204-0vu7fdbfl25nrf5f8dec2nlg3nhn37c0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAadFhrMTSwxiZCKLJx4cH71z4-2ud0QmU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "383995737204-0vu7fdbfl25nrf5f8dec2nlg3nhn37c0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,334 @@
+﻿@model RequestFacilityGuarantorInfoModel
+@{
+    ViewData["Title"] = ViewBag.Title;
+    Layout = "~/Views/Shared/_NewLayoutWithoutRightMenu.cshtml";
+    var ajaxUrl = string.Empty;
+    var backUrl = Url.Action("AllRequests", "RequestFacilityGuarantor");
+    if (User.IsInRole(RoleEnum.Buyer.ToString()))
+        backUrl = @Url.Action("List", "RequestFacilityGuarantor");
+}
+@section styles
+    {
+    <style type="text/css">
+
+    </style>
+}
+@section responsiveMenu
+    {
+    <div class="collapse navbar-collapse d-lg-flex justify-content-between align-items-center" id="navbarNav">
+        <ul class="navbar-nav d-flex d-lg-none mt-1 mt-lg-0">
+            <li class="nav-item">
+                <a class="nav-link dark text-bold-500 top-menu" href="javascript:void(0)" data-target-div='userInfoContent'>
+                    <span class="d-flex align-items-center">اطلاعات هویتی</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link dark text-bold-500 top-menu" href="javascript:void(0)" data-target-div='userDocuments'>
+                    <span class="d-flex align-items-center">مدارک هویتی</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link dark text-bold-500 top-menu" href="javascript:void(0)" data-target-div="userScoreAndRisk">
+                    <span class="d-flex align-items-center">امتیاز و ریسک</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link dark text-bold-500 top-menu" href="javascript:void(0)" data-target-div="userCheque">
+                    <span class="d-flex align-items-center">چک ها - تضامین</span>
+                </a>
+            </li>
+        </ul>
+        <ul class="navbar-nav d-none d-lg-flex">
+            <li class="nav-item mr-1">
+                <a class="nav-link" href="#"><i class="bx bx-bell font-medium-5"></i></a>
+            </li>
+            <li class="nav-item mr-1">
+                <a class="nav-link" href="#"><i class="bx bx-user font-medium-5" style="color:green"></i></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="@Url.Action("Logout","Account")"><i class="bx bx-log-out font-medium-5" style="color:red"></i></a>
+            </li>
+        </ul>
+    </div>
+}
+<form id="frmVerifyGuarnator" method="post">
+    <div class="row">
+        <div class="col-12 col-md-6 mb-2">
+            <div class="d-flex align-items-center">
+                <a href="@backUrl" class="dark bg-white rounded-lg px-1 py-50 mr-50 d-flex align-items-center" title="بازگشت">
+                    <i class="bx bx-arrow-back rotate-180 font-large-1"></i>
+                </a>
+                <div class="ml-75">
+                    <div class="d-flex flex-column">
+                        <div class="font-medium-3 secondary darken-4 text-bold-700">
+                            پرونده @Model.UserIdentityInfo.FName @Model.UserIdentityInfo.LName
+                        </div>
+                        <div class="mt-50 font-small-3 text-bold-400 text-muted">
+                            کد ملی : @Model.UserIdentityInfo.NationalCode
+                        </div>
+                    </div>
+                </div>
+                <div class="ml-75 badge badge-pill badge-light-info">
+                    <div class="d-flex align-items-center">
+                        <i class="bx bxs-circle font-size-xxsmall mr-25"></i>
+                        @Model.LastStatusDescription
+                        @if (Model.RequestFacilityDetail.CancelByUser)
+                        {
+                            <span style='color:red'>(انصراف توسط کاربر)</span>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 mb-2">
+            <div class="d-flex align-items-center justify-content-end">
+                @*<button id="btnRequestFacilityWorkFlowSteps" class="btn btn-outline-secondary mr-1">
+                تاریخچه درخواست
+                </button>*@
+                @if (Model.WaitingForZarinLend)
+                {
+                    <button id="btnVerifyRequest" class="btn white zl-bg-secondary">
+                        تایید درخواست
+                    </button>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 mt-1">
+            @await Component.InvokeAsync("WorkFlowStepWizardHorizental", new {workFlow = WorkFlowEnum.RegisterGuarantor, requestId = Model.Id })
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="d-none d-lg-flex col-12 col-lg-4 full-height">
+            <div class="w-100 p-2 rounded-lg bg-white">
+                <a href="javascript:void(0)" data-target-div='userInfoContent'
+                   class="d-flex flex-row align-items-center justify-content-between w-100 left-menu">
+                    <span class="zl-text-primary text-bold-500">اطلاعات هویتی</span>
+                    <i class="zl-text-primary bx bx-chevron-left font-medium-5"></i>
+                </a>
+                <a href="javascript:void(0)" data-target-div='userDocuments'
+                   class="d-flex flex-row align-items-center justify-content-between w-100 mt-1 left-menu">
+                    <span class="dark text-bold-500">مدارک هویتی</span>
+                    <i class="bx bx-chevron-left text-muted font-medium-5"></i>
+                </a>
+                <a href="javascript:void(0)" data-target-div="userScoreAndRisk"
+                   class="d-flex flex-row align-items-center justify-content-between w-100 mt-1 left-menu">
+                    <span class="dark text-bold-500">امتیاز و ریسک</span>
+                    <i class="bx bx-chevron-left text-muted font-medium-5"></i>
+                </a>
+                <a href="javascript:void(0)" data-target-div="userCheque"
+                   class="d-flex flex-row align-items-center justify-content-between w-100 mt-1 left-menu">
+                    <span class="dark text-bold-500">چک ها - تضامین</span>
+                    <i class="bx bx-chevron-left text-muted font-medium-5"></i>
+                </a>
+            </div>
+        </div>
+        <div class="col-12 col-lg-8">
+            <div id="userInfoContent" class="content-div">
+                @await Component.InvokeAsync("UserIdentityInfo", new { userIdentityInfo = @Model.UserIdentityInfo , showAccountInfo = false })
+            </div>
+            <div id="userDocuments" class="content-div" style="display:none">
+                @await Component.InvokeAsync("UserIdentityDocuments", new { userIdentitydocuments = @Model.BuyerIdentityDocuments })
+            </div>
+            <div id="userScoreAndRisk" class="content-div" style="display:none">
+                <div class="p-2">
+                    @await Component.InvokeAsync("UserIranCreditScoringHistory", new { userId = @Model.UserId, showFileLinks = true})
+                </div>
+            </div>
+            <div id="userCheque" class="content-div" style="display:none">
+                @await Component.InvokeAsync("RequestFacilityGuarantorWarranty", new { userId = @Model.UserId, requestFacilityGuarantorId = @Model.Id })
+            </div>
+        </div>
+    </div>
+    @if (Model.WaitingForZarinLend)
+    {
+        if (Model.CurrentStepForm == WorkFlowFormEnum.VerifyGuarantorByZarinLend)
+        {
+            ajaxUrl = "/api/v1/RequestFacilityGuarantor/VerifyGuarantorByZarinLend";
+        }
+        else if (Model.CurrentStepForm == WorkFlowFormEnum.VerifyGuaranteesByZarinLend)
+        {
+            ajaxUrl = "/api/v1/RequestFacilityGuarantor/VerifyGuaranteesByZarinLend";
+        }
+        <div class="modal fade text-left" id="pendingRequestModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel18" style="display: none;" data-backdrop="static" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-md" role="document">
+                <div class="modal-content rounded-lg modal-md">
+                    <div class="modal-header">
+                        <h4 class="modal-title dark" id="myModalLabel18">
+                            تایید/عدم تایید درخواست
+                        </h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="بستن">
+                            <i class="bx bx-x"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body line-height-2">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="d-flex align-items-center justify-content-around">
+                                    <fieldset>
+                                        <div class="radio radio-success radio-glow radio-sm">
+                                            <input type="radio" name="requestStatusRadio" id="approveRadio" value="@((int)StatusEnum.Approved)" />
+                                            <label class="font-small-3 success darken-4 text-bold-400 line-height-23" for="approveRadio">تایید درخواست</label>
+                                        </div>
+                                    </fieldset>
+                                    <fieldset>
+                                        <div class="radio radio-warning radio-glow radio-sm">
+                                            <input type="radio" name="requestStatusRadio" id="returnToCorrectionRadio" value="@((int)StatusEnum.ReturnToCorrection)" />
+                                            <label class="font-small-3 warning darken-4 text-bold-400 line-height-23" for="returnToCorrectionRadio">برگشت جهت اصلاح/ویرایش</label>
+                                        </div>
+                                    </fieldset>
+                                    <fieldset>
+                                        <div class="radio radio-danger radio-glow radio-sm">
+                                            <input type="radio" name="requestStatusRadio" id="rejectRadio" value="@((int)StatusEnum.Rejected)" />
+                                            <label class="font-small-3 danger darken-4 text-bold-400 line-height-23" for="rejectRadio">رد درخواست(ضامن)</label>
+                                        </div>
+                                    </fieldset>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="form-group form-group-ex">
+                                    <label class="control-label">توضیحات</label>
+                                    <textarea id="description_admin" name="description_admin" class="form-control" placeholder="توضیحات"></textarea>
+                                    <span class="text-danger field-validation-valid" data-valmsg-for="description_admin" data-valmsg-replace="true"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <div class="text-right">
+                            <a href="#" class="btn btn-outline-secondary" data-dismiss="modal">
+                                <span>انصراف</span>
+                            </a>
+                            <button id="btnChangeStatus" class="btn btn-zl-primary white">
+                                <span>ثبت اطلاعات</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</form>
+
+@section scripts{
+    @*<partia name="_ValidationScriptsPartial" />*@
+    @{
+        await Html.RenderPartialAsync("~/Views/Shared/_ValidationScriptsPartial.cshtml");
+    }
+
+    <script>
+        $(document).ready(function () {
+
+        });
+
+        $('.left-menu,.top-menu').click(function (sender) {
+            debugger;
+            const targetElement = $($(sender)[0].currentTarget);
+            const targetDivId = targetElement.data('target-div');
+            const contentDiv = $(`#${targetDivId}`);
+            $('.content-div').hide();
+            contentDiv.show();
+
+            $('a.left-menu > span').removeClass('zl-text-primary');
+            $('a.left-menu > span').addClass('dark');
+            $('a.left-menu > i').removeClass('zl-text-primary');
+            $('a.left-menu > i').addClass('text-muted');
+            $('a.top-menu > span').removeClass('zl-text-primary');
+            $('a.top-menu > span').addClass('dark');
+
+
+            targetElement.children().first().removeClass('dark').addClass('zl-text-primary');
+            targetElement.children().last().removeClass('text-muted').addClass('zl-text-primary');
+            $([document.documentElement, document.body]).animate({
+                scrollTop: $(`#${targetDivId}`).offset().top - 80
+            }, 2000);
+        });
+
+        $('#btnVerifyRequest').click(function (e) {
+            e.preventDefault();
+            $('#pendingRequestModal').modal();
+        });
+
+        $('#btnRequestFacilityWorkFlowSteps').click((e) => {
+            debugger;
+            e.preventDefault();
+            loadRequestFacilitySteps(@Model.Id);
+            $('#requestFacilityStepsHistoryModal').modal();
+        });
+
+        if ('@Model.WaitingForZarinLend' == 'True') {
+            $('input[name=requestStatusRadio]').change((e) => {
+                debugger;
+                if ($(e.target).val() == @((int)StatusEnum.Approved)) {
+                    $('#facilityNumberRow').show();
+                    forceDescriptionToBeOptional();
+                }
+                else {
+                    $('#facilityNumberRow').hide();
+                    forceDescriptionToBeRequire();
+                }
+            });
+
+            $('#btnChangeStatus').click(function (e) {
+                e.preventDefault();
+                debugger;
+                const formIsValid = $('#frmVerifyGuarnator').valid();
+                const requestStatus = $('input[name=requestStatusRadio]:checked').val();
+                if (requestStatus == undefined) {
+                    showMessage('@ResourceFile.InfoTitle', 'لطفا وضعیت درخواست را مشخص کنید!', icons.warning, '@ResourceFile.Close');
+                    return;
+                }
+
+                if (formIsValid) {
+                    showWaiting('frmVerifyGuarnator', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                    const postData = {
+                        RequestFacilityGuarantorId: '@Model.Id',
+                        Status: requestStatus,
+                        StatusDescription: $('#description_admin').val()
+                    };
+
+                    $.ajax({
+                        type: 'post',
+                        data: JSON.stringify(postData),
+                        datatype: "json",
+                        contentType: "application/json; charset=utf-8",
+                        url: '@ajaxUrl',
+                        success: function (result) {
+                            hideWaiting('frmVerifyGuarnator');
+                            debugger;
+                            if (result.isSuccess) {
+                                showMessage('@ResourceFile.InfoTitle', '@ResourceFile.MessageSuccess', icons.success, '@ResourceFile.Close', 
+                                () => { window.location.replace('@backUrl'); });
+                            }
+                        },
+                        error: function (error) {
+                            hideWaiting('frmVerifyGuarnator');
+                            const exception = getExceptionMessageFromError(error);
+                            if (exception != null)
+                                showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                            else
+                                showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                        }
+                    });
+                }
+                else {
+                    scrollToFirstError();
+                }
+            });
+        }
+
+        const forceDescriptionToBeRequire = () => {
+            $('#description_admin').attr('data-val', true);
+            $('#description_admin').attr('data-val-required', 'توضیحات اجباری است!');
+        }
+
+        const forceDescriptionToBeOptional = () => {
+            $('#description_admin').removeAttr('data-val');
+            $('#description_admin').removeAttr('data-val-required');
+        }
+    </script>
+}

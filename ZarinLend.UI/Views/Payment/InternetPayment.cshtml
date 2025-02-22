@@ -1,0 +1,276 @@
+﻿@using Core.Entities.Business.Payment
+@using Services.Model.Payment
+@model InternetPaymentModel
+@{
+    ViewData["Title"] = Model.Description;
+    Layout = "~/Views/Shared/_NewLayout.cshtml";
+    var returnUrl = Url.RouteUrl("home");
+    var requestId = 0;
+}
+@section styles
+{
+    <style type="text/css">
+        .ipg-img {
+            width: 100px;
+            height: 100px;
+            border-radius: 18px;
+            border: 1px solid #e6dbdb;
+            opacity: .35
+        }
+    </style>
+}
+@if (Model.PaymentType == PaymentType.PayValidationFeeByGuarantor)
+{
+    @await Component.InvokeAsync("WorkFlowStepWizardHorizental", new { workFlow = WorkFlowEnum.RegisterGuarantor, requestId = Model.RequestFacilityGuarantorId })
+    requestId = Model.RequestFacilityGuarantorId;
+    returnUrl = Url.Action("List", "RequestFacilityGuarantor");
+}
+else if (Model.PaymentType == PaymentType.PaySalesCommission || (Model.PaymentType == PaymentType.PayValidationFee && Model.RequestFacilityId.HasValue))
+{
+    @await Component.InvokeAsync("WorkFlowStepWizardHorizental", new { workFlow = WorkFlowEnum.RequestFacility, requestId = Model.RequestFacilityId })
+    requestId = Model.RequestFacilityId.Value;
+    returnUrl = Url.Action("List", "RequestFacility");
+}
+<form id="frmPayment" method="post" action="@Model.PostAction">
+    <div class="p-2 bg-white rounded-lg">
+        <div class="d-flex align-items-center">
+            <a href="@returnUrl"
+               class="dark bg-white rounded-lg px-50 py-25 mr-50 d-flex align-items-center"
+               title="بازگشت">
+                <i class="bx bx-arrow-back rotate-180 font-medium-4"></i>
+            </a>
+            <div class="ml-1">
+                <div class="font-medium-3 secondary darken-4 text-bold-700">
+                    @(Model.PaymentType == PaymentType.PayValidationFee ? "اعتبار سنجی" : "هزینه عضویت در باشگاه مشتریان")
+                </div>
+            </div>
+        </div>
+        <div class="bg-white mt-2 p-1 p-md-2 p-lg-3 rounded-lg">
+            @if (Model.PaymentType == PaymentType.PayValidationFee || Model.PaymentType == PaymentType.PayValidationFeeByGuarantor)
+            {
+                <div class="d-flex align-items-center justify-content-around" id="user-validation-tabs">
+                    <div class="d-flex flex-column w-100">
+                        <div class="zl-uv-current rounded mb-50"></div>
+                        <div class="d-flex align-items-center text-nowrap mb-75">
+                            <!-- <i class="bx bxs-check-circle zl-text-primary mr-25"></i> -->
+                            <i class="bx bxs-time-five mr-25"></i>
+                            پرداخت هزینه اعتبار سنجی
+                        </div>
+                    </div>
+                    <div class="d-flex flex-column w-100 ml-1">
+                        <div class="zl-uv-next rounded mb-50"></div>
+                        <div class="d-flex align-items-center text-nowrap mb-75">
+                            <i class="bx bx-circle mr-25"></i>
+                            <span>تایید اعتبارسنجی</span>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-column w-100 ml-1">
+                        <div class="zl-uv-next rounded mb-50"></div>
+                        <div class="d-flex align-items-center text-nowrap mb-75">
+                            <i class="bx bx-circle mr-25"></i>
+                            <span>نتیجه اعتبار سنجی</span>
+                        </div>
+                    </div>
+                </div>
+            }
+            <div id="user-validation-section">
+                <div class="mt-2">
+                    @if ((/*!Model.ValidationMustBeRepeated ||*/ Model.ExistValidation) && Model.PaymentType == PaymentType.PayValidationFee)
+                    {
+                        <div class="alert zl-bg-alert-danger border-danger border-accent-4 alert-dismissible my-2"
+                             role="alert">
+                            @*<button type="button" class="close" data-dismiss="alert" aria-label="بستن">
+                        <span aria-hidden="true">×</span>
+                        </button>*@
+                            <div class="d-flex">
+                                <i class="bx bx-error-circle font-large-1"></i>
+                                <span class="text-muted text-bold-400 font-small-4">
+                                    <ul>
+                                        <li>
+                                            کاربر گرامی شما قبلا هزینه اعتبارسنجی را پرداخته کرده و استعلام اعتبارسنجی را انجام داده اید و در این مرحله نیاز به پرداخت و استعلام مجدد نیست
+                                        </li>
+                                        <li>
+                                            لازم به ذکر است نتیجه استعلام و در واقع رتبه اعتباری شما در تایید پرونده شما موثر است در صورتی که فکر میکنید با استعلام مجدد رتبه اعتباری شما ارتقا پیدا میکند میتوانید با پرداخت مجدد هزینه اعتبارسنجی،اقدام به اعتبارسنجی مجدد نمایید
+                                        </li>
+                                        @if (Model.ExistValidation)
+                                        {
+                                            <li>
+                                                در صورتی که نمی خواهید استعلام مجدد انجام دهید روی دکمه <b style="color:red">ثبت درخواست تسهیلات</b> کلیک کنید
+                                            </li>
+                                        }
+                                        @*  else if (!Model.ValidationMustBeRepeated)
+                                    {
+                                    <li>
+                                    در صورتی که نمی خواهید استعلام مجدد انجام دهید روی دکمه <b style="color:red">ارسال پرونده به کارشناسان زرین لند</b> کلیک کنید
+                                    </li>
+                                    <li>
+                                    <p style="text-align:center">
+                                    <button type="button" id="btnSendRequestToZarinLend" class="btn btn-primary">
+                                    ارسال پرونده به کارشناسان زرین لند
+                                    </button>
+                                    </p>
+                                    </li>
+                                    } *@
+                                    </ul>
+                                    @if(Model.ExistValidation)
+                                    {
+                                        <p style="text-align:center">
+                                            <a asp-action="Add" asp-controller="RequestFacility" class="btn btn-primary">
+                                                ثبت درخواست تسهیلات
+                                            </a>
+                                        </p>
+                                    }
+                                </span>
+                            </div>
+                        </div>
+                    }
+                    <div class="alert zl-bg-alert-warning border-warning border-accent-4 alert-dismissible my-2"
+                         role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="بستن">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                        <div class="d-flex">
+                            <i class="bx bx-error-circle font-large-1"></i>
+                            <span class="text-muted text-bold-400 font-small-3">
+                                @if (Model.PaymentType == PaymentType.PayValidationFee || Model.PaymentType == PaymentType.PayValidationFeeByGuarantor)
+                                {
+                                    <ul>
+                                        <li>
+                                            این صورت حساب برای اخذ استعلام هویتی و سوابق بانکی به
+                                            سامانه های مربوطه پرداخت می گردد و در هر صورت قابل بازگشت نیست.
+                                        </li>
+                                        <li>
+                                            اعطای تسهیلات به افرادی که دارای قسط معوق یا چک برگشتی
+                                            در سامانه بانکی کشور باشند، مقدور نمی باشد.
+                                        </li>
+                                        <li>
+                                            ارائه خدمات فقط به افرادی مقدور است که مالکیت شماره
+                                            موبایل و کدملی‌شان با هم تطابق داشته باشد.
+                                        </li>
+                                    </ul>
+                                }
+                                else if (Model.PaymentType == PaymentType.PaySalesCommission)
+                                {
+                                    <ul>
+                                        <li>
+                                            این صورتحساب برای صدور کارت و سایر خدمات دیگر در روال درخواست تسهیلات دریافت میگردد و قابل بازگشت نیست.
+                                        </li>
+                                        <li>
+                                            توجه داشته باشید که در صورت پرداخت هزینه عضویت و پرداخت تسهیلات، امکان لغو درخواست تسهیلات امکان پذیر نیست.
+                                        </li>
+                                    </ul>
+                                }
+                            </span>
+                        </div>
+                    </div>
+                    <div class="mt-2 p-2 d-flex align-items-center justify-content-start border rounded-lg">
+                        <div class="w-50 font-small-2 text-bold-500">
+                            @((Model.PaymentType == PaymentType.PayValidationFee || Model.PaymentType == PaymentType.PayValidationFeeByGuarantor) ? "هزینه اعتبار سنجی" : "هزینه عضویت در باشگاه مشتریان")
+                        </div>
+                        <div class="w-50 secondary darken-4 text-bold-500">
+                            @Model.Amount.ToString("N0")
+                            <small class="font-size-xsmall text-muted ml-50">ریال</small>
+                        </div>
+                    </div>
+                    <div class="mt-2 p-2 d-flex align-items-center justify-content-start border rounded-lg">
+                        <div class="w-50 font-small-2 text-bold-500">
+                            <fieldset>
+                                <div class="radio radio-success radio-glow radio-sm">
+                                    <img src="/images/ipg/saman.jpg" class="ipg-img" id="imgSaman" for="samanIpg" />
+                                    <input type="radio" name="ipgRadio" id="samanIpg" value="1" />
+                                    <label class="font-small-3 success darken-4 text-bold-400 line-height-23" for="samanIpg">درگاه سامان</label>
+                                </div>
+                            </fieldset>
+                        </div>
+                        <div class="w-50 secondary darken-4 text-bold-500">
+                            <fieldset>
+                                <div class="radio radio-success radio-glow radio-sm">
+                                    <img src="/images/ipg/zarinpal.png" class="ipg-img" id="imgZarinpal" for="zarinpalIpg" />
+                                    <input type="radio" name="ipgRadio" id="zarinpalIpg" value="2" />
+                                    <label class="font-small-3 success darken-4 text-bold-400 line-height-23" for="zarinpalIpg">درگاه زرین پال</label>
+                                </div>
+                            </fieldset>
+                        </div>
+                    </div>
+                    <hr class="mt-4 mb-1" />
+                    <div class="text-right">
+                        <a class="btn btn-outline-secondary" href='@returnUrl'>
+                            <span>انصراف</span>
+                        </a>
+                        <button type="submit" id="btnGoToIpg" disabled class="btn btn-zl-primary">
+                            <span>پرداخت</span>
+                        </button>
+                        @if (!string.IsNullOrEmpty(Model.Error))
+                        {
+                            <p style="color:red; font-weight:bold;text-align:center">
+                                @Html.Raw(Model.Error)
+                            </p>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+@section scripts
+{
+    <script>
+        $(document).ready(() => {
+            $('input[name=ipgRadio]').change((e) => {
+                if ($(e.target).val() == '') {
+                    $('#frmPayment').prop('action', '');
+                    $('#btnGoToIpg').prop('disabled', true);
+                }
+                else {
+                    if ($(e.target).val() == @((int)IpgType.SamanIPG)) {
+                        $('#imgSaman').css('opacity', 1);
+                        $('#imgZarinpal').css('opacity', 0.35);
+                    }
+                    else {
+                        $('#imgSaman').css('opacity', 0.35);
+                        $('#imgZarinpal').css('opacity', 1);
+                    }
+                    debugger;
+                    if (@requestId != 0)
+                        $('#frmPayment').prop('action', `@Model.PostAction/@requestId/${$(e.target).val()}`);
+                    else
+                        $('#frmPayment').prop('action', `@Model.PostAction/${$(e.target).val()}`);
+
+                    $('#btnGoToIpg').prop('disabled', false);
+                }
+            });
+        @*@if (!Model.ValidationMustBeRepeated && Model.PaymentType == PaymentType.PayValidationFee)
+            {
+            <text>
+            $('#btnSendRequestToZarinLend').click((e) => {
+            showWaiting('frmPayment', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+            $.ajax({
+            type: 'post',
+            dataType: 'json',
+            contentType: "application/json; charset=utf-8",
+            url: '/api/v1/IranCreditScoring/GoToNextStepFromVerifyPaymentToZarinLend/@Model.RequestFacilityId',
+            //data: data,// JSON.stringify(model),
+            success: function (result) {
+            hideWaiting('frmPayment');
+            debugger;
+            if (result.isSuccess) {
+            window.location.replace('@Url.Action("List", "RequestFacility")');
+            }
+            },
+            error: function (error) {
+            debugger;
+            hideWaiting('frmPayment');
+            const exception = getExceptionMessageFromError(error);
+            if (exception != null)
+            showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+            else
+            showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+            }
+            });
+            });
+            </text>
+            }*@
+
+                        });
+    </script>
+}

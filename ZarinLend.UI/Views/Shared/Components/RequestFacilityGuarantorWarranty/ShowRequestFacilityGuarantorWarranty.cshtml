@@ -1,0 +1,45 @@
+﻿@using static Common.Enums;
+@model RequestFacilityGuarantorWarrantyModel
+
+<style type="text/css">
+</style>
+<div class="bg-white border rounded p-2">
+    @if (Model != null)
+    {
+        <div class="text-bold-900 secondary darken-4 font-medium-3">
+            چک ضمانت
+        </div>
+        <div class="mt-2 px-0 px-sm-5 px-lg-0"   style="width: 100%">
+            <div class="w-100 text-center">
+                <a href="@Model.ChequeDocument.FilePath" target="_blank">
+                    <img src="@Model.ChequeDocument.FilePath" class="img-fluid mt-75" />
+                </a>
+            </div>
+        </div>
+        <div class="border rounded mt-1">
+            <div class="d-flex align-items-center p-1">
+                <span class="w-50 text-bold-500 font-small-2">شناسه چک صیادی</span><span class="w-50 text-bold-700 secondary darken-4 font-medium-1">@Model.DocumentNumber</span>
+            </div>
+            <hr class="my-0" />
+            <div class="d-flex align-items-center p-1">
+                <span class="w-50 text-bold-500 font-small-2">مبلغ چک ضمانت</span><span class="w-50 text-bold-400 secondary darken-4 font-medium-1">@Model.WarantyAmount.ToString("N0") ريال</span>
+            </div>
+            <hr class="my-0" />
+            <div class="d-flex align-items-center p-1">
+                <span class="w-50 text-bold-500 font-small-2">تاریخ چک</span><span class="w-50 text-bold-400 secondary darken-4 font-medium-1">@Model.ShamsiWarantyDate</span>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="d-flex flex-column mt-4 mb-2">
+            <img src="/new-layout/images/no-docs-img.svg" class="height-100" />
+            <div class="font-small-3 text-muted text-center mt-3">
+                چک ضمانت بارگذاری نشده است!
+            </div>
+        </div>
+    }
+</div>
+<script on-content-loaded="true">
+
+</script>

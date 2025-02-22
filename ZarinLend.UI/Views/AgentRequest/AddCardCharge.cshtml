@@ -1,0 +1,431 @@
+﻿@model Services.Model.CardChargeRequestModel
+@{
+    ViewData["Title"] = _loc["AddCardChargeRequest_Title"];
+}
+@section styles
+{
+    <style type="text/css">
+        .col-md-1-ex {
+            padding-left: 3px !important;
+            padding-right: 3px !important;
+        }
+
+        .cardNumber-part {
+            text-align: center;
+            direction: ltr;
+        }
+
+        textarea {
+            height: 120px !important;
+        }
+
+        .table-custom th,
+        .table-custom td {
+            text-align: center !important;
+            vertical-align: middle !important;
+        }
+
+        .button-columns {
+            padding-top: 7px !important;
+            width: 100px;
+            text-align: center;
+        }
+
+        [type="checkbox"]:not(:checked), [type="checkbox"]:checked,
+        [type="radio"]:not(:checked), [type="radio"]:checked {
+            position: unset !important;
+            right: unset !important;
+            opacity: 1 !important;
+        }
+    </style>
+}
+
+<form id="frmAddRequestCardCharge" method="post">
+    <div class="card">
+        <div class="card-header" localize-content>AddCardChargeRequest_Title</div>
+        <div class="card-body">
+            <fieldset>
+                <legend localize-content>
+                    Search_to_CardNumber
+                </legend>
+                <div class="row" style="padding-right:15px !important;direction:rtl !important">
+                    <div class="col-md-2">
+                        <div class="form-group" style="text-align:left">
+                            <button id="btnSearchCardNumber" tabindex="4" class="btn btn-outline-primary" localize-content>
+                                Search
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-1 col-md-1-ex">
+                        <div class="form-group">
+                            <input asp-for="CardNumber_Part4" tabindex="4" class="form-control cardNumber-part" />
+                            <span asp-validation-for="CardNumber_Part4" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-1 col-md-1-ex">
+                        <div class="form-group">
+                            <input asp-for="CardNumber_Part3" tabindex="3" class="form-control cardNumber-part" />
+                            <span asp-validation-for="CardNumber_Part3" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-1 col-md-1-ex">
+                        <div class="form-group">
+                            <input asp-for="CardNumber_Part2" tabindex="2" class="form-control cardNumber-part" />
+                            <span asp-validation-for="CardNumber_Part2" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-1 col-md-1-ex">
+                        <div class="form-group">
+                            <input asp-for="CardNumber_Part1" tabindex="1" class="form-control cardNumber-part" />
+                            <span asp-validation-for="CardNumber_Part1" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label style="direction:ltr;margin-top:0.5rem" class="control-label" localize-content>PleaseInpuCardNumberToInccorectFormat</label>
+                        </div>
+                    </div>
+                </div>
+                <fieldset id="personCardInfo" style="display:none">
+                    <legend localize-content>
+                        CardInfo_OwnerInfo
+                    </legend>
+                    <div class="row" style="padding-right:15px !important">
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label style="" class="control-label" localize-content>FName</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label id="lblFName" style="font-weight:bold; color:blueviolet" class="control-label"></label>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label style="" class="control-label" localize-content>LName</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label id="lblLName" style="font-weight:bold; color:blueviolet" class="control-label"></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" style="padding-right:15px !important">
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label style="" class="control-label" localize-content>PassportID</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label id="lblPassportId" style="font-weight:bold; color:blueviolet" class="control-label"></label>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label style="" class="control-label" localize-content>Nationality</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label id="lblNationality" style="font-weight:bold; color:blueviolet" class="control-label"></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" style="padding-right:15px !important">
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label style="" class="control-label" localize-content>CardType</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label id="lblCardTypeName" style="font-weight:bold; color:blueviolet" class="control-label"></label>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label style="" class="control-label" localize-content>RegDateForIssuanceRequest</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label id="lblShamsiIssuanceCardDate" style="font-weight:bold; color:blueviolet" class="control-label"></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" style="padding-right:15px !important">
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label style="" class="control-label" localize-content>ChargeWage</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label id="lblChargeWage" style="font-weight:bold; color:blueviolet" class="control-label"></label>
+                                <input id="hdnChargeWage" type="hidden" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" style="padding-right:15px !important">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label style="" class="control-label" localize-content>AgentRegIssuanceCardRequest</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label id="lblCreatorFullName" style="font-weight:bold; color:blueviolet" class="control-label"></label>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" asp-for="PersonCardId" value="" />
+                </fieldset>
+            </fieldset>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label asp-for="Amount" class="control-label"></label>
+                        <input asp-for="AmountThousandSeparator" class="form-control number-thousand-separator" />
+                        <label id="lblAmountDesc" style="margin-top:10px; color:blueviolet" class="control-label"></label>
+                        <span asp-validation-for="AmountThousandSeparator" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="form-group">
+                        <label class="control-label" localize-content>Attachments</label>
+                        <input type="file" name="PostedFiles" id="PostedFiles" class="form-control-file" multiple>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer" style="text-align:left">
+            <button id="btnAddRequestCardCharge" tabindex="5" style="display:none" class="btn btn-outline-success" localize-content>
+                @_loc["RegisterRequest"]&nbsp;<i class="fal fa-send"></i>
+            </button>
+            <a class="btn btn-outline-secondary" href='@Url.Action("CardChargeList","AgentRequest")'>
+                @_loc["Cancel"]&nbsp;<i class="fal fa-close"></i>
+            </a>
+        </div>
+    </div>
+</form>
+
+@section scripts{
+    @*<partia name="_ValidationScriptsPartial" />*@
+    @{
+        await Html.RenderPartialAsync("~/Views/Shared/_ValidationScriptsPartial.cshtml");
+        @*<localization-validation-scripts></localization-validation-scripts>*@
+    }
+    <script>
+        $('#CardNumber_Part1').on('paste', (e) => {
+            debugger;
+            console.log(e);
+            let clipboard = e.originalEvent.clipboardData.getData('text').replace(/-/g, '');
+            if (clipboard != '' && !isNaN(parseInt(clipboard))) {
+                $('#CardNumber_Part1').val(clipboard.substring(0, 4));
+                $('#CardNumber_Part2').val(clipboard.substring(4, 8));
+                $('#CardNumber_Part3').val(clipboard.substring(8, 12));
+                $('#CardNumber_Part4').val(clipboard.substring(12, 16));
+                if (clipboard.length >= 16)
+                    $('#btnSearchCardNumber').focus();
+                else if (clipboard.length >= 12)
+                    $('#CardNumber_Part4').focus();
+                else if (clipboard.length >= 8)
+                    $('#CardNumber_Part3').focus();
+                else if (clipboard.length >= 4)
+                    $('#CardNumber_Part2').focus();
+                else
+                    $('#CardNumber_Part1').focus();
+            }
+        });
+
+        $(".cardNumber-part").keyup(function (e) {
+            if ($(e.target).prop('id').toLocaleLowerCase() != 'CardNumber_Part1'.toLocaleLowerCase() &&
+                e.which == 8/*backspace*/ || e.which == 37/*left arrow*/)
+            {
+                if ($(e.target).val().length == 0 || e.target.selectionStart == 0) {
+                    $(`#CardNumber_Part${$(e.target).prop('tabIndex') - 1}`).focus();
+                    $(`#CardNumber_Part${$(e.target).prop('tabIndex') - 1}`).select();
+                }
+            }
+            else {
+                  if ($(e.target).val().length == $(e.target).prop('maxLength')) {
+                    if ($(e.target).prop('id').toLocaleLowerCase() != 'CardNumber_Part4'.toLocaleLowerCase()) {
+                        $(`#CardNumber_Part${$(e.target).prop('tabIndex') + 1}`).focus();
+                        $(`#CardNumber_Part${$(e.target).prop('tabIndex') + 1}`).select();
+                    }
+                    else
+                        $('#btnSearchCardNumber').focus();
+                }
+            }
+        });
+
+        $(".cardNumber-part").focus((e) => {
+            $(e.target).select();
+        });
+
+        $('#btnSearchCardNumber').click(function (e) {
+            e.preventDefault();
+            $('#AmountThousandSeparator').val('0');
+            debugger;
+            const formIsValid = $('#frmAddRequestCardCharge').valid();
+            if (formIsValid) {
+                $('#AmountThousandSeparator').val('');
+                const cardNumber = `${$('#CardNumber_Part1').val()}${$('#CardNumber_Part2').val()}${$('#CardNumber_Part3').val()}${$('#CardNumber_Part4').val()}`;
+                $.ajax({
+                    type: 'post',
+                    //dataType: 'json',
+                    contentType: "application/json; charset=utf-8",
+                    url: `/api/v1/Person/GetPersonByCardNumber/${cardNumber}`,
+                    //data: JSON.stringify(model),
+                    success: function (result) {
+                        debugger;
+                        if (result.isSuccess) {
+                            fillPersonInfo(result.data);
+                            if (!result.data.cardIsDeleted) {
+                                $('#personCardInfo').show();
+                                $('#btnAddRequestCardCharge').show();
+                            }
+                            else {
+                                showMessage('@_loc["ErrorTitle"]', '@_loc["MessageCardIsInActive"]', icons.error, '@_loc["Close"]');
+                            }
+                        }
+                        else {
+                            $('#personCardInfo').hide();
+                            $('#btnAddRequestCardCharge').hide();
+                            showMessage('@_loc["ErrorTitle"]', '<p>@_loc["MessageCardNotFound"]</p>', icons.error, '@_loc["Close"]');
+                        }
+                    },
+                    error: function (error) {
+                        $('#AmountThousandSeparator').val('');
+                        debugger;
+                        if (error.responseJSON != undefined && error.responseJSON.Message != undefined && error.responseJSON.Message != '') {
+                            if (IsJsonString(error.responseJSON.Message)) {
+                                const exception = JSON.parse(error.responseJSON.Message).Exception;
+                                showMessage('@_loc["ErrorTitle"]', exception, icons.error, '@_loc["Close"]');
+                            }
+                            else
+                                showMessage('@_loc["ErrorTitle"]', error.responseJSON.Message, icons.error, '@_loc["Close"]');
+                        }
+                        else {
+                            showMessage('@_loc["ErrorTitle"]', '@_loc["UnhandledError"]', icons.error, '@_loc["Close"]');
+                        }
+                    }
+                });
+            }
+            else {
+                $('#AmountThousandSeparator').val('');
+            }
+        });
+
+        fillPersonInfo = (person) => {
+            $('#lblFName').text(person.fName);
+            $('#lblLName').text(person.lName);
+            $('#lblPassportId').text(person.passportId);
+            $('#lblNationality').text(person.nationality);
+            $('#lblCardTypeName').text(person.cardTypeName);
+            $('#lblChargeWage').text(`${person.chargeWage} %`);
+            $('#hdnChargeWage').val(person.chargeWage);
+            $('#lblShamsiIssuanceCardDate').text(person.shamsiIssuanceCardDate);
+            $('#lblCreatorFullName').text(person.creatorFullName);
+            $('#PersonCardId').val(person.personCardId);
+        }
+
+        $('#AmountThousandSeparator').keyup(function (event) {
+            if (event.which >= 37 && event.which <= 40) return;
+            const amount = parseInt(replaceAllComma($('#AmountThousandSeparator').val()));
+            const wage = parseInt($('#hdnChargeWage').val());
+            $('#lblAmountDesc').empty();
+            if (wage != '' && !isNaN(wage) && amount != '' && !isNaN(amount)) {
+                const wage_amount = parseInt(wage * amount / 100);
+                const finalAmount = amount + wage_amount;
+                $('#lblAmountDesc').html(`@(_loc["Wage"])(${wage}%) : ${splitNumber(wage_amount)} @_loc["RialIran"]<br/>@_loc["ChargeAmount2"] + @_loc["Wage"] : ${splitNumber(finalAmount)} @_loc["RialIran"]`);
+            }
+            else {
+
+            }
+        });
+
+        $('#btnAddRequestCardCharge').click(function (e) {
+            e.preventDefault();
+            debugger;
+            const formIsValid = $('#frmAddRequestCardCharge').valid();
+            const fileUpload = $("#PostedFiles")[0];
+            if (formIsValid) {
+                showWaiting('frmAddRequestCardCharge', '@_loc["PleaseWait"]', '@_loc["Loading"]');
+                //const postdata = $('#frmAgentRequest').serialize();
+                //const model = {
+                //    FName: $("#FName").val(),
+                //    LName: $("#LName").val(),
+                //    PassportId: $("#PassportId").val(),
+                //    Money: $("#Money").val(),
+                //    Mobile: $("#Mobile").val(),
+                //    PrivateNumber: $("#PrivateNumber").val(),
+                //    Email: $("#Email").val(),
+                //    Amount: $("#Amount").val(),
+                //    CountryId: $('#CountryId').val(),
+                //    CardTypeId: $('#CardTypeId').val()
+                //};
+                const amount = parseInt(replaceAllComma($('#AmountThousandSeparator').val()));
+                const wage = parseInt($('#hdnChargeWage').val());
+                const wage_amount = parseInt(wage * amount / 100);
+                const finalAmount = amount + wage_amount;
+                if (amount <= 0) {
+                    showMessage('@_loc["ErrorTitle"]', '@_loc["ChargeMustBeGreaterThanZero"]', icons.success, '@_loc["Close"]');
+                    return;
+                }
+                let data = new FormData();
+                $.map(fileUpload.files, (item) => {
+                    data.append('PostedFiles', item);
+                });
+                data.append('CardNumber_Part1', $("#CardNumber_Part1").val());
+                data.append('CardNumber_Part2', $("#CardNumber_Part2").val());
+                data.append('CardNumber_Part3', $("#CardNumber_Part3").val());
+                data.append('CardNumber_Part4', $("#CardNumber_Part4").val());
+                data.append('PersonCardId', $("#PersonCardId").val());
+                data.append('Amount', amount);
+                data.append('AmountThousandSeparator', $('#AmountThousandSeparator').val());
+
+                $.ajax({
+                    type: 'post',
+                    //dataType: 'json',
+                    //contentType: "application/json; charset=utf-8",
+                    processData: false,
+                    contentType: false,
+                    url: '/api/v1/AgentRequest/AddCardCharge',
+                    data: data,// JSON.stringify(model),
+                    success: function (result) {
+                        hideWaiting('frmAddRequestCardCharge');
+                        debugger;
+                        if (result.isSuccess) {
+                            showMessage('@_loc["InfoTitle"]', '@_loc["MessageSuccess"]', icons.success, '@_loc["Close"]');
+                            setTimeout(function () {
+                                window.location.replace('@Url.Action("CardChargeList","AgentRequest")');
+                            }, 1500);
+                        }
+                    },
+                    error: function (error) {
+                        hideWaiting('frmAddRequestCardCharge');
+                        debugger;
+                        if (error.responseJSON != undefined && error.responseJSON.Message != undefined && error.responseJSON.Message != '') {
+                            if (IsJsonString(error.responseJSON.Message)) {
+                                const exception = JSON.parse(error.responseJSON.Message).Exception;
+                                showMessage('@_loc["ErrorTitle"]', exception, icons.error, '@_loc["Close"]');
+                            }
+                            else
+                                showMessage('@_loc["ErrorTitle"]', error.responseJSON.Message, icons.error, '@_loc["Close"]');
+                        }
+                        else {
+                            showMessage('@_loc["ErrorTitle"]', '@_loc["UnhandledError"]', icons.error, '@_loc["Close"]');
+                        }
+                    }
+                });
+            }
+            else {
+                scrollToFirstError();
+            }
+        });
+    </script>
+}

@@ -1,0 +1,111 @@
+﻿@model int
+<style type="text/css">
+</style>
+<div class="modal fade text-left" id="requestFacilityStepsHistoryModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel19" style="display: none;" data-backdrop="static" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl modal-dialog-full-screen" role="document">
+        <div class="modal-content rounded-lg modal-xl modal-content-full-screen">
+            <div class="modal-header">
+                <h4 class="modal-title dark" id="myModalLabel19">
+                    مراحل درخواست مرتب شده بصورت نزولی
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="بستن">
+                    <i class="bx bx-x"></i>
+                </button>
+            </div>
+            <div class="modal-body px-1" id="requestFacilityStepsHistoryModalContent">
+                <div class="" id="requestFacilityStepsHistoryContainer">
+                    <div class="table-responsive table-sm">
+                        <table class="display requestFacilityStepsHistory" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th >عنوان مرحله</th>
+                                    <th >وضعیت</th>
+                                    <th >اقدام کننده</th>
+                                    <th >تاریخ اقدام</th>
+                                    <th >توضیحات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="requestFacilityStepsHistoryRows">
+                            </tbody>    
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="text-right">
+                    <a href="#" class="btn btn-outline-secondary" data-dismiss="modal">
+                        <span>بستن</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function() {
+        $(".requestFacilityStepsHistory").DataTable({
+            ordering: false,
+            responsive: true,
+            searching: false,
+            paging: false,
+            lengthChange: false,
+            info: false
+        });
+    });
+
+    const loadRequestFacilitySteps = (requestFacilityId) => {
+        debugger;
+        if (requestFacilityId == -1) return;
+
+        showWaiting('requestFacilityStepsHistoryContainer', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+
+        $.ajax({
+            type: 'post',
+            //data: JSON.stringify({ requestFacilityId: @ViewContext.RouteData.Values["requestFacilityId"]}),
+            //data: JSON.stringify({ requestFacilityId: @Model}),
+            datatype: "json",
+            contentType: "application/json; charset=utf-8",
+            url: `/api/v1/RequestFacility/GetRequestFacilityStepsHistory/${requestFacilityId}`,
+            success: function(result) {
+                hideWaiting('requestFacilityStepsHistoryContainer');
+                debugger;
+                if (result !== undefined && result !== null && result.isSuccess === true) {
+                    renderRequestFacilityStepsGrid(result.data);
+                }
+            },
+            error: function(error) {
+                debugger;
+                hideWaiting('requestFacilityStepsHistoryContainer');
+                const exception = getExceptionMessageFromError(error);
+                if (exception != null)
+                    showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                else
+                    showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+            }
+        });
+    }
+
+    const renderRequestFacilityStepsGrid = (data) => {
+        let rows = '<tr><td colspan="5">@ResourceFile.NoRows</td></tr>';
+        if (data.length > 0) {
+            rows = '';
+            for (var i = 0; i < data.length; i++) {
+                rows += '<tr>';
+                rows += "<td style=''>" + (i + 1) + "</td>";
+                rows += "<td>" + data[i].workFlowStepName + "</td>";
+                rows += "<td>" + (data[i].statusName != undefined ? data[i].statusName : '') + "</td>";
+                rows += "<td>" + (data[i].statusName != undefined ? data[i].operator : '') + "</td>";
+                rows += "<td class='date-cell'>" + data[i].shamsiUpdateDate + "</td>";
+                rows += "<td>" + (data[i].statusDescription != undefined ? data[i].statusDescription : '') + "</td>";
+                rows += '</tr>';
+            }
+        }
+        $(`#requestFacilityStepsHistoryRows`).html(rows);
+
+    }
+
+    if (@Model> 0) {
+        loadRequestFacilitySteps(@Model);
+    }
+</script>

@@ -1,0 +1,38 @@
+﻿@model string
+@{
+    ViewData["Title"] = "انتقال به درگاه بانک سامان";
+    Layout = "~/Views/Shared/_NewLayout.cshtml";
+}
+@section styles
+    {
+    <style type="text/css">
+
+    </style>
+}
+@*onload="document.forms['frmPayment'].submit()"*@
+<form id="frmPayment" action="https://sep.shaparak.ir/OnlinePG/OnlinePG" method="post">
+    <input type="hidden" name="Token" value="@Model" />
+    <input name="GetMethod" type="hidden" value="true">
+    <div class="p-2 bg-white rounded-lg">
+        <div class="bg-white mt-2 p-1 p-md-2 p-lg-3 rounded-lg">
+            <div id="user-validation-section">
+                <div class="mt-2">
+                    <div class="mt-2 p-2 d-flex align-items-center justify-content-start border rounded-lg">
+                        <div class="w-10 font-large text-bold-500">
+                            در حال انتقال به درگاه بانک سامان<br />
+                            لطفا صبر کنید...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+@section scripts
+    {
+    <script>
+        $(document).ready(()=>{
+            $('#frmPayment').submit();
+        });
+    </script>
+}

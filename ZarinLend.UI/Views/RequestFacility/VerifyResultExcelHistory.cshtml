@@ -1,0 +1,592 @@
+﻿@{
+    ViewData["Title"] = ViewBag.Title;
+    Layout = "~/Views/Shared/_NewLayout.cshtml";
+}
+@section styles{
+    <style type="text/css">
+        .modal-dialog, .modal-content {
+            max-width: 1330px !important;
+        }
+    </style>
+}
+<div id="requestGridDiv" class="p-2 bg-white rounded-lg">
+    <div class="font-medium-3 secondary darken-4 text-bold-800 d-flex align-items-center">
+        <i class="bx bx-align-right zl-text-secondary mr-25"></i>
+        <span>تاریخچه استعلامات گروهی</span>
+    </div>
+    <table id="groupVerifyHistoryList" class="display" style="width:100%">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th >تاریخ</th>
+                <th >کاربر ثبت کننده</th>
+                <th >تعداد کل استعلام ها</th>
+                <th >تعداد استعلام تایید شده</th>
+                <th >تعداد استعلام رد شده</th>
+                <th >تعداد استعلام نامشخص</th>
+                <th >فایل استعلام</th>
+                <th >جزئیات</th>
+            </tr>
+        </thead>
+    </table>
+</div>
+<div class="modal fade text-left" id="verifyResultExcelDetailModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel20" style="display: none;" data-backdrop="static" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl" role="document">
+        <div class="modal-content rounded-lg modal-xl">
+            <div class="modal-header">
+                <h4 class="modal-title dark" id="myModalLabel20">
+                    جزئیات فایل اکسل
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="بستن">
+                    <i class="bx bx-x"></i>
+                </button>
+            </div>
+            <div class="modal-body line-height-2" id="verifyResultExcelDetailModalContent">
+                <table id="groupVerifyHistoryDetailList" class="display" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th >درخواست دهنده تسهیلات</th>
+                            <th >استعلام ثبت احوال</th>
+                            <th >استعلام چک برگشتی</th>
+                            <th >استعلام تسهیلات</th>
+                            <th >استعلام کد پستی</th>
+                            <th >استعلام تحریم شورا امنیت</th>
+                            <th >استعلام شاهکار</th>
+                            <th >استعلام نظام وظیفه</th>
+                            <th >استعلام لیست سیاه</th>
+                            <th >نتیجه نهایی</th>
+                            <th >توضیحات</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts{
+    @{
+        await Html.RenderPartialAsync("~/Views/Shared/_ValidationScriptsPartial.cshtml");
+    }
+
+    <script>
+        let groupVerifyHistoryDatatable;
+        let groupVerifyHistoryDetailDatatable;
+        let groupVerifyHistoryId = -1;
+        $(document).ready(function () {
+            $('div').removeClass('zl-active');
+            $('#groupVerifyHistory').addClass('zl-active');
+
+            loadGroupVerifyHistory();
+            loadGroupVerifyHistoryDetails();
+        });
+
+        const loadGroupVerifyHistory = () => {
+            groupVerifyHistoryDatatable = $('#groupVerifyHistoryList')
+                .on('preXhr.dt', function (e, settings, data, a, b) {
+                    //trigger before ajax call
+                    //debugger;
+                    //alert('preXhr');
+                    showWaiting('groupVerifyHistoryList', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                })
+                .on('xhr.dt', function (e, settings, json, xhr) {
+                    //trigger after ajax call
+                    //debugger;
+                    //alert('xhr');
+                })
+                .DataTable({
+                    order: [],
+                    processing: true,
+                    serverSide: true,
+                    responsive: true,
+                    rowReorder: false,
+                    select: true,
+                    searching: false,
+                    paging: true,
+                    ordering: false,
+                    searching: false,
+                    filtering: false,
+                    info: true,
+                    lengthMenu: [
+                        [5, 10, 25, 50],
+                        [5, 10, 25, 50]
+                    ],
+                    pageLength: 10,
+                    columnDefs: [
+                        //{ "visible": false, "targets": 0 },
+                        //and in this case the < a href="//legacy.datatables.net/ref#bStateSave" > bStateSave</a> works regularly ....but then I would like to have responsive columns indicating responsive: {
+                        {
+                            details: false,
+                            breakpoints: [
+                                { name: 'desktop', width: Infinity },
+                                { name: 'tablet-l', width: 1200 },
+                                { name: 'tablet-p', width: 992 },
+                                { name: 'mobile-l', width: 576 },
+                                { name: 'mobile-p', width: 320 }
+                            ]
+                        },
+                        {
+                            targets: [0, 1, 2, 3, 4, 5, 6, 7, 8],
+                            className: 'dt-center',
+                        },
+                        {
+                            targets: 1,
+                            render: function (data, type, row, meta) {
+                                return `<span style='direction:ltr'>${data}</span>`;
+                            }
+                        },
+                        {
+                            targets: 7,
+                            render: function (data, type, row, meta) {
+                                return `<a class="btn btn-outline-info" style='width:130px' href='${data}'>دانلود فایل اکسل</a>`
+                            }
+                        },
+                        {
+                            targets: 8,
+                            responsivePriority: 3,
+                            render: function (data, type, row, meta) {
+                                let buttonsHtml = `<button data-verify-result-excel-id='${data}' style='width:120px' class="btn btn-outline-primary show-detail" >مشاهده جزئیات</button>`;
+                                return buttonsHtml;
+                            }
+                        }],
+                    rowCallback: function (row, data) {
+                        //$('td:eq(0)', row).css('text-align', 'center');
+                    },
+                    ajax: (data, callback, setting) => {
+                        getGroupVerifyHistoryData(data).then(function (_data) {
+                            callback(_data);
+                        });
+                    },
+                    drawCallback: function (settings) {
+                        hideWaiting('groupVerifyHistoryList');
+                    },
+                    initComplete: function (settings, json) {
+                        $('#groupVerifyHistoryList tbody').on('click', 'button.show-detail', function (e) {
+                            e.preventDefault();
+                            var data = groupVerifyHistoryDatatable.row($(this).parents('tr')).data();
+                            groupVerifyHistoryId = data.id;
+                            groupVerifyHistoryDetailDatatable.page(0);
+                            groupVerifyHistoryDetailDatatable.ajax.reload(null, false);
+                            $('#verifyResultExcelDetailModal').modal();
+                        });
+                    },
+                    rowCallback: (row, data, displayNum, displayIndex, dataIndex) => {
+                        $('td:eq(0)', row).html(displayIndex + 1);
+                        return row;
+                    },
+                    columns: [
+                        //{ "data": null },
+                        {
+                            "data": null,
+                            render: function (data, type, row, a, b) {
+                                debugger;
+                                return data;
+                            },
+                        },
+                        { "data": "shamsiCreatedDate" },
+                        { "data": "creator" },
+                        { "data": "rowCount" },
+                        { "data": "approvedCount" },
+                        { "data": "rejectedCount" },
+                        { "data": "unknownCount" },
+                        { "data": "excelFilePath" },
+                        { "data": null }
+                    ],
+                    language: {
+                        url: '/new-layout/datatables.net/fa.json'
+                    }
+                });
+
+            const getGroupVerifyHistoryData = (data) => {
+                const postData = {
+                    Page: Math.floor(data.start / data.length) + 1,
+                    PageSize: data.length,
+                    SortDirection: null,
+                    SortOrder: null,
+                    FilterList: []
+                };
+
+                //postData.FilterList.push({
+                //    PropertyName: 'RequestStatus',
+                //    Operator: @((int)Services.Dto.Operator.Equal),
+                //    PropertyValue: parseInt(facilityStatusValue)
+                //});
+                return new Promise(function (resolve, reject) {
+                    console.log('Loading data');
+
+                    $.ajax({
+                        type: 'post',
+                        datatype: "json",
+                        data: JSON.stringify(postData),
+                        contentType: "application/json; charset=utf-8",
+                        url: `/api/v1/VerifyResultExcel/GetVerifyResultExcelHistory`,
+                        success: function (result) {
+                            if (result != undefined && result.isSuccess == true) {
+                                resolve({
+                                    data: result.data.data,
+                                    recordsTotal: result.data.totalRowCount,
+                                    recordsFiltered: result.data.totalRowCount
+                                });
+                            }
+                        },
+                        error: function (error) {
+                            debugger;
+                            const exception = getExceptionMessageFromError(error);
+                            if (exception != null)
+                                showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                            else
+                                showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                        },
+                        complete: function () {
+
+                        },
+                    });
+                });
+            }
+        }
+
+        const loadGroupVerifyHistoryDetails = () => {
+            groupVerifyHistoryDetailDatatable = $('#groupVerifyHistoryDetailList')
+                .on('preXhr.dt', function (e, settings, data, a, b) {
+                    //trigger before ajax call
+                    //debugger;
+                    //alert('preXhr');
+                    showWaiting('groupVerifyHistoryDetailList', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                })
+                .on('xhr.dt', function (e, settings, json, xhr) {
+                    //trigger after ajax call
+                    //debugger;
+                    //alert('xhr');
+                })
+                .DataTable({
+                    order: [],
+                    processing: true,
+                    serverSide: true,
+                    responsive: true,
+                    rowReorder: false,
+                    select: true,
+                    searching: false,
+                    paging: false,
+                    ordering: false,
+                    searching: false,
+                    filtering: false,
+                    info: true,
+                    //lengthMenu: [
+                    //    [10, 25, 50, -1],
+                    //    [10, 25, 50, 'همه']
+                    //],
+                    pageLength: -1,
+                    columnDefs: [
+                        //{ "visible": false, "targets": 0 },
+                        //and in this case the < a href="//legacy.datatables.net/ref#bStateSave" > bStateSave</a> works regularly ....but then I would like to have responsive columns indicating responsive: {
+                        {
+                            details: false,
+                            breakpoints: [
+                                { name: 'desktop', width: Infinity },
+                                { name: 'tablet-l', width: 1200 },
+                                { name: 'tablet-p', width: 992 },
+                                { name: 'mobile-l', width: 576 },
+                                { name: 'mobile-p', width: 320 }
+                            ]
+                        },
+                        {
+                            targets: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+                            className: 'dt-center',
+                        },
+                        {
+                            targets: 2,
+                            render: function (data, type, row, meta) {
+                                return (data != undefined ? (data == true ? '<span style="color:green">تایید</span>' : '<span style="color:red">عدم تایید</span>') : '<span style="color:gray">نامشخص</span>');
+                            }
+                        },
+                        {
+                            targets: 3,
+                            render: function (data, type, row, meta) {
+                                return (data != undefined ? (data == true ? '<span style="color:green">تایید</span>' : '<span style="color:red">عدم تایید</span>') : '<span style="color:gray">نامشخص</span>');
+                            }
+                        },
+                        {
+                            targets: 4,
+                            render: function (data, type, row, meta) {
+                                return (data != undefined ? (data == true ? '<span style="color:green">تایید</span>' : '<span style="color:red">عدم تایید</span>') : '<span style="color:gray">نامشخص</span>');
+                            }
+                        },
+                        {
+                            targets: 5,
+                            render: function (data, type, row, meta) {
+                                return (data != undefined ? (data == true ? '<span style="color:green">تایید</span>' : '<span style="color:red">عدم تایید</span>') : '<span style="color:gray">نامشخص</span>');
+                            }
+                        },
+                        {
+                            targets: 6,
+                            render: function (data, type, row, meta) {
+                                return (data != undefined ? (data == true ? '<span style="color:green">تایید</span>' : '<span style="color:red">عدم تایید</span>') : '<span style="color:gray">نامشخص</span>');
+                            }
+                        },
+                        {
+                            targets: 7,
+                            render: function (data, type, row, meta) {
+                                return (data != undefined ? (data == true ? '<span style="color:green">تایید</span>' : '<span style="color:red">عدم تایید</span>') : '<span style="color:gray">نامشخص</span>');
+                            }
+                        },
+                        {
+                            targets: 8,
+                            render: function (data, type, row, meta) {
+                                return (data != undefined ? (data == true ? '<span style="color:green">تایید</span>' : '<span style="color:red">عدم تایید</span>') : '<span style="color:gray">نامشخص</span>');
+                            }
+                        },
+                        {
+                            targets: 9,
+                            render: function (data, type, row, meta) {
+                                return (data != undefined ? (data == true ? '<span style="color:green">تایید</span>' : '<span style="color:red">عدم تایید</span>') : '<span style="color:gray">نامشخص</span>');
+                            }
+                        },
+                        {
+                            targets: 10,
+                            responsivePriority: 2,
+                            render: function (data, type, row, meta) {
+                                return (data != undefined ? (data == true ? '<span style="color:green">تایید نهایی</span>' : '<span style="color:red">عدم تایید</span>') : '<span style="color:gray">نامشخص</span>')
+                            }
+                        },
+                        {
+                            targets: 11,
+                            responsivePriority: 3,
+                            render: function (data, type, row, meta) {
+                                return (data != undefined ? data : '')
+                            }
+                        }
+                    ],
+                    rowCallback: function (row, data) {
+                        //$('td:eq(8)', row).css('text-align', 'right');
+                        //$('td', row).eq(1).css('color', 'red');
+                    },
+                    ajax: (data, callback, setting) => {
+                        getGroupVerifyHistoryDataDetails(data).then(function (_data) {
+                            callback(_data);
+                        });
+                    },
+                    drawCallback: function (settings) {
+                        hideWaiting('groupVerifyHistoryDetailList');
+                    },
+                    initComplete: function (settings, json) {
+                        //initialized = true;
+                    },
+                    rowCallback: (row, data, displayNum, displayIndex, dataIndex) => {
+                        $('td:eq(0)', row).html(displayIndex + 1);
+                        return row;
+                    },
+                    columns: [
+                        //{
+                        //    "data": "Id",
+                        //    render: function (data, type, row, meta) {
+                        //        return meta.settings.oAjaxData.start + meta.row + 1;
+                        //    }
+                        //},
+                        //{
+                        //    "data": "PersonFirstName",
+                        //    render: function (data, type) {
+                        //        //debugger;
+                        //        //if (type === 'display') {
+                        //        //    let link = 'http://datatables.net';
+
+                        //        //    if (data[0] < 'H') {
+                        //        //        link = 'http://cloudtables.com';
+                        //        //    } else if (data[0] < 'S') {
+                        //        //        link = 'http://editor.datatables.net';
+                        //        //    }
+
+                        //        //    return '<a href="' + link + '">' + data + '</a>';
+                        //        //}
+
+                        //        return data;
+                        //    },
+                        //},
+                        { "data": null },
+                        { "data": "requesterFullName" },
+                        { "data": "civilRegistryInquiry" },
+                        { "data": "returnedCheckInquiry" },
+                        { "data": "facilityInquiry" },
+                        { "data": "postalCodeInquiry" },
+                        { "data": "securityCouncilSanctionsInquiry" },
+                        { "data": "shahkarInquiry" },
+                        { "data": "militaryInquiry" },
+                        { "data": "blackListInquiry" },
+                        { "data": "finalResult" },
+                        { "data": "description" }
+                    ],
+                    language: {
+                        url: '/new-layout/datatables.net/fa.json'
+                    }
+                });
+
+            const getGroupVerifyHistoryDataDetails = (data) => {
+                return new Promise(function (resolve, reject) {
+                    if (groupVerifyHistoryId == -1) {
+                        resolve({
+                            data: [],
+                            recordsTotal: 0,
+                            recordsFiltered: 0
+                        });
+                    }
+                    else {
+                        $.ajax({
+                            type: 'post',
+                            datatype: "json",
+                            data: JSON.stringify(data),
+                            contentType: "application/json; charset=utf-8",
+                            url: `/api/v1/VerifyResultExcel/GetVerifyResultExcelDetailHistory/${groupVerifyHistoryId}`,
+                            success: function (result) {
+                                debugger;
+                                if (result != undefined && result.isSuccess == true) {
+                                    resolve({
+                                        data: result.data,
+                                        recordsTotal: result.data.length,
+                                        recordsFiltered: result.data.length
+                                    });
+                                }
+                            },
+                            error: function (error) {
+                                debugger;
+                                const exception = getExceptionMessageFromError(error);
+                                if (exception != null)
+                                    showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                                else
+                                    showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                            },
+                            complete: function () {
+
+                            },
+                        });
+                    }
+                });
+            }
+        }
+
+        //const loadGroupVerifyHistory2 = (sender) => {
+        //    showWaiting('requestGridDiv', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');;
+
+        //    const sortDirectionValue = $('#hdnSortDirection').val();
+        //    const sortOrderValue = $('#hdnSortOrder').val();
+        //    let currentPage = 1;
+        //    if (typeof $(sender).attr('current-page') !== typeof undefined && $(sender).attr('current-page') !== false)
+        //        currentPage = $(sender).attr('current-page');
+
+        //    const postData = {
+        //        Page: currentPage,
+        //        PageSize: PAGE_SIZE,
+        //        SortDirection: sortDirectionValue,
+        //        SortOrder: sortOrderValue
+        //    };
+        //    debugger;
+
+        //    $.ajax({
+        //        type: 'post',
+        //        data: JSON.stringify(postData),
+        //        datatype: "json",
+        //        contentType: "application/json; charset=utf-8",
+        //        url: '/api/v1/VerifyResultExcel/GetVerifyResultExcelHistory',
+        //        success: function (result) {
+        //            hideWaiting('requestGridDiv');
+        //            debugger;
+        //            if (result !== undefined && result !== null && result.isSuccess === true) {
+        //                renderRequestGrid(result.data.data, result.data.currentPage, PAGE_SIZE);
+        //                renderNavigation('requestGridDiv', result.data.totalRowCount, result.data.currentPage, result.data.totalPages);
+        //                resetGridStyle('requestGridDiv', 'hdnSortOrder', 'hdnSortDirection');
+        //            }
+        //        },
+        //        error: function (error) {
+        //            debugger;
+        //            hideWaiting('requestGridDiv');
+        //            const exception = getExceptionMessageFromError(error);
+        //            if (exception != null)
+        //                showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+        //            else
+        //                showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+        //        },
+        //        complete: function () {
+
+        //        },
+        //    });
+        //}
+
+        //const renderRequestGrid = (data, currentPage, pageSize) => {
+        //    let rows = '<tr><td colspan="9">@ResourceFile.NoRows</td></tr>';
+        //    if (data.length > 0) {
+        //        rows = '';
+        //        for (var i = 0; i < data.length; i++) {
+        //            rows += '<tr>';
+        //            rows += "<td style=''>" + (((currentPage - 1) * pageSize) + i + 1) + "</td>";
+        //            rows += "<td style='direction:ltr;width:130px'>" + data[i].shamsiCreatedDate + "</td>";
+        //            rows += "<td>" + data[i].creator + "</td>";
+        //            rows += "<td>" + data[i].rowCount + "</td>";
+        //            rows += "<td>" + data[i].approvedCount + "</td>";
+        //            rows += "<td>" + data[i].rejectedCount + "</td>";
+        //            rows += "<td>" + data[i].unknownCount + "</td>";
+        //            rows += `<td><a class="btn btn-outline-info" style='width:130px' href='${data[i].excelFilePath}'>دانلود فایل اکسل</a></td>`;
+        //            rows += `<td><button data-verify-result-excel-id='${data[i].id}' style='width:120px' class="btn btn-outline-primary show-detail" >مشاهده جزئیات</button></td>`;
+        //            rows += '</tr>';
+        //        }
+        //    }
+        //    $('#requestGridRows').html(rows);
+        //    $('.show-detail').off('click');
+        //    $('.show-detail').click((e) => {
+        //        debugger;
+        //        e.preventDefault();
+        //        $('#verifyResultExcelDetailModal').modal();
+        //        GetVerifyResultExcelDetailHistory($(e.target).data('verify-result-excel-id'));
+        //    });
+        //}
+
+        //const GetVerifyResultExcelDetailHistory = (verifyResultExcelId) => {
+        //    showWaiting('verifyResultExcelDetailModalContent', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+
+        //    $.ajax({
+        //        type: 'post',
+        //        datatype: "json",
+        //        contentType: "application/json; charset=utf-8",
+        //        url: `/api/v1/VerifyResultExcel/GetVerifyResultExcelDetailHistory/${verifyResultExcelId}`,
+        //        success: function (result) {
+        //            hideWaiting('verifyResultExcelDetailModalContent');
+        //            debugger;
+        //            if (result !== undefined && result !== null && result.isSuccess === true) {
+        //                renderverifyResultExcelDetailGrid(result.data);
+        //            }
+        //        },
+        //        error: function (error) {
+        //            debugger;
+        //            hideWaiting('verifyResultExcelDetailModalContent');
+        //            const exception = getExceptionMessageFromError(error);
+        //            if (exception != null)
+        //                showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+        //            else
+        //                showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+        //        }
+        //    });
+        //}
+
+        //const renderverifyResultExcelDetailGrid = (data) => {
+        //    let rows = '<tr><td colspan="5">@ResourceFile.NoRows</td></tr>';
+        //    if (data.length > 0) {
+        //        rows = '';
+        //        for (var i = 0; i < data.length; i++) {
+        //            rows += '<tr>';
+        //            rows += "<td style=''>" + (i + 1) + "</td>";
+        //            rows += "<td>" + data[i].requesterFullName + "</td>";
+        //            rows += "<td>" + (data[i].civilRegistryInquiry != undefined ? (data[i].civilRegistryInquiry == true ? '<span style="color:green">تایید</span>' : '<span style="color:red">عدم تایید</span>') : '<span style="color:gray">نامشخص</span>') + "</td>";
+        //            rows += "<td>" + (data[i].returnedCheckInquiry != undefined ? (data[i].returnedCheckInquiry == true ? '<span style="color:green">تایید</span>' : '<span style="color:red">عدم تایید</span>') : '<span style="color:gray">نامشخص</span>') + "</td>";
+        //            rows += "<td>" + (data[i].facilityInquiry != undefined ? (data[i].facilityInquiry == true ? '<span style="color:green">تایید</span>' : '<span style="color:red">عدم تایید</span>') : '<span style="color:gray">نامشخص</span>') + "</td>";
+        //            rows += "<td>" + (data[i].postalCodeInquiry != undefined ? (data[i].postalCodeInquiry == true ? '<span style="color:green">تایید</span>' : '<span style="color:red">عدم تایید</span>') : '<span style="color:gray">نامشخص</span>') + "</td>";
+        //            rows += "<td>" + (data[i].securityCouncilSanctionsInquiry != undefined ? (data[i].securityCouncilSanctionsInquiry == true ? '<span style="color:green">تایید</span>' : '<span style="color:red">عدم تایید</span>') : '<span style="color:gray">نامشخص</span>') + "</td>";
+        //            rows += "<td>" + (data[i].shahkarInquiry != undefined ? (data[i].shahkarInquiry == true ? '<span style="color:green">تایید</span>' : '<span style="color:red">عدم تایید</span>') : '<span style="color:gray">نامشخص</span>') + "</td>";
+        //            rows += "<td>" + (data[i].militaryInquiry != undefined ? (data[i].militaryInquiry == true ? '<span style="color:green">تایید</span>' : '<span style="color:red">عدم تایید</span>') : '<span style="color:gray">نامشخص</span>') + "</td>";
+        //            rows += "<td>" + (data[i].blackListInquiry != undefined ? (data[i].blackListInquiry == true ? '<span style="color:green">تایید</span>' : '<span style="color:red">عدم تایید</span>') : '<span style="color:gray">نامشخص</span>') + "</td>";
+        //            rows += "<td>" + (data[i].finalResult != undefined ? (data[i].finalResult == true ? '<span style="color:green">تایید نهایی</span>' : '<span style="color:red">عدم تایید</span>') : '<span style="color:gray">نامشخص</span>') + "</td>";
+        //            rows += "<td>" + (data[i].description != undefined ? data[i].description : '') + "</td>";
+        //            rows += '</tr>';
+        //        }
+        //    }
+        //    $(`#verifyResultExcelDetailRows`).html(rows);
+
+        //}
+    </script>
+}

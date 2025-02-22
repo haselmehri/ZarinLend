@@ -1,0 +1,202 @@
+﻿@using Core.Entities.Business.Transaction
+@{
+    ViewData["Title"] = ViewBag.Title;
+    Layout = "~/Views/Shared/_NewLayout.cshtml";
+}
+@section styles {
+    <style type="text/css">
+        .ipg-img {
+            width: 40px;
+            border-radius: 5px;
+        }
+    </style>
+}
+<div id="requestGridDiv" class="p-2 bg-white rounded-lg">
+    <div class="font-medium-3 secondary darken-4 text-bold-800 d-flex align-items-center">
+        <i class="bx bx-align-right zl-text-secondary mr-25"></i>
+        <span>@ViewBag.Title</span>
+    </div>
+    <div class="p-2 rounded-lg">
+        <table id="samanIpgList" class="display" style="width:100%">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th >مبلغ(ريال)</th>
+                    <th >نوع تراکنش</th>
+                    <th >تاریخ تراکنش</th>
+                    <th >توضیحات</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+@section scripts {
+    <script>
+        let responsiveDatatable;
+        $(document).ready(function () {
+            $('div').removeClass('zl-active');
+            $('#transactionList').addClass('zl-active');
+
+            loadTransactionList();
+        });
+
+        //============
+        const loadTransactionList = () => {
+            responsiveDatatable = $('#samanIpgList')
+                .on('preXhr.dt', function (e, settings, data, a, b) {
+                    //trigger before ajax call
+                    //debugger;
+                    //alert('preXhr');
+                    showWaiting('samanIpgList', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                })
+                .on('xhr.dt', function (e, settings, json, xhr) {
+                    //trigger after ajax call
+                    //debugger;
+                    //alert('xhr');
+                })
+                .DataTable({
+                    order: [],
+                    processing: true,
+                    serverSide: true,
+                    responsive: true,
+                    rowReorder: false,
+                    select: true,
+                    searching: false,
+                    paging: true,
+                    ordering: false,
+                    searching: false,
+                    filtering: false,
+                    info: true,
+                    lengthMenu: [
+                        [5, 10, 25, 50],
+                        [5, 10, 25, 50]
+                    ],
+                    pageLength: 10,
+                    columnDefs: [
+                        {
+                            details: false,
+                            breakpoints: [
+                                { name: 'desktop', width: Infinity },
+                                { name: 'tablet-l', width: 1200 },
+                                { name: 'tablet-p', width: 992 },
+                                { name: 'mobile-l', width: 576 },
+                                { name: 'mobile-p', width: 320 }
+                            ]
+                        },
+                        {
+                            targets: [0, 1, 2, 3, 4],
+                            className: 'dt-center',
+                        },
+                        {
+                            targets: 1,
+                            render: function (data, type, row, meta) {
+                                return `<span style="direction:ltr">${splitNumber(data)}</span>`;
+                            }
+                        },
+                        {
+                            targets: 2,
+                            render: function (data, type, row, meta) {
+                                let transactionType = '';
+                                switch (data) {
+                                    case @((int)TransactionTypeEnum.Fee):
+                                        transactionType = '@TransactionTypeEnum.Fee.ToDisplay()';
+                                        break;
+                                    case @((int)TransactionTypeEnum.Withdraw):
+                                        transactionType = '@TransactionTypeEnum.Withdraw.ToDisplay()';
+                                        break;
+                                    case @((int)TransactionTypeEnum.Deposit):
+                                        transactionType = '@TransactionTypeEnum.Deposit.ToDisplay()';
+                                        break;     
+                                    default:
+                                        break;
+                                }
+                                return `<span style="">${transactionType}</span>`;
+                            }
+                        },
+                        {
+                            targets: 3,
+                            render: function (data, type, row, meta) {
+                                return (row.shamsiUpdateDate != null && row.shamsiUpdateDate != ''
+                                        ? row.shamsiUpdateDate
+                                        : row.shamsiCreateDate);
+                            }
+                        }
+                    ],
+                    ajax: (data, callback, setting) => {
+                        getSamanIpgData(data).then(function (_data) {
+                            callback(_data);
+                        });
+                    },
+                    drawCallback: function (settings) {
+                        hideWaiting('samanIpgList');
+                    },
+                    initComplete: function (settings, json) {
+                    },
+                    rowCallback: (row, data, displayNum, displayIndex, dataIndex) => {
+                        $('td:eq(0)', row).html(displayIndex + 1);
+                        return row;
+                    },
+                    columns: [
+                        { "data": null },
+                        { "data": "amount" },
+                        { "data": "transactionType" },
+                        { "data": null },
+                        { "data": 'description' }
+                    ],
+                    language: {
+                        url: '/new-layout/datatables.net/fa.json'
+                    }
+                });
+
+            const getSamanIpgData = (data) => {
+                const postData = {
+                    Page: Math.floor(data.start / data.length) + 1,
+                    PageSize: data.length,
+                    SortDirection: null,
+                    SortOrder: null,
+                    FilterList: []
+                };
+
+                return new Promise(function (resolve, reject) {
+                    console.log('Loading data');
+
+                    $.ajax({
+                        type: 'post',
+                        datatype: "json",
+                        data: JSON.stringify(postData),
+                        contentType: "application/json; charset=utf-8",
+                        url: '/api/v1/Transaction/GetTransactionList',
+                        success: function (result) {
+                            if (result != undefined && result.isSuccess == true) {
+                                resolve({
+                                    data: result.data.data,
+                                    recordsTotal: result.data.totalRowCount,
+                                    recordsFiltered: result.data.totalRowCount
+                                });
+                            }
+                        },
+                        error: function (error) {
+                            debugger;
+                            const exception = getExceptionMessageFromError(error);
+                            if (exception != null)
+                                showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                            else
+                                showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                        },
+                        complete: function () {
+
+                        },
+                    });
+                });
+            }
+
+            $('#samanIpgList').on('page.dt', function () {
+                debugger;
+                var info = responsiveDatatable.page.info();
+                //$('#pageInfo').html('Showing page: ' + info.page + ' of ' + info.pages);
+                console.log('Showing page: ' + info.page + ' of ' + info.pages);
+            });
+        }
+        //============
+    </script>
+}

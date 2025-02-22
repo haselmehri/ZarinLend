@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Contracts\_OldIIranCreditScoringService.cs" />
+    <Compile Remove="Implements\_OldIranCreditScoringService.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="HttpClientToCurl" Version="2.0.6" />
+    <PackageReference Include="WebPush" Version="1.0.12" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ZarinLend.Data\ZarinLend.Data.csproj" />
+  </ItemGroup>
+
+</Project>

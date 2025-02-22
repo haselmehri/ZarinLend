@@ -1,0 +1,554 @@
+﻿@{
+    ViewData["Title"] = _loc["CardChargeList"];
+}
+@section styles{
+    <style type="text/css">
+
+        ex-h2 {
+            line-height: 30px !important
+        }
+
+        .date-update {
+            float: left;
+            color: wheat !important;
+            font-size: 12pt !important;
+            margin-top: 6px !important;
+        }
+
+        .table-custom th,
+        .table-custom td {
+            text-align: center !important;
+            vertical-align: middle !important;
+        }
+
+        .SelectedCell {
+            font-weight: bold !important;
+            background-color: black;
+            /*background-color: red;*/
+            color: white;
+        }
+
+        .NonSelectedCell {
+            font-weight: normal !important;
+            background-color: black;
+            color: whitesmoke;
+        }
+
+        .card {
+            word-wrap: normal !important;
+        }
+
+        .ex-card-header {
+            text-align: right !important;
+            padding-bottom: 4px !important;
+            padding-top: 4px !important;
+        }
+
+        .ex-btn-link {
+            padding-bottom: 4px !important;
+            padding-top: 4px !important;
+            color: white !important;
+        }
+
+            .ex-btn-link:hover {
+                color: #f7e7e7 !important;
+            }
+
+        .accordion {
+            margin-bottom: 15px !important;
+        }
+
+        .bi {
+            /*color: #fff;*/
+            height: 30px;
+            width: 30px;
+        }
+
+        .header-grid {
+            text-align: center !important;
+            vertical-align: middle !important;
+            min-width: 140px;
+        }
+
+        .detail-grid {
+            text-align: center;
+            padding: 0.65rem !important;
+        }
+
+        .card-body {
+            padding: 1rem !important;
+        }
+
+        .mb-0 {
+            line-height: 30px !important;
+        }
+
+        .label-value {
+            font-weight: bold;
+            color: blueviolet;
+            padding-right: 10px;
+        }
+
+        .form-group-ex {
+            margin-bottom: 10px !important
+        }
+
+        .form-check-inline {
+            margin-bottom: 1rem !important
+        }
+    </style>
+
+}
+<div class="card">
+    <div class="card-header" localize-content>CardChargeList</div>
+    <div class="card-body" id="agentRequestGridDiv">
+        <div class="col-md-12">
+            <div class="form-group">
+                <a class="btn btn-outline-success" href='@Url.Action("AddCardCharge","AgentRequest")'>
+                    @_loc["CardChargeRegister"]&nbsp;<i class="fal fa-send"></i>
+                </a>
+            </div>
+        </div>
+        <div class="paging-div"></div>
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover table-custom">
+                <thead>
+                    <tr class="table-secondary">
+                        <th scope="col">#</th>
+                        @*<th scope="col" data-sortorder="date" localize-content>RequestType</th>*@
+                        <th scope="col" data-sortorder="Tedad" localize-content>RequestDate</th>
+                        <th scope="col" data-sortorder="Mablagh" localize-content>RequestStatus</th>
+                        <th scope="col" data-sortorder="Tedad" localize-content>CardNumber</th>
+                        <th scope="col" data-sortorder="Mablagh">@_loc["ChargeAmount"]%</th>
+                        <th scope="col" data-sortorder="DaftariEghtesadi" localize-content>Wage</th>
+                        <th scope="col" data-sortorder="DescErtebad" localize-content>CustomerFullName</th>
+                        <th scope="col" data-sortorder="DaftariEghtesadi" localize-content>Attachments</th>
+                        <th scope="col" data-sortorder="DaftariEghtesadi"></th>
+                    </tr>
+                </thead>
+                <tbody id="agentRequestGridRows">
+                    <tr>
+                        <td colspan="9" localize-content>
+                            NoRows
+                        </td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    @*<tr class="table-primary" style="font-weight:bold">
+                            <td scope="row"></td>
+                            <td></td>
+                            <td></td>
+                            <td>جمع کل</td>
+                            <td id="Mablagh_Sum"></td>
+                            <td id="DaftariEghtesadi_Sum"></td>
+                        </tr>*@
+                </tfoot>
+            </table>
+        </div>
+        <div class="paging-div"></div>
+    </div>
+    <div class="card-footer"></div>
+</div>
+<div class="modal fade left" id="modalChangeStatusRequest" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+     aria-hidden="true" data-backdrop="false">
+    <div class="modal-dialog modal-full-height modal-left modal-notify modal-info modal-xl" role="document" style="margin-bottom:6rem !important">
+        <!-- Content -->
+        <div id="modalChangeStatusRequestContent" class="modal-content modal-xl">
+            <!-- Header -->
+            <div class="modal-header">
+                <span style="font-weight: bold;" id="modalTitle" localize-content>ChargeCardRequestDetail</span>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true" class="white-text">&times;</span>
+                </button>
+            </div>
+            <!-- Body -->
+            <div class="modal-body" style="">
+                <fieldset>
+                    <legend localize-content>
+                        CustomerInfo
+                    </legend>
+                    <div class="row">
+                        <div class="col-xl-4">
+                            <div class="form-group form-group-ex">
+                                <label class="control-label" localize-content>CustomerFName</label>
+                                <label id="fname" class="control-label label-value" />
+                            </div>
+                        </div>
+                        <div class="col-xl-4">
+                            <div class="form-group form-group-ex">
+                                <label class="control-label" localize-content>CustomerLName</label>
+                                <label id="lname" class="control-label label-value" />
+                            </div>
+                        </div>
+                        <div class="col-xl-4">
+                            <div class="form-group form-group-ex">
+                                <label class="control-label" localize-content>Nationality</label>
+                                <label id="nationality" class="control-label label-value" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xl-4">
+                            <div class="form-group form-group-ex">
+                                <label class="control-label" localize-content>PassportID</label>
+                                <label id="passportId" class="control-label label-value" />
+                            </div>
+                        </div>
+                        <div class="col-xl-4">
+                            <div class="form-group form-group-ex">
+                                <label class="control-label" localize-content>PrivateNumber</label>
+                                <label id="privateNumber" class="control-label label-value" />
+                            </div>
+                        </div>
+                        <div class="col-xl-4">
+                            <div class="form-group form-group-ex">
+                                <label class="control-label" localize-content>Mobile</label>
+                                <label id="mobile" class="control-label label-value" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xl-4">
+                            <div class="form-group form-group-ex">
+                                <label class="control-label" localize-content>Email</label>
+                                <label id="email" class="control-label label-value" />
+                            </div>
+                        </div>
+                        <div class="col-xl-4">
+                            <div class="form-group form-group-ex">
+                                <label class="control-label" localize-content>Attachments</label>
+                                <div id="attachments_holder"></div>
+                            </div>
+                        </div>
+                        <div class="col-xl-4">
+                            <div class="form-group form-group-ex" style="display:none">
+                                <label class="control-label" localize-content>SelfiPhotoToCard</label>
+                                <div id="attachment_selfi"></div>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+                <fieldset>
+                    <legend localize-content>
+                        CardDetail
+                    </legend>
+                    <div class="row">
+                        <div class="col-xl-4">
+                            <div class="form-group form-group-ex">
+                                <label class="control-label" localize-content>CardNumber</label>
+                                <label id="cardNumber" class="control-label label-value" />
+                            </div>
+                        </div>
+                        <div class="col-xl-4">
+                            <div class="form-group form-group-ex">
+                                <label class="control-label" localize-content>CardType</label>
+                                <label id="cardType" class="control-label label-value" />
+                            </div>
+                        </div>
+                        <div class="col-xl-4">
+                            <div class="form-group form-group-ex">
+                                <label class="control-label" localize-content>BankCardType</label>
+                                <label id="bankName" class="control-label label-value" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xl-4">
+                            <div class="form-group form-group-ex">
+                                <label class="control-label" localize-content>AgentRequester</label>
+                                <label id="agentFullName" class="control-label label-value" />
+                            </div>
+                        </div>
+                        <div class="col-xl-4">
+                            <div class="form-group form-group-ex">
+                                <label class="control-label" localize-content>RequestDate</label>
+                                <label id="createDate" class="control-label label-value" />
+                            </div>
+                        </div>
+                        <div class="col-xl-4">
+                            <div class="form-group form-group-ex">
+                                <label class="control-label" localize-content>Amount</label>
+                                <label id="amount" class="control-label label-value" />&nbsp;@_loc["RialIran"]
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+                <!-- Footer -->
+                <div class="modal-footer justify-content-center" id="footerModalDiv">
+                    <button class="btn btn-outline-info waves-effect" data-dismiss="modal" localize-content>Close</button>
+                </div>
+            </div>
+            <!-- Content -->
+        </div>
+    </div>
+</div>
+<input type="hidden" id="hdnRequestGridSortOrder" value="CreateDate" />
+<input type="hidden" id="hdnRequestGridSortDirection" value="DESC" />
+@section scripts{
+    <script>
+        const PAGE_SIZE = 10;
+
+        $(document).ready(function () {
+            loadAgentRequest();
+        });
+
+        $('#agentRequestGridDiv').on('click', 'thead th', function () {
+            renderSortColumn(this, 'hdnRequestGridSortOrder', 'hdnRequestGridSortDirection', () => { loadAgentRequest(); })
+        });
+
+        //$('#customerTrendHazine').on('shown.bs.modal', function () {
+        //    if ($('#hdnNewCodeActionSample').val() === '' ||
+        //        $('#hdnErtebatCodeAction').val() === '') {
+        //        loadAgentRequest();
+        //    }
+        //});
+
+       const loadAgentRequest = (sender) => {
+            showWaiting('agentRequestGridDiv', '@_loc["PleaseWait"]', '@_loc["Loading"]');
+
+            const sortDirectionValue = $('#hdnRequestGridSortDirection').val();
+            const sortOrderValue = $('#hdnRequestGridSortOrder').val();
+            let currentPage = 1;
+            if (typeof $(sender).attr('current-page') !== typeof undefined && $(sender).attr('current-page') !== false)
+                currentPage = $(sender).attr('current-page');
+
+            const postData = {
+                Page: currentPage,
+                PageSize: PAGE_SIZE,
+                SortDirection: sortDirectionValue,
+                SortOrder: sortOrderValue
+            };
+
+            $.ajax({
+                type: 'post',
+                data: JSON.stringify(postData),
+                datatype: "json",
+                contentType: "application/json; charset=utf-8",
+                url: '/api/v1/AgentRequest/GetAllCardChargeRequest',
+                success: function (result) {
+                    hideWaiting('agentRequestGridDiv');
+                    if (result !== undefined && result !== null && result.isSuccess === true) {
+                        renderRequestGrid(result.data.data, result.data.currentPage, PAGE_SIZE);
+                        renderNavigation('agentRequestGridDiv', result.data.totalRowCount, result.data.currentPage, result.data.totalPages);
+                        resetGridStyle('agentRequestGridDiv', 'hdnRequestGridSortOrder', 'hdnRequestGridSortDirection');
+                    }
+                },
+                error: function (error) {
+                    hideWaiting('agentRequestGridDiv');
+                    if (error.responseJSON != undefined && error.responseJSON.Message != undefined && error.responseJSON.Message != '') {
+                        if (IsJsonString(error.responseJSON.Message)) {
+                            const exception = JSON.parse(error.responseJSON.Message).Exception;
+                            showMessage('@_loc["ErrorTitle"]', exception, icons.error, '@_loc["Close"]');
+                        }
+                        else
+                            showMessage('@_loc["ErrorTitle"]', error.responseJSON.Message, icons.error, '@_loc["Close"]');
+                    }
+                    else {
+                        showMessage('@_loc["ErrorTitle"]', '@_loc["UnhandledError"]', icons.error, '@_loc["Close"]');
+                    }
+                },
+                complete: function () {
+
+                },
+            });
+        }
+
+      const  renderRequestGrid = (data, currentPage, pageSize) => {
+            let rows = '<tr><td colspan="9">@_loc["NoRows"]</td></tr>';
+            if (data.length > 0) {
+                rows = '';
+                for (var i = 0; i < data.length; i++) {
+                    rows += '<tr class="' + (i % 2 == 0 ? 'table-info' : 'table-light') + '">';
+                    rows += "<td style=''>" + (((currentPage - 1) * pageSize) + i + 1) + "</td>";
+                    @*rows += "<td style=''>" + ('@cultureAccessor.GetCurrentCulture()' == FA_CULTURE ? data[i].requestTypeName : data[i].requestTypeNameAR) + "</td>";*@
+
+                    if ('@cultureAccessor.GetCurrentCulture()' == FA_CULTURE)
+                        rows += "<td style=''>" + (data[i].shamsiUpdateDate != '' ? data[i].shamsiUpdateDate : data[i].shamsiCreateDate) + "</td>";
+                    else
+                        rows += "<td style=''>" + ((data[i].updateDate != '' || data[i].updateDate != null) ? data[i].updateDate : data[i].createDate) + "</td>";
+
+                    rows += "<td style=''>" + data[i].statusName + "</td>";
+                    rows += "<td style=''>" + data[i].splitCardNumber + "</td>";
+                    rows += "<td style='direction:ltr'>" + splitNumber(data[i].amount) + "</td>";
+                    rows += `<td style='direction:ltr'>${splitNumber(parseInt(data[i].wage * data[i].amount / 100))}(${data[i].wage}%)</td>`;
+                    rows += "<td style=''>" + `${data[i].personFName} ${data[i].personLName}` + "</td>";
+                    rows += "<td style='direction:rtl'>" + generateDocumentsLink(data[i].documents, '@_loc["DocNumber"]') + "</td>";
+                    rows += `<td><button data-agentRequestId='${data[i].id}' class='btn btn-outline-success show-detail'>@_loc["Detail"]</button></td>`;
+                    rows += '</tr>';
+                }
+            }
+            $('#agentRequestGridRows').html(rows);
+
+
+            $('show-detail').off('click');
+            $('.show-detail').click((e) => {
+                showModal($(e.target).data('agentrequestid'));
+            });
+        }
+
+      const  clearModalContent = () => {
+            $('#fname').text('');
+            $('#lname').text('');
+            $('#nationality').text('');
+            $('#passportId').text('');
+            $('#privateNumber').text('');
+            $('#mobile').text('');
+            $('#email').text('');
+            $('#cardNumber').text('');
+            $('#cardType').text('');
+            $('#bankName').text('');
+            $('#agentFullName').text('');
+            $('#createDate').text('');
+            $('#amount').text('');
+            $('#attachments_holder').empty();
+            $('#attachment_selfi').empty();
+        }
+
+       const showModal = (agentRequestId) => {
+            //$('#dynamicModalGridTitle').text('جزئیات عملکرد مشتری')
+            $('#modalChangeStatusRequest').modal();
+            showWaiting('modalChangeStatusRequestContent', '@_loc["PleaseWait"]', '@_loc["Loading"]');
+
+            //======Load Agent Request Detail===========
+            $.ajax({
+                type: 'post',
+                //dataType: 'json',
+                contentType: "application/json; charset=utf-8",
+                url: `/api/v1/AgentRequest/GetAgentRequest/${agentRequestId}/@cultureAccessor.GetCurrentCulture()`,
+                data: '{}',
+                success: function (result) {
+                    hideWaiting('modalChangeStatusRequestContent');
+                    if (result.isSuccess) {
+                        debugger;
+                        const data = result.data;
+                        $('#fname').text(data.personFName);
+                        $('#lname').text(data.personLName);
+                        $('#nationality').text(data.personCountryName);
+                        $('#passportId').text(data.personPassportId);
+                        $('#privateNumber').text(data.personPrivateNumber);
+                        $('#mobile').text(data.personMobile);
+                        $('#email').text(data.personEmail);
+                        $('#cardNumber').text(data.splitCardNumber);
+                        $('#cardType').text( data.cardTypeTitle );
+                        $('#bankName').text(data.bankName);
+                        $('#agentFullName').text(data.agentFullName);
+                        $('#amount').text(splitNumber(data.amount));
+                        $('#createDate').text(data.shamsiCreateDate);
+                        $('#attachments_holder').html(generateDocumentsLink(data.documents, '@_loc["DocNumber"]'));
+                        if (data.documents != null && data.documents != undefined && data.documents.length > 0) {
+                            selfiDoc = data.documents.find((item) => {
+                                return item.documentType == @((short)DocumentType.CustomerSelfiToCard);
+                            });
+                            if (selfiDoc != null && selfiDoc != undefined) {
+                                let htmlSelfiPhotoToLink = `<a target='_blank' href='${selfiDoc.filePath}'><img src='${selfiDoc.filePath}' style='width:100px;' alt='@_loc["SelfiPhotoToCard"]' /></a>`
+                                $('#attachment_selfi').html(htmlSelfiPhotoToLink);
+                            }
+                        }
+                    }
+                },
+                error: function (error) {
+                    hideWaiting('modalChangeStatusRequestContent');
+                    if (error.responseJSON != undefined && error.responseJSON.Message != undefined && error.responseJSON.Message != '') {
+                        if (IsJsonString(error.responseJSON.Message)) {
+                            const exception = JSON.parse(error.responseJSON.Message).Exception;
+                            showMessage('@_loc["ErrorTitle"]', exception, icons.error, '@_loc["Close"]');
+                        }
+                        else
+                            showMessage('@_loc["ErrorTitle"]', error.responseJSON.Message, icons.error, '@_loc["Close"]');
+                    }
+                    else {
+                        showMessage('@_loc["ErrorTitle"]', '@_loc["UnhandledError"]', icons.error, '@_loc["Close"]');
+                    }
+                }
+            });
+            //======Load Agent Request Detail===========
+        }
+
+       const resetGridStyle = (parentGridElementId, hdnSortOrderElementId, hdnSortDirectionElementId) => {
+            const sortDirectionValue = $(`#${hdnSortDirectionElementId}`).val();
+            const sortOrderValue = $(`#${hdnSortOrderElementId}`).val();
+
+            $(`#${parentGridElementId} thead th`).removeClass("sorted-column");
+            $(`#${parentGridElementId} thead th`).addClass("not-sorted-column");
+
+            if (sortOrderValue != undefined || sortOrderValue != '') {
+                let sortCell = $(`#${parentGridElementId} *[data-sortorder='${sortOrderValue}']`);
+                $(sortCell).removeClass('not-sorted-column');
+                $(sortCell).addClass('sorted-column');
+
+                if (sortDirectionValue == undefined || sortDirectionValue == '' || sortDirectionValue.toUpperCase() == "DESC") {
+                    $(`#${parentGridElementId}  thead th span`).remove();
+                    //$(sortCell).append("<span class='fa fa-chevron-down' style='color:red;position:absolute;margin-right:3px'></span>");
+                    $(sortCell).append("<span class='fa fa-chevron-down' style='color:red;margin-right:3px'></span>");
+                } else {
+                    $(`#${parentGridElementId}  thead th span`).remove();
+                    //$(sortCell).append("<span class='fa fa-chevron-up' style='color:green;position:absolute;margin-right:3px'></span>");
+                    $(sortCell).append("<span class='fa fa-chevron-up' style='color:green;margin-right:3px'></span>");
+                }
+            }
+        }
+
+      const  renderNavigation = (rootElementId, totalRowCount, currentPage, totalPages) => {
+            let pagingHtml = '';
+            if (totalRowCount > PAGE_SIZE) {
+                if (currentPage != 1) {
+                    pagingHtml += '<li class="page-item"><button class="page-link page-link-active" current-page="1">@_loc["First"]</button></li>';
+                    pagingHtml += '<li class="page-item"><button class="page-link page-link-active" current-page="' + (currentPage - 1) + '">@_loc["Prev"]</button></li>';
+                } else {
+                    pagingHtml += '<li class="page-item disabled"><button class="page-link">@_loc["First"]</button></li>';
+                    pagingHtml += '<li class="page-item disabled"><button class="page-link">@_loc["Prev"]</button></li>';
+                }
+
+                let firstPageToDisplay = currentPage - (PAGE_SIZE / 2);
+
+                if (firstPageToDisplay < 1) {
+                    firstPageToDisplay = 1;
+                }
+
+                for (var pageNumber = firstPageToDisplay; pageNumber < (firstPageToDisplay + PAGE_SIZE); pageNumber++) {
+                    if (pageNumber <= totalPages) {
+                        if (currentPage == pageNumber) {
+                            pagingHtml += '<li class="page-item active">' +
+                                '<button class="page-link page-link-active" current-page="' +
+                                pageNumber +
+                                '">' +
+                                pageNumber +
+                                '<span class="sr-only">(current)</span>' +
+                                '</button>' +
+                                '</li>';
+                        } else {
+                            pagingHtml += '<li class="page-item"><button class="page-link page-link-active" current-page="' + pageNumber + '">' + pageNumber + '</button></li>';
+                        }
+                    } else {
+                        break;
+                    }
+                }
+
+                if (currentPage != totalPages) {
+                    pagingHtml += '<li class="page-item"><button class="page-link page-link-active" current-page="' + (currentPage + 1) + '">@_loc["Next"]</button></li>';
+                    pagingHtml += '<li class="page-item"><button class="page-link page-link-active" current-page="' + totalPages + '">@_loc["Last"]</button></li>';
+                } else {
+                    pagingHtml += '<li class="page-item disabled"><button class="page-link">@_loc["Next"]</button></li>';
+                    pagingHtml += '<li class="page-item disabled"><button class="page-link">@_loc["Last"]</button></li>';
+                }
+            }
+            pagingHtml = '<nav aria-label="Page navigation example" style="text-align:center"><ul class="pagination">' +
+                pagingHtml +
+                '</ul><b style="color:#1e88e5">@_loc["TotalRowCount"] : ' +
+                totalRowCount +
+                '</b></nav>';
+
+            $(`#${rootElementId} .paging-div`).html(pagingHtml);
+            $(`#${rootElementId} .paging-div .page-link-active`).off('click');
+            $(`#${rootElementId} .paging-div .page-link-active`).on('click',
+                function (e) {
+                    e.preventDefault();
+                    switch (rootElementId.toLowerCase()) {
+                        case 'agentrequestgriddiv':
+                            loadAgentRequest(this);
+                            break;
+                    }
+                });
+        }
+    </script>
+}

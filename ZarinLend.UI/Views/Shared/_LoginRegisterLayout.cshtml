@@ -1,0 +1,172 @@
+﻿@using Microsoft.AspNetCore.Http.Extensions
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon32x32.svg">
+    @*    <link rel="icon" type="image/png" sizes="180x180" href="/images/favicon32x32.svg">
+        <link rel="icon" type="image/png" sizes="192x192" href="/images/favicon32x32.svg">*@
+
+    <link rel="manifest" href="/manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
+    <meta name="theme-color" content="#6748fe">
+
+    <title>@ResourceFile.SiteTitle - @ViewData["Title"]</title>
+
+    @*<link rel="stylesheet" href="~/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="~/css/bootstrap-rtl.min.css" />
+        <link rel="stylesheet" href="~/css/fonts.css" />*@
+    <link rel="stylesheet" type="text/css" href="~/new-layout/vendor/vendors.min.css" />
+    <link rel="stylesheet" type="text/css" href="~/new-layout/css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="~/new-layout/css/bootstrap-extended.css" />
+    <link rel="stylesheet" type="text/css" href="~/new-layout/css/colors.css" />
+    <link rel="stylesheet" type="text/css" href="~/new-layout/css/components.css" />
+    <link rel="stylesheet" href="~/font-awesome/css/font-awesome.css" />
+    <link rel="stylesheet" href="~/font-awesome/css/font-awesome-animation.min.css" />
+    <link href="~/css/all.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/site-rtl.css" asp-append-version="true" />
+    @await RenderSectionAsync("styles", required: false)
+    <style>
+        .pwa-alert {
+            margin-top: 3.5rem;
+        }
+        .bx-extend {
+            color: #f8c818;
+        }
+    </style>
+</head>
+<body class="container-fluid container-fluid-zero-padding">
+    <nav class="px-50 px-md-2 fixed-top navbar navbar-expand-lg navbar-light bg-white zl-app-content">
+        <div class="d-flex flex-row justify-content-between w-100">
+            <div class="d-flex">
+                <button class="navbar-toggler"
+                        type="button"
+                        data-toggle="collapse"
+                        data-target="#navbarNav"
+                        aria-controls="navbarNav"
+                        aria-expanded="false"
+                        aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <a class="navbar-brand mr-auto mr-lg-1" href='@Url.Action("index","Home")'>
+                    <img class="ml-1 ml-lg-0 logo-image" src="~/new-layout/images/ZarinLend-Logo.svg?v=1" alt="زرین‌لند" />
+                </a>
+                <ul class="navbar-nav flex-row d-none d-lg-flex">
+                    @*<li class="nav-item">
+                            <a class="nav-link dark text-bold-500" asp-route="register">ثبت نام</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link dark text-bold-500" asp-controller="account" asp-action="loginbyzarinpal">مشتریان درگاه زرین پال</a>
+                        </li>*@
+                    <li class="nav-item">
+                        <a class="nav-link dark text-bold-500" href="#">راهنمای گرفتن تسهیلات</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link dark text-bold-500" href="#">سوالات متداول</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="collapse navbar-collapse d-lg-flex justify-content-between align-items-center" id="navbarNav">
+            <ul class="navbar-nav d-flex d-lg-none mt-1 mt-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link dark text-bold-500" asp-route="Login">
+                        <span class="d-flex align-items-center">
+                            <i class="bx bx-user font-medium-5"></i>
+                            ورود
+                        </span>
+                    </a>
+                    <a class="nav-link dark text-bold-500" asp-route="Register_Step1">
+                        <span class="d-flex align-items-center">
+                            <i class="bx bx-user font-medium-5"></i>
+                            ثبت نام
+                        </span>
+                    </a>
+                    <a class="nav-link dark text-bold-500" asp-controller="account" asp-action="loginbyzarinpal">
+                        <span class="d-flex align-items-center">
+                            <i class="bx bx-user font-medium-5"></i>
+                            مشتریان درگاه زرین پال
+                        </span>
+                    </a>
+                    <a class="nav-link dark text-bold-500" href="#">
+                        <span class="d-flex align-items-center">
+                            <i class="bx bx-help-circle font-medium-5"></i>
+                            راهنمای گرفتن تسهیلات
+                        </span>
+                    </a>
+                    <a class="nav-link dark text-bold-500" href="#">
+                        <span class="d-flex align-items-center">
+                            <i class="bx bx-question-mark font-medium-5"></i>
+                            سوالات متداول
+                        </span>
+                    </a>
+                </li>
+            </ul>
+            <ul class="navbar-nav d-none d-lg-flex">
+                @if (Context.Request.GetEncodedPathAndQuery().Contains("/login"))
+                {
+                    <li class="nav-item mr-1">
+                        <a class="btn btn-outline-info nav-link text-nowrap" asp-route="Register_Step1" ><i class="bx bx-user bx-extend font-medium-5"></i>ثبت نام کنید!</a>
+                    </li>
+                }
+                @if (Context.Request.GetEncodedPathAndQuery().Contains("/register/first-step") || Context.Request.GetEncodedPathAndQuery().Contains("/register/second-step"))
+                {
+                    <li class="nav-item mr-1">
+                        <a class="btn btn-outline-info nav-link text-nowrap" asp-route="Login" ><i class="bx bx-log-in bx-extend font-medium-5"></i>ورود</a>
+                    </li>
+                }
+                @*  <li class="nav-item mr-1">
+                    <a class="nav-link" href="#"><i class="bx bx-user font-medium-5" style="color:green"></i></a>
+                    </li>
+                    <li class="nav-item">
+                    <a class="nav-link" asp-route="register"><i class="bx bx-log-out font-medium-5" style="color:red"></i></a>
+                    </li>*@
+            </ul>
+        </div>
+    </nav>
+    <div class="alert zl-bg-alert-success border-success border-accent-4 alert-dismissible pwa-alert" style="display:none" role="alert" id="installAppBox">
+        <button id="btnClosenstallAppBox" type="button" class="close pwa-alert-close-button" data-dismiss="alert" aria-label="بستن">
+            <span aria-hidden="true">×</span>
+        </button>
+        <div class="d-flex">
+            <i class="bx bx-download font-large-1 pwa-bx-error-circle"></i>
+            <span class="font-small-3 black" style="text-align:justify">
+                کاربر گرامی برای استفاده از تمام قابلیت های سایت نسخه PWA سایت را نصب کنید <button id="btnInstallApp" class="btn btn-success font-small-3">نصب نسخه PWA</button>
+            </span>
+        </div>
+    </div>
+    <div class="alert zl-bg-alert-info border-info border-accent-4 alert-dismissible pwa-alert" style="margin-top:0px;display:none" role="alert" id="giveNotificationAccessBox">
+        <button id="btnCloseGiveNotificationAccessBox" type="button" class="close pwa-alert-close-button" data-dismiss="alert" aria-label="بستن">
+            <span aria-hidden="true">×</span>
+        </button>
+        <div class="d-flex">
+            <i class="bx bx-notification font-large-1 pwa-bx-error-circle"></i>
+            <span class="font-small-3 black" style="text-align:justify">
+                کاربر گرامی برای دادن مجوز دریافت آخرین اعلان ها اینجا کلیک کنید <button id="btnNotificationAccess" class="btn btn-info font-small-3">مجوز دریافت اعلان ها</button>
+            </span>
+            <form id="frmSendNotificationIdentity">
+                <input id="endpoint" name="endpoint" hidden />
+                <input id="p256dh" name="p256dh" hidden />
+                <input id="auth" name="auth" hidden />
+            </form>
+        </div>
+    </div>
+    <div id="mainContentDiv" class="zl-app-content pb-25">
+        @RenderBody()
+    </div>
+    @*  <script src="~/js/jquery.min.js"></script>
+        <script src="~/js/jquery.unobtrusive-ajax.min.js"></script>
+        <script src="~/js/bootstrap.bundle.min.js"></script>
+        <script src="~/Vendor/sweetalert2/sweetalert2.all.min.js" type="text/javascript"></script>
+        <script src="/js/jquery.blockUI.min.js"></script>
+        <script src="/js/moment.js"></script>
+        <script src="~/js/jquery.mask.min.js"></script>
+        <script src="~/js/site.js" asp-append-version="true"></script> *@
+    <partial name="_ScriptsPartial" />
+    <partial name="_PwaScriptsPartial" />
+    @await RenderSectionAsync("scripts", required: false)
+</body>
+</html>

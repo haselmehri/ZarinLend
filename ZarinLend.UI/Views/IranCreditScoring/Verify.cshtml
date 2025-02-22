@@ -1,0 +1,412 @@
+﻿@model Services.Model.IranCreditScoring.IranCreditScoringInputModel
+@{
+    ViewData["Title"] = "اعتبار سنجی ایرانیان";
+    Layout = "~/Views/Shared/_NewLayout.cshtml";
+    var returnUrl = string.Empty;
+}
+@section styles
+{
+    <style type="text/css">
+    </style>
+}
+@if (Model.IranCreditScoringRequestType != Services.Model.IranCreditScoring.IranCreditScoringRequestType.BeforeFacilityRequest)
+{
+    if (Model.IranCreditScoringRequestType == Services.Model.IranCreditScoring.IranCreditScoringRequestType.ForFacilityRequestGuarantor)
+    {
+        await Component.InvokeAsync("WorkFlowStepWizardHorizental", new { workFlow = WorkFlowEnum.RegisterGuarantor, requestId = Model.RequestId });
+        returnUrl = Url.Action("List", "RequestFacilityGuarantor");
+    }
+    else
+    {
+        await Component.InvokeAsync("WorkFlowStepWizardHorizental", new { workFlow = WorkFlowEnum.RequestFacility, requestId = Model.RequestId });
+        returnUrl = Url.Action("List", "RequestFacility");
+    }
+}
+else
+{
+    returnUrl = Url.Action("Add", "RequestFacility");
+}
+<form id="frmMain">
+    <div class="p-2 bg-white rounded-lg">
+        <div class="d-flex align-items-center">
+            <a href="@returnUrl"
+               class="dark bg-white rounded-lg px-50 py-25 mr-50 d-flex align-items-center"
+               title="بازگشت">
+                <i class="bx bx-arrow-back rotate-180 font-medium-4"></i>
+            </a>
+            <div class="ml-1">
+                <div class="font-medium-3 secondary darken-4 text-bold-700">
+                    اعتبار سنجی
+                </div>
+            </div>
+        </div>
+        <div class="bg-white mt-2 p-1 p-md-2 p-lg-3 rounded-lg">
+            <div class="d-flex align-items-center justify-content-around" id="user-validation-tabs">
+                <div class="d-flex flex-column w-100">
+                    <div class="rounded mb-50 zl-uv-passed"></div>
+                    <div class="d-flex align-items-center text-nowrap mb-75">
+                        <i class="bx mr-25 bxs-check-circle"></i>
+                        پرداخت هزینه اعتبار سنجی
+                    </div>
+                </div>
+                <div class="d-flex flex-column w-100 ml-1">
+                    <div id="tabVerifyBorder" class="mb-50 rounded zl-uv-current"></div>
+                    <div id="tabVerifyText" class="d-flex align-items-center text-nowrap mb-75">
+                        <i id="tabVerifyIcon" class="bx mr-25 bxs-time-five"></i>
+                        <span>تایید اعتبارسنجی</span>
+                    </div>
+                </div>
+                <div class="d-flex flex-column w-100 ml-1">
+                    <div id="tabResultBorder" class="zl-uv-next rounded mb-50"></div>
+                    <div id="tabResultText" class="d-flex align-items-center text-nowrap mb-75">
+                        <i id="tabResultIcon" class="bx mr-25 bx-circle"></i>
+                        <span>نتیجه اعتبار سنجی</span>
+                    </div>
+                </div>
+            </div>
+            <div id="user-validation-section">
+                <div id="verifyDiv" class="mt-2">
+                    <div class="py-2 border rounded-lg">
+                        @if (Model.ZarinPalPaymentResponse != null)
+                        {
+                            <div class="bg-white p-1 p-md-2 p-lg-3 rounded-lg">
+                                <div class="d-flex flex-column align-items-center">
+                                    <i class="bx bxs-check-circle success darken-2 font-large-5"></i>
+                                    <div class="text-center font-medium-2 success darken-4">
+                                        پرداخت شما با موفقیت انجام شد!
+                                    </div>
+                                </div>
+                                <div class="mt-2 py-2 border rounded-lg">
+                                    <div class="d-flex mx-2 align-items-center justify-content-start">
+                                        <div class="w-50 font-small-2 text-bold-500">شماره مرجع</div>
+                                        <div class="w-50 secondary darken-4 text-bold-500">
+                                            @Model.ZarinPalPaymentResponse.Ref_Id
+                                        </div>
+                                    </div>
+                                    <hr />
+                                    <div class="d-flex mx-2 align-items-center justify-content-start">
+                                        <div class="w-50 font-small-2 text-bold-500">مبلغ</div>
+                                        <div class="w-50 secondary darken-4 text-bold-500">
+                                            @Model.ZarinPalPaymentResponse.Amount.ToString("N0")
+                                            <small class="font-size-xsmall text-muted ml-50">ریال</small>
+                                        </div>
+                                    </div>
+                                    <hr />
+                                    <div class="d-flex mx-2 align-items-center justify-content-start">
+                                        <div class="w-50 font-small-2 text-bold-500">شناسه پرداخت</div>
+                                        <div class="w-50 secondary darken-4 text-bold-500">
+                                            @Model.ZarinPalPaymentResponse.Authority
+                                        </div>
+                                    </div>
+                                    <hr />
+                                    <div class="d-flex mx-2 align-items-center justify-content-start">
+                                        <div class="w-50 font-small-2 text-bold-500">شماره کارت</div>
+                                        <div class="w-50 secondary darken-4 text-bold-500" style="direction:ltr">
+                                            @Model.ZarinPalPaymentResponse.Card_Pan
+                                        </div>
+                                    </div>
+                                </div>
+                                <p>
+                                    برای انجام اعتبارسنجی روی دکمه <b>ارسال درخواست</b> کلیک کنید
+                                </p>
+                                <hr class="mt-2 mb-1" />
+                            </div>
+                        }
+                        else if (Model.SamanPaymentResponse != null)
+                        {
+                            <div class="bg-white p-1 p-md-2 p-lg-3 rounded-lg">
+                                <div class="d-flex flex-column align-items-center">
+                                    <i class="bx bxs-check-circle success darken-2 font-large-5"></i>
+                                    <div class="text-center font-medium-2 success darken-4">
+                                        پرداخت شما با موفقیت انجام شد!
+                                    </div>
+                                </div>
+                                <div class="mt-2 py-2 border rounded-lg">
+                                    <div class="d-flex mx-2 align-items-center justify-content-start">
+                                        <div class="w-50 font-small-2 text-bold-500">رسید دیجیتالی خرید</div>
+                                        <div class="w-50 secondary darken-4 text-bold-500">
+                                            @Model.SamanPaymentResponse.RefNum
+                                        </div>
+                                    </div>
+                                    <hr />
+                                    <div class="d-flex mx-2 align-items-center justify-content-start">
+                                        <div class="w-50 font-small-2 text-bold-500">مبلغ</div>
+                                        <div class="w-50 secondary darken-4 text-bold-500">
+                                            @Model.SamanPaymentResponse.Amount.ToString("N0")
+                                            <small class="font-size-xsmall text-muted ml-50">ریال</small>
+                                        </div>
+                                    </div>
+                                    <hr />
+                                    <div class="d-flex mx-2 align-items-center justify-content-start">
+                                        <div class="w-50 font-small-2 text-bold-500">شماره رهگیری</div>
+                                        <div class="w-50 secondary darken-4 text-bold-500">
+                                            @Model.SamanPaymentResponse.TraceNo
+                                        </div>
+                                    </div>
+                                    <hr />
+                                    <div class="d-flex mx-2 align-items-center justify-content-start">
+                                        <div class="w-50 font-small-2 text-bold-500">شماره مرجع</div>
+                                        <div class="w-50 secondary darken-4 text-bold-500" style="word-wrap: break-word;word-break: break-word;">
+                                            @Model.SamanPaymentResponse.Rrn
+                                        </div>
+                                    </div>
+                                    <hr />
+                                    <div class="d-flex mx-2 align-items-center justify-content-start">
+                                        <div class="w-50 font-small-2 text-bold-500">شماره کارت</div>
+                                        <div class="w-50 secondary darken-4 text-bold-500" style="direction:ltr">
+                                            @Model.SamanPaymentResponse.SecurePan
+                                        </div>
+                                    </div>
+                                </div>
+                                <p>
+                                    برای انجام اعتبارسنجی روی دکمه <b>ارسال درخواست</b> کلیک کنید
+                                </p>
+                                <hr class="mt-2 mb-1" />
+                            </div>
+                        }
+                        <div class="d-flex align-items-center justify-content-start px-1">
+                            <div class="w-50 font-small-2 text-bold-500">کد ملی</div>
+                            <div data-value='@Model.NationalCode' id="NationalCode" name="NationalCode" class="w-50 secondary darken-4 text-bold-500">
+                                @Model.NationalCode
+                            </div>
+                        </div>
+                        <hr />
+                        <div class="d-flex align-items-center justify-content-start px-1">
+                            <div class="w-50 font-small-2 text-bold-500">
+                                شماره موبایل
+                            </div>
+                            <div id="Mobile" data-value='@Model.Mobile' name="Mobile" class="w-50 secondary darken-4 text-bold-500">
+                                @Model.Mobile
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-2" id="otp_div" style="display:none">
+                        <input type="text" id="Otp" name="Otp" class="form-control form-control-lg" autocomplete="off" placeholder="کد ارسالی" />
+                        <span asp-validation-for="Otp" class="text-danger"></span>
+                        <small class="text-muted text-bold-400">
+                            برای تایید اعتبارسنجی لطفا کد ارسال شده به شماره
+                            @Model.Mobile وارد نمایید.
+                        </small>
+                    </div>
+                    <hr class="mt-4 mb-1" />
+                    <div class="text-right">
+                        <a class="btn btn-outline-secondary" asp-controller="RequestFacility" asp-action="List">
+                            <span>انصراف</span>
+                        </a>
+                        <button type="button" id="btnSendRequest" class="btn btn-zl-primary">
+                            <span>ارسال درخواست</span>
+                        </button>
+                        <button type="button" id="btnDownloadResultRequest" style="display:none" class="btn btn-zl-primary">
+                            <span>مشاهده نتیجه استعلام</span>
+                        </button>
+                    </div>
+                </div>
+                <div id='resultDiv' class="mt-2 d-none">
+                    <div class="mt-2 px-0 px-sm-5 px-lg-0" id="canvas-holder" style="width: 100%">
+                        <canvas id="chart" class="mx-auto"></canvas>
+                    </div>
+                    <div class="border rounded mt-1">
+                        <div class="d-flex align-items-center p-2">
+                            <span class="w-50 text-bold-500 font-small-2">امتیاز</span><span id="score" class="w-50 text-bold-700 secondary darken-4 font-medium-1"></span>
+                        </div>
+                        <hr class="my-0" />
+                        <div class="d-flex align-items-center p-2">
+                            <span class="w-50 text-bold-500 font-small-2">کد امتیاز</span><span id="scoreCodeAndDesc" class="w-50 text-bold-400 secondary darken-4 font-medium-1"></span>
+                        </div>
+                        <hr class="my-0" />
+                        <div class="d-flex align-items-center p-2" style="text-align:center">
+                            <a id="downloadPdfLink" class="btn btn-outline-info" target="_blank">مشاهده/دانلود نتیجه اعتبارسنجی(فایل PDF)</a>
+                        </div>
+                    </div>
+                    <hr class="mt-4 mb-1" />
+                    @if (Model.IranCreditScoringRequestType == Services.Model.IranCreditScoring.IranCreditScoringRequestType.BeforeFacilityRequest)
+                    {
+                        <div class="text-right">
+                            <a class="btn btn-outline-secondary" href="@returnUrl">
+                                <span>ثبت درخواست تسهیلات</span>
+                            </a>
+                            <a class="btn btn-outline-primary" asp-controller="RequestFacilityGuarantor" asp-action="RegisterGuarantor">
+                                <span>میخواهم ضامن شوم</span>
+                            </a>
+                        </div>
+                    }
+                    else if (Model.IranCreditScoringRequestType == Services.Model.IranCreditScoring.IranCreditScoringRequestType.ForFacilityRequestGuarantor)
+                    {
+                        <div class="text-right">
+                            <a class="btn btn-outline-secondary" href="@returnUrl">
+                                <span>ثبت درخواست ضامن</span>
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-right">
+                            <a class="btn btn-outline-secondary" href="@returnUrl">
+                                <span>بازگشت به لیست درخواست ها</span>
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/new-layout/chart/chart.min.js"></script>
+    <script src="~/new-layout/chart/chartjs-gauge.js"></script>
+    <script>
+
+        let hashCode;
+        $("#btnSendRequest").click(function (e) {
+            e.preventDefault();
+            showWaiting('frmMain', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+            debugger;
+            if ($("#frmMain").valid()) {
+                const model = {
+                    NationalCode: $("#NationalCode").data('value'),
+                    Mobile: $("#Mobile").data('value'),
+                    RequestId: @Model.RequestId,
+                    IranCreditScoringRequestType: @((int)Model.IranCreditScoringRequestType),
+                    Otp: "0",
+                };
+
+                $.ajax({
+                    type: 'post',
+                    //dataType: 'json',
+                    contentType: "application/json; charset=utf-8",
+                    url: '/api/v1/IranCreditScoring/SendRequest',
+                    data: JSON.stringify(model),
+                    success: function (result) {
+                        hideWaiting('frmMain');
+                        debugger;
+                        if (result.isSuccess && result.data != null) {
+                            //apiKey = result.data.apiKey;
+                            //accessToken = result.data.accessToken;
+                            hashCode = result.data.hashCode;
+                            $('#otp_div').show();
+                            $('#btnDownloadResultRequest').show();
+                            $('#btnSendRequest').hide();
+                            showMessage('@ResourceFile.InfoTitle', 'لطفا کد ارسال شده به شماره موبایل فوق را وارد کرده و روی دکمه <b>مشاهده نتیجه استعلام</b> کلیک کنید', icons.success, '@ResourceFile.Close');
+                        }
+                        else {
+                            if (result.data.errorType = "AccountBalanceInsufficient") {
+                                showMessage('@ResourceFile.InfoTitle', result.data.message, icons.error, '@ResourceFile.Close', () => { window.location.href = '@Url.Action("InternetPayment", "Payment")' });
+                            }
+                            $('#otp_div').hide();
+                            $('#btnDownloadResultRequest').hide();
+                            $('#btnSendRequest').show();
+                        }
+                    },
+                    error: function (error) {
+                        hideWaiting('frmMain');;
+                        if (error.responseJSON != undefined && error.responseJSON.message != undefined && error.responseJSON.message != '') {
+                            if (IsJsonString(error.responseJSON.message)) {
+                                const exception = JSON.parse(error.responseJSON.message).Exception;
+                                showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                            }
+                            else
+                                showMessage('@ResourceFile.ErrorTitle', error.responseJSON.message, icons.error, '@ResourceFile.Close');
+                        }
+                        else {
+                            showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                        }
+                    }
+                });
+            }
+        });
+
+        $('#btnDownloadResultRequest').click((e) => {
+            e.preventDefault();
+            showWaiting('frmMain', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+            debugger;
+            if ($("#frmMain").valid()) {
+                const model = {
+                    //ApiKey: apiKey,
+                    //AccessToken: accessToken,
+                    HashCode: hashCode,
+                    Otp: $("#Otp").val(),
+                    RequestId: @Model.RequestId,
+                    IranCreditScoringRequestType: @((int)Model.IranCreditScoringRequestType)
+                        };
+
+                $.ajax({
+                    type: 'post',
+                    //dataType: 'json',
+                    contentType: "application/json; charset=utf-8",
+                    url: '/api/v1/IranCreditScoring/Download',
+                    data: JSON.stringify(model),
+                    success: function (result) {
+                        hideWaiting('frmMain');
+                        debugger;
+                        if (result.isSuccess && result.data != null) {
+                            $('#otp_div').hide();
+                            $('#verifyDiv').addClass('d-none');
+                            $('#resultDiv').removeClass('d-none');
+
+                            $('#tabVerifyBorder').removeClass('zl-uv-current');
+                            $('#tabVerifyBorder').addClass('zl-uv-passed');
+
+                            $('#tabVerifyIcon').removeClass('bxs-time-five');
+                            $('#tabVerifyIcon').addClass('bxs-check-circle');
+
+                            $('#tabResultBorder').removeClass('zl-uv-next');
+                            $('#tabResultBorder').addClass('zl-uv-passed');
+
+                            $('#tabResultIcon').removeClass('bx-circle');
+                            $('#tabResultIcon').addClass('bxs-check-circle');
+
+                            $('#btnDownloadResultRequest').hide();
+                            $('#downloadPdfLink').attr('href', result.data.score.pdfUrl);
+                            $('#score').html(result.data.score.score);
+                            $('#scoreCodeAndDesc').text(`${result.data.score.description} - ${result.data.score.risk}`);
+
+                            var ctx = document.getElementById("chart").getContext("2d");
+                            gaugeChartConfig.data.datasets[0].value = result.data.score.score;
+                            window.myGauge = new Chart(ctx, gaugeChartConfig);
+                            //$('#scoreTitle').text(result.data.score.description);
+
+                            //const downloadPdfLink = document.createElement("a");
+                            //downloadPdfLink.href = `data:application/pdf;base64,${result.data.pdfBase64}`;
+                            //downloadPdfLink.download = "result.pdf";
+                            //downloadPdfLink.click();
+
+                            //const downloadXmlLink = document.createElement("a");
+                            //downloadXmlLink.href = `data:text/xml;base64,${result.data.xml}`;
+                            //downloadXmlLink.download = "result.xml";
+                            //downloadXmlLink.click();
+
+                            //const downloadJsonLink = document.createElement("a");
+                            //downloadJsonLink.href = `data:text/json;base64,${result.data.json}`;
+                            //downloadJsonLink.download = "result.json";
+                            //downloadJsonLink.click();
+                        }
+                        else if (!result.isSuccess && result.data.hasError && result.data.errorResult != null && result.data.errorResult.messages.length > 0) {
+                            let message = null;
+                            for (error in result.data.errorResult.messages) {
+                                if (message == null)
+                                    message += `${error.reason} : ${error.message}`;
+                                else
+                                    message += `<br/>${error.reason} : ${error.message}`;
+                            }
+                            showMessage('@ResourceFile.ErrorTitle', result.message, icons.error, '@ResourceFile.Close');
+                        }
+                        else {
+                            showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                        }
+                    },
+                    error: function (error) {
+                        hideWaiting('frmMain');
+                        const exception = getExceptionMessageFromError(error);
+                        if (exception != null)
+                            showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                        else
+                            showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                    }
+                });
+            }
+        });
+
+    </script>
+}

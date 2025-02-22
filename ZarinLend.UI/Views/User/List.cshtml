@@ -1,0 +1,732 @@
+﻿@model UserFilterModel
+@{
+    ViewData["Title"] = "لیست کاربران";
+    Layout = "~/Views/Shared/_NewLayout.cshtml";
+    var ajaxExportUrl = "/api/v1/RequestFacility/SearchRequestExport";
+}
+@section styles {
+    <link rel="stylesheet" type="text/css" href="~/new-layout/css/dropzone.min.css" />
+    <link rel="stylesheet" type="text/css" href="~/new-layout/css/dropzone.custom.css" />
+    <style type="text/css">
+        #fileUploadZone {
+            text-align: center;
+        }
+
+        .dropzone {
+            height: 14rem !important;
+            padding: 13px !important;
+        }
+
+            .dropzone.dz-started .dz-message {
+                top: 0px !important;
+            }
+
+            .dropzone .dz-preview, .dropzone-previews .dz-preview {
+                margin: 1px !important;
+            }
+
+        @@media (min-width:768px) and (max-width:814px) {
+            .dropzone .dz-preview .dz-details img, .dropzone-previews .dz-preview .dz-details img {
+                width: 85px !important;
+                height: 90px !important;
+            }
+
+            .dropzone .dz-preview .dz-details, .dropzone-previews .dz-preview .dz-details {
+                width: 85px !important;
+                height: 90px !important;
+            }
+        }
+
+        @@media (max-width:407px) {
+            .dropzone .dz-preview .dz-details img, .dropzone-previews .dz-preview .dz-details img {
+                width: 75px !important;
+                height: 75px !important;
+            }
+
+            .dropzone .dz-preview .dz-details, .dropzone-previews .dz-preview .dz-details {
+                width: 75px !important;
+                height: 75px !important;
+            }
+        }
+    </style>
+}
+<div id="userGridDiv" class="p-2 bg-white rounded-lg">
+    <div class="font-medium-3 secondary darken-4 text-bold-800 d-flex align-items-center">
+        <i class="bx bx-align-right zl-text-secondary mr-25"></i>
+        <span>لیست کاربران</span>
+    </div>
+    <div class="rounded-lg">
+        <form id="filterForm" method="post">
+            <div class="row my-0 my-md-1">
+                <div class=" col-md-4 col-sm-12">
+                    <div class="form-group">
+                        <input type="text" class="form-control bg-transparent" asp-for="NationalCode" placeholder="کد ملی" style="text-align:center;direction:ltr" />
+                        <span asp-validation-for="NationalCode" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class=" col-md-4 col-sm-12">
+                    <div class="form-group">
+                        <input type="text" class="form-control bg-transparent" asp-for="FName" placeholder="نام" style="" />
+                        <span asp-validation-for="FName" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class=" col-md-4 col-sm-12">
+                    <div class="form-group">
+                        <input type="text" class="form-control bg-transparent" asp-for="LName" placeholder="نام خانوادگی" style="" />
+                        <span asp-validation-for="LName" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row my-0 my-md-1">
+                <div class="col-lg-4 col-sm-12">
+                    <div class="form-group">
+                        <select name="RoleId" asp-for="RoleId" class="form-control bg-transparent" asp-items="Model.Roles">
+                            <option value="" >نقش کاربر</option>
+                        </select>
+                        <span asp-validation-for="RoleId" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 col-sm-12">
+                    <div class="checkbox checkbox-primary checkbox-glow checkbox-md">
+                        <input type="checkbox" id="chkUseHasActiveFacility" />
+                        <label class="font-small-3 primary darken-4 text-bold-400 line-height-23" for="chkUseHasActiveFacility">درخواست تسهیلات فعال داشته باشد</label>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-sm-12">
+                    <div class="checkbox checkbox-success checkbox-glow checkbox-md">
+                        <input type="checkbox" id="chkUserInstallApp" />
+                        <label class="font-small-3 success darken-4 text-bold-400 line-height-23" for="chkUserInstallApp">اپلیکیشن را نصب کرده باشد</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row my-0 my-md-1">
+                <div class="col-xl-12" style="text-align:left">
+                    <button type="button" id="btnSearch" class="btn btn-primary">
+                        جستجو&nbsp;<i class="fal fa-search"></i>
+                    </button>
+                    <a asp-action="AddUser" class="btn btn-success">
+                        کاربر جدید&nbsp;<i class="fal fa-user"></i>
+                    </a>
+                    <button type="button" id="btnSendMessage" class="btn btn-info">
+                        ارسال پیام&nbsp;<i class="fal fa-sms"></i>
+                    </button>
+                    <button id="btnExportToExcel" tabindex="5" class="btn btn-outline-info">
+                        خروجی اکسل&nbsp;<i class="fal fa-file-excel-o"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+        <table id="userGridView" class="display" style="width:100%">
+            <thead>
+                <tr>
+                    <th><div class='checkbox checkbox-primary'><input type='checkbox' id="checkAll" /><label for="checkAll"></label></div></th>
+                    <th>#</th>
+                    <th >نام</th>
+                    <th >نام خانوادگی</th>
+                    <th >نام کاربری</th>
+                    <th >موبایل</th>
+                    <th >نام سازمان(نوع)</th>
+                    <th >نقش(ها)</th>
+                    <th >وضعیت</th>
+                    <th>تاریخ ایجاد</th>
+                    <th>امتیاز</th>
+                    <th >اقدام</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+<form id="frmSendMessage" method="post">
+    <div class="modal fade text-left" id="sendMessageModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel18" style="display: none;" data-backdrop="static" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl" role="document">
+            <div class="modal-content rounded-lg modal-xl">
+                <div class="modal-header">
+                    <h4 class="modal-title dark" id="myModalLabel18">
+                        ارسال پیامک/نوتیفیکیشن
+                    </h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="بستن">
+                        <i class="bx bx-x"></i>
+                    </button>
+                </div>
+                <div class="modal-body line-height-2">
+                    <div id="userSelectedCountDesc" class="row">
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-4 col-md-6 col-sm-12">
+                            <div class="checkbox checkbox-primary checkbox-glow checkbox-md">
+                                <input type="checkbox" id="chkSendSms" />
+                                <label class="font-small-3 primary darken-4 text-bold-400 line-height-23" for="chkSendSms">ارسال پیامک(SMS)</label>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-sm-12">
+                            <div class="checkbox checkbox-success checkbox-glow checkbox-md">
+                                <input type="checkbox" id="chkSendNotification" />
+                                <label class="font-small-3 success darken-4 text-bold-400 line-height-23" for="chkSendNotification">ارسال نوتیفیکیشن</label>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-sm-12">
+                            <div class="checkbox checkbox-warning checkbox-glow checkbox-md">
+                                <input type="checkbox" id="chkSendToInbox" />
+                                <label class="font-small-3 warning darken-4 text-bold-400 line-height-23" for="chkSendToInbox">ارسال به صندوق پیام</label>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+                    <div id="sendSmsDiv" style="display:none">
+                        <div class="row font-medium-3 secondary darken-4 text-bold-800 d-flex align-items-center">
+                            <div class="col-12 mb-2">
+                                <i class="bx bx-message zl-text-secondary mt-25"></i>
+                                <span>ارسال پیامک(SMS)</span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <textarea class="form-control bg-transparent" placeholder="متن پیامک(SMS)" style=" direction:rtl" data-val="true"
+                                              data-val-length="حداکثر متن پیامک(SMS) میتواند 500 کاراکتر باشد." data-val-length-max="500" data-val-required="متن پیامک(SMS) اجباری است!" id="SmsContent" maxlength="500" name="SmsContent"></textarea>
+                                    <span class="text-danger field-validation-valid" data-valmsg-for="SmsContent" data-valmsg-replace="true"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="sendToInboxDiv" style="display:none">
+                        <div class="row font-medium-3 secondary darken-4 text-bold-800 d-flex align-items-center">
+                            <div class="col-12 mb-2">
+                                <i class="bx bx-message zl-text-secondary mt-25"></i>
+                                <span>ارسال به صندوق پیام</span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <textarea class="form-control bg-transparent" placeholder="متن صندوق پیام" style="direction:rtl" data-val="true"
+                                              data-val-length="حداکثر متن برای ارسال به صندوق پیام میتواند 1000 کاراکتر باشد." data-val-length-max="1000" data-val-required="متن صندوق پیام اجباری است!" id="InboxContent" maxlength="1000" name="InboxContent"></textarea>
+                                    <span class="text-danger field-validation-valid" data-valmsg-for="InboxContent" data-valmsg-replace="true"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="sendNotificationDiv" style="display:none">
+                        <div class="row font-medium-3 secondary darken-4 text-bold-800 d-flex align-items-center">
+                            <div class="col-12 mb-2">
+                                <i class="bx bx-notification zl-text-secondary mt-25"></i>
+                                <span>ارسال نوتیفیکیشن</span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <input class="form-control bg-transparent" placeholder="عنوان نوتیفیکیشن" style="direction:rtl" data-val="true"
+                                           data-val-length="حداکثر عنوان نوتیفیکیشن میتواند 100 کاراکتر باشد." data-val-length-max="100" data-val-required="عنوان نوتیفیکیشن اجباری است!" id="NotificationTitle" maxlength="100" name="NotificationTitle" />
+                                    <span class="text-danger field-validation-valid" data-valmsg-for="NotificationTitle" data-valmsg-replace="true"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <textarea class="form-control bg-transparent" placeholder="متن نوتیفیکیشن" style="direction:rtl" data-val="true"
+                                              data-val-length="حداکثر متن نوتیفیکیشن میتواند 250 کاراکتر باشد." data-val-length-max="250" data-val-required="متن نوتیفیکیشن اجباری است!" id="NotificationContent" maxlength="250" name="NotificationContent"></textarea>
+                                    <span class="text-danger field-validation-valid" data-valmsg-for="NotificationContent" data-valmsg-replace="true"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <input class="form-control bg-transparent" style="text-align:left; direction:ltr" placeholder="لینک/آدرس نوتیفیکیشن" type="text" data-val="true" data-val-length="The field شماره موبایل must be a string with a maximum length of 15." data-val-length-max="500"
+                                           data-val-regex="لینک/آدرس نوتیفیکیشن را با فرمت صحیح وارد کنید" data-val-regex-pattern="^http(s)?://([\w-]+.)+[\w-]+(/[\w- ./?%&=])?$" id="NotificationUrl" maxlength="500" name="NotificationUrl">
+                                    <span class="text-danger field-validation-valid" data-valmsg-for="NotificationUrl" data-valmsg-replace="true"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 mb-2">
+                                <div class="d-flex flex-column align-items-start">
+                                    <div class="text-bold-400 mb-2 font-small-2">
+                                        انتخاب تصویر - فرمت‌های مجاز: png و jpg و gif و bmp و jpeg
+                                    </div>
+                                    <div class="w-100">
+                                        <div action="#" class="dropzone dropzone-area bg-white" id="fileUploadZone">
+                                            <div class="dz-message font-medium-1">
+                                                انتخاب فایل ..
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <div class="text-right">
+                        <a href="#" class="btn btn-outline-secondary" data-dismiss="modal">
+                            <span>انصراف</span>
+                        </a>
+                        <button id="btnSend" class="btn btn-zl-primary white">
+                            <span>ارسال</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+@section scripts {
+    <script src="~/new-layout/js/dropzone.min.js"></script>
+    <script>
+        let responsiveDatatable;
+        let selectedUserIds = [];
+        let rowCount = 0;
+        $(document).ready(function () {
+            $('div').removeClass('zl-active');
+            $('#userList').addClass('zl-active');
+            loadUsers();
+        });
+
+        const fileIsImage = (file) => {
+            return file.type == 'image/jpg' ||
+                file.type == 'image/jpeg' ||
+                file.type == 'image/png' ||
+                file.type == 'image/gif' ||
+                file.type == 'image/bmp';
+        }
+
+        let imageFile = null;
+        Dropzone.options.fileUploadZone = {
+            paramName: "file", // The name that will be used to transfer the file
+            maxFilesize: 0.2, //200KB/ MB
+            addRemoveLinks: true,
+            dictRemoveFile: "حذف",
+            autoProcessQueue: false,
+            acceptedFiles: ".png,.jpg,.gif,.bmp,.jpeg",
+            maxFiles: 1,
+            accept: function (file, done) {
+                debugger;
+                imageFile = file;
+                console.log(typeof (file));
+                done();
+            },
+            init: function () {
+                this.on("maxfilesexceeded", function (file) {
+                    showMessage('@ResourceFile.InfoTitle', 'فقط میتوانید یک فایل بارگذاری کنید،در صورت نیاز به بارگذاری فایل جدید ابتدا فایل قبلی را حذف کنید!', icons.warning, '@ResourceFile.Close');
+                    this.removeFile(file);
+                });
+                this.on("sending", function (file) {
+                    debugger;
+                });
+                this.on("addedfile", file => {
+                    debugger;
+                    if (!fileIsImage(file)) {
+                        this.removeFile(file);
+                        showMessage('@ResourceFile.InfoTitle', 'فقط فایل های با پسوند png,jpg,gif,bmp,jpeg میتوانید انتخاب کنید', icons.warning, '@ResourceFile.Close');
+                        $('#fileUploadZone').addClass('dz-started');
+                        return;
+                    }
+                });
+                this.on("removedfile", file => {
+                    debugger;
+                    BirthCertificateFile_Page1 = null;
+                    $('#fileUploadZone').addClass('dz-started');
+                });
+            }
+        };
+
+        $('#btnSearch').click((e) => {
+            e.preventDefault();
+            responsiveDatatable.page(0);
+            responsiveDatatable.ajax.reload(null, false);
+        });
+
+        $('#btnSendMessage').click(e => {
+            e.preventDefault();
+            if (selectedUserIds.length > 0) {
+                $('#userSelectedCountDesc').html(`<b style='margin-left:5px;color:navy'>${selectedUserIds.length}</b> نفر برای ارسال پیامک(SMS)/صندوق پیام/نوتیفیکیشن انتخاب شده اند!`)
+                $('#sendMessageModal').modal();
+            }
+            else {
+                showMessage('@ResourceFile.ErrorTitle', 'هیچ کاربری برای ارسال  پیامک/نوتیفیکیشن انتخاب نشده است!', icons.warning, '@ResourceFile.Close');
+            }
+        });
+
+        $('#btnSend').click(e => {
+            e.preventDefault();
+            debugger;
+            if ($('#frmSendMessage').valid()) {
+                if (!$('#chkSendSms').prop('checked') && !$('#chkSendNotification').prop('checked') && !$('#chkSendToInbox').prop('checked')) {
+                    showMessage('@ResourceFile.InfoTitle', 'حداقل یکی از روش های ارسال(پیامک/صندق پیام/نوتیفیکیشن) را انتخاب کنید!', icons.warning, '@ResourceFile.Close');
+                    return;
+                }
+                showWaiting('sendMessageModal', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                var data = new FormData();
+                selectedUserIds.forEach(item => {
+                    data.append("UserIds", item);
+                });
+                if ($('#chkSendSms').prop('checked')) {
+                    data.append("SendSms", true);
+                    data.append("SmsContent", $('#SmsContent').val());
+                }
+                else
+                    data.append("SendSms", false);
+
+                if ($('#chkSendNotification').prop('checked')) {
+                    data.append("SendNotification", true);
+                    data.append("UserNotificationModel.Message", $('#NotificationContent').val());
+                    data.append("UserNotificationModel.Title", $('#NotificationTitle').val());
+                    data.append("UserNotificationModel.Url", $('#NotificationUrl').val());
+                    data.append("UserNotificationModel.ImageFile", imageFile);
+                }
+                else
+                    data.append("SendNotification", false);
+
+                if ($('#chkSendToInbox').prop('checked')) {
+                    data.append("SendToInbox", true);
+                    data.append("InboxMessageContent", $('#InboxContent').val());
+                }
+                else
+                    data.append("SendToInbox", false);
+
+                $.ajax({
+                    processData: false,
+                    contentType: false,
+                    data: data,
+                    type: 'post',
+                    url: '/api/v1/Message/SendMessage',
+                    success: function (result) {
+                        selectedUserIds = [];
+                        $('input[type="checkbox"].select-row').prop('checked', false);
+                        $('#checkAll').prop('checked', false);
+                        $('#userSelectedCountDesc').html(`<b style='margin-left:5px;color:navy'>0</b> نفر برای ارسال پیامک(SMS)/صندوق پیام/نوتیفیکیشن انتخاب شده اند!`)
+                        hideWaiting('sendMessageModal');
+                        showMessage('@ResourceFile.InfoTitle', 'ارسال با موفقیت انجام شد!', icons.success, '@ResourceFile.Close');
+                        debugger;
+                    },
+                    error: function (error) {
+                        hideWaiting('sendMessageModal');
+                        rowCount = 0;
+                        debugger;
+                        const exception = getExceptionMessageFromError(error);
+                        if (exception != null)
+                            showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                        else
+                            showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                    }
+                });
+            }
+            else {
+                scrollToFirstError();
+            }
+        });
+
+        $('#chkSendSms').change(e => {
+            if (e.currentTarget.checked)
+                $('#sendSmsDiv').show();
+            else
+                $('#sendSmsDiv').hide();
+        });
+
+        $('#chkSendNotification').change(e => {
+            if (e.currentTarget.checked)
+                $('#sendNotificationDiv').show();
+            else
+                $('#sendNotificationDiv').hide();
+        });
+
+        $('#chkSendToInbox').change(e => {
+            if (e.currentTarget.checked)
+                $('#sendToInboxDiv').show();
+            else
+                $('#sendToInboxDiv').hide();
+        });
+
+        const loadUsers = () => {
+            responsiveDatatable = $('#userGridView')
+                .on('preXhr.dt', function (e, settings, data, a, b) {
+                    //trigger before ajax call
+                    //debugger;
+                    //alert('preXhr');
+                    showWaiting('userGridView', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                })
+                .on('xhr.dt', function (e, settings, json, xhr) {
+                    //trigger after ajax call
+                    //debugger;
+                    //alert('xhr');
+                })
+                .DataTable({
+                    order: [],
+                    processing: true,
+                    serverSide: true,
+                    responsive: true,
+                    rowReorder: false,
+                    select: true,
+                    searching: false,
+                    paging: true,
+                    ordering: false,
+                    searching: false,
+                    filtering: false,
+                    info: true,
+                    lengthMenu: [
+                        [5, 10, 25, 50],
+                        [5, 10, 25, 50]
+                    ],
+                    pageLength: 10,
+                    columnDefs: [
+                        //{ "visible": false, "targets": 0 },
+                        //and in this case the < a href="//legacy.datatables.net/ref#bStateSave" > bStateSave</a> works regularly ....but then I would like to have responsive columns indicating responsive: {
+                        {
+                            details: false,
+                            breakpoints: [
+                                { name: 'desktop', width: Infinity },
+                                { name: 'tablet-l', width: 1200 },
+                                { name: 'tablet-p', width: 992 },
+                                { name: 'mobile-l', width: 576 },
+                                { name: 'mobile-p', width: 320 }
+                            ]
+                        },
+                        {
+                            targets: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+                            className: 'dt-center',
+                        },
+                        {
+                            targets: 0,
+                            render: function (data, type, row, meta) {
+                                return `<div class='checkbox checkbox-primary'><input type='checkbox'  ${selectedUserIds.indexOf(data) != -1 ? 'checked' : ''} class='select-row' value='${data}' id='chk_${data}'/><label for='chk_${data}'></label></div></fieldset>`;
+                            }
+                        },
+                        {
+                            targets: 6,
+                            render: function (data, type, row, meta) {
+                                if (row.organizationName != null && row.organizationTypeName != null)
+                                    return `<span style='color:red'>${row.organizationName}(${row.organizationTypeName})</span>`;
+
+                                return '-';
+                            }
+                        },
+                        {
+                            targets: 8,
+                            render: function (data, type, row, meta) {
+                                return `${data ? '<span style="color:green">فعال</span>' : '<span style="color:red">غیر فعال</span>'}`;
+                            }
+                        },
+                        {
+                            targets: 11,
+                            responsivePriority: 3,
+                            render: function (data, type, row, meta) {
+                                let cancelButtonHtml = '';
+                                let buttonsHtml = `<a class="dropdown-item edit-user" href='@Url.Action("EditUser", "User")/${data.id}'><i class="bx bx-detail font-medium-5 secondary darken-4 mr-75"></i>ویرایش</a>`;
+
+                                return `<div class="btn-group dropright"><a href="#" class="dark" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="bx bx-dots-horizontal"></i></a><div class="dropdown-menu">${buttonsHtml}</div></div>`;
+                            }
+                        }],
+                    ajax: (data, callback, setting) => {
+                        getUsers(data).then(function (_data) {
+                            callback(_data);
+                        });
+                    },
+                    drawCallback: function (settings) {
+                        hideWaiting('userGridView');
+                    },
+                    initComplete: function (settings, json) {
+                    },
+                    rowCallback: (row, data, displayNum, displayIndex, dataIndex) => {
+                        $('td:eq(1)', row).html(displayIndex + 1);
+                        return row;
+                    },
+                    columns: [
+                        { "data": 'id' },
+                        { "data": null },
+                        { "data": "fName" },
+                        { "data": "lName" },
+                        { "data": "userName" },
+                        { "data": "mobile" },
+                        { "data": null },
+                        { "data": "roleName" },
+                        { "data": "isActive" },
+                        { "data": "createdDatePersian" },
+                        { "data": "iranCardScore" },
+                        { "data": null },
+                    ],
+                    language: {
+                        url: '/new-layout/datatables.net/fa.json'
+                    }
+                });
+
+            const getUsers = (data) => {
+                const postData = {
+                    Page: Math.floor(data.start / data.length) + 1,
+                    PageSize: data.length,
+                    SortDirection: null,
+                    SortOrder: null,
+                    FilterList: []
+                };
+
+                fillFilter(postData);
+                return new Promise(function (resolve, reject) {
+                    console.log('Loading data');
+
+                    $.ajax({
+                        type: 'post',
+                        datatype: "json",
+                        data: JSON.stringify(postData),
+                        contentType: "application/json; charset=utf-8",
+                        url: '/api/v1/User/UserList',
+                        success: function (result) {
+                            debugger;
+                            if (result != undefined && result.isSuccess == true) {
+                                rowCount = result.data.totalRowCount;
+                                resolve({
+                                    data: result.data.data,
+                                    recordsTotal: result.data.totalRowCount,
+                                    recordsFiltered: result.data.totalRowCount
+                                });
+                            }
+                        },
+                        error: function (error) {
+                            rowCount = 0;
+                            debugger;
+                            const exception = getExceptionMessageFromError(error);
+                            if (exception != null)
+                                showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                            else
+                                showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                        }
+                    });
+                });
+            }
+
+            //$('#userGridView tbody').on('click', 'a.edit-user', function (e) {
+            //    e.preventDefault();
+            //    let data = responsiveDatatable.row(this).data();
+            //    if (data == undefined)
+            //        data = responsiveDatatable.row($(this).parents('tr')).data();
+            //    loadRequestFacilitySteps(data.id);
+            //    $('#requestFacilityStepsHistoryModal').modal();
+            //});
+            $('#userGridView tbody').on('change', 'input[type="checkbox"].select-row', function (e) {
+                debugger;
+                if ($(e.target).is(":checked")) {
+                    if (jQuery.inArray(parseInt($(e.target).attr("value")), selectedUserIds) === -1)
+                        selectedUserIds.push($(e.target).attr("value"));
+                    if ($("input[type='checkbox'].select-row").length == $("input[type='checkbox'].select-row:checked").length)
+                        $('#checkAll').prop('checked', true);
+                } else {
+                    selectedUserIds.splice(parseInt(jQuery.inArray($(e.target).attr("value")), selectedUserIds), 1);
+                    $('#checkAll').prop('checked', false);
+                }
+                debugger;
+            });
+
+            $('#userGridView').on('page.dt', function () {
+                debugger;
+                var info = responsiveDatatable.page.info();
+                //$('#pageInfo').html('Showing page: ' + info.page + ' of ' + info.pages);
+                console.log('Showing page: ' + info.page + ' of ' + info.pages);
+            });
+        }
+
+        $('#checkAll').change((e) => {
+            const checkAllState = $(e.target).prop('checked');
+            $('input[type="checkbox"].select-row').prop('checked', checkAllState);
+
+            $("input[type='checkbox'].select-row").each(function () {
+                var $this = $(this);
+
+                if ($this.is(":checked")) {
+                    if (jQuery.inArray($this.attr("value"), selectedUserIds) === -1)
+                        selectedUserIds.push($this.attr("value"));
+                } else {
+                    selectedUserIds.splice(jQuery.inArray($this.attr("value"), selectedUserIds), 1);
+                }
+            });
+            debugger;
+        });
+
+        const fillFilter = (postData) => {
+            if ($('#FName').val() != undefined && $('#FName').val() != null && $('#FName').val() != '')
+                postData.FilterList.push({
+                    PropertyName: 'FName',
+                    Operator: @((int)Operator.Contain),
+                    PropertyValue: $('#FName').val()
+                });
+
+            if ($('#LName').val() != undefined && $('#LName').val() != null && $('#LName').val() != '')
+                postData.FilterList.push({
+                    PropertyName: 'LName',
+                    Operator: @((int)Operator.Contain),
+                    PropertyValue: $('#LName').val()
+                });
+
+            if ($('#NationalCode').val() != undefined && $('#NationalCode').val() != null && $('#NationalCode').val() != '')
+                postData.FilterList.push({
+                    PropertyName: 'NationalCode',
+                    Operator: @((int)Operator.Equal),
+                    PropertyValue: $('#NationalCode').val()
+                });
+
+            if ($('#RoleId').val() != null && $('#RoleId').val() != '')
+                postData.FilterList.push({
+                    PropertyName: 'RoleId',
+                    Operator: @((int)Operator.Equal),
+                    PropertyValue: $('#RoleId').val()
+                });
+
+            if ($('#chkUseHasActiveFacility').prop('checked'))
+                postData.FilterList.push({
+                    PropertyName: 'UseHasActiveRequestFacility',
+                    Operator: @((int)Operator.Equal),
+                    PropertyValue: true
+                });
+
+            if ($('#chkUserInstallApp').prop('checked'))
+                postData.FilterList.push({
+                    PropertyName: 'UserInstallApp',
+                    Operator: @((int)Operator.Equal),
+                    PropertyValue: true
+                });
+        }
+
+        $('#btnExportToExcel').click((e) => {
+            e.preventDefault();
+
+            showWaiting('userGridView', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');;
+
+            const postData = {
+                Page: 0,
+                PageSize: 0,
+                SortDirection: null,
+                SortOrder: null,
+                FilterList: []
+            };
+
+            fillFilter(postData);
+            debugger;
+
+            $.ajax({
+                type: 'post',
+                data: JSON.stringify(postData),
+                datatype: "json",
+                contentType: "application/json; charset=utf-8",
+                url: '/api/v1/User/GenerateUserExcelList',
+                success: function (result) {
+                    hideWaiting('userGridView');;
+                    if (result !== undefined && result !== null && result.data != null && result.isSuccess === true) {
+                        debugger;
+                        const downloadJsonLink = document.createElement("a");
+                        downloadJsonLink.href = `data:application/vnd.ms-excel;base64,${result.data}`;
+                        downloadJsonLink.download = "UserList.xlsx";
+                        downloadJsonLink.click();
+                    }
+                },
+                error: function (error) {
+                    hideWaiting('userGridView');;
+                    const exception = getExceptionMessageFromError(error);
+                    if (exception != null)
+                        showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                    else
+                        showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                }
+            });
+        });
+    </script>
+}

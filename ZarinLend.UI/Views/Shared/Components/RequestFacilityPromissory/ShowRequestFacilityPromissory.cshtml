@@ -1,0 +1,257 @@
+﻿@using static Common.Enums;
+@model RequestFacilityPromissoryModel
+
+<style type="text/css">
+    #promissoryCanvas {
+        width: 100%;
+        height: auto;
+    }
+</style>
+<div class="bg-white border rounded p-75">
+    @if (Model != null)
+    {
+        <div class="text-bold-900 secondary darken-4 font-medium-3">
+            اطلاعات سفته
+        </div>
+        <div class="border rounded mt-1">
+            <div class="d-flex align-items-center p-1">
+                <span class="w-50 text-bold-500 font-small-2">مبلغ سفته</span><span class="w-50 text-bold-700 secondary darken-4 font-medium-1">@Model.Amount.ToString("N0") ريال</span>
+            </div>
+            <hr class="my-0" />
+            <div class="d-flex align-items-center p-1">
+                <span class="w-50 text-bold-500 font-small-2">شماره خزانه داری</span><span class="w-50 text-bold-400 secondary darken-4 font-medium-1">@Model.PromissoryId</span>
+            </div>
+            <hr class="my-0" />
+            <div class="d-flex align-items-center p-1">
+                <span class="w-50 text-bold-500 font-small-2">در وجه</span><span class="w-50 text-bold-400 secondary darken-4 font-medium-1">@Model.ReceiverName با شناسه ملی @Model.ReceiverIdCode</span>
+            </div>
+            <hr class="my-0" />
+          @*   <div class="p-1">
+                <div class="row" style="margin-right:7px;margin-left:7px">
+                    <div class="col-sm-12">
+                        <div style="text-align:center" class="form-group">
+                            <button id="btnDownloadPromissoryPdf" type="button" class="btn btn-outline-info">مشاهده/دانلود سفته(فایل PDF)</button>
+                            <input type="hidden" asp-for="MultiSignedPdf" />
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                <div style="text-align:center" class="form-group justify-content-center">
+                <canvas id="promissoryCanvas"></canvas>
+                </div>
+                </div>
+                    <div class="col-sm-12">
+                        <div style="text-align:center" class="form-group justify-content-center">
+                            <embed src="data:application/pdf;base64,@Model.MultiSignedPdf" type="application/pdf" style="width:600px;height:450px" />
+                        </div>
+                    </div>
+                </div>
+            </div> *@
+            <div class="border rounded p-75">
+                <input type="hidden" asp-for="MultiSignedPdf" />
+                <div class="d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center">
+                        <i class="bx bx-paperclip rotate-45 font-large-1 dark"></i>
+                        <div class="font-small-3 text-bold-700 secondary darken-4 ml-75">
+                            مشاهده/دانلود سفته(فایل PDF)
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <a id="anchorDownloadPromissoryPdf" download="promissory.pdf">
+                            <i class="bx bx-download dark font-medium-5 mr-2"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="d-flex flex-column mt-4 mb-2">
+            <img src="/new-layout/images/no-docs-img.svg" class="height-100" />
+            <div class="font-small-3 text-muted text-center mt-3">
+                اطلاعات سفته یافت نشد.یا سفته هنوز نهایی نشده است!
+            </div>
+        </div>
+    }
+    @if (Model is not null)
+    {
+        <a style="margin-top: 10px" href="#" data-toggle="modal" data-target="#promissoryDetailsModal" class="btn btn-primary ml-1 margin-top-10">
+            راستی‌آزمایی سفته
+        </a>
+    }
+</div>
+
+@if (Model is not null)
+{
+    <div class="modal fade" id="promissoryDetailsModal" tabindex="-1" role="dialog" aria-labelledby="promissoryDetailsModalTitle" data-backdrop="static" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg"
+        role="document">
+            <div class="modal-content rounded-lg">
+                <div class="modal-header">
+                    <h5 class="modal-title secondary darken-4" id="promissoryDetailsModalTitle">
+                        راستی آزمایی سفته
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="بستن" onclick="$('#promissoryDetailsModal').modal('hide');">
+                        <i class="bx bx-x"></i>
+                    </button>
+                </div>
+                <div class="modal-body" id="promissoryDetailsContent">
+                    <div id="promissoryDetails" class="mt-3">
+                        <div class="border rounded p-75">
+                            <fieldset>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <lable>نام صادر کننده سفته</lable>
+                                            <input type="text" class="form-control bg-transparent" placeholder="نام صادر کننده سفته" readonly value="@Model.IssuerName" />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <lable>کد ملی صادر کننده</lable>
+                                            <input type="text" class="form-control bg-transparent" placeholder="کد ملی صادر کننده" readonly value="@Model.IssuerIdCode" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <lable>تاریخ تولد صادر کننده</lable>
+                                            <input type="text" class="form-control bg-transparent" placeholder="تاریخ تولد صادر کننده" readonly value="@Model.BirthDate" />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <lable>شماره شبا صادر کننده</lable>
+                                            <input type="text" class="form-control bg-transparent" placeholder="شماره شبا صادر کننده" readonly value="@Model.IssuerIban" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <lable>آدرس صادر کننده</lable>
+                                            <input type="text" class="form-control bg-transparent" placeholder="آدرس صادر کننده" readonly value="@Model.IssuerAddress" />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <lable>موبایل صادر کننده</lable>
+                                            <input type="text" class="form-control bg-transparent" placeholder="موبایل صادر کننده" readonly value="@Model.IssuerMobile" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <lable>نام دریافت کننده</lable>
+                                            <input type="text" class="form-control bg-transparent" placeholder="نام دریافت کننده" readonly value="@Model.ReceiverName" />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <lable>کد ملی دریافت کننده</lable>
+                                            <input type="text" class="form-control bg-transparent" placeholder="کد ملی دریافت کننده" readonly value="@Model.ReceiverIdCode" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <lable>موبایل دریافت کننده</lable>
+                                            <input type="text" class="form-control bg-transparent" placeholder="موبایل دریافت کننده" readonly value="@Model.ReceiverMobile" />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <lable>آدرس دریافت کننده</lable>
+                                            <input type="text" class="form-control bg-transparent" placeholder="آدرس دریافت کننده" readonly value="@Model.PaymentPlace" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <lable>مبلغ سفته</lable>
+                                            <input type="text" class="form-control bg-transparent" placeholder="مبلغ سفته" readonly value="@Model.Amount" />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <lable>توضیحات</lable>
+                                            <input type="text" class="form-control bg-transparent" placeholder="توضیحات" readonly value="@Model.Description" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </fieldset>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+@if (Model != null)
+{
+    @*     <script src="/Vendor/pdf.js/pdf.min.mjs" type="module"></script>
+    <script type="module">
+        // atob() is used to convert base64 encoded PDF to binary-like data.
+        // (See also https://developer.mozilla.org/en-US/docs/Web/API/WindowBase64/
+        // Base64_encoding_and_decoding.)
+        var pdfData = atob(`${$("#MultiSignedPdf").val()}`);
+
+        // Loaded via <script> tag, create shortcut to access PDF.js exports.
+        var { pdfjsLib, FontLoader } = globalThis;
+
+        // The workerSrc property shall be specified.
+        pdfjsLib.GlobalWorkerOptions.workerSrc = '/Vendor/pdf.js/pdf.worker.min.mjs';
+
+        // Using DocumentInitParameters object to load binary data.
+        var loadingTask = pdfjsLib.getDocument({ data: pdfData });
+        loadingTask.promise.then(function (pdf) {
+            console.log('PDF loaded');
+
+            // Fetch the first page
+            var pageNumber = 1;
+            pdf.getPage(pageNumber).then(function (page) {
+                console.log('Page loaded');
+
+                //var scale = 1.5;
+                var scale = 1;
+                var viewport = page.getViewport({ scale: scale });
+
+                // Prepare canvas using PDF page dimensions
+                var canvas = document.getElementById('promissoryCanvas');
+                var context = canvas.getContext('2d');
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+
+                // Render PDF page into canvas context
+                var renderContext = {
+                    canvasContext: context,
+                    viewport: viewport
+                };
+                var renderTask = page.render(renderContext);
+                renderTask.promise.then(function () {
+                    console.log('Page rendered');
+                });
+            });
+        }, function (reason) {
+            // PDF loading error
+            console.error(reason);
+        });
+    </script> *@
+    <script on-content-loaded="true">
+        $(() => {
+            $('#anchorDownloadPromissoryPdf').prop('href', `data:application/pdf;base64,${$("#MultiSignedPdf").val()}`);
+            $('#btnDownloadPromissoryPdf').on('click', (e) => {
+                e.preventDefault();
+                debugger
+                const downloadLink = document.createElement("a");
+                downloadLink.href = `data:application/pdf;base64,${$("#MultiSignedPdf").val()}`;
+                downloadLink.download = "promissory.pdf";
+                downloadLink.click();
+            });
+        });
+    </script>
+}

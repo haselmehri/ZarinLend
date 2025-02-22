@@ -1,0 +1,36 @@
+﻿@model int
+@*@model RequestFacilityInfoModel*@
+@{
+    ViewData["Title"] = ViewBag.Title;
+}
+@section styles
+    {
+    <style type="text/css">
+    </style>
+    }
+
+    @await Component.InvokeAsync("WorkFlowStepWizard", new { workFlowId = 1, requestFacilityId = Model /*Model.Id*/ })
+    <form id="frmVerifyBuyer" method="post">
+        <div class="card">
+            <div class="card-header" >بررسی پرونده-اخذ استعلام های لازم-تخصیص اعتبار</div>
+            <div class="card-body" style="margin-right:auto;margin-left:auto">
+                <img src="~/images/underconstruction.jpg" style="width:100%" />
+            </div>
+            <div class="card-footer" style="text-align:left">
+                <a class="btn btn-outline-secondary" asp-controller="requestfacility" asp-action="SearchLeasingRequest">
+                    بازگشت به لیست درخواست تسهیلات&nbsp;<i class="fal fa-list-alt"></i>
+                </a>
+            </div>
+        </div>
+    </form>
+    @section scripts{
+    @*<partia name="_ValidationScriptsPartial" />*@
+    @{
+        await Html.RenderPartialAsync("~/Views/Shared/_ValidationScriptsPartial.cshtml");
+    }
+    <script>
+        $(document).ready(function () {
+
+        });
+    </script>
+    }

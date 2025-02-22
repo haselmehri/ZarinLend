@@ -1,0 +1,1000 @@
+﻿@{
+    ViewData["Title"] = "لیست درخواست ها";
+    Layout = "~/Views/Shared/_NewLayout.cshtml";
+    var ajaxUrl = "/api/v1/RequestFacility/GetAllLeasingRequest";
+    //if (User.IsInRole(Core.Entities.RoleEnum.AdminBankLeasing.ToString()))
+    //{
+    //    ajaxUrl = "/api/v1/RequestFacility/GetAllAdminLeasingRequest";
+    //}
+}
+@section styles{
+    <style type="text/css">
+
+    </style>
+}
+    <div id="requestGridDiv" class="p-2 bg-white rounded-lg">
+        <div class="font-medium-3 secondary darken-4 text-bold-800 d-flex align-items-center">
+            <i class="bx bx-align-right zl-text-secondary mr-25"></i>
+            <span>درخواست های من</span>
+        </div>
+        <div class="p-2 rounded-lg">
+            @if (User.IsInRole(RoleEnum.BankLeasing.ToString()) || User.IsInRole(RoleEnum.SupervisorLeasing.ToString()))
+        {
+            <div class="row my-0 my-md-1">
+                <div class="col-md-5 col-xs-12" style="text-align:right">
+                    <div class="form-group">
+                        <button id="btnDownloadGroupOctetExcel" tabindex="5" class="btn btn-outline-info" localize-content>
+                            @_loc["DownloadGroupOctetExcel"]&nbsp;<i class="fal fa-file-excel-o"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-3 col-xs-12">
+                    <div class="form-group" style="text-align:left">
+                        <input type="file" name="OctetExcelResultFile" id="OctetExcelResultFile" class="form-control" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                    </div>
+                </div>
+                <div class="col-md-4 col-xs-12">
+                    <div class="form-group" style="text-align:right">
+                        <button id="btnUploadGroupOctetExcelResult" tabindex="5" class="btn btn-outline-primary" localize-content>
+                            @_loc["UploadGroupOctetExcelResult"]&nbsp;<i class="fal fa-file-excel-o"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        }
+        else if (User.IsInRole(RoleEnum.AdminBankLeasing.ToString()))
+        {
+            <div class="row my-0 my-md-1">
+                <div class="col-md-12" style="text-align:right">
+                    <div class="form-group">
+                        <button id="btnSignAllContract" tabindex="5" class="btn btn-outline-info" localize-content>
+                            امضاء گروهی همه قراردادها&nbsp;<i class="fal fa-file-excel-o"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        }
+        <div class="shadow-none zl-req-list-container">
+            <ul id='myTab' class="nav nav-pills nav-justified border-bottom">
+                <li class="nav-item mb-0">
+                    <a class="nav-link bg-transparent pb-1 active"
+                       id="active-facilities-justified"
+                       data-toggle="pill"
+                       href="#active-facilities"
+                       aria-expanded="true">
+                        درخواست های جاری
+                    </a>
+                </li>
+                <li class="nav-item mb-0">
+                    <a class="nav-link bg-transparent pb-1"
+                       id="done-facilities-justified"
+                       data-toggle="pill"
+                       href="#done-facilities"
+                       aria-expanded="false">
+                        درخواست های پایان یافته
+                    </a>
+                </li>
+                <li class="nav-item mb-0">
+                    <a class="nav-link bg-transparent pb-1"
+                       id="reject-facilities-justified"
+                       data-toggle="pill"
+                       href="#reject-facilities"
+                       aria-expanded="false">
+                        درخواست های رد شده
+                    </a>
+                </li>
+                <li class="nav-item mb-0">
+                    <a class="nav-link bg-transparent pb-1"
+                       id="all-justified"
+                       data-toggle="pill"
+                       href="#all-facilities"
+                       aria-expanded="false">
+                        همه درخواست ها
+                    </a>
+                </li>
+            </ul>
+            <div class="tab-content shadow-none">
+                <div role="tabpanel" class="tab-pane active" id="active-facilities" aria-labelledby="active-facilities-justified" aria-expanded="true">
+                    <div id="activeFacilityDiv" class="mt-2">
+                        <div class="paging-div"></div>
+                        <div class="table-responsive table-sm">
+                            <table class="table zero-configuration active-facility-table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col"><fieldset><div class='checkbox checkbox-primary'><input type='checkbox' id="checkAll" /><label for="checkAll"></label></div></fieldset></th>
+                                        <th scope="col">#</th>
+                                        <th scope="col" localize-content>اعتبار درخواستی(ريال)</th>
+                                        <th scope="col" localize-content>بازه پرداخت</th>
+                                        <th scope="col" localize-content>درخواست کننده</th>
+                                        <th scope="col" localize-content>کد ملی/شناسه ملی</th>
+                                        <th scope="col" localize-content>تاریخ درخواست</th>
+                                        <th scope="col" localize-content>تاریخ آخرین اقدام</th>
+                                        <th scope="col" localize-content>وضعیت</th>
+                                        @if (User.IsInRole(Core.Entities.RoleEnum.AdminBankLeasing.ToString()))
+                                        {
+                                            <th scope="col" localize-content>امضاء قرارداد</th>
+                                        }
+                                        <th scope="col" localize-content>اقدام</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="requestGridActiveRows">
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="paging-div"></div>
+                    </div>
+                </div>
+                <div class="tab-pane" id="done-facilities" role="tabpanel" aria-labelledby="done-facilities-justified" aria-expanded="false">
+                    <div id="doneFacilityDiv" class="mt-2">
+                        <div class="paging-div"></div>
+                        <div class="table-responsive table-sm">
+                            <table class="table zero-configuration done-facility-table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col"><fieldset><div class='checkbox checkbox-primary'><input type='checkbox' id="checkAll" /><label for="checkAll"></label></div></fieldset></th>
+                                        <th scope="col">#</th>
+                                        <th scope="col" localize-content>اعتبار درخواستی(ريال)</th>
+                                        <th scope="col" localize-content>بازه پرداخت</th>
+                                        <th scope="col" localize-content>درخواست کننده</th>
+                                        <th scope="col" localize-content>کد ملی/شناسه ملی</th>
+                                        <th scope="col" localize-content>تاریخ درخواست</th>
+                                        <th scope="col" localize-content>تاریخ آخرین اقدام</th>
+                                        <th scope="col" localize-content>وضعیت</th>
+                                        @if (User.IsInRole(Core.Entities.RoleEnum.AdminBankLeasing.ToString()))
+                                        {
+                                            <th scope="col" localize-content>امضاء قرارداد</th>
+                                        }
+                                        <th scope="col" localize-content>اقدام</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="requestGridDoneRows">
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="paging-div"></div>
+                    </div>
+                </div>
+                <div class="tab-pane" id="reject-facilities" role="tabpanel" aria-labelledby="reject-facilities-justified" aria-expanded="false">
+                    <div id="rejectFacilityDiv" class="mt-2">
+                        <div class="paging-div"></div>
+                        <div class="table-responsive table-sm">
+                            <table class="table zero-configuration reject-facility-table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col"><fieldset><div class='checkbox checkbox-primary'><input type='checkbox' id="checkAll" /><label for="checkAll"></label></div></fieldset></th>
+                                        <th scope="col">#</th>
+                                        <th scope="col" localize-content>اعتبار درخواستی(ريال)</th>
+                                        <th scope="col" localize-content>بازه پرداخت</th>
+                                        <th scope="col" localize-content>درخواست کننده</th>
+                                        <th scope="col" localize-content>کد ملی/شناسه ملی</th>
+                                        <th scope="col" localize-content>تاریخ درخواست</th>
+                                        <th scope="col" localize-content>تاریخ آخرین اقدام</th>
+                                        <th scope="col" localize-content>وضعیت</th>
+                                        @if (User.IsInRole(Core.Entities.RoleEnum.AdminBankLeasing.ToString()))
+                                        {
+                                            <th scope="col" localize-content>امضاء قرارداد</th>
+                                        }
+                                        <th scope="col" localize-content>اقدام</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="requestGridRejectRows">
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="paging-div"></div>
+                    </div>
+                </div>
+                <div class="tab-pane" id="all-facilities" role="tabpanel" aria-labelledby="all-facilities-justified" aria-expanded="false">
+                    <div id="allFacilityDiv" class="mt-2">
+                        <div class="paging-div"></div>
+                        <div class="table-responsive table-sm">
+                            <table class="table zero-configuration all-facility-table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col"><fieldset><div class='checkbox checkbox-primary'><input type='checkbox' id="checkAll" /><label for="checkAll"></label></div></fieldset></th>
+                                        <th scope="col">#</th>
+                                        <th scope="col" localize-content>اعتبار درخواستی(ريال)</th>
+                                        <th scope="col" localize-content>بازه پرداخت</th>
+                                        <th scope="col" localize-content>درخواست کننده</th>
+                                        <th scope="col" localize-content>کد ملی/شناسه ملی</th>
+                                        <th scope="col" localize-content>تاریخ درخواست</th>
+                                        <th scope="col" localize-content>تاریخ آخرین اقدام</th>
+                                        <th scope="col" localize-content>وضعیت</th>
+                                        @if (User.IsInRole(Core.Entities.RoleEnum.AdminBankLeasing.ToString()))
+                                        {
+                                            <th scope="col" localize-content>امضاء قرارداد</th>
+                                        }
+                                        <th scope="col" localize-content>اقدام</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="requestGridAllRows">
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="paging-div"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts{
+    @if (User.IsInRole(Core.Entities.RoleEnum.AdminBankLeasing.ToString()))
+    {
+        <script src="~/js/Dastine/Dastine-Config-For-Group-Sign.js"></script>
+        <script src="~/js/Dastine/Dastine.js"></script>
+        <script>
+            let selectedCertificateFromTokenByUIResult;
+            let selectedCertificate;
+            let digest;
+            let signature;
+            function SelectCertificateFromTokenByUI(callback) {
+                if (Dastine.isInstalled) {
+                    const issuer = '';// document.getElementById('txtSelectCertificateFromTokenByUIIssuer').value;
+                    const keyUsages = '';// document.getElementById('txtSelectCertificateFromTokenByUIKeyUsages').value;
+                    try {
+                        Dastine.SelectCertificateFromTokenByUI(issuer, keyUsages, function(event) {
+                            selectedCertificateFromTokenByUIResult = event.data.Result;
+                            if (selectedCertificateFromTokenByUIResult == 0)
+                                callback(true);
+                            else {
+                                showMessage('@_loc["InfoTitle"]', 'خطایی نامشخص رخ داده است،لطفا نسبت به متصل بودن توکن سخت افزاری به سیستم کامپیوتر خود اطمینان حاصل کنید', icons.error, '@_loc["Close"]');
+                                callback(false);
+                            }
+                        });
+                    }
+                    catch (e) {
+                        //alert(e);
+                        showMessage('@_loc["InfoTitle"]', e, icons.error, '@_loc["Close"]');
+                        callback(false);
+                    }
+                } else {
+                    if (Dastine.errorMessage == 'DASTINE_NOT_INSTALLED') {
+                        //alert(Dastine.errorMessage + '\n Get it from:\n' + DastineConfig.hostDownloadLink);
+                        showMessage('@_loc["InfoTitle"]', Dastine.errorMessage + '\n Get it from:\n' + DastineConfig.hostDownloadLink, icons.error, '@_loc["Close"]');
+                    }
+                    else {
+                        //alert(Dastine.errorMessage);
+                        showMessage('@_loc["InfoTitle"]', Dastine.errorMessage, icons.error, '@_loc["Close"]');
+                    }
+
+                    callback(false);
+                }
+            }
+
+            function ReadSelectedCertificate(callback) {
+                if (Dastine.isInstalled) {
+                    try {
+                        Dastine.GetSelectedCertificate(function(event) {
+                            selectedCertificate = event.data.Result;
+                            callback(true);
+                        });
+                    }
+                    catch (e) {
+                        //alert(e);
+                        showMessage('@_loc["InfoTitle"]', e, icons.error, '@_loc["Close"]');
+                        callback(false);
+                    }
+                } else {
+                    if (Dastine.errorMessage == 'DASTINE_NOT_INSTALLED') {
+                        //alert(Dastine.errorMessage + '\n Get it from:\n' + DastineConfig.hostDownloadLink);
+                        showMessage('@_loc["InfoTitle"]', Dastine.errorMessage + '\n Get it from:\n' + DastineConfig.hostDownloadLink, icons.error, '@_loc["Close"]');
+                    }
+                    else {
+                        //alert(Dastine.errorMessage);
+                        showMessage('@_loc["InfoTitle"]', Dastine.errorMessage, icons.error, '@_loc["Close"]');
+                    }
+
+                    callback(false);
+                }
+            }
+
+            function SignMessage(digest, callback) {
+                debugger;
+                if (Dastine.isInstalled) {
+                    try {
+                        Dastine.Sign(digest, 'SHA1', function(event) {
+                            debugger;
+                            if (event.data.Result == '18' || event.data.Result == '14') {
+                                showMessage('@_loc["InfoTitle"]', 'کلمه عبور وارد شده اشتباه می باشد!', icons.error, '@_loc["Close"]');
+                                callback(false);
+                            }
+                            else {
+                                signature = event.data.Result;
+                                callback(true);
+                            }
+                        });
+                    }
+                    catch (e) {
+                        debugger;
+                        showMessage('@_loc["InfoTitle"]', e, icons.error, '@_loc["Close"]');
+                        callback(false);
+                    }
+                } else {
+                    if (Dastine.errorMessage == 'DASTINE_NOT_INSTALLED') {
+                        showMessage('@_loc["InfoTitle"]', Dastine.errorMessage + '\n Get it from:\n' + DastineConfig.hostDownloadLink, icons.error, '@_loc["Close"]');
+                    }
+                    else {
+                        showMessage('@_loc["InfoTitle"]', Dastine.errorMessage, icons.error, '@_loc["Close"]');
+                    }
+
+                    callback(false);
+                }
+            }
+        </script>
+    }
+    <script>
+        const PAGE_SIZE = 10;
+        const SHOW_PAGE_COUNT = 10;
+        let requestFacilityIdArray = [];
+        let activeFacilityTable;
+        let doneFacilityTable;
+        let rejectFacilityTable;
+        let allFacilityTable;
+        let parentGridElementId = 'activeFacilityDiv';
+        let tbody_targetId = 'requestGridActiveRows';
+        $(document).ready(function() {
+            $('div').removeClass('zl-active');
+            $('#myRequests').addClass('zl-active');
+
+            activeFacilityTable = $(".active-facility-table").DataTable({
+                ordering: false,
+                responsive: false,
+                searching: false,
+                paging: false,
+                lengthChange: false,
+                info: false
+            });
+
+            doneFacilityTable = $(".done-facility-table").DataTable({
+                ordering: false,
+                responsive: false,
+                searching: false,
+                paging: false,
+                lengthChange: false,
+                info: false
+            });
+
+            rejectFacilityTable = $(".reject-facility-table").DataTable({
+                ordering: false,
+                responsive: false,
+                searching: false,
+                paging: false,
+                lengthChange: false,
+                info: false
+            });
+
+            allFacilityTable = $(".all-facility-table").DataTable({
+                ordering: false,
+                responsive: false,
+                searching: false,
+                paging: false,
+                lengthChange: false,
+                info: false
+            });
+            const triggerTabList = [].slice.call(document.querySelectorAll('#myTab a'));
+            triggerTabList.forEach(function(triggerEl) {
+                var tabTrigger = new bootstrap.Tab(triggerEl)
+
+                triggerEl.addEventListener('click', function(event) {
+                    event.preventDefault()
+                    debugger;
+                    const target = $(event.target).attr('href');
+                    switch (target) {
+                        case "#active-facilities":
+                            parentGridElementId = 'activeFacilityDiv';
+                            tbody_targetId = 'requestGridActiveRows';
+                            loadLeasingRequest();
+                            break;
+                        case "#done-facilities":
+                            parentGridElementId = 'doneFacilityDiv';
+                            tbody_targetId = 'requestGridDoneRows';
+                            loadLeasingRequest();
+                            break;
+                        case "#reject-facilities":
+                            parentGridElementId = 'rejectFacilityDiv';
+                            tbody_targetId = 'requestGridRejectRows';
+                            loadLeasingRequest();
+                            break;
+                        case "#all-facilities":
+                            parentGridElementId = 'allFacilityDiv';
+                            tbody_targetId = 'requestGridAllRows';
+                            loadLeasingRequest();
+                            break;
+                    }
+                });
+            });
+            loadLeasingRequest();
+        });
+
+
+        $('#checkAll').change((e) => {
+            const checkAllState = $(e.target).prop('checked');
+            $('input[type="checkbox"].select-row').prop('checked', checkAllState);
+
+            $("input[type='checkbox'].select-row").each(function() {
+                var $this = $(this);
+
+                if ($this.is(":checked")) {
+                    if (jQuery.inArray($this.attr("value"), requestFacilityIdArray) === -1)
+                        requestFacilityIdArray.push($this.attr("value"));
+                } else {
+                    requestFacilityIdArray.splice(jQuery.inArray($this.attr("value"), requestFacilityIdArray), 1);
+                }
+            });
+            debugger;
+        });
+
+        if ('@User.IsInRole(RoleEnum.BankLeasing.ToString())' == 'True') {
+            $('#btnDownloadGroupOctetExcel').click((e) => {
+                e.preventDefault();
+                debugger;
+                showWaiting('requestGridDiv', '@_loc["PleaseWait"]', '@_loc["Loading"]');;
+
+                $.ajax({
+                    type: 'post',
+                    data: JSON.stringify('{}'),
+                    datatype: "json",
+                    contentType: "application/json; charset=utf-8",
+                    url: '/api/v1/RequestFacility/DownloadGroupVerifyOctectExcel',
+                    success: function(result) {
+                        hideWaiting('requestGridDiv');;
+                        if (result !== undefined && result !== null && result.data != null && result.isSuccess === true) {
+                            debugger;
+                            const downloadJsonLink = document.createElement("a");
+                            //downloadJsonLink.href = `data:application/octet-stream;base64,${result.data}`;
+                            downloadJsonLink.href = `data:application/vnd.ms-excel;base64,${result.data}`;
+                            downloadJsonLink.download = "GroupVerifyOctect.xlsx";
+                            downloadJsonLink.click();
+                        }
+                        else {
+                            showMessage('@_loc["ErrorTitle"]', 'کاربر گرامی هیج درخواست تسهیلاتی در مرحله <b>اعتبار سنجی 8 گانه</b> وجود ندارد', icons.warning, '@_loc["Close"]');
+                        }
+                    },
+                    error: function(error) {
+                        hideWaiting('requestGridDiv');;
+                        const exception = getExceptionMessageFromError(error);
+                        if (exception != null)
+                            showMessage('@_loc["ErrorTitle"]', exception, icons.error, '@_loc["Close"]');
+                        else
+                            showMessage('@_loc["ErrorTitle"]', '@_loc["UnhandledError"]', icons.error, '@_loc["Close"]');
+                    },
+                    complete: function() {
+
+                    },
+                });
+            });
+
+            $('#btnUploadGroupOctetExcelResult').click((e) => {
+                e.preventDefault();
+                debugger;
+
+                const OctetExcelResultFile = $("#OctetExcelResultFile")[0];
+                if (OctetExcelResultFile.files.length == 0) {
+                    showMessage('@_loc["InfoTitle"]', 'لطفا فایل نتیجه اعتبارسنجی را جهت بارگذاری،انتخاب کنید', icons.warning, '@_loc["Close"]');
+                    return;
+                }
+                showWaiting('requestGridDiv', '@_loc["PleaseWait"]', '@_loc["Loading"]');
+                let data = new FormData();
+                data.append('verifyOctectResultFile', OctetExcelResultFile.files[0]);
+                $.ajax({
+                    type: 'post',
+                    data: data,
+                    processData: false,
+                    contentType: false,
+                    //datatype: "json",
+                    //contentType: "application/json; charset=utf-8",
+                    url: '/api/v1/RequestFacility/UploadGroupVerifyOctectResult',
+                    success: function(result) {
+                        hideWaiting('requestGridDiv');
+                        debugger;
+                        if (result !== undefined && result !== null && result.data != null && result.isSuccess === true) {
+                            parentGridElementId = 'activeFacilityDiv';
+                            tbody_targetId = 'requestGridActiveRows';
+                            loadLeasingRequest();
+
+                            showMessage('@_loc["InfoTitle"]', 'با توجه به اطلاعات اکسل و وضعیت اعتیارسنجی درخواست ها تایید شده و به مرحله بعد ارجاع داده شدند یا رد شده و جهت اصلاح به مرحله قبل ارسال داده شدند', icons.info, '@_loc["Close"]');
+                        }
+                    },
+                    error: function(error) {
+                        hideWaiting('requestGridDiv');;
+                        const exception = getExceptionMessageFromError(error);
+                        if (exception != null)
+                            showMessage('@_loc["ErrorTitle"]', exception, icons.error, '@_loc["Close"]');
+                        else
+                            showMessage('@_loc["ErrorTitle"]', '@_loc["UnhandledError"]', icons.error, '@_loc["Close"]');
+                    }
+                });
+            });
+        }
+
+        $('#requestGridDiv').on('click', 'thead th', function() {
+            //renderSortColumn(this, 'hdnSortOrder', 'hdnSortDirection', () => { loadLeasingRequest(); })
+        });
+
+        const loadLeasingRequest = (sender) => {
+            showWaiting('requestGridDiv', '@_loc["PleaseWait"]', '@_loc["Loading"]');;
+
+            const sortDirectionValue = $('#hdnSortDirection').val();
+            const sortOrderValue = $('#hdnSortOrder').val();
+            let currentPage = 1;
+            if (typeof $(sender).attr('current-page') !== typeof undefined && $(sender).attr('current-page') !== false)
+                currentPage = $(sender).attr('current-page');
+
+            const postData = {
+                Page: currentPage,
+                PageSize: PAGE_SIZE,
+                SortDirection: sortDirectionValue,
+                SortOrder: sortOrderValue,
+                FilterList: []
+            };
+
+            fillFilter(postData);
+
+            $.ajax({
+                type: 'post',
+                data: JSON.stringify(postData),
+                datatype: "json",
+                contentType: "application/json; charset=utf-8",
+                url: '@ajaxUrl',
+                success: function(result) {
+                    hideWaiting('requestGridDiv');
+                    debugger;
+                    if (result !== undefined && result !== null && result.isSuccess === true) {
+                        renderRequestGrid(result.data.data, result.data.currentPage, PAGE_SIZE);
+                        renderNavigation(parentGridElementId, result.data.totalRowCount, result.data.currentPage, result.data.totalPages);
+                        resetGridStyle(parentGridElementId, 'hdnSortOrder', 'hdnSortDirection');
+                    }
+                },
+                error: function(error) {
+                    debugger;
+                    hideWaiting('requestGridDiv');
+                    const exception = getExceptionMessageFromError(error);
+                    if (exception != null)
+                        showMessage('@_loc["ErrorTitle"]', exception, icons.error, '@_loc["Close"]');
+                    else
+                        showMessage('@_loc["ErrorTitle"]', '@_loc["UnhandledError"]', icons.error, '@_loc["Close"]');
+                },
+                complete: function() {
+
+                },
+            });
+        }
+
+        const fillFilter = (postData) => {
+            let facilityStatusValue;
+            switch (parentGridElementId) {
+                case "activeFacilityDiv":
+                    facilityStatusValue = 1;
+                    break;
+                case "doneFacilityDiv":
+                    facilityStatusValue = 2;
+                    break;
+                case "rejectFacilityDiv":
+                    facilityStatusValue = 3;
+                    break;
+                case "allFacilityDiv":
+                    facilityStatusValue = -1;
+                    break;
+            }
+            postData.FilterList.push({
+                PropertyName: 'FacilityStatus',
+                Operator: @((int)Operator.Equal),
+                PropertyValue: parseInt(facilityStatusValue)
+            });
+        }
+
+        const renderRequestGrid = (data, currentPage, pageSize) => {
+            let rows = '<tr><td colspan="9">@_loc["NoRows"]</td></tr>';
+            if (data.length > 0) {
+                rows = '';
+                for (var i = 0; i < data.length; i++) {
+                    rows += '<tr>';
+                    rows += `<td style=''><fieldset><div class='checkbox checkbox-primary'><input type='checkbox' class='select-row' value='${data[i].id}' id='chk_${data[i].id}'/><label for='chk_${data[i].id}'></label></div></fieldset></td>`;
+                    rows += "<td style=''>" + (((currentPage - 1) * pageSize) + i + 1) + "</td>";
+                    rows += "<td style='direction:ltr'>" + splitNumber(data[i].amount) + "</td>";
+                    rows += "<td>" + data[i].monthCountTitle + "</td>";
+                    rows += "<td>" + data[i].requester + "</td>";
+                    rows += "<td>" + data[i].nationalCode + "</td>";
+                    rows += "<td style='direction:ltr'>" + data[i].shamsiCreateDate + "</td>";
+                    rows += "<td style='direction:ltr'>" + data[i].shamsiLastActionDate + "</td>";
+
+                    let waitingStep = '';
+                    let buttonsHtml = `<a class="dropdown-item change-status" href='@Url.Action("Detail","RequestFacility")/${data[i].id}'>
+                                                                                                                                                                                <i class="bx bx-detail font-medium-5 secondary darken-4 mr-75"></i>
+                                                                                                                                                                                جزئیات
+                                                                                                                                                                                </a>`;
+                    if (data[i].cancelByUser) {
+                        const cancelByUserDescription = "<span style='color:red'>انصراف کاربر</span>";
+                        if ('@((short)StatusEnum.Approved)' == data[i].statusId)
+                            waitingStep = `${data[i].lastStatusDescription}(${cancelByUserDescription})`;
+                        else if ('@((short)StatusEnum.Rejected)' == data[i].statusId)
+                            waitingStep = `${data[i].lastStatusDescription}(${cancelByUserDescription})`;
+                        else
+                            waitingStep = `${data[i].lastStatusDescription}(${cancelByUserDescription})`;
+                    }
+                    else {
+                        if ('@((short)StatusEnum.Approved)' == data[i].statusId)
+                            waitingStep += data[i].lastStatusDescription;
+                        else if ('@((short)StatusEnum.Rejected)' == data[i].statusId)
+                            waitingStep = data[i].lastStatusDescription;
+                        else {
+                            waitingStep = data[i].lastStatusDescription;
+                        }
+                        if (data[i].formUrl != null)
+                            buttonsHtml = `<a href='${data[i].formUrl}' class='dropdown-item change-status'>
+                                                                                                                                        <i class="bx bx-news font-medium-5 secondary darken-4 mr-75"></i>اقدام
+                                                                                                                                        </a>` + buttonsHtml;
+                    }
+
+                    if ('@User.IsInRole(Core.Entities.RoleEnum.AdminBankLeasing.ToString())' == 'True') {
+                        if (data[i].canAdminLeasingSignContract) {
+                            rows += `<td style='text-align:center'><button data-id='${data[i].id}' class="btn white zl-bg-secondary sign-contract">امضاء</button></td>`;
+                        }
+                        else {
+                            rows += `<td style='text-align:center'><button disabled class="btn btn-outline-secondary">امضاء</button></td>`;
+                        }
+                    }
+                    buttonsHtml = buttonsHtml + `<a class="dropdown-item request-history" data-request-facility-id='${data[i].id}' href='javascript:void(0)'>
+                                                                                                                                <i class="bx bx-detail font-medium-5 secondary darken-4 mr-75"></i>
+                                                                                                                                تاریخچه مراحل تسهیلات
+                                                                                                                                </a>`;
+
+                    rows += `<td><div class="badge badge-pill zl-badge-upload-document">
+                                                                                                                                <div class="d-flex align-items-center">
+                                                                                                                                <i class="bx bxs-circle font-size-xxsmall mr-25"></i>${waitingStep}</div>
+                                                                                                                                </div>
+                                                                                                                                </td>`;
+                    rows += `<td>
+                                                                                                                                <div class="btn-group dropright">
+                                                                                                                                    <a href="#" class="dark" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                                                                                                    <i class="bx bx-dots-horizontal"></i>
+                                                                                                                                    </a>
+                                                                                                                                    <div class="dropdown-menu">${buttonsHtml}</div>
+                                                                                                                                    </div>
+                                                                                                                                    </td>`;
+
+                    rows += '</tr>';
+                }
+            }
+            $(`#${tbody_targetId}`).html(rows);
+            $('.request-history').off('click');
+            $('.request-history').click((e) => {
+                debugger;
+                e.preventDefault();
+                loadRequestFacilitySteps($(e.target).data('request-facility-id'));
+                $('#requestFacilityStepsHistoryModal').modal();
+            });
+
+            $("input[type='checkbox'].select-row").off('change');
+            $("input[type='checkbox'].select-row").change((e) => {
+
+                if ($(e.target).is(":checked")) {
+                    if (jQuery.inArray($(e.target).attr("value"), requestFacilityIdArray) === -1)
+                        requestFacilityIdArray.push($(e.target).attr("value"));
+                } else {
+                    requestFacilityIdArray.splice(jQuery.inArray($(e.target).attr("value"), requestFacilityIdArray), 1);
+                    $('#checkAll').prop('checked', false);
+                }
+                debugger;
+            });
+
+            if ('@User.IsInRole(Core.Entities.RoleEnum.AdminBankLeasing.ToString())' == 'True') {
+                $('.sign-contract').off('click');
+                $('.sign-contract').click((e) => {
+                    debugger;
+                    e.preventDefault();
+                    confirmMessage("هشدار",
+                        'آیا برای امضاء قرارداد مطمئن هستید؟'
+                        , icons.warning,
+                        'بله،مطمئنم',
+                        "خیر،مطمئن نیستم",
+                        undefined,
+                        () => {
+                            SelectCertificateFromTokenByUI(function(selectCertificateResult) {
+                                debugger;
+                                if (selectCertificateResult == true) {
+                                    ReadSelectedCertificate(function(readCertificateResult) {
+                                        debugger;
+                                        if (readCertificateResult == true) {
+                                            showWaiting('requestGridDiv', '@_loc["PleaseWait"]', '@_loc["Loading"]');
+                                            data = {
+                                                RequestFacilityId: $(e.target).data('id'),
+                                                SelectedCertificate: selectedCertificate
+                                            };
+                                            $.ajax({
+                                                type: 'post',
+                                                data: JSON.stringify(data),
+                                                datatype: "json",
+                                                contentType: "application/json; charset=utf-8",
+                                                url: `/api/v1/dastine/JustPDFDigestForMultiSign`,
+                                                success: function(result) {
+                                                    hideWaiting('requestGridDiv');
+                                                    debugger;
+                                                    if (result.isSuccess) {
+                                                        digest = result.data;
+                                                        SignMessage(digest, function(signMessageResult) {
+                                                            debugger;
+                                                            if (signMessageResult == true) {
+                                                                //======================
+                                                                const postData = {
+                                                                    RequestFacilityId: $(e.target).data('id'),
+                                                                    SelectedCertificate: selectedCertificate,
+                                                                    Digest: digest,
+                                                                    Signature: signature
+                                                                };
+                                                                $.ajax({
+                                                                    type: 'post',
+                                                                    data: JSON.stringify(postData),
+                                                                    datatype: "json",
+                                                                    contentType: "application/json; charset=utf-8",
+                                                                    url: `/api/v1/dastine/PutPDFSignatureForMultiSign`,
+                                                                    success: function(result) {
+                                                                        hideWaiting('requestGridDiv');
+                                                                        debugger;
+                                                                        if (result.isSuccess) {
+                                                                            const contractLink = `<a href='/UploadFiles/RequestFacilityContract/${result.data}' target='_blank'><b>اینجا<b/></a>`;
+                                                                            showMessage('@_loc["InfoTitle"]', `امضای قرارداد با موفقیت انجام شد<br/>برای مشاهده قرارداد ${contractLink} کلیک کنید!`, icons.success, '@_loc["Close"]');
+                                                                        }
+                                                                    },
+                                                                    error: function(error) {
+                                                                        hideWaiting('requestGridDiv');
+                                                                        const exception = getExceptionMessageFromError(error);
+                                                                        if (exception != null)
+                                                                            showMessage('@_loc["ErrorTitle"]', exception, icons.error, '@_loc["Close"]');
+                                                                        else
+                                                                            showMessage('@_loc["ErrorTitle"]', '@_loc["UnhandledError"]', icons.error, '@_loc["Close"]');
+                                                                    }
+                                                                });
+                                                                //======================
+                                                            }
+                                                        });
+                                                    }
+                                                },
+                                                error: function(error) {
+                                                    hideWaiting('requestGridDiv');
+                                                    const exception = getExceptionMessageFromError(error);
+                                                    if (exception != null)
+                                                        showMessage('@_loc["ErrorTitle"]', exception, icons.error, '@_loc["Close"]');
+                                                    else
+                                                        showMessage('@_loc["ErrorTitle"]', '@_loc["UnhandledError"]', icons.error, '@_loc["Close"]');
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
+                            });
+                        });
+                });
+            }
+        }
+
+        if ('@User.IsInRole(Core.Entities.RoleEnum.AdminBankLeasing.ToString())' == 'True') {
+            const requestFacilitySignatureArray = [];
+            $('#btnSignAllContract').click((e) => {
+                e.preventDefault();
+                confirmMessage("هشدار",
+                    'آیا برای امضاء قرارداد مطمئن هستید؟'
+                    , icons.warning,
+                    'بله،مطمئنم',
+                    "خیر،مطمئن نیستم",
+                    undefined,
+                    () => {
+                        SelectCertificateFromTokenByUI(function(selectCertificateResult) {
+                            if (selectCertificateResult == true) {
+                                ReadSelectedCertificate(function(readCertificateResult) {
+                                    if (readCertificateResult == true) {
+                                        showWaiting('requestGridDiv', '@_loc["PleaseWait"]', '@_loc["Loading"]');
+
+                                        //==============get Request Facility IDs for sign by Bank Admin==============
+                                        $.ajax({
+                                            type: 'post',
+                                            data: '{}',
+                                            datatype: "json",
+                                            async: false,
+                                            cache: false,
+                                            contentType: "application/json; charset=utf-8",
+                                            url: `/api/v1/RequestFacility/GetAllRequestFacilityIdsForSign`,
+                                            success: function(result) {
+                                                if (result.isSuccess && result.data != undefined && result.data.length > 0) {
+                                                    for (let i = 0; i < result.data.length; i++) {
+                                                        requestFacilitySignatureArray.push({
+                                                            RequestFacilityId: result.data[i],
+                                                            SelectedCertificate: selectedCertificate,
+                                                            Digest: null,
+                                                            SignCompleted: false,
+                                                        });
+                                                    }
+                                                }
+                                            },
+                                            error: function(error) {
+                                                const exception = getExceptionMessageFromError(error);
+                                                if (exception != null)
+                                                    showMessage('@_loc["ErrorTitle"]', exception, icons.error, '@_loc["Close"]');
+                                                else
+                                                    showMessage('@_loc["ErrorTitle"]', '@_loc["UnhandledError"]', icons.error, '@_loc["Close"]');
+                                            }
+                                        });
+                                        //==============get Request Facility IDs for sign by Bank Admin==============
+                                        debugger;
+                                        if (requestFacilitySignatureArray.length > 0) {
+                                            signAllPdf();
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                    });
+            });
+
+            let indexArray = 0;
+            const signAllPdf = () => {
+                debugger;
+                if (indexArray < requestFacilitySignatureArray.length) {
+                    //var dataToSign = requestFacilitySignatureArray[indexArray];
+                    data = {
+                        RequestFacilityId: requestFacilitySignatureArray[indexArray].RequestFacilityId,
+                        SelectedCertificate: requestFacilitySignatureArray[indexArray].SelectedCertificate
+                    };
+                    $.ajax({
+                        type: 'post',
+                        data: JSON.stringify(data),
+                        datatype: "json",
+                        async: false,
+                        contentType: "application/json; charset=utf-8",
+                        url: `/api/v1/dastine/JustPDFDigestForMultiSign`,
+                        success: function(result) {
+                            debugger;
+                            if (result.isSuccess) {
+                                requestFacilitySignatureArray[indexArray].Digest = result.data;
+                                SignMessage(requestFacilitySignatureArray[indexArray].Digest, function(signMessageResult) {
+                                    if (signMessageResult == true) {
+                                        //======================
+                                        debugger;
+                                        const postData = {
+                                            RequestFacilityId: requestFacilitySignatureArray[indexArray].RequestFacilityId,
+                                            SelectedCertificate: requestFacilitySignatureArray[indexArray].SelectedCertificate,
+                                            Digest: requestFacilitySignatureArray[indexArray].Digest,
+                                            Signature: signature
+                                        };
+                                        $.ajax({
+                                            type: 'post',
+                                            data: JSON.stringify(postData),
+                                            datatype: "json",
+                                            async: false,
+                                            contentType: "application/json; charset=utf-8",
+                                            url: `/api/v1/dastine/PutPDFSignatureForMultiSign`,
+                                            success: function(result) {
+                                                hideWaiting('requestGridDiv');
+                                                debugger;
+                                                if (result.isSuccess) {
+                                                    requestFacilitySignatureArray[indexArray].SignCompleted = true;
+                                                    if (indexArray == requestFacilitySignatureArray.length - 1) {
+                                                        showMessage('@_loc["InfoTitle"]', `امضای ${requestFacilitySignatureArray.length} قرارداد بصورت گروهی با موفقیت انجام شد!`, icons.success, '@_loc["Close"]');
+                                                    }
+                                                }
+                                                indexArray++;
+                                                signPdf();
+                                            },
+                                            error: function(error) {
+                                                debugger;
+                                                indexArray++;
+                                                hideWaiting('requestGridDiv');
+                                                const exception = getExceptionMessageFromError(error);
+                                                if (exception != null)
+                                                    showMessage('@_loc["ErrorTitle"]', exception, icons.error, '@_loc["Close"]');
+                                                else
+                                                    showMessage('@_loc["ErrorTitle"]', '@_loc["UnhandledError"]', icons.error, '@_loc["Close"]');
+
+                                                signPdf();
+                                            }
+                                        });
+
+                                        //======================
+                                    }
+                                });
+                            }
+                        },
+                        error: function(error) {
+                            hideWaiting('requestGridDiv');
+                            const exception = getExceptionMessageFromError(error);
+                            if (exception != null)
+                                showMessage('@_loc["ErrorTitle"]', exception, icons.error, '@_loc["Close"]');
+                            else
+                                showMessage('@_loc["ErrorTitle"]', '@_loc["UnhandledError"]', icons.error, '@_loc["Close"]');
+                        }
+                    });
+                }
+                else
+                    indexArray = -1;
+            }
+        }
+
+        const resetGridStyle = (parentGridElementId, hdnSortOrderElementId, hdnSortDirectionElementId) => {
+            const sortDirectionValue = $(`#${hdnSortDirectionElementId}`).val();
+            const sortOrderValue = $(`#${hdnSortOrderElementId}`).val();
+
+            $(`#${parentGridElementId} thead th`).removeClass("sorted-column");
+            $(`#${parentGridElementId} thead th`).addClass("not-sorted-column");
+
+            if (sortOrderValue != undefined || sortOrderValue != '') {
+                let sortCell = $(`#${parentGridElementId} *[data-sortorder='${sortOrderValue}']`);
+                $(sortCell).removeClass('not-sorted-column');
+                $(sortCell).addClass('sorted-column');
+
+                if (sortDirectionValue == undefined || sortDirectionValue == '' || sortDirectionValue.toUpperCase() == "DESC") {
+                    $(`#${parentGridElementId}  thead th span`).remove();
+                    //$(sortCell).append("<span class='fa fa-chevron-down' style='color:red;position:absolute;margin-right:3px'></span>");
+                    $(sortCell).append("<span class='fa fa-chevron-down' style='color:red;margin-right:3px'></span>");
+                } else {
+                    $(`#${parentGridElementId}  thead th span`).remove();
+                    //$(sortCell).append("<span class='fa fa-chevron-up' style='color:green;position:absolute;margin-right:3px'></span>");
+                    $(sortCell).append("<span class='fa fa-chevron-up' style='color:green;margin-right:3px'></span>");
+                }
+            }
+        }
+
+        const renderNavigation = (rootElementId, totalRowCount, currentPage, totalPages) => {
+            let pagingHtml = '';
+            if (totalRowCount > PAGE_SIZE) {
+                if (currentPage != 1) {
+                    pagingHtml += '<li class="page-item"><button class="page-link page-link-active" current-page="1">@_loc["First"]</button></li>';
+                    pagingHtml += '<li class="page-item"><button class="page-link page-link-active" current-page="' + (currentPage - 1) + '">@_loc["Prev"]</button></li>';
+                } else {
+                    pagingHtml += '<li class="page-item disabled"><button class="page-link">@_loc["First"]</button></li>';
+                    pagingHtml += '<li class="page-item disabled"><button class="page-link">@_loc["Prev"]</button></li>';
+                }
+
+                let firstPageToDisplay = totalPages <= SHOW_PAGE_COUNT ? 1 : currentPage - parseInt((SHOW_PAGE_COUNT / 2));
+
+                if (firstPageToDisplay < 1) {
+                    firstPageToDisplay = 1;
+                }
+
+                for (var pageNumber = firstPageToDisplay; pageNumber < (firstPageToDisplay + SHOW_PAGE_COUNT); pageNumber++) {
+                    if (pageNumber <= totalPages) {
+                        if (currentPage == pageNumber) {
+                            pagingHtml += '<li class="page-item active">' +
+                                '<button class="page-link page-link-active" current-page="' +
+                                pageNumber +
+                                '">' +
+                                pageNumber +
+                                '<span class="sr-only">(current)</span>' +
+                                '</button>' +
+                                '</li>';
+                        } else {
+                            pagingHtml += '<li class="page-item"><button class="page-link page-link-active" current-page="' + pageNumber + '">' + pageNumber + '</button></li>';
+                        }
+                    } else {
+                        break;
+                    }
+                }
+
+                if (currentPage != totalPages) {
+                    pagingHtml += '<li class="page-item"><button class="page-link page-link-active" current-page="' + (currentPage + 1) + '">@_loc["Next"]</button></li>';
+                    pagingHtml += '<li class="page-item"><button class="page-link page-link-active" current-page="' + totalPages + '">@_loc["Last"]</button></li>';
+                } else {
+                    pagingHtml += '<li class="page-item disabled"><button class="page-link">@_loc["Next"]</button></li>';
+                    pagingHtml += '<li class="page-item disabled"><button class="page-link">@_loc["Last"]</button></li>';
+                }
+            }
+            pagingHtml = '<nav aria-label="Page navigation example" style="text-align:center"><ul class="pagination">' +
+                pagingHtml +
+                '</ul><b style="color:#1e88e5">@_loc["TotalRowCount"] : ' +
+                totalRowCount +
+                '</b></nav>';
+
+            $(`#${rootElementId} .paging-div`).html(pagingHtml);
+            $(`#${rootElementId} .paging-div .page-link-active`).off('click');
+            $(`#${rootElementId} .paging-div .page-link-active`).on('click',
+                function(e) {
+                    e.preventDefault();
+                    switch (rootElementId.toLowerCase()) {
+                        default:
+                            loadLeasingRequest(this);
+                            break;
+                    }
+                });
+        }
+    </script>
+        }

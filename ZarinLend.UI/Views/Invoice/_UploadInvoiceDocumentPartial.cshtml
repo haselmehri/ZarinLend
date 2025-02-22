@@ -1,0 +1,126 @@
+﻿@model Services.Model.Invoice.InvoiceImageUploadModel
+
+<style type="text/css">
+</style>
+
+<form id="frmUploadInvoiceDocument" method="post" enctype="multipart/form-data">
+    <div class="modal fade text-left" id="uploadInvoiceDocumentModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel18" style="display: none;" data-backdrop="static" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-md" role="document">
+            <div class="modal-content rounded-lg modal-md">
+                <div class="modal-header">
+                    <h4 class="modal-title dark" id="myModalLabel18">
+                        بارگذاری تصویر فاکتور
+                    </h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="بستن">
+                        <i class="bx bx-x"></i>
+                    </button>
+                </div>
+                <div class="modal-body line-height-2" id="modalContent">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="control-label" asp-for="Number"></label>
+                                <input asp-for="Number" class="form-control" style="text-align:center;direction:ltr" />
+                                <span asp-validation-for="Number" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="control-label">تصویر فاکتور</label>
+                                <input type="file" asp-for="InvoiceFile" class="form-control" accept="image/*;capture=camera">
+                                <span asp-validation-for="InvoiceFile" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="text-right">
+                        <a href="#" class="btn btn-outline-secondary" data-dismiss="modal">
+                            <span>انصراف</span>
+                        </a>
+                        <button id="btnSave" class="btn btn-outline-success" data-invoice-id="-1">
+                            بارگذاری فاکتور&nbsp;<i class="fal fa-save"></i>
+                        </button>
+                        <button id="btnSaveAndVerifyInvoice" class="btn btn-outline-primary" data-invoice-id="-1">
+                            بارگذاری فاکتور و ارسال جهت تسویه&nbsp;<i class="fal fa-save"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@{
+    await Html.RenderPartialAsync("~/Views/Shared/_ValidationScriptsPartial.cshtml");
+}
+<script on-content-loaded="true">
+    $(document).ready(() => {
+
+    });
+
+    $('#btnSave,#btnSaveAndVerifyInvoice').on('click', (e) => {
+        e.preventDefault();
+        debugger;
+        const formIsValid = $('#frmUploadInvoiceDocument').valid();
+
+        if (formIsValid) {
+            const file = $("#InvoiceFile")[0];
+            if (file.files.length == 0) {
+                showMessage('@ResourceFile.InfoTitle', 'لطفا تصویر فاکتور را بارگذاری کنید', icons.warning, '@ResourceFile.Close');
+                return;
+            }
+
+            showWaiting('modalContent', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+            let data = new FormData();
+            // if (file.files.length > 0) {
+            //     data.append('InvoiceFile', file.files[0]);
+            // }
+            let ajaxUrl = $(e.target).prop("id").toLowerCase() == 'btnsave' ? "/api/v1/Invoice/UploadInvoiceFile" : "/api/v1/Invoice/UploadInvoiceFileAndSendToVerify";
+
+            data.append('Id', $(e.target).data('invoice-id'));
+            data.append('Number', $("#Number").val());
+            data.append('InvoiceFile', file.files[0]);
+
+            $.ajax({
+                type: 'post',
+                //dataType: 'json',
+                //contentType: "application/json; charset=utf-8",
+                //enctype: 'multipart/form-data',
+                contentType: false,
+                processData: false,
+                url: ajaxUrl,
+                //data: JSON.stringify(model),
+                data: data,
+                success: function (result) {
+                    $('#btnSave').data('invoice-id', -1);
+                    $('#btnSaveAndVerifyInvoice').data('invoice-id', -1);
+                    debugger;
+                    if (result.isSuccess) {
+                        dataTableResponsive.page(0);
+                        dataTableResponsive.ajax.reload(null, false);
+                        hideWaiting('modalContent');
+                        showMessage('@ResourceFile.InfoTitle', '@ResourceFile.MessageSuccess', icons.success, '@ResourceFile.Close');
+                        $('#uploadInvoiceDocumentModal').modal('hide');
+                    }
+                    else if (!result.isSuccess) {
+                        showMessage('@ResourceFile.ErrorTitle', result.message, icons.error, '@ResourceFile.Close');
+                    }
+                },
+                error: function (error) {
+                    hideWaiting('modalContent');
+                    const exception = getExceptionMessageFromError(error);
+                    if (exception != null)
+                        showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                    else
+                        showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                }
+            });
+        }
+        else {
+            scrollToFirstError();
+        }
+    });
+</script>

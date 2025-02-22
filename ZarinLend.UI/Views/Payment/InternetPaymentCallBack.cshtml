@@ -1,0 +1,132 @@
+﻿@using Core.Entities.Business.Payment
+@using Services.Model.Payment
+@model InternetPaymentResponseModel
+@{
+    ViewData["Title"] = "نتیحه تراکنش";
+    Layout = "~/Views/Shared/_NewLayout.cshtml";
+    var title = string.Empty;
+    var backListUrl = Url.Action("List", "RequestFacility");
+    var nextStepUrl = string.Empty;
+    var backButtonText = "بازگشت به لیست تسهیلات";
+    if (Model != null)
+    {
+        switch (Model.PaymentType)
+        {
+            case PaymentType.PayValidationFee:
+                title = "نتیجه پرداخت کارمزد";
+                break;
+            case PaymentType.PaySalesCommission:
+                nextStepUrl = Url.Action("SignPromissoryByUser", "RequestFacilityPromissory", new { requestFacilityId = Model.RequestFacilityId });
+                title = "نتیجه پرداخت هزینه عضویت در باشگاه مشتریان";
+                break;
+            case PaymentType.PayValidationFeeByGuarantor:
+                backListUrl = Url.Action("List", "RequestFacilityGuarantor");
+                 backButtonText = "بازگشت به لیست";
+                break;
+            case PaymentType.PayInstallment:
+                title = "نتیجه پرداخت/تسویه اقساط";
+                backButtonText = "بازگشت به لیست اقساط";
+                backListUrl = Url.Action("InstallmentList", "RequestFacilityInstallment");
+                break;
+            case PaymentType.PayForBuyByBuyer:
+                title = "نتیجه پرداخت جهت خرید کالا";
+                backButtonText = "بازگشت";
+                backListUrl = Url.Action("Index", "Home");
+                break;
+            default:
+                title = "نتیجه عملیات پرداخت";
+                break;
+        }
+    }
+}
+@section styles
+    {
+    <style type="text/css">
+    </style>
+}
+@* @if (Model.PaymentType == PaymentType.PayValidationFeeByGuarantor)
+{
+    @await Component.InvokeAsync("WorkFlowStepWizardHorizental", new { workFlow = WorkFlowEnum.RegisterGuarantor, requestId = Model.RequestFacilityGuarantorId });
+}
+else
+{
+    @await Component.InvokeAsync("WorkFlowStepWizardHorizental", new { workFlow = WorkFlowEnum.RequestFacility, requestId = Model.RequestFacilityId });
+} *@
+@if (Model.PaymentType == PaymentType.PaySalesCommission)
+{
+    @await Component.InvokeAsync("WorkFlowStepWizardHorizental", new { workFlow = WorkFlowEnum.RequestFacility, requestId = Model.RequestFacilityId })
+}
+<div class="p-2 bg-white rounded-lg">
+    <div class="d-flex align-items-center">
+        <a href="@backListUrl" class="dark bg-white rounded-lg px-50 py-25 mr-50 d-flex align-items-center" title="بازگشت">
+            <i class="bx bx-arrow-back rotate-180 font-medium-4"></i>
+        </a>
+        <div class="ml-1">
+            <div class="font-medium-3 secondary darken-4 text-bold-700">
+                @title
+            </div>
+        </div>
+    </div>
+    <div class="bg-white p-1 p-md-2 p-lg-3 rounded-lg">
+        @if (Model.IsSuccess)
+        {
+            <div class="d-flex flex-column align-items-center">
+                <i class="bx bxs-check-circle success darken-2 font-large-5"></i>
+                <div class="text-center font-medium-2 success darken-4">
+                    پرداخت شما با موفقیت انجام شد!
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="d-flex flex-column align-items-center">
+                <i class="bx bxs-x-circle danger darken-2 font-large-5"></i>
+                <div class="text-center font-medium-2 danger darken-4 danger">
+                    متاسفانه پرداخت شما ناموفق بود!
+                </div>
+            </div>
+        }
+        <div class="mt-2 py-2 border rounded-lg">
+            <div class="d-flex mx-2 align-items-center justify-content-start">
+                <div class="w-50 font-small-2 text-bold-500">شماره مرجع</div>
+                <div class="w-50 secondary darken-4 text-bold-500" style="overflow-wrap:break-word; text-wrap:balance">
+                    @Model.Ref_Id
+                </div>
+            </div>
+            <hr />
+            <div class="d-flex mx-2 align-items-center justify-content-start">
+                <div class="w-50 font-small-2 text-bold-500">مبلغ</div>
+                <div class="w-50 secondary darken-4 text-bold-500">
+                    @Model.Amount.ToString("N0")
+                    <small class="font-size-xsmall text-muted ml-50">ریال</small>
+                </div>
+            </div>
+            <hr />
+            <div class="d-flex mx-2 align-items-center justify-content-start">
+                <div class="w-50 font-small-2 text-bold-500">شناسه پرداخت</div>
+                <div class="w-50 secondary darken-4 text-bold-500" style="word-wrap: break-word;word-break: break-word;">
+                    @Model.Authority
+                </div>
+            </div>
+            <hr />
+            <div class="d-flex mx-2 align-items-center justify-content-start">
+                <div class="w-50 font-small-2 text-bold-500">شماره کارت</div>
+                <div class="w-50 secondary darken-4 text-bold-500" style="direction:ltr;">
+                    @Model.Card_Pan
+                </div>
+            </div>
+        </div>
+        <hr class="mt-4 mb-1" />
+        <div class="text-right">
+            <a class="btn btn-outline-secondary" href="@backListUrl">
+                <span>@backButtonText</span>
+            </a>
+            @if (Model.PaymentType == PaymentType.PaySalesCommission && Model.IsSuccess)
+            {
+                <a class="btn btn-outline-success" href="@nextStepUrl">
+                    <span>رفتن به مرحله امضای سفته</span>
+                </a>
+            }
+        </div>
+    </div>
+</div>

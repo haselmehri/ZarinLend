@@ -1,0 +1,98 @@
+﻿@model SamatBackChequeHeaderModel
+
+<style type="text/css">
+</style>
+<div class="card-body">
+    @if (Model != null)
+    {
+        <div class="row">
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label class="control-label" asp-for="ShamsiCreatedDate">آخرین بروزرسانی</label>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label disabled class="control-label control-label-value">@Model.ShamsiCreatedDate</label>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label class="control-label" asp-for="CreatorName">دریافت کننده اطلاعات</label>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label disabled class="control-label control-label-value">@Model.CreatorName</label>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label class="control-label">نام و نام خانوادگی</label>
+                </div>
+            </div>
+            <div class="col-md-10">
+                <div class="form-group">
+                    <label disabled class="control-label control-label-value">@Model.Name</label>
+                </div>
+            </div>           
+        </div>
+        <div class="paging-div"></div>
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover table-custom">
+                <thead>
+                    <tr class="table-secondary">
+                        <th scope="col">#</th>
+                        <th scope="col" data-sortorder="date" >تاریخ برگشت چک</th>
+                        <th scope="col" data-sortorder="date" >مبلغ چک(ريال)</th>
+                        <th scope="col" data-sortorder="date" >شماره چک</th>
+                        <th scope="col" data-sortorder="Tedad" >شماره شبا</th>
+                        <th scope="col" data-sortorder="Tedad" >بانک-شعبه</th>
+                        <th scope="col" data-sortorder="Tedad" >تاریخ چک</th>
+                    </tr>
+                </thead>
+                <tbody id="requestGridRows">
+                    @if (Model.BackChequeList != null && Model.BackChequeList.Any())
+                    {
+                        for (int i = 0; i < Model.BackChequeList.Count; i++)
+                        {
+                            <tr class='@(i % 2 == 0 ? "table-info" : "table-light")'>
+                                <td>@(i + 1)</td>
+                                <td>@($"{Model.BackChequeList[i].BackDate.Substring(0, 4)}/{Model.BackChequeList[i].BackDate.Substring(4, 2)}/{Model.BackChequeList[i].BackDate.Substring(6)}")</td>
+                                <td>@Model.BackChequeList[i].Amount.ToString("N0")</td>
+                                <td>@Model.BackChequeList[i].Number</td>
+                                <td>@($"IR{Model.BackChequeList[i].AccountNumber}")</td>
+                                <td>@Model.BackChequeList[i].BranchDescription</td>
+                                <td>@($"{Model.BackChequeList[i].Date.Substring(0, 4)}/{Model.BackChequeList[i].Date.Substring(4, 2)}/{Model.BackChequeList[i].Date.Substring(6)}")</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" >
+                                هیچ چک برگشتی یافت نشد
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    @*<tr class="table-primary" style="font-weight:bold">
+                            <td scope="row"></td>
+                            <td></td>
+                            <td></td>
+                            <td>جمع کل</td>
+                            <td id="Mablagh_Sum"></td>
+                            <td id="DaftariEghtesadi_Sum"></td>
+                        </tr>*@
+                </tfoot>
+            </table>
+        </div>
+        <div class="paging-div"></div>
+    }
+</div>
+<script on-content-loaded="true">
+
+</script>

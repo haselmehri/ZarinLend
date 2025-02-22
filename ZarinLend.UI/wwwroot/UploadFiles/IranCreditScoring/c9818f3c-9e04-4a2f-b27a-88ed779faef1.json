@@ -1,0 +1,393 @@
+{
+  "reportTypes": [
+    "Base",
+    "Standard",
+    "Score"
+  ],
+  "score": {
+    "personInformation": {
+      "name": "الناز",
+      "nationalCode": "0013612034",
+      "address": "رضويه امام سجاد م شقايق پ190و7",
+      "contacts": [
+        {
+          "title": "تلفن ثابت",
+          "value": " 021033246307 "
+        },
+        {
+          "title": "تلفن ثابت",
+          "value": " - "
+        }
+      ],
+      "hasBlockedContract": false,
+      "dateOfBirth": "1370/05/04",
+      "family": "محمدي اميرآباد",
+      "fatherName": "-",
+      "maritalStatus": "مجرد",
+      "placeOfBirth": "تهران",
+      "sex": "زن",
+      "companyType": null,
+      "registrationNumber": null,
+      "percent": 0
+    },
+    "scoreCodes": [
+      {
+        "code": "AGE2",
+        "description": "گروه سنی جوان"
+      }
+    ],
+    "score": 672,
+    "description": " ریسک خیلی کم",
+    "risk": "A2",
+    "inquiryCreatedDate": "1402/07/18 16:44:51",
+    "perviouScoreDate": "1400/06/31",
+    "perviouScore": true
+  },
+  "report": {
+    "personInformation": {
+      "name": "الناز",
+      "nationalCode": "0013612034",
+      "address": "رضويه امام سجاد م شقايق پ190و7",
+      "contacts": [
+        {
+          "title": "تلفن ثابت",
+          "value": " 021033246307 "
+        },
+        {
+          "title": "تلفن ثابت",
+          "value": " - "
+        }
+      ],
+      "hasBlockedContract": false,
+      "dateOfBirth": "1370/05/04",
+      "family": "محمدي اميرآباد",
+      "fatherName": "-",
+      "maritalStatus": "مجرد",
+      "placeOfBirth": "تهران",
+      "sex": "زن",
+      "companyType": null,
+      "registrationNumber": null
+    },
+    "inquiryStats": [
+      {
+        "organizationType": "بانک مرکزی",
+        "organizationTypeCode": "0102533",
+        "lastMonthInquiryCount": 0,
+        "lastYearInquiryCount": 0,
+        "personNegativeStatusCount": 0,
+        "contractNegativeStatusCount": 0
+      },
+      {
+        "organizationType": "بانک ها و موسسات اعتباری",
+        "organizationTypeCode": "010333",
+        "lastMonthInquiryCount": 0,
+        "lastYearInquiryCount": 0,
+        "personNegativeStatusCount": 0,
+        "contractNegativeStatusCount": 0
+      },
+      {
+        "organizationType": "تلکام/سازمان هاي خدماتی",
+        "organizationTypeCode": "0108933",
+        "lastMonthInquiryCount": 0,
+        "lastYearInquiryCount": 0,
+        "personNegativeStatusCount": 0,
+        "contractNegativeStatusCount": 0
+      },
+      {
+        "organizationType": "سازمان های خرده فروشی",
+        "organizationTypeCode": "0106633",
+        "lastMonthInquiryCount": 0,
+        "lastYearInquiryCount": 0,
+        "personNegativeStatusCount": 0,
+        "contractNegativeStatusCount": 0
+      },
+      {
+        "organizationType": "سازمان های عمومی/دولتی",
+        "organizationTypeCode": "01010233",
+        "lastMonthInquiryCount": 0,
+        "lastYearInquiryCount": 0,
+        "personNegativeStatusCount": 0,
+        "contractNegativeStatusCount": 0
+      },
+      {
+        "organizationType": "سازمان های قضايی",
+        "organizationTypeCode": "01012233",
+        "lastMonthInquiryCount": 0,
+        "lastYearInquiryCount": 0,
+        "personNegativeStatusCount": 0,
+        "contractNegativeStatusCount": 0
+      },
+      {
+        "organizationType": "مصرف کنندگان",
+        "organizationTypeCode": "01010033",
+        "lastMonthInquiryCount": 0,
+        "lastYearInquiryCount": 0,
+        "personNegativeStatusCount": 0,
+        "contractNegativeStatusCount": 0
+      },
+      {
+        "organizationType": "موسسات اعتباري غير متشکل",
+        "organizationTypeCode": "0103033",
+        "lastMonthInquiryCount": 0,
+        "lastYearInquiryCount": 0,
+        "personNegativeStatusCount": 0,
+        "contractNegativeStatusCount": 0
+      },
+      {
+        "organizationType": "موسسات صادر کننده کارت اعتباری",
+        "organizationTypeCode": "0104433",
+        "lastMonthInquiryCount": 0,
+        "lastYearInquiryCount": 0,
+        "personNegativeStatusCount": 0,
+        "contractNegativeStatusCount": 0
+      }
+    ],
+    "personRoles": [
+      {
+        "title": "متقاضی اصلی",
+        "numberOfContracts": 0,
+        "code": "0101333"
+      },
+      {
+        "title": "ضامن",
+        "numberOfContracts": 0,
+        "code": "0109433"
+      }
+    ],
+    "summaryInformationRelatedToContracts": [
+      {
+        "organizationName": "بانک صادرات",
+        "organizationNameCode": "020971",
+        "currency": "ریال",
+        "currencyCode": "0102933",
+        "inProgressContractsCount": 0,
+        "terminatedContractsCount": 2,
+        "outstandingAmount": 0.0,
+        "overdueAmount": 0.0,
+        "typeOfFinancing": "تسهیلات",
+        "typeOfFinancingCode": "01010533",
+        "roleType": 0,
+        "totalAmount": 0.0,
+        "organizationId": 0
+      },
+      {
+        "organizationName": "بانک قرض الحسنه رسالت",
+        "organizationNameCode": "0207371",
+        "currency": "ریال",
+        "currencyCode": "0102933",
+        "inProgressContractsCount": 0,
+        "terminatedContractsCount": 1,
+        "outstandingAmount": 0.0,
+        "overdueAmount": 0.0,
+        "typeOfFinancing": "تسهیلات",
+        "typeOfFinancingCode": "01010533",
+        "roleType": 0,
+        "totalAmount": 0.0,
+        "organizationId": 0
+      }
+    ],
+    "summaryInformationRelatedToContractsSum": [
+      {
+        "currency": "ریال",
+        "currencyCode": "0102933",
+        "outstandingAmount": 0.0,
+        "overdueAmount": 0.0,
+        "inProgressContractsCount": 0,
+        "terminatedContractsCount": 3,
+        "totalAmount": 0.0
+      }
+    ],
+    "directContracts": [
+      {
+        "contractId": 0,
+        "organizationName": "بانک صادرات",
+        "organizationNameCode": "010933",
+        "organizationType": "بانک ها و موسسات اعتباری",
+        "organizationTypeCode": "010333",
+        "contractNumber": "02526252696051732958",
+        "contractCurrency": "ریال",
+        "contractCurrencyCode": "0102933",
+        "installmentsCurrency": "ریال",
+        "installmentsCurrencyCode": "0102933",
+        "customerRoleTilte": "متقاضی اصلی",
+        "customerRole": 13,
+        "customerRoleCode": "0101333",
+        "expectedEndDate": "1400/06/22",
+        "instalmentAmount": 2083333.0,
+        "paymentMethod": "پرداخت مستقیم (نقدی)",
+        "paymentMethodCode": "0102733",
+        "negativeContractStatus": "فاقد وضعیت منفی",
+        "negativeContractStatusCode": "0104033",
+        "outstandingAmount": 0.0,
+        "overdueAmount": 0.0,
+        "paymentPeriodicity": "ماهانه",
+        "paymentPeriodicityCode": "0105633",
+        "phaseOfOperationTitle": "خاتمه یافته عادی طبق قرارداد",
+        "phaseOfOperation": 112,
+        "phaseOfOperationCode": "01011233",
+        "purposeOfTheCredit": "ایجاد",
+        "purposeOfTheCreditCode": "0102033",
+        "accountingDate": "1400/06/31",
+        "startDate": "1396/06/22",
+        "totalAmount": 100000000.0,
+        "typeOfFinancingTitle": "قرض الحسنه",
+        "typeOfFinancing": 105,
+        "typeOfFinancingCode": "01010533",
+        "typeofInstallments": "اقساط ثابت",
+        "typeofInstallmentsCode": "0105733",
+        "realEndDate": "1400/06/31",
+        "totalNumberOfInstallments": 48,
+        "totalNumberOfOverdue": 0,
+        "totalNumberOfOutstanding": 0,
+        "guarantees": [
+          {
+            "value": 110000960.0,
+            "type": "سایر",
+            "typeCode": null,
+            "currency": "ریال",
+            "currencyCode": null
+          }
+        ],
+        "relatedPersons": [
+          {
+            "customerRole": "ضامن",
+            "customerRoleCode": "0109433",
+            "nationalCode": "2722238578"
+          }
+        ],
+        "repayments": [],
+        "contractStartDateIsTransactionType": false
+      },
+      {
+        "contractId": 0,
+        "organizationName": "بانک صادرات",
+        "organizationNameCode": "010933",
+        "organizationType": "بانک ها و موسسات اعتباری",
+        "organizationTypeCode": "010333",
+        "contractNumber": "0252696051732958",
+        "contractCurrency": "ریال",
+        "contractCurrencyCode": "0102933",
+        "installmentsCurrency": "ریال",
+        "installmentsCurrencyCode": "0102933",
+        "customerRoleTilte": "متقاضی اصلی",
+        "customerRole": 13,
+        "customerRoleCode": "0101333",
+        "expectedEndDate": "1400/06/22",
+        "instalmentAmount": 2083333.0,
+        "paymentMethod": "پرداخت مستقیم (نقدی)",
+        "paymentMethodCode": "0102733",
+        "negativeContractStatus": "فاقد وضعیت منفی",
+        "negativeContractStatusCode": "0104033",
+        "outstandingAmount": 0.0,
+        "overdueAmount": 0.0,
+        "paymentPeriodicity": "ماهانه",
+        "paymentPeriodicityCode": "0105633",
+        "phaseOfOperationTitle": "خاتمه یافته عادی طبق قرارداد",
+        "phaseOfOperation": 112,
+        "phaseOfOperationCode": "01011233",
+        "purposeOfTheCredit": "ایجاد",
+        "purposeOfTheCreditCode": "0102033",
+        "accountingDate": "1398/05/30",
+        "startDate": "1396/06/22",
+        "totalAmount": 100000000.0,
+        "typeOfFinancingTitle": "قرض الحسنه",
+        "typeOfFinancing": 105,
+        "typeOfFinancingCode": "01010533",
+        "typeofInstallments": "اقساط ثابت",
+        "typeofInstallmentsCode": "0105733",
+        "realEndDate": "1398/04/31",
+        "totalNumberOfInstallments": 48,
+        "totalNumberOfOverdue": 0,
+        "totalNumberOfOutstanding": null,
+        "guarantees": [
+          {
+            "value": 110000960.0,
+            "type": "سایر",
+            "typeCode": null,
+            "currency": "ریال",
+            "currencyCode": null
+          }
+        ],
+        "relatedPersons": [
+          {
+            "customerRole": "ضامن",
+            "customerRoleCode": "0109433",
+            "nationalCode": "2722238578"
+          }
+        ],
+        "repayments": [],
+        "contractStartDateIsTransactionType": false
+      },
+      {
+        "contractId": 0,
+        "organizationName": "بانک قرض الحسنه رسالت",
+        "organizationNameCode": "0107333",
+        "organizationType": "بانک ها و موسسات اعتباری",
+        "organizationTypeCode": "010333",
+        "contractNumber": "10-110-6338224-1",
+        "contractCurrency": "ریال",
+        "contractCurrencyCode": "0102933",
+        "installmentsCurrency": "ریال",
+        "installmentsCurrencyCode": "0102933",
+        "customerRoleTilte": "متقاضی اصلی",
+        "customerRole": 13,
+        "customerRoleCode": "0101333",
+        "expectedEndDate": "1398/12/25",
+        "instalmentAmount": 15000000.0,
+        "paymentMethod": "پرداخت مستقیم (نقدی)",
+        "paymentMethodCode": "0102733",
+        "negativeContractStatus": "فاقد وضعیت منفی",
+        "negativeContractStatusCode": "0104033",
+        "outstandingAmount": 0.0,
+        "overdueAmount": 0.0,
+        "paymentPeriodicity": "ماهانه",
+        "paymentPeriodicityCode": "0105633",
+        "phaseOfOperationTitle": "خاتمه یافته عادی طبق قرارداد",
+        "phaseOfOperation": 112,
+        "phaseOfOperationCode": "01011233",
+        "purposeOfTheCredit": "سایر",
+        "purposeOfTheCreditCode": "0107933",
+        "accountingDate": "1399/06/31",
+        "startDate": "1397/02/25",
+        "totalAmount": 300000000.0,
+        "typeOfFinancingTitle": "قرض الحسنه",
+        "typeOfFinancing": 105,
+        "typeOfFinancingCode": "01010533",
+        "typeofInstallments": "اقساط ثابت",
+        "typeofInstallmentsCode": "0105733",
+        "realEndDate": "1399/02/09",
+        "totalNumberOfInstallments": 22,
+        "totalNumberOfOverdue": 0,
+        "totalNumberOfOutstanding": null,
+        "guarantees": [],
+        "relatedPersons": [],
+        "repayments": [],
+        "contractStartDateIsTransactionType": false
+      }
+    ],
+    "indirectContracts": [],
+    "contractNegativeStatus": [],
+    "personNegativeStatus": [
+      {
+        "organizationName": "بانک صادرات",
+        "organizationNameCode": "010933",
+        "organizationType": "بانک ها و موسسات اعتباری",
+        "organizationTypeCode": "010333",
+        "date": "1400/06/31",
+        "state": "فاقد وضعیت منفی",
+        "stateCode": "01015633"
+      },
+      {
+        "organizationName": "بانک قرض الحسنه رسالت",
+        "organizationNameCode": "0107333",
+        "organizationType": "بانک ها و موسسات اعتباری",
+        "organizationTypeCode": "010333",
+        "date": "1399/06/31",
+        "state": "فاقد وضعیت منفی",
+        "stateCode": "01015633"
+      }
+    ],
+    "inquiryCreatedDate": "1402/07/18 16:44:51",
+    "reportUniqueId": "9000 8000 4000 0442 1109"
+  }
+}

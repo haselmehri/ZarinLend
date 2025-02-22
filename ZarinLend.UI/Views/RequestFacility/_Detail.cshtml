@@ -1,0 +1,174 @@
+﻿@model RequestFacilityInfoModel
+
+<div class="accordion" id="accordionRequestFacility">
+    <div class="card">
+        <div class="card-header btn btn-info ex-card-header" id="headingPersonInfo">
+            <h2 class="mb-0">
+                @*<i class="fa fa-align-justify" aria-hidden="true"></i>*@
+                <button class="btn btn-link ex-btn-link" type="button" data-toggle="collapse" data-target="#collapsePersonInfo" aria-expanded="true" aria-controls="collapsePersonInfo">
+                    <svg class="bi bi-list" width="1em" height="1em" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" d="M4.5 13.5A.5.5 0 015 13h10a.5.5 0 010 1H5a.5.5 0 01-.5-.5zm0-4A.5.5 0 015 9h10a.5.5 0 010 1H5a.5.5 0 01-.5-.5zm0-4A.5.5 0 015 5h10a.5.5 0 010 1H5a.5.5 0 01-.5-.5z" clip-rule="evenodd"></path>
+                    </svg>
+                    <span >
+                        PersonInfo
+                    </span>
+                </button>
+                @*<label class="date-update">تاریخ بروزرسانی : @Model.CustomerInfoDateUpdate</label>*@
+            </h2>
+        </div>
+        <div id="collapsePersonInfo" class="collapse show" aria-labelledby="headingPersonInfo" data-parent="#accordionRequestFacility">
+            @await Component.InvokeAsync("UserIdentityInfo", new { userIdentityInfo = @Model.UserIdentityInfo })
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header btn btn-info ex-card-header" id="headingRequestFacility">
+            <h2 class="mb-0">
+                @*<i class="fa fa-align-justify" aria-hidden="true"></i>*@
+                <button class="btn btn-link ex-btn-link" type="button" data-toggle="collapse" data-target="#collapseRequestFacility" aria-expanded="true" aria-controls="collapseRequestFacility">
+                    <svg class="bi bi-list" width="1em" height="1em" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" d="M4.5 13.5A.5.5 0 015 13h10a.5.5 0 010 1H5a.5.5 0 01-.5-.5zm0-4A.5.5 0 015 9h10a.5.5 0 010 1H5a.5.5 0 01-.5-.5zm0-4A.5.5 0 015 5h10a.5.5 0 010 1H5a.5.5 0 01-.5-.5z" clip-rule="evenodd"></path>
+                    </svg>
+                    جزئیات درخواست تسهیلات
+                </button>
+                @*<label class="date-update">تاریخ بروزرسانی : @Model.CustomerInfoDateUpdate</label>*@
+            </h2>
+        </div>
+        <div id="collapseRequestFacility" class="collapse show" aria-labelledby="headingRequestFacility" data-parent="#accordionRequestFacility">
+            @await Component.InvokeAsync("RequestFacilityDetail", new { requestFacilityDetail = @Model.RequestFacilityDetail })
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header btn btn-info ex-card-header" id="headingPersonIdentityDocuments">
+            <h2 class="mb-0">
+                @*<i class="fa fa-align-justify" aria-hidden="true"></i>*@
+                <button class="btn btn-link ex-btn-link" type="button" data-toggle="collapse" data-target="#collapsePersonIdentityDocuments" aria-expanded="true" aria-controls="collapsePersonIdentityDocuments">
+                    <svg class="bi bi-list" width="1em" height="1em" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" d="M4.5 13.5A.5.5 0 015 13h10a.5.5 0 010 1H5a.5.5 0 01-.5-.5zm0-4A.5.5 0 015 9h10a.5.5 0 010 1H5a.5.5 0 01-.5-.5zm0-4A.5.5 0 015 5h10a.5.5 0 010 1H5a.5.5 0 01-.5-.5z" clip-rule="evenodd"></path>
+                    </svg>
+                    مدارک هویتی
+                </button>
+                @*<label class="date-update">تاریخ بروزرسانی : @Model.CustomerInfoDateUpdate</label>*@
+            </h2>
+        </div>
+        <div id="collapsePersonIdentityDocuments" class="collapse show" aria-labelledby="headingPersonIdentityDocuments" data-parent="#accordionRequestFacility">
+            @await Component.InvokeAsync("UserIdentityDocuments", new { userIdentitydocuments = @Model.BuyerIdentityDocuments })
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header btn btn-info ex-card-header" id="headingIranCreditScoringResult">
+            <h2 class="mb-0">
+                @*<i class="fa fa-align-justify" aria-hidden="true"></i>*@
+                <button class="btn btn-link ex-btn-link" type="button" data-toggle="collapse" data-target="#collapseIranCreditScoringResult" aria-expanded="true" aria-controls="collapseIranCreditScoringResult">
+                    <svg class="bi bi-list" width="1em" height="1em" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" d="M4.5 13.5A.5.5 0 015 13h10a.5.5 0 010 1H5a.5.5 0 01-.5-.5zm0-4A.5.5 0 015 9h10a.5.5 0 010 1H5a.5.5 0 01-.5-.5zm0-4A.5.5 0 015 5h10a.5.5 0 010 1H5a.5.5 0 01-.5-.5z" clip-rule="evenodd"></path>
+                    </svg>
+                    امتیاز و ریسک
+                </button>
+                @*<label class="date-update">تاریخ بروزرسانی : @Model.CustomerInfoDateUpdate</label>*@
+            </h2>
+        </div>
+        <div id="collapseIranCreditScoringResult" class="collapse show" aria-labelledby="headingIranCreditScoringResult" data-parent="#accordionRequestFacility">
+            @await Component.InvokeAsync("UserIranCreditScoringHistory", new { userId = @Model.UserId })
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header btn btn-info ex-card-header" id="headingSamatFacilityResult">
+            <h2 class="mb-0">
+                @*<i class="fa fa-align-justify" aria-hidden="true"></i>*@
+                <button class="btn btn-link ex-btn-link" type="button" data-toggle="collapse" data-target="#collapseSamatFacilityResult" aria-expanded="true" aria-controls="collapseSamatFacilityResult">
+                    <svg class="bi bi-list" width="1em" height="1em" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" d="M4.5 13.5A.5.5 0 015 13h10a.5.5 0 010 1H5a.5.5 0 01-.5-.5zm0-4A.5.5 0 015 9h10a.5.5 0 010 1H5a.5.5 0 01-.5-.5zm0-4A.5.5 0 015 5h10a.5.5 0 010 1H5a.5.5 0 01-.5-.5z" clip-rule="evenodd"></path>
+                    </svg>
+                    تسهیلات فعال(سمات)
+                </button>
+                @*<label class="date-update">تاریخ بروزرسانی : @Model.CustomerInfoDateUpdate</label>*@
+            </h2>
+        </div>
+        <div id="collapseSamatFacilityResult" class="collapse show" aria-labelledby="headingSamatFacilityResult" data-parent="#accordionRequestFacility">
+            @await Component.InvokeAsync("UserActiveFacilities", new { requestFacilityId = @Model.Id })
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header btn btn-info ex-card-header" id="headingUserBackCheques">
+            <h2 class="mb-0">
+                @*<i class="fa fa-align-justify" aria-hidden="true"></i>*@
+                <button class="btn btn-link ex-btn-link" type="button" data-toggle="collapse" data-target="#collapseUserBackCheques" aria-expanded="true" aria-controls="collapseUserBackCheques">
+                    <svg class="bi bi-list" width="1em" height="1em" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" d="M4.5 13.5A.5.5 0 015 13h10a.5.5 0 010 1H5a.5.5 0 01-.5-.5zm0-4A.5.5 0 015 9h10a.5.5 0 010 1H5a.5.5 0 01-.5-.5zm0-4A.5.5 0 015 5h10a.5.5 0 010 1H5a.5.5 0 01-.5-.5z" clip-rule="evenodd"></path>
+                    </svg>
+                    اطلاعات چکهای برگشتی
+                </button>
+                @*<label class="date-update">تاریخ بروزرسانی : @Model.CustomerInfoDateUpdate</label>*@
+            </h2>
+        </div>
+        <div id="collapseUserBackCheques" class="collapse show" aria-labelledby="headingUserBackCheques" data-parent="#accordionRequestFacility">
+            @await Component.InvokeAsync("UserBackCheques", new { requestFacilityId = @Model.Id })
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header btn btn-info ex-card-header" id="headingRequestFacilityWarranty">
+            <h2 class="mb-0">
+                @*<i class="fa fa-align-justify" aria-hidden="true"></i>*@
+                <button class="btn btn-link ex-btn-link" type="button" data-toggle="collapse" data-target="#collapseRequestFacilityWarranty" aria-expanded="true"
+                        aria-controls="collapseRequestFacilityWarranty">
+                    <svg class="bi bi-list" width="1em" height="1em" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" d="M4.5 13.5A.5.5 0 015 13h10a.5.5 0 010 1H5a.5.5 0 01-.5-.5zm0-4A.5.5 0 015 9h10a.5.5 0 010 1H5a.5.5 0 01-.5-.5zm0-4A.5.5 0 015 5h10a.5.5 0 010 1H5a.5.5 0 01-.5-.5z" clip-rule="evenodd"></path>
+                    </svg>
+                    چک(ها)-تضامین
+                </button>
+                @*<label class="date-update">تاریخ بروزرسانی : @Model.CustomerInfoDateUpdate</label>*@
+            </h2>
+        </div>
+        <div id="collapseRequestFacilityWarranty" class="collapse show" aria-labelledby="headingRequestFacilityWarranty" data-parent="#accordionRequestFacility">
+            @await Component.InvokeAsync("RequestFacilityWarranty", new { userId = @Model.UserId, requestFacilityId = @Model.Id })
+        </div>
+    </div>
+    @if (Model.LeasingId.HasValue)
+    {
+        <div class="card">
+            <div class="card-header btn btn-info ex-card-header" id="headingApplicantValidationResult">
+                <h2 class="mb-0">
+                    @*<i class="fa fa-align-justify" aria-hidden="true"></i>*@
+                    <button class="btn btn-link ex-btn-link" type="button" data-toggle="collapse" data-target="#collapseApplicantValidationResult" aria-expanded="true"
+                        aria-controls="collapseApplicantValidationResult">
+                        <svg class="bi bi-list" width="1em" height="1em" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd" d="M4.5 13.5A.5.5 0 015 13h10a.5.5 0 010 1H5a.5.5 0 01-.5-.5zm0-4A.5.5 0 015 9h10a.5.5 0 010 1H5a.5.5 0 01-.5-.5zm0-4A.5.5 0 015 5h10a.5.5 0 010 1H5a.5.5 0 01-.5-.5z" clip-rule="evenodd"></path>
+                        </svg>
+                        نتیجه استعلام های 8 گانه بانک
+                    </button>
+                    @*<label class="date-update">تاریخ بروزرسانی : @Model.CustomerInfoDateUpdate</label>*@
+                </h2>
+            </div>
+            <div id="collapseApplicantValidationResult" class="collapse show" aria-labelledby="headingApplicantValidationResult" data-parent="#accordionRequestFacility">
+                @await Component.InvokeAsync("ApplicantValidationResult", new {  requestFacilityId = @Model.Id ,leasingId = @Model.LeasingId})
+            </div>
+        </div>
+        @if (Model.CardIssuanceModel != null || !string.IsNullOrEmpty(Model.RequestFacilityDetail.FacilityNumber) ||
+       !string.IsNullOrEmpty(Model.RequestFacilityDetail.PoliceNumber) || !string.IsNullOrEmpty(Model.RequestFacilityDetail.SignedContractByBankFileName))
+        {
+            <div class="card">
+                <div class="card-header btn btn-info ex-card-header" id="headingFacilityDetail">
+                    <h2 class="mb-0">
+                        @*<i class="fa fa-align-justify" aria-hidden="true"></i>*@
+                        <button class="btn btn-link ex-btn-link" type="button" data-toggle="collapse" data-target="#collapseFacilityDetail" aria-expanded="true"
+                        aria-controls="collapseFacilityDetail">
+                            <svg class="bi bi-list" width="1em" height="1em" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M4.5 13.5A.5.5 0 015 13h10a.5.5 0 010 1H5a.5.5 0 01-.5-.5zm0-4A.5.5 0 015 9h10a.5.5 0 010 1H5a.5.5 0 01-.5-.5zm0-4A.5.5 0 015 5h10a.5.5 0 010 1H5a.5.5 0 01-.5-.5z" clip-rule="evenodd"></path>
+                            </svg>
+                            شماره تسهیلات-شماره انتظامی-اطلاعات بن کارت
+                        </button>
+                        @*<label class="date-update">تاریخ بروزرسانی : @Model.CustomerInfoDateUpdate</label>*@
+                    </h2>
+                </div>
+                <div id="collapseFacilityDetail" class="collapse show" aria-labelledby="headingFacilityDetail" data-parent="#accordionRequestFacility">
+                    @await Component.InvokeAsync("CardIssuanceDetail",new {
+                        cardIssuance = @Model.CardIssuanceModel ,
+                        signedContractByBankFileName = Model.RequestFacilityDetail.SignedContractByBankFileName,
+                        policeNumber = Model.RequestFacilityDetail.PoliceNumber,
+                        facilityNumber = Model.RequestFacilityDetail.FacilityNumber
+                    })
+                </div>
+            </div>
+        }
+    }
+</div>

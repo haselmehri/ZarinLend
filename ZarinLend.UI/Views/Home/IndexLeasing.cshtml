@@ -1,0 +1,383 @@
+﻿@{
+    ViewData["Title"] = ViewBag.Title;
+    Layout = "~/Views/Shared/_NewLayout.cshtml";
+    var ajaxUrl = "/api/v1/RequestFacility/GetAllLeasingRequest";
+    //if (User.IsInRole(Core.Entities.RoleEnum.AdminBankLeasing.ToString()))
+    //    ajaxUrl = "/api/v1/RequestFacility/GetAllAdminLeasingRequest";
+}
+@section styles
+    {
+    <style type="text/css">
+        .d-flex.align-items-center.h-100 {
+            color: gold !important;
+        }
+    </style>
+}
+@section scripts
+    {
+    <script>
+        let dataTableResponsive;
+        $(() => {
+            debugger;
+            $('div').removeClass('zl-active');
+            $('#myDashboard').addClass('zl-active');
+            loadLeasingRequest();
+        });
+
+        const loadLeasingRequest = () => {
+            dataTableResponsive = $('#requestList')
+                .on('preXhr.dt', function (e, settings, data, a, b) {
+                    //trigger before ajax call
+                    //debugger;
+                    //alert('preXhr');
+                    showWaiting('requestList', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                })
+                .on('xhr.dt', function (e, settings, json, xhr) {
+                    //trigger after ajax call
+                    //debugger;
+                    //alert('xhr');
+                })
+                .DataTable({
+                    order: [],
+                    processing: true,
+                    serverSide: true,
+                    responsive: true,
+                    rowReorder: false,
+                    select: true,
+                    searching: false,
+                    paging: true,
+                    ordering: false,
+                    searching: false,
+                    filtering: false,
+                    info: true,
+                    lengthMenu: [
+                        [5, 10, 25, 50],
+                        [5, 10, 25, 50]
+                    ],
+                    pageLength: 5,
+                    //columnDefs: [{
+                    //    targets: 0,
+                    //    Id: function (td, cellData, rowData, row, col) {
+                    //        debugger;
+                    //        if (rowData[5] === 'Inactive') {
+                    //            $(td).css('color', 'red');
+                    //        }
+                    //    }
+                    //}],
+                    columnDefs: [
+                        {
+                            details: false,
+                            breakpoints: [
+                                { name: 'desktop', width: Infinity },
+                                { name: 'tablet-l', width: 1200 },
+                                { name: 'tablet-p', width: 992 },
+                                { name: 'mobile-l', width: 576 },
+                                { name: 'mobile-p', width: 320 }
+                            ]
+                        },
+                        {
+                            targets: [0, 1, 2, 3, 4, 5, 6, 7, 8],
+                            className: 'dt-center',
+                        },
+                        {
+                            targets: 1,
+                            render: function (data, type, row, meta) {
+                                return splitNumber(data);
+                            }
+                        },
+                        {
+                            targets: 7,
+                            render: function (data, type, row, meta) {
+                                let waitingStep = '';
+                                if (data.cancelByUser) {
+                                    const cancelByUserDescription = "<span style='color:red'>انصراف توسط کاربر</span>";
+                                    if ('@((short)StatusEnum.Approved)' == data.statusId)
+                                        waitingStep = `${data.lastStatusDescription}(${cancelByUserDescription})`;
+                                    else if ('@((short)StatusEnum.Rejected)' == data.statusId)
+                                        waitingStep = `${data.lastStatusDescription}(${cancelByUserDescription})`;
+                                    else
+                                        waitingStep = `${data.lastStatusDescription}(${cancelByUserDescription})`;
+                                }
+                                else {
+                                    if ('@((short)StatusEnum.Approved)' == data.statusId)
+                                        waitingStep += data.lastStatusDescription;
+                                    else if ('@((short)StatusEnum.Rejected)' == data.statusId)
+                                        waitingStep = data.lastStatusDescription;
+                                    else {
+                                        waitingStep = data.lastStatusDescription;
+                                    }
+                                }
+                                return `<div class="badge badge-pill zl-badge-upload-document"><div class="d-flex align-items-center"><i class="bx bxs-circle font-size-xxsmall mr-25"></i>${waitingStep}</div></div>`;
+                            }
+                        },
+                        {
+                            targets: 8,
+                            responsivePriority: 3,
+                            data: { aa: 'bb' },
+                            render: function (data, type, row, meta) {
+                                let buttonsHtml = `<a class="dropdown-item change-status" href='@Url.Action("Detail","RequestFacility")/${data.id}'><i class="bx bx-detail font-medium-5 secondary darken-4 mr-75"></i>جزئیات</a>`;
+
+                                if (!data.cancelByUser) {
+                                    if (data.formUrl != null)
+                                        buttonsHtml = `<a href='${data.formUrl}' class='dropdown-item change-status'><i class="bx bx-news font-medium-5 secondary darken-4 mr-75"></i>اقدام</a>` + buttonsHtml;
+                                }
+                                buttonsHtml = buttonsHtml + `<a id='requestHistory' class="dropdown-item request-history" data-request-facility-id='${data.id}' href='javascript:void(0)'><i class="bx bx-detail font-medium-5 secondary darken-4 mr-75"></i>تاریخچه مراحل تسهیلات</a>`;
+
+                                return `<div class="btn-group dropright"><a href="#" class="dark" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="bx bx-dots-horizontal"></i></a><div class="dropdown-menu">${buttonsHtml}</div></div>`;
+                            }
+                        }],
+                    rowCallback: function (row, data) {
+                        //$('td:eq(0)', row).css('text-align', 'center');
+                        //$('td', row).eq(1).css('color', 'red');
+                    },
+                    //ajax: {
+                    //    url: `/api/v1/RequestFacilityInstallment/SelectInstallment2/${$('#drpApprovalFacility').val()}`,
+                    //    type: 'POST',
+                    //    dataSrc: function(data) {
+                    //        data.recordsTotal = data.data.length;
+                    //        data.recordsFiltered = data.data.length;
+                    //        return data.data;
+                    //    },
+                    //    datatype: "json",
+                    //    //contentType: "application/json",
+                    //    contentType: "application/json; charset=utf-8",
+                    //    data: function(input) {
+                    //        debugger;
+                    //        //if ($('#FacilityTypeId').val() != '')
+                    //        //    input.FacilityTypeId = $('#FacilityTypeId').val();
+
+                    //        return JSON.stringify(input);
+                    //    },
+                    //},
+                    ajax: (data, callback, setting) => {
+                        getLeasingRequestFacilities(data).then(function (_data) {
+                            callback(_data);
+                        });
+                    },
+                    drawCallback: function (settings) {
+                        hideWaiting('requestList');
+                    },
+                    initComplete: function (settings, json) {
+                    },
+                    rowCallback: (row, data, displayNum, displayIndex, dataIndex) => {
+                        $('td:eq(0)', row).html(displayIndex + 1);
+                        return row;
+                    },
+                    columns: [
+                        { "data": null },
+                        { "data": "amount" },
+                        { "data": "monthCountTitle" },
+                        { "data": "requester" },
+                        { "data": "nationalCode" },
+                        { "data": "shamsiCreateDate" },
+                        { "data": "shamsiLastActionDate" },
+                        { "data": null },
+                        { "data": null }
+                    ],
+                    language: {
+                        url: '/new-layout/datatables.net/fa.json'
+                    }
+                });
+
+            const getLeasingRequestFacilities = (data) => {
+                const postData = {
+                    Page: Math.floor(data.start / data.length) + 1,
+                    PageSize: data.length,
+                    SortDirection: null,
+                    SortOrder: null,
+                    FilterList: []
+                };
+
+                postData.FilterList.push({
+                    PropertyName: 'FacilityStatus',
+                    Operator: @((int)Operator.Equal),
+                    PropertyValue: @((int)FacilityStatus.WaitingRequest)
+                });
+
+                if ('@User.IsInRole(RoleEnum.BankLeasing.ToString())' == 'True') {
+                    postData.FilterList.push({
+                        PropertyName: 'OperatorId',
+                        Operator: @((int)Operator.Equal),
+                        PropertyValue: '@User.Identity!.GetUserId()'
+                    });
+                }
+
+                return new Promise(function (resolve, reject) {
+                    console.log('Loading data');
+
+                    $.ajax({
+                        type: 'post',
+                        datatype: "json",
+                        data: JSON.stringify(postData),
+                        contentType: "application/json; charset=utf-8",
+                        url: `@ajaxUrl`,
+                        success: function (result) {
+                            if (result != undefined && result.isSuccess == true) {
+                                resolve({
+                                    data: result.data.data,
+                                    recordsTotal: result.data.totalRowCount,
+                                    recordsFiltered: result.data.totalRowCount
+                                });
+                            }
+                        },
+                        error: function (error) {
+                            debugger;
+                            const exception = getExceptionMessageFromError(error);
+                            if (exception != null)
+                                showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                            else
+                                showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                        },
+                        complete: function () {
+
+                        },
+                    });
+                });
+            }
+
+            $('#requestList tbody').on('click', 'a#requestHistory', function (e) {
+                e.preventDefault();
+                let data = dataTableResponsive.row(this).data();
+                if (data == undefined)
+                    data = dataTableResponsive.row($(this).parents('tr')).data();
+                loadRequestFacilitySteps(data.id);
+                $('#requestFacilityStepsHistoryModal').modal();
+            });
+        }
+    </script>
+}
+<div class="row">
+    <div class="col-sm-6 col-md-5 col-lg-4 mx-auto">
+        <div class="rounded-lg bg-white">
+            <div class="d-flex flex-column p-1">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div class="font-medium-1 w-50 text-nowrap text-bold-700 secondary darken-4">
+                        مشتری جدید
+                    </div>
+                    <div class="w-50">
+                        <select name="" class="form-control">
+                            <option value="1">این هفته</option>
+                            <option value="2">این ماه</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="mt-2">
+                    <div class="card shadow-none">
+                        <div class="card-content">
+                            <img class="card-img img-fluid"
+                                 src="~/new-layout/images/test.png"
+                                 alt="Card image" />
+                            <div class="card-img-overlay d-flex justify-content-between flex-column">
+                                <div class="overlay-content h-100">
+                                    <div class="d-flex align-items-center h-100">
+                                        <div class="font-large-25 text-bold-800">0</div>
+                                        <span class="font-medium-2 mt-75 ml-50 fo">نفر</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-md-5 col-lg-4 mt-1 mt-sm-0 mx-auto">
+        <div class="rounded-lg bg-white">
+            <div class="d-flex flex-column p-1">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div class="font-medium-1 w-50 text-nowrap text-bold-700 secondary darken-4">
+                        مشتری جاری
+                    </div>
+                    <div class="w-50">
+                        <select name="" class="form-control">
+                            <option value="1">این هفته</option>
+                            <option value="2">این ماه</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="mt-2">
+                    <div class="card shadow-none">
+                        <div class="card-content">
+                            <img class="card-img img-fluid"
+                                 src="~/new-layout/images/test.png"
+                                 alt="Card image" />
+                            <div class="card-img-overlay d-flex justify-content-between flex-column">
+                                <div class="overlay-content h-100">
+                                    <div class="d-flex align-items-center h-100">
+                                        <div class="font-large-25 text-bold-800">0</div>
+                                        <span class="font-medium-2 mt-75 ml-50 fo">نفر</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-md-5 col-lg-4 mt-1 mt-lg-0 mx-auto">
+        <div class="rounded-lg bg-white">
+            <div class="d-flex flex-column p-1">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div class="font-medium-1 w-50 text-nowrap text-bold-700 secondary darken-4">
+                        مشتری پایان یافته
+                    </div>
+                    <div class="w-50">
+                        <select name="" class="form-control">
+                            <option value="1">این هفته</option>
+                            <option value="2">این ماه</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="mt-2">
+                    <div class="card shadow-none">
+                        <div class="card-content">
+                            <img class="card-img img-fluid"
+                                 src="~/new-layout/images/test.png"
+                                 alt="Card image" />
+                            <div class="card-img-overlay d-flex justify-content-between flex-column">
+                                <div class="overlay-content h-100">
+                                    <div class="d-flex  align-items-center h-100">
+                                        <div class="font-large-25 text-bold-800">0</div>
+                                        <span class="font-medium-2 mt-75 ml-50 fo">نفر</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12 mt-1">
+        <div class="rounded-lg bg-white p-1 pt-2">
+            <div class="d-flex align-items-center justify-content-between">
+                <div class="font-medium-1 secondary darken-4 text-bold-700">
+                    درخواست های اخیر
+                </div>
+                <div>
+                    <a href="@Url.Action("SearchLeasingRequest","RequestFacility")" class="rounded dark border px-1 py-50">مشاهده همه</a>
+                </div>
+            </div>
+            <div class="mt-2">
+                <table id="requestList" class="display" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th >اعتبار درخواستی(ريال)</th>
+                            <th >بازه پرداخت</th>
+                            <th >درخواست کننده</th>
+                            <th >کد ملی/شناسه ملی</th>
+                            <th >تاریخ درخواست</th>
+                            <th >تاریخ آخرین اقدام</th>
+                            <th >وضعیت</th>
+                            <th >اقدام</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

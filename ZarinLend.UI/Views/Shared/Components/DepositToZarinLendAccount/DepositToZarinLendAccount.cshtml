@@ -1,0 +1,86 @@
+﻿@model RequestFacilityDepositDocumentModel
+
+<style type="text/css">
+</style>
+
+@if (Model != null)
+{
+    <div id="depoistRow" style="display:none">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label class="control-label" asp-for="DepositDate"></label>
+                    <fieldset class="form-group position-relative has-icon-left">
+                        <input class="form-control bg-transparent shamsi-datepicker" id="txtDepositDate" maxlength="10" style="text-align:center;direction:ltr" autocomplete="off"
+                               name="txtDepositDate" type="text" />
+                        <div class="form-control-position">
+                            <i class="bx bx-calendar"></i>
+                        </div>
+                    </fieldset>
+                    <input asp-for="DepositDate" type="hidden" />
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label class="control-label" asp-for="DepositDocumentNumber"></label>
+                    <input asp-for="DepositDocumentNumber" class="form-control" style="text-align:center;direction:ltr" />
+                    <span asp-validation-for="DepositDocumentNumber" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label class="control-label" asp-for="DepositDocumentFileName"></label>
+                    <input type="file" name="file" id="file" class="form-control" accept="image/*;capture=camera">
+                </div>
+            </div>
+            <div class="col-md-8"></div>
+        </div>
+    </div>
+
+    <script on-content-loaded="true">
+        // document.addEventListener("DOMContentLoaded", (event) => {
+        $(() => {            
+            debugger;
+            $('#DepositDate').val('@Model.DepositDate');
+            $('#txtDepositDate').val('@Model.ShamsiDepositDate');
+            $("#txtDepositDate").persianDatepicker(
+                {
+                    months: ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"],
+                    dowTitle: ["شنبه", "یکشنبه", "دوشنبه", "سه شنبه", "چهارشنبه", "پنج شنبه", "جمعه"],
+                    shortDowTitle: ["ش", "ی", "د", "س", "چ", "پ", "ج"],
+                    theme: 'lightorang',
+                    showGregorianDate: !1,
+                    persianNumbers: !0,
+                    formatDate: "YYYY/0M/0D",
+                    selectedBefore: !1,
+                    selectedDate: '@(string.IsNullOrEmpty(Model.ShamsiDepositDate) ? DateTime.Now.GregorianToShamsi() : Model.ShamsiDepositDate)',
+                    //selectedDate: '1401/10/30',
+                    prevArrow: '\u25c4',
+                    nextArrow: '\u25ba',
+                    alwaysShow: !1,
+                    selectableYears: null,
+                    selectableMonths: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                    cellWidth: 50, // by px
+                    cellHeight: 40, // by px
+                    fontSize: 17, // by px
+                    isRTL: !1,
+                    calendarPosition: {
+                        x: 0,
+                        y: 0,
+                    },
+                    onSelect: function () {
+                        //alert($("#txtBirthDate").attr("data-gdate"));
+                        $('#DepositDate').val($("#txtDepositDate").attr("data-gdate"));
+                    },
+                    onShow: function () { },
+                    onHide: function () { },
+                    onRender: function () { }
+                });
+        });
+        //});
+    </script>
+}

@@ -1,0 +1,16 @@
+{
+  "version": "1.0",
+  "defaultProvider": "cdnjs",
+  "libraries": [
+    {
+      "provider": "unpkg",
+      "library": "jalali-moment@3.3.9",
+      "destination": "wwwroot/lib/jalali-moment/"
+    },
+    {
+      "provider": "cdnjs",
+      "library": "pdf.js@4.10.38",
+      "destination": "wwwroot/Vendor/pdf.js/"
+    }
+  ]
+}

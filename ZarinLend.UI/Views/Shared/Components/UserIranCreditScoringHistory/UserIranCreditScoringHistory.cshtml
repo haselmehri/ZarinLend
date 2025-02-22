@@ -1,0 +1,148 @@
+﻿@model Services.Model.IranCreditScoring.IranCreditScoringModel
+@{
+    Layout = null;
+}
+<style type="text/css">
+</style>
+<div class="p-2 bg-white rounded-lg">
+    @if (Model != null)
+    {
+        <div class="text-bold-900 secondary darken-4 font-medium-3">
+            اعتبار سنجی
+        </div>
+        <div class="mt-2 px-0 px-sm-5 px-lg-0" id="canvas-holder" style="width: 100%">
+            <canvas id="iranCreditScoreChart" class="mx-auto"></canvas>
+        </div>
+        <div class="border rounded mt-1">
+            <div class="d-flex align-items-center p-1">
+                <span class="w-50 text-bold-500 font-small-2">امتیاز</span><span class="w-50 text-bold-700 secondary darken-4 font-medium-1">@(Model.Score.HasValue ? Model.Score.Value.ToString() : "-")</span>
+            </div>
+            <hr class="my-0" />
+            <div class="d-flex align-items-center p-1">
+                <span class="w-50 text-bold-500 font-small-2">کد امتیاز</span><span class="w-50 text-bold-400 secondary darken-4 font-medium-1">@(!string.IsNullOrEmpty(Model.Description) ? $"{Model.Description} - {(!string.IsNullOrEmpty(Model.Risk) ? Model.Risk : "-")}" : "-")</span>
+            </div>
+            <hr class="my-0" />
+            <div class="d-flex align-items-center p-1">
+                <span class="w-50 text-bold-500 font-small-2">تاریخ اعتبارسنجی</span><span class="w-50 text-bold-400 secondary darken-4 font-medium-1">@Model.ShamsiCreateDate</span>
+            </div>
+            @*            <hr class="my-0" />
+        <div class="d-flex align-items-center p-2">
+        <span class="w-50 text-bold-500 font-small-2">توضیحات</span><span class="w-50 text-bold-400 secondary darken-4 font-medium-1">@(!string.IsNullOrEmpty(Model.Description) ? Model.Description : "-")</span>
+        </div>*@
+            @if (ViewBag.ShowFileLinks)
+            {
+                <hr class="my-0" />
+                <div class="p-1">
+                    <div class="row">
+                        <div class="col-md-6" style="text-align:center;margin-top:5px">
+                            <a class="btn btn-outline-info" style="min-width:260px" href="@Model.PdfUrl" target="_blank">مشاهده/دانلود نتیحه اعتبارسنجی(PDF)</a>
+                        </div>
+                        @if (User.IsInRole(RoleEnum.Admin.ToString()) || User.IsInRole(RoleEnum.SuperAdmin.ToString()))
+                        {
+                            <div class="col-md-6" style="text-align:center;margin-top:5px">
+                                <a class="btn btn-outline-success" style="min-width:260px" href="@Model.JsonUrl" target="_blank">مشاهده/دانلود نتیحه اعتبارسنجی(JSON)</a>
+                            </div>
+                            @*  <div class="col-md-12 p-1" style="text-align:center">
+                <a class="btn btn-outline-primary" style="min-width:280px" href="@Model.XmlUrl" target="_blank">مشاهده/دانلود نتیحه اعتبارسنجی(XML)</a>
+                </div> *@
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="text-bold-900 secondary darken-4 font-medium-3">
+            اعتبار سنجی
+        </div>
+        <div class="d-flex flex-column mt-4 mb-2">
+            <img src="/new-layout/images/no-docs-img.svg" class="height-100" />
+            <div class="font-small-3 text-muted text-center mt-3">
+                هیچ اطلاعاتی وجود ندارد
+            </div>
+        </div>
+    }
+</div>
+@*<div class="card-body">
+    @if (Model != null)
+    {
+        <div class="row">
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label class="control-label" asp-for="ShamsiCreateDate">تاریخ استعلام</label>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label disabled class="control-label control-label-value">@Model.ShamsiCreateDate</label>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label class="control-label" asp-for="Score">امتیاز</label>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label style="font-weight:bold;font-size:13pt" class="control-label control-label-value">@(Model.Score.HasValue ? Model.Score.Value.ToString() : "-")</label>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label class="control-label" asp-for="Risk">وضعیت ریسک</label>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label style="font-weight:bold;font-size:13pt" class="control-label control-label-value">@(!string.IsNullOrEmpty(Model.Risk) ? Model.Risk : "-")</label>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label class="control-label" asp-for="Description">توضیحات</label>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label style="font-weight:bold;font-size:13pt" class="control-label control-label-value">@(!string.IsNullOrEmpty(Model.Description) ? Model.Description : "-")</label>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4" style="text-align:center">
+                <a class="btn btn-outline-info" href="@Model.PdfUrl" target="_blank">مشاهده/دانلود نتیحه اعتبارسنجی(فایل PDF)</a>
+            </div>
+            @if (User.IsInRole(RoleEnum.Admin.ToString()) || User.IsInRole(RoleEnum.SuperAdmin.ToString()))
+            {
+                <div class="col-md-4" style="text-align:center">
+                    <a class="btn btn-outline-success" href="@Model.JsonUrl" target="_blank">مشاهده/دانلود نتیحه اعتبارسنجی(فایل JSON)</a>
+                </div>
+                <div class="col-md-4" style="text-align:center">
+                    <a class="btn btn-outline-primary" href="@Model.XmlUrl" target="_blank">مشاهده/دانلود نتیحه اعتبارسنجی(فایل XML)</a>
+                </div>
+            }
+        </div>
+    }
+</div>*@
+
+@if (Model != null && Model.Score.HasValue)
+{
+    <text>
+        @* <script src="~/js/jquery.min.js"></script> *@
+        <script src="~/new-layout/chart/chart.min.js"></script>
+        <script src="~/new-layout/chart/chartjs-gauge.js"></script>
+        <script on-content-loaded="true">
+            //document.addEventListener("DOMContentLoaded", (event) => {               
+                $(() => {
+                    var ctx = document.getElementById("iranCreditScoreChart").getContext("2d");
+                    gaugeChartConfig.data.datasets[0].value = @Model.Score.Value;
+                    window.myGauge = new Chart(ctx, gaugeChartConfig);
+                });
+            //});
+          
+        </script>
+    </text>
+}

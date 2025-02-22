@@ -1,0 +1,28 @@
+﻿@model List<string>
+@{
+    ViewData["Title"] = "Notify Page";
+}
+
+<h1>Send Push Notifications</h1>
+@if (Model == null || Model.Count() == 0)
+{
+    <b><p style="color:red">There are no active subscribers</p></b>
+}
+else
+{
+    <form asp-action="Notify">
+        <label for="message">Message: </label>
+        <input id="message" name="message" /><br />
+        @foreach (string client in Model)
+        {
+            <input type="radio" id="@(client)_identifier" name="client" value="@client">
+            <label for="@(client)_identifier">@client</label>
+
+            <br>
+        }
+        <button type="submit">Push</button>
+    </form>
+}
+@section Scripts {
+
+}

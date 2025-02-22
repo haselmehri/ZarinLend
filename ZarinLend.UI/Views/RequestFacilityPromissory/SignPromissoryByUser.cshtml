@@ -1,0 +1,163 @@
+﻿@model RequestFacilityPromissoryModel
+@{
+    ViewData["Title"] = "امضای سفته";
+    Layout = "~/Views/Shared/_NewLayout.cshtml";
+}
+@section styles {
+    <link rel="stylesheet" type="text/css" href="~/new-layout/css/dropzone.min.css" />
+    <link rel="stylesheet" type="text/css" href="~/new-layout/css/dropzone.custom.css" />
+    <style type="text/css">
+
+    </style>
+}
+
+@await Component.InvokeAsync("WorkFlowStepWizardHorizental", new { workFlow = WorkFlowEnum.RequestFacility, requestId = Model.RequestFacilityId })
+<div id="promissoryContentDiv">
+    <div class="p-2 bg-white rounded-lg">
+        <div class="d-flex align-items-center">
+            <a href="@Url.Action("List","RequestFacility")" class="dark bg-white rounded-lg px-50 py-25 mr-50 d-flex align-items-center" title="بازگشت">
+                <i class="bx bx-arrow-back rotate-180 font-medium-4"></i>
+            </a>
+            <div class="ml-1">
+                <div class="font-medium-3 secondary darken-4 text-bold-700">
+                    امضای سفته
+                </div>
+            </div>
+        </div>
+        <div class="bg-white p-1 p-md-2 p-lg-3 rounded-lg">
+            <div class="alert zl-bg-alert-warning border-warning border-accent-4 alert-dismissible" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="بستن">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <div class="d-flex">
+                    <i class="bx bx-error-circle font-large-1"></i>
+                    <div class="text-muted text-bold-400 font-small-3">
+                        کاربر گرامی جهت انجام عملیات امضا سفته و قرارداد لازم می باشد نرم افزار آینده ساین را روی تلفن همراه اندرویدی خود از آدرس <a href="https://pki.co.ir/download/mkeyone/AyandehSign.apk">https://pki.co.ir/download/mkeyone/AyandehSign.apk</a> دنلود و نصب نمایید.
+                        پس از نصب نرم افزار آینده ساین و انجام عملیات احراز هویت باید از گزینه "مدیریت گواهی" نسبت به دریافت گواهی امضا اقدام نمایید.
+                        پس از دریافت گواهی امضا به همین صفحه برگشته و روی گزینه "ارسال درخواست امضای سفته" کلیک نمایید
+                    </div>
+                </div>
+            </div>
+            <div class="row" style="margin-right:7px;margin-left:7px">
+                <div class="col-sm-12">
+                    <div class="form-group">
+                        <button id="btnDownloadPromissoryPdf" type="button" class="btn btn-outline-info">مشاهده/دانلود پیش نویس سفته(فایل PDF)</button>
+                        <input type="hidden" asp-for="UnSignedPdf" />
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div style="text-align:center" class="form-group justify-content-center">
+                        <embed src="data:application/pdf;base64,@Model.UnSignedPdf" type="application/pdf" style="width:600px;height:400px" />
+                    </div>
+                </div>
+                @*    <div class="col-sm-12">
+                <object src="data:application/pdf;base64,@Model.UnSignedPdf" type="application/pdf" style="max-width:100%;max-height:500pt"></object>
+                </div> *@
+            </div>
+            <hr class="mt-4 mb-1" />
+            <div class="text-right">
+                <a class="btn btn-outline-secondary" asp-controller="RequestFacility" asp-action="List">
+                    <span>بازگشت</span>
+                </a>
+                @if (ViewBag.IsInWaitingSignPromissoryByUserStep)
+                {
+                    <button id="btnSendSignRequest" class="btn btn-zl-primary white">
+                        ارسال مجدد درخواست امضای سفته&nbsp;<i class="fal fa-key"></i>
+                    </button>
+                    <a href="https://pki.co.ir/download/mkeyone/AyandehSign.apk" class="btn btn-zl-primary white">دانلود نرم افزار آینده ساین</a>
+                    <button id="btnPromissoryFinalize" class="btn btn-outline-success">
+                        امضای سفته را انجام دادم&nbsp;<i class="fal fa-sign"></i>
+                    </button>
+                }
+                else
+                {
+                    <a href="https://pki.co.ir/download/mkeyone/AyandehSign.apk" class="btn btn-zl-primary white">دانلود نرم افزار آینده ساین</a>
+                    <button id="btnSendSignRequest" class="btn btn-zl-primary white">
+                        ارسال درخواست امضای سفته&nbsp;<i class="fal fa-key"></i>
+                    </button>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts {
+    @*<partia name="_ValidationScriptsPartial" />*@
+    @{
+        await Html.RenderPartialAsync("~/Views/Shared/_ValidationScriptsPartial.cshtml");
+    }
+    <script>
+        $(document).ready(function () {
+
+        });
+
+        $('#btnDownloadPromissoryPdf').click(function (e) {
+            e.preventDefault();
+            const downloadLink = document.createElement("a");
+            downloadLink.href = `data:application/pdf;base64,${$("#UnSignedPdf").val()}`;
+            downloadLink.download = "promissory.pdf";
+            downloadLink.click();
+        });
+
+        $('#btnPromissoryFinalize').click(function (e) {
+            e.preventDefault();
+            debugger;
+
+            showWaiting('promissoryContentDiv', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+
+            $.ajax({
+                type: 'post',
+                dataType: 'json',
+                contentType: "application/json; charset=utf-8",
+                url: `/api/v1/RequestFacilityPromissory/PromissoryFinalize/${@Model.RequestFacilityId}`,
+                //data JSON.stringify(model),
+                success: function (result) {
+                    hideWaiting('promissoryContentDiv');
+                    debugger;
+                    if (result.isSuccess) {
+                        showMessage('@ResourceFile.InfoTitle', 'کاربر گرامی<br/>صدور سفته نهایی شد،لطفا در مرحله بعد اقدام به امضای قرارداد درخواست تسهیلات نمایید!', icons.success, '@ResourceFile.Close',
+                            () => { window.location.replace('@Url.Action("List", "RequestFacility")'); });
+                    }
+                },
+                error: function (error) {
+                    hideWaiting('promissoryContentDiv');
+                    const exception = getExceptionMessageFromError(error);
+                    if (exception != null)
+                        showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                    else
+                        showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                }
+            });
+        });
+
+        $('#btnSendSignRequest').click(function (e) {
+            e.preventDefault();
+            debugger;
+
+            showWaiting('promissoryContentDiv', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+
+            $.ajax({
+                type: 'post',
+                dataType: 'json',
+                contentType: "application/json; charset=utf-8",
+                url: `/api/v1/RequestFacilityPromissory/SendSignRequest/${@Model.RequestFacilityId}`,
+                //data JSON.stringify(model),
+                success: function (result) {
+                    hideWaiting('promissoryContentDiv');
+                    debugger;
+                    if (result.isSuccess) {
+                        showMessage('@ResourceFile.InfoTitle', 'کاربر گرامی<br/>درخواست امضا سفته به برنامه آینده ساین ارسال گردید، لطفا پس از امضا در برنامه آینده ساین به پنل ما برگشته و کلید امضا کردم را انتخاب نمایید تا به مرحله امضا قرارداد منتقل گردید.', icons.success, '@ResourceFile.Close',
+                            () => { window.location.replace('@Url.Action("List", "RequestFacility")'); });
+                    }
+                },
+                error: function (error) {
+                    hideWaiting('promissoryContentDiv');
+                    const exception = getExceptionMessageFromError(error);
+                    if (exception != null)
+                        showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                    else
+                        showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                }
+            });
+        });
+    </script>
+}

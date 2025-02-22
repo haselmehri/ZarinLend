@@ -1,0 +1,201 @@
+﻿@model RequestFacilityInfoModel
+@{
+    ViewData["Title"] = ViewBag.Title;
+    Layout = "~/Views/Shared/_NewLayoutWithoutRightMenu.cshtml";
+    var ajaxUrl = string.Empty;
+    var requestList = string.Empty;
+    if (User.IsInRole(RoleEnum.Admin.ToString()) || User.IsInRole(RoleEnum.SuperAdmin.ToString()))
+        requestList = Url.Action("SearchRequest", "RequestFacility");
+    else if (User.IsInRole(RoleEnum.AdminBankLeasing.ToString()) || User.IsInRole(RoleEnum.BankLeasing.ToString()))
+        requestList = Url.Action("SearchLeasingRequest", "RequestFacility");
+    if (User.IsInRole(RoleEnum.Buyer.ToString()))
+        requestList = Url.Action("List", "RequestFacility");
+}
+@section styles
+{
+    <link href="~/css/sizes.css" rel="stylesheet" />
+    <style type="text/css">
+    </style>
+}
+@section responsiveMenu
+    {
+    <div class="collapse navbar-collapse d-lg-flex justify-content-between align-items-center" id="navbarNav">
+        <ul class="navbar-nav d-flex d-lg-none mt-1 mt-lg-0">
+            <li class="nav-item">
+                <a class="nav-link dark text-bold-500" href='@Url.Action("Index", "Home")'>
+                    <span class="d-flex align-items-center">
+                        <i class="bx bx-dashboard font-medium-5 mr-1"></i>داشبورد من
+                    </span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link dark text-bold-500" href="@requestList">
+                    <span class="d-flex align-items-center">
+                        <i class="bx bx-book-content font-medium-5 mr-1"></i>درخواست های من
+                    </span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link dark text-bold-500" href="#">
+                    <span class="d-flex align-items-center">
+                        <i class="bx bx-wallet-alt font-medium-5 mr-1"></i>اقساط من
+                    </span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link dark text-bold-500"
+                   href="@Url.Action("UploadIdentityDocuments", "User")">
+                    <span class="d-flex align-items-center">
+                        <i class="bx bx-cloud-upload font-medium-5 mr-1"></i>بارگذاری مدارک
+                    </span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link dark text-bold-500" href="@Url.Action("Edit", "User")">
+                    <span class="d-flex align-items-center">
+                        <i class="bx bxs-user-detail font-medium-5 mr-1"></i>اطلاعات کاربری من
+                    </span>
+                </a>
+            </li>
+            <li class="navigation-header border-top"></li>
+            <li class="nav-item">
+                <a class="nav-link dark text-bold-500" href="@Url.Action("Logout","Account")">
+                    <span class="d-flex align-items-center">
+                        <i class="bx bx-log-out font-medium-5 mr-1"></i>خروج از حساب کاربری
+                    </span>
+                </a>
+            </li>
+        </ul>
+        <ul class="navbar-nav d-none d-lg-flex">
+            <li class="nav-item mr-1">
+                <a class="nav-link" href="#"><i class="bx bx-bell font-medium-5"></i></a>
+            </li>
+            <li class="nav-item mr-1">
+                <a class="nav-link" href="#"><i class="bx bx-user font-medium-5" style="color:green"></i></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="@Url.Action("Logout","Account")"><i class="bx bx-log-out font-medium-5" style="color:red"></i></a>
+            </li>
+        </ul>
+    </div>
+}
+<div class="col-12">
+    <div class="d-flex align-items-center">
+        <a asp-controller="requestfacility" asp-action="List" class="dark bg-white rounded-lg px-50 py-25 mr-50 d-flex align-items-center" title="بازگشت">
+            <i class="bx bx-arrow-back rotate-180 font-medium-4"></i>
+        </a>
+        <div class="d-flex flex-column mx-1">
+            <div class="font-medium-3 zl-text-primary text-bold-800">
+                @Model.RequestFacilityDetail.Amount.ToString("N0") <small class="font-small-3">ريال</small>
+            </div>
+            @if (Model.RequestFacilityDetail.LeasingName != null && Model.RequestFacilityDetail.LeasingNationalId.HasValue)
+            {
+                <span class="text-muted font-small-75 text-bold-500">@Model.RequestFacilityDetail.LeasingName</span>
+            }
+        </div>
+        <div class="badge badge-pill badge-light-info">
+            <div class="d-flex align-items-center">
+                <i class="bx bxs-circle font-size-xxsmall mr-25"></i>
+                @Model.LastStatusDescription
+                @if (Model.RequestFacilityDetail.CancelByUser)
+                {
+                    <span style='color:red'>(انصراف توسط کاربر)</span>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-12 d-lg-none mt-1">
+    @await Component.InvokeAsync("WorkFlowStepWizardHorizental", new { workFlow = WorkFlowEnum.RequestFacility, requestId = Model.Id })
+</div>
+<div class="col-12">
+    <div class="row">
+        <div class="col-lg-9">
+            <div class="row">
+                <div id="collapseRequestFacility" class="col-12 mt-2">
+                    @await Component.InvokeAsync("RequestFacilityDetail", new { requestFacilityDetail = @Model.RequestFacilityDetail })
+                </div>
+                <div id="collapsePersonInfo" class="col-12 mt-2">
+                    @await Component.InvokeAsync("UserIdentityInfo", new { userIdentityInfo = @Model.UserIdentityInfo })
+                </div>
+                @*<div id="collapsePersonJobInfo" class="col-12 mt-2">
+                @await Component.InvokeAsync("PersonJobInfo", new { personId = @Model.UserIdentityInfo.PersonId })
+                </div>*@
+                <div class="col-12 ">
+                    <div class="row pb-2">
+                        <div class="col-lg-6">
+                            @await Component.InvokeAsync("CardIssuanceDetail", new
+                                {
+                                    cardIssuance = @Model.CardIssuanceModel,
+                                    signedContractByBankFileName = Model.RequestFacilityDetail.SignedContractByBankFileName,
+                                    policeNumber = Model.RequestFacilityDetail.PoliceNumber,
+                                    facilityNumber = Model.RequestFacilityDetail.FacilityNumber,
+                                    
+                                })
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="mt-2 p-2 bg-white rounded-lg h-100">
+                                @await Component.InvokeAsync("UserIranCreditScoringHistory", new { userId = @Model.UserId })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="mt-2 p-2 bg-white rounded-lg">
+                        <div class="text-bold-900 secondary darken-4 font-medium-3">
+                            مدارک و فایل ها
+                        </div>
+                        <div class="d-flex flex-column mt-1 mb-1">
+                            @await Component.InvokeAsync("RequestFacilityPromissory", new { userId = @Model.UserId, requestFacilityId = @Model.Id })
+                            @if (Model.RequestFacilityDetail.SignedContractByBankFileName != null || Model.RequestFacilityDetail.SignedContractByUserFileName != null)
+                            {
+                                <div class="border rounded p-75">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div class="d-flex align-items-center">
+                                            <i class="bx bx-paperclip rotate-45 font-large-1 dark"></i>
+                                            <div class="font-small-3 text-bold-700 secondary darken-4 ml-75">
+                                                قرارداد
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center">
+                                            <a href="~/UploadFiles/RequestFacilityContract/@(!string.IsNullOrEmpty(Model.RequestFacilityDetail.SignedContractByBankFileName) ? Model.RequestFacilityDetail.SignedContractByBankFileName : Model.RequestFacilityDetail.SignedContractByUserFileName)">
+                                                <i class="bx bx-download dark font-medium-5 mr-2"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="border rounded p-75">
+                                    <div class="d-flex flex-column mt-1 mb-1">
+                                        <img src="/new-layout/images/no-docs-img.svg" class="height-100" />
+                                        <div class="font-small-3 text-muted text-center mt-3">
+                                            قرارداد هنوز امضاء نشده است!
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3">
+            @await Component.InvokeAsync("WorkFlowStepWizardVertical", new { workFlow = WorkFlowEnum.RequestFacility, requestFacilityId = Model.Id })
+        </div>
+    </div>
+</div>
+@section scripts {
+    @*<partia name="_ValidationScriptsPartial" />*@
+    @{
+        await Html.RenderPartialAsync("~/Views/Shared/_ValidationScriptsPartial.cshtml");
+    }
+    <script src="~/new-layout/chart/chart.min.js"></script>
+    <script src="~/new-layout/chart/chartjs-gauge.js"></script>
+    <script>
+        $(document).ready(function () {
+
+        });
+    </script>
+}

@@ -1,0 +1,701 @@
+﻿@model UserAddEditModelByAdmin
+@{
+    ViewData["Title"] = Model.IsEditMode ? "ویرایش کاربر" : "ثبت کاربر جدید";
+    Layout = "~/Views/Shared/_NewLayout.cshtml";
+    var apiUrl = Model.IsEditMode ? "/api/v1/User/EditUser" : "/api/v1/User/AddUser";
+}
+@section styles
+{
+    <link href="~/persianDatePicker/css/persianDatepicker-lightorang.css" rel="stylesheet" />
+    <style type="text/css">
+        textarea {
+            height: 80px !important;
+        }
+
+        @@media (min-width:768px) {
+            .username-info {
+                margin-top: 40px;
+            }
+        }
+    </style>
+}
+
+<div id="contentDiv" class="p-2 bg-white rounded-lg">
+    <div class="font-medium-3 secondary darken-4 text-bold-800 d-flex align-items-center">
+        <i class="bx bx-user zl-text-secondary mr-25"></i>
+        <span>@(Model.IsEditMode ? "ویرایش کاربر" : "ثبت کاربر جدید")</span>
+    </div>
+    <form id="frmAddEditUser" class="mt-2" method="post">
+        <div class="font-medium-1 secondary darken-4 text-bold-800 d-flex align-items-center mb-1">
+            <i class="bx bx-info-circle zl-text-secondary mr-25"></i>
+            <span>اطلاعات هویتی</span>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <input asp-for="FName" class="form-control bg-transparent" placeholder="نام" />
+                    <span asp-validation-for="FName" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <input asp-for="LName" class="form-control bg-transparent" placeholder="نام خانوادگی" />
+                    <span asp-validation-for="LName" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <input asp-for="FatherName" class="form-control bg-transparent" placeholder="نام پدر" />
+                    <span asp-validation-for="FatherName" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <input asp-for="NationalCode" class="form-control bg-transparent" placeholder="کد ملی" style="text-align:center;direction:ltr;letter-spacing:3px" />
+                    <span asp-validation-for="NationalCode" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <input asp-for="Mobile" class="form-control bg-transparent" style="text-align:center; direction:ltr;letter-spacing:3px" placeholder="موبایل" />
+                    <span asp-validation-for="Mobile" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <input asp-for="PhoneNumber" class="form-control bg-transparent" style="text-align:center; direction:ltr" placeholder="تلفن ثابت" />
+                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <fieldset class="form-group position-relative has-icon-left">
+                    <input class="form-control bg-transparent shamsi-datepicker" autocomplete="off" asp-for="ShamsiBirthDate" maxlength="10" placeholder="تاریخ تولد"
+                           style="text-align:center;direction:ltr;opacity: 1 !important;background-color: #fff !important;border: 1px solid #DFE3E7 !important;"
+                           type="text" value="" data-fromdate="" readonly="readonly" data-jdate="@ViewBag.PersianBirthDate" data-gdate="@ViewBag.BirthDate" />
+                    <div class="form-control-position">
+                        <i class="bx bx-calendar"></i>
+                    </div>
+                    <span asp-validation-for="ShamsiBirthDate" class="text-danger"></span>
+                </fieldset>
+                <input asp-for="BirthDate" type="hidden" />
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <select name="Gender" asp-for="Gender" class="form-control bg-transparent  CivilRegistryData">
+                        <option value="" selected="selected" >@ResourceFile.SelectGender</option>
+                        <option value="1" >@ResourceFile.Male</option>
+                        <option value="2" >@ResourceFile.Female</option>
+                    </select>
+                    <span asp-validation-for="Gender" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <input asp-for="Email" class="form-control bg-transparent" style="text-align:center; direction:ltr" placeholder="ایمیل" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <input asp-for="SSID" class="form-control bg-transparent" placeholder="شماره شناسنامه" />
+                    <span asp-validation-for="SSID" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                  @*   <input asp-for="BirthCertificateSerial" class="form-control bg-transparent" placeholder="سريال شناسنامه" />
+                    <span asp-validation-for="BirthCertificateSerial" class="text-danger"></span> *@
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                @*     <input asp-for="SanaNumber" class="form-control bg-transparent" placeholder="شماره ثنا" />
+                    <span asp-validation-for="SanaNumber" class="text-danger"></span> *@
+                </div>
+            </div>
+        </div>
+@*         <div class="row my-0">
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <select name="ProvinceOfBirthId" asp-for="ProvinceOfBirthId" class="form-control bg-transparent "
+                            asp-items="Model.Provinces">
+                        <option value="" >@ResourceFile.SelectProvinceOfBirth</option>
+                    </select>
+                    <span asp-validation-for="ProvinceOfBirthId" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-sm-4"></div>
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <select name="CityOfBirthId" asp-for="CityOfBirthId" asp-items="Model.BirthCities" class="form-control bg-transparent ">
+                        <option value="" >@ResourceFile.SelectCityOfBirth</option>
+                    </select>
+                    <span asp-validation-for="CityOfBirthId" class="text-danger"></span>
+                </div>
+            </div>
+        </div> *@
+@*         <div class="row my-0">
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <select name="ProvinceOfIssueId" asp-for="ProvinceOfIssueId" class="form-control bg-transparent "
+                            asp-items="Model.Provinces">
+                        <option value="" >SelectProvinceOfIssue</option>
+                    </select>
+                    <span asp-validation-for="ProvinceOfIssueId" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-sm-4"></div>
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <select name="CityOfIssueId" asp-for="CityOfIssueId" asp-items="Model.IssueCities" class="form-control bg-transparent ">
+                        <option value="" >@ResourceFile.SelectCityOfIssue</option>
+                    </select>
+                    <span asp-validation-for="CityOfIssueId" class="text-danger"></span>
+                </div>
+            </div>
+        </div> *@
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <select name="ProvinceId" asp-for="ProvinceId" class="form-control bg-transparent "
+                            asp-items="Model.Provinces">
+                        <option value="" >@ResourceFile.SelectProvince</option>
+                    </select>
+                    <span asp-validation-for="ProvinceId" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <select name="CityId" asp-for="CityId" asp-items="Model.Cities" class="form-control bg-transparent ">
+                        <option value="" >@ResourceFile.SelectCity</option>
+                    </select>
+                    <span asp-validation-for="CityId" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <input asp-for="PostalCode" class="form-control bg-transparent" style="text-align:center; direction:ltr" placeholder="کد پستی" />
+                    <span asp-validation-for="PostalCode" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <textarea asp-for="Address" class="form-control bg-transparent" style=" direction:rtl" placeholder="آدرس"></textarea>
+                    <span asp-validation-for="Address" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4 col-sm-12">
+                <div class="form-group">
+                    <div class="d-flex align-items-center justify-content-around">
+                        <label class="control-label" asp-for="IsActive"></label> :
+                        <fieldset>
+                            <div class="radio radio-success radio-glow radio-sm">
+                                <input type="radio" name="IsActive" value="true" @(Model.IsActive ? "checked='checked'" : "") id="IsActive" />
+                                <label class="font-small success darken-4 text-bold-400 line-height-23" for="IsActive">فعال</label>
+                            </div>
+                        </fieldset>
+                        <fieldset>
+                            <div class="radio radio-warning radio-glow radio-sm">
+                                <input type="radio" name="IsActive" value="false" @(!Model.IsActive ? "checked='checked'" : "") id="IsDisable" />
+                                <label class="font-small warning darken-4 text-bold-400 line-height-23" for="IsDisable">غیر فعال</label>
+                            </div>
+                        </fieldset>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mt-2 mb-1 font-medium-1 secondary darken-4 text-bold-800 d-flex align-items-center">
+            <i class="bx bx-key zl-text-secondary mr-25"></i>
+            <span>اطلاعات کاربری</span>
+        </div>
+        <div class="row">
+            <div class="col-md-4 col-sm-12">
+                <div class="form-group">
+                    <select name="RoleId" asp-for="RoleId" class="form-control"
+                            asp-items="Model.Roles">
+                        <option value="" >نقش کاربر را انتخاب کنید</option>
+                    </select>
+                    <span asp-validation-for="RoleId" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+        <div class="row" id="organizationDiv">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <select name="OrganizationTypeId" asp-for="OrganizationTypeId" class="form-control"
+                            asp-items="Model.OrganizationTypes">
+                        <option value="" >نوع سازمان را انتخاب کنید</option>
+                        <option value="-100" >حقیقی</option>
+                    </select>
+                    <span asp-validation-for="OrganizationTypeId" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <select name="OrganizationId" asp-for="OrganizationId" asp-items="Model.Organizations" class="form-control ">
+                        <option value="" >سازمان را انتخاب کنید</option>
+                    </select>
+                    <span asp-validation-for="OrganizationId" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div id="userDiv" class="col-md-4 col-sm-12 col-xs-12">
+                <div class="form-group">
+                    <input asp-for="UserName" class="form-control" style="text-align:center; direction:ltr" placeholder="نام کاربری" />
+                    <span asp-validation-for="UserName" class="text-danger"></span>
+                </div>
+            </div>
+            @if (!Model.IsEditMode)
+            {
+                <div class="col-md-4 col-sm-12 col-xs-12">
+                    <div class="form-group">
+                        <input asp-for="Password" class="form-control" placeholder="کلمه عبور" />
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-12 col-xs-12">
+                    <div class="form-group">
+                        <input asp-for="ConfirmPassword" class="form-control" placeholder="تکرار کلمه عبور" />
+                        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="row">
+            <div class="col-xl-12" style="text-align:left">
+                <button id="btnRegister" class="btn btn-outline-success">
+                    @ResourceFile.Save&nbsp;<i class="fal fa-save"></i>
+                </button>
+                <a class="btn btn-outline-primary" asp-controller="User" asp-action="List">
+                    لیست کاربران&nbsp;<i class="fal fa-list"></i>
+                </a>
+            </div>
+        </div>
+    </form>
+</div>
+@section scripts {
+    @{
+        await Html.RenderPartialAsync("~/Views/Shared/_ValidationScriptsPartial.cshtml");
+    }
+    <script src="~/new-layout/js/jquery.steps.min.js"></script>
+    <script src="~/persianDatePicker/js/persianDatepicker.min.js"></script>
+    @*<partia name="_ValidationScriptsPartial" />*@
+    <script>
+
+        $(document).ready(function () {
+            //$('#NationalCode').mask('9999999999', { placeholder: "__________" });
+            $('#NationalCode').mask('9999999999');
+            $('#Mobile').mask('ZN000000000',
+                {
+                    //placeholder: "09_________",
+                    translation: {
+                        Z: { pattern: /0/ },
+                        N: { pattern: /9/ },
+                        0: { pattern: /[0-9]/ }
+                    }
+                });
+            if ('@Model.IsEditMode' == 'True') {
+                if ($('#RoleId option:selected').text() == 'تسهیلات گیرنده') {
+                    $('#organizationDiv').show();
+                    $('#userDiv').hide();
+                    if ($('#OrganizationTypeId').val() == '') {
+                        $('#OrganizationId').prop('disabled', true);
+                        $('#OrganizationTypeId').prop('disabled', false);
+                        $('#OrganizationTypeId').val('-100');
+                    }
+                    else {
+                        $('#OrganizationId').prop('disabled', false);
+                        $('#OrganizationTypeId').prop('disabled', false);
+                    }
+                }
+                else if ($('#RoleId option:selected').text() == 'کارشناس فروشگاه') {
+                    $('#organizationDiv').show();
+                    $('#userDiv').hide();
+                    $('#OrganizationId').prop('disabled', false);
+                    $('#OrganizationTypeId').prop('disabled', false);
+                }
+                else if ($('#RoleId option:selected').text() == 'مدیر ارشد زرین لند' ||
+                    $('#RoleId option:selected').text() == 'مدیر زرین لند' ||
+                    $('#RoleId option:selected').text() == 'کارشناس زرین لند') {
+                    $('#organizationDiv').show();
+                    $('#userDiv').show();
+                    $('#OrganizationId').prop('disabled', false);
+                    $('#OrganizationTypeId').prop('disabled', true);
+                }
+                else if ($('#RoleId option:selected').text() == 'مدیر بانک' ||
+                    $('#RoleId option:selected').text() == 'کارشناس ارشد بانک' ||
+                    $('#RoleId option:selected').text() == 'کارشناس بانک') {
+                    $('#organizationDiv').show();
+                    $('#userDiv').show();
+                    $('#OrganizationId').prop('disabled', false);
+                    $('#OrganizationTypeId').prop('disabled', true);
+                }
+            }
+
+            $('#BirthDate').val('@ViewBag.BirthDate');
+            $('#ShamsiBirthDate').val('@ViewBag.PersianBirthDate');
+            $("#ShamsiBirthDate").persianDatepicker({
+                //startDate: '@Model.IsEditMode' == 'True' ? undefined : '1300/01/01',
+                endDate: new persianDate().now().addYear(-18).toString("YYYY/MM/DD"),
+                months: ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"],
+                dowTitle: ["شنبه", "یکشنبه", "دوشنبه", "سه شنبه", "چهارشنبه", "پنج شنبه", "جمعه"],
+                shortDowTitle: ["ش", "ی", "د", "س", "چ", "پ", "ج"],
+                theme: 'lightorang',
+                showGregorianDate: !1,
+                persianNumbers: !0,
+                formatDate: "YYYY/0M/0D",
+                selectedBefore: 0,
+                selectedDate: '@Model.IsEditMode' == 'False' ? null : '@ViewBag.PersianBirthDate',
+                //selectedDate: '@ViewBag.PersianBirthDate',
+                prevArrow: '\u25c4',
+                nextArrow: '\u25ba',
+                alwaysShow: !1,
+                selectableYears: null,
+                selectableMonths: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                cellWidth: 35, // by px
+                cellHeight: 30, // by px
+                fontSize: 14, // by px
+                isRTL: !1,
+                calendarPosition: {
+                    x: 0,
+                    y: 0,
+                },
+                onSelect: function () {
+                    if ($("#ShamsiBirthDate").attr("data-gdate") != undefined &&
+                        $("#ShamsiBirthDate").attr("data-gdate") != '' &&
+                        $("#ShamsiBirthDate").attr("data-gdate") != "NaN/0NaN/0NaN") {
+                        if (moment().diff($("#ShamsiBirthDate").attr("data-gdate"), 'years') < 18) {
+                            showMessage("اخطار", "کاربر گرامی حداقل سن برای درخواست تسهیلات 18 سال می باشد!", icons.warning, 'متوجه شدم');
+                        }
+                        $('#BirthDate').val($("#ShamsiBirthDate").attr("data-gdate"));
+                    }
+                },
+                onShow: function () { },
+                onHide: function () { },
+                onRender: function () {
+                    if ('@Model.IsEditMode' == 'False') {
+                        $('#ShamsiBirthDate').val('');
+                    }
+                }
+            });
+        });
+
+        $('#RoleId').change(e => {
+            if ($('#RoleId option:selected').text() == 'تسهیلات گیرنده') {
+                $('#organizationDiv').show();
+                $('#userDiv').hide();
+                $('#OrganizationId').prop('disabled', true);
+                $('#OrganizationTypeId').prop('disabled', false);
+                $('#OrganizationTypeId').val('-100');
+                $('#OrganizationTypeId').trigger('change');
+            }
+            else if ($('#RoleId option:selected').text() == 'کارشناس فروشگاه') {
+                $('#organizationDiv').show();
+                $('#userDiv').hide();
+                $('#OrganizationId').prop('disabled', false);
+                $('#OrganizationTypeId').prop('disabled', false);
+                $('#OrganizationTypeId').val('@((short)OrganizationTypeEnum.Shop)');
+                $('#OrganizationTypeId').trigger('change');
+            }
+            else if ($('#RoleId option:selected').text() == 'مدیر ارشد زرین لند' ||
+                $('#RoleId option:selected').text() == 'مدیر زرین لند' ||
+                $('#RoleId option:selected').text() == 'کارشناس زرین لند') {
+                $('#organizationDiv').show();
+                $('#userDiv').show();
+                $('#OrganizationId').prop('disabled', false);
+                $('#OrganizationTypeId').prop('disabled', true);
+                $('#OrganizationTypeId').val('@((short)OrganizationTypeEnum.ZarinLend)');
+                $('#OrganizationTypeId').trigger('change');
+            }
+            else if ($('#RoleId option:selected').text() == 'مدیر بانک' ||
+                $('#RoleId option:selected').text() == 'کارشناس ارشد بانک' ||
+                $('#RoleId option:selected').text() == 'کارشناس بانک') {
+                $('#organizationDiv').show();
+                $('#userDiv').show();
+                $('#OrganizationId').prop('disabled', false);
+                $('#OrganizationTypeId').prop('disabled', true);
+                $('#OrganizationTypeId').val('@((short)OrganizationTypeEnum.BankLeasing)');
+                $('#OrganizationTypeId').trigger('change');
+            }
+        });
+
+        $('#ProvinceOfBirthId').change(e => {
+            const provinceId = $(e.target).val();
+
+            if (provinceId != undefined && provinceId != '') {
+                showWaiting('userInfoContent', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                $.ajax({
+                    type: 'get',
+                    //dataType: 'json',
+                    contentType: "application/json; charset=utf-8",
+                    //processData: false,
+                    //contentType: false,
+                    url: `/api/v1/Location/SelectCityByProvince/${provinceId}`,
+                    success: function (result) {
+                        hideWaiting('userInfoContent');
+                        debugger;
+                        if (result.isSuccess && result.data != undefined && result.data.length > 0) {
+                            $('#CityOfBirthId').empty().append('<option value="">@ResourceFile.SelectCityOfBirth</option>');
+                            result.data.map(city => {
+                                $('#CityOfBirthId').append(`<option value="${city.value}">${city.text}</option>`);
+                            });
+                        }
+                        else {
+                            $('#CityOfBirthId').empty().append('<option value="">@ResourceFile.SelectCityOfBirth</option>');
+                        }
+                    },
+                    error: function (error) {
+                        hideWaiting('userInfoContent');
+                        const exception = getExceptionMessageFromError(error);
+                        if (exception != null)
+                            showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                        else
+                            showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                    }
+                });
+            }
+            else {
+                $('#CityOfBirthId').empty().append('<option value="">@ResourceFile.SelectCityOfBirth</option>');
+            }
+        });
+
+        $('#ProvinceOfIssueId').change(e => {
+            const provinceId = $(e.target).val();
+
+            if (provinceId != undefined && provinceId != '') {
+                showWaiting('userInfoContent', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                $.ajax({
+                    type: 'get',
+                    //dataType: 'json',
+                    contentType: "application/json; charset=utf-8",
+                    //processData: false,
+                    //contentType: false,
+                    url: `/api/v1/Location/SelectCityByProvince/${provinceId}`,
+                    success: function (result) {
+                        hideWaiting('userInfoContent');
+                        debugger;
+                        if (result.isSuccess && result.data != undefined && result.data.length > 0) {
+                            $('#CityOfIssueId').empty().append('<option value="">@ResourceFile.SelectCityOfIssue</option>');
+                            result.data.map(city => {
+                                $('#CityOfIssueId').append(`<option value="${city.value}">${city.text}</option>`);
+                            });
+                        }
+                        else {
+                            $('#CityOfIssueId').empty().append('<option value="">@ResourceFile.SelectCityOfIssue</option>');
+                        }
+                    },
+                    error: function (error) {
+                        hideWaiting('userInfoContent');
+                        const exception = getExceptionMessageFromError(error);
+                        if (exception != null)
+                            showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                        else
+                            showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                    }
+                });
+            }
+            else {
+                $('#CityOfIssueId').empty().append('<option value="">@ResourceFile.SelectCity</option>');
+            }
+        });
+
+        $('#ProvinceId').change(e => {
+            const provinceId = $(e.target).val();
+
+            if (provinceId != undefined && provinceId != '') {
+                showWaiting('userLocationBody', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                $.ajax({
+                    type: 'get',
+                    //dataType: 'json',
+                    contentType: "application/json; charset=utf-8",
+                    //processData: false,
+                    //contentType: false,
+                    url: `/api/v1/Location/SelectCityByProvince/${provinceId}`,
+                    success: function (result) {
+                        hideWaiting('userLocationBody');
+                        debugger;
+                        if (result.isSuccess && result.data != undefined && result.data.length > 0) {
+                            $('#CityId').empty().append('<option value="">@ResourceFile.SelectCity</option>');
+                            result.data.map(city => {
+                                $('#CityId').append(`<option value="${city.value}">${city.text}</option>`);
+                            });
+                        }
+                        else {
+                            $('#CityId').empty().append('<option value="">@ResourceFile.SelectCity</option>');
+                        }
+                    },
+                    error: function (error) {
+                        hideWaiting('userLocationBody');
+                        const exception = getExceptionMessageFromError(error);
+                        if (exception != null)
+                            showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                        else
+                            showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                    }
+                });
+            }
+            else {
+                $('#CityId').empty().append('<option value="">@ResourceFile.SelectCity</option>');
+            }
+        });
+
+        $('#OrganizationTypeId').change(e => {
+            const organizationTypeId = $(e.target).val();
+
+            if (organizationTypeId != undefined && organizationTypeId != '' && organizationTypeId != '-100') {
+                showWaiting('frmAddEditUser', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                $('#OrganizationId').prop('disabled', false);
+                $.ajax({
+                    type: 'get',
+                    //dataType: 'json',
+                    contentType: "application/json; charset=utf-8",
+                    //processData: false,
+                    //contentType: false,
+                    url: `/api/v1/Organization/SelectOrganizationByOganizationType/${organizationTypeId}`,
+                    success: function (result) {
+                        hideWaiting('frmAddEditUser');
+                        debugger;
+                        if (result.isSuccess && result.data != undefined && result.data.length > 0) {
+                            $('#OrganizationId').empty().append('<option value="">سازمان را انتخاب کنید</option>');
+                            result.data.map(city => {
+                                $('#OrganizationId').append(`<option value="${city.value}">${city.text}</option>`);
+                            });
+                        }
+                        else {
+                            $('#OrganizationId').empty().append('<option value="">سازمان را انتخاب کنید</option>');
+                        }
+                    },
+                    error: function (error) {
+                        hideWaiting('frmAddEditUser');
+                        if (error.responseJSON != undefined && error.responseJSON.message != undefined && error.responseJSON.message != '') {
+                            if (IsJsonString(error.responseJSON.message)) {
+                                const exception = JSON.parse(error.responseJSON.message).Exception;
+                                showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                            }
+                            else
+                                showMessage('@ResourceFile.ErrorTitle', error.responseJSON.message, icons.error, '@ResourceFile.Close');
+                        }
+                        else {
+                            showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                        }
+                    }
+                });
+            }
+            else {
+                $('#OrganizationId').empty().append('<option value="">سازمان را انتخاب کنید</option>');
+                if (organizationTypeId == '-100')
+                    $('#OrganizationId').prop('disabled', true);
+            }
+        });
+
+        $('#btnRegister').click(function (e) {
+            e.preventDefault();
+            debugger;
+            const formIsValid = $('#frmAddEditUser').valid();
+
+            if (moment().diff($("#ShamsiBirthDate").attr("data-gdate"), 'years') < 18) {
+                showMessage("اخطار", "کاربر گرامی حداقل سن برای درخواست تسهیلات 18 سال می باشد!", icons.warning, 'متوجه شدم');
+                return;
+            }
+
+            if ($("#OrganizationTypeId").val() != '' && $("#OrganizationTypeId").val() != '-100' && $("#OrganizationId").val() == '') {
+                showMessage('@ResourceFile.InfoTitle', "در صورت انتخاب <b>نوع سازمان</b> باید <b>سازمان</b> را نیز انتخاب کنید", icons.error, '@ResourceFile.Close');
+                return;
+            }
+            const isActive = $('input[name=IsActive]:checked').val();
+            if (isActive == undefined) {
+                showMessage('@ResourceFile.InfoTitle', 'لطفا وضعیت(فعال/غیر فعال) را مشخص کنید!', icons.warning, '@ResourceFile.Close');
+                return;
+            }
+
+            if (formIsValid) {
+                showWaiting('frmAddEditUser', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                //const postdata = $('#frmAddEditUser').serialize();
+                //const model = {
+                //    FName: $("#FName").val(),
+                //    LName: $("#LName").val(),
+                //};
+                let data = new FormData();
+                if ('@Model.IsEditMode' == 'True') {
+                    data.append('Id', '@ViewContext.RouteData.Values["Id"]');
+                    data.append('Password', '123456');
+                    data.append('ConfirmPassword', '123456');
+                }
+                else {
+                    data.append('Password', $("#Password").val());
+                    data.append('ConfirmPassword', $("#ConfirmPassword").val());
+                }
+                data.append('FName', $("#FName").val());
+                data.append('LName', $("#LName").val());
+                data.append('FatherName', $("#FatherName").val());
+                data.append('Mobile', $("#Mobile").val());
+                data.append('NationalCode', $("#NationalCode").val());
+                data.append('SSID', $("#SSID").val());
+                data.append('BirthCertificateSerial', $("#BirthCertificateSerial").val());
+                data.append('Gender', $("#Gender").val());
+                data.append('Email', $("#Email").val());
+                data.append('Address', $("#Address").val());
+                data.append('PhoneNumber', $("#PhoneNumber").val());
+                data.append('ProvinceId', $("#ProvinceId").val());
+                data.append('CityId', $("#CityId").val());
+                data.append('ProvinceOfBirthId', $("#ProvinceOfBirthId").val());
+                data.append('CityOfBirthId', $("#CityOfBirthId").val());
+                data.append('ProvinceOfIssueId', $("#ProvinceOfIssueId").val());
+                data.append('CityOfIssueId', $("#CityOfIssueId").val());
+                data.append('IsActive', isActive);
+                data.append('PostalCode', $("#PostalCode").val());
+                data.append('SanaNumber', $("#SanaNumber").val());
+                data.append('BirthDate', $("#BirthDate").val());
+                data.append('ShamsiBirthDate', $("#ShamsiBirthDate").attr("data-jdate"));
+                data.append('RoleId', $("#RoleId").val());
+                if ($("#OrganizationTypeId").val() != '' && $("#OrganizationId").val() != '') {
+                    data.append('OrganizationTypeId', $("#OrganizationTypeId").val());
+                    data.append('OrganizationId', $("#OrganizationId").val());
+                }
+                if ($('#RoleId option:selected').text() == 'تسهیلات گیرنده')
+                    data.append('UserName', $("#NationalCode").val());
+                else
+                    data.append('UserName', $("#UserName").val());
+
+                $.ajax({
+                    type: 'post',
+                    //dataType: 'json',
+                    //contentType: "application/json; charset=utf-8",
+                    processData: false,
+                    contentType: false,
+                    url: '@apiUrl',
+                    data: data,// JSON.stringify(model),
+                    success: function (result) {
+                        hideWaiting('frmAddEditUser');
+                        debugger;
+                        if (result.isSuccess) {
+                            showMessage('@ResourceFile.InfoTitle', '@ResourceFile.MessageSuccess', icons.success, '@ResourceFile.Close', () => { window.location.replace('@Url.Action("List", "User")'); });
+                        }
+                    },
+                    error: function (error) {
+                        hideWaiting('frmAddEditUser');
+                        const exception = getExceptionMessageFromError(error);
+                        if (exception != null)
+                            showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                        else
+                            showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                    }
+                });
+            }
+            else {
+                scrollToFirstError();
+            }
+        });
+    </script>
+}

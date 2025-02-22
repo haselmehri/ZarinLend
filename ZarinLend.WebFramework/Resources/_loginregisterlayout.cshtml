@@ -1,0 +1,85 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    @*<link rel="apple-touch-icon" sizes="57x57" href="/apple-icon-57x57.png">
+        <link rel="apple-touch-icon" sizes="60x60" href="/apple-icon-60x60.png">
+        <link rel="apple-touch-icon" sizes="72x72" href="/apple-icon-72x72.png">
+        <link rel="apple-touch-icon" sizes="76x76" href="/apple-icon-76x76.png">
+
+        <link rel="apple-touch-icon" sizes="114x114" href="/apple-icon-114x114.png">
+        <link rel="apple-touch-icon" sizes="120x120" href="/apple-icon-120x120.png">
+        <link rel="apple-touch-icon" sizes="144x144" href="/apple-icon-144x144.png">
+        <link rel="apple-touch-icon" sizes="152x152" href="/apple-icon-152x152.png">
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-icon-180x180.png">
+
+        <link rel="icon" type="image/png" sizes="192x192" href="/android-icon-192x192.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">*@
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon32x32.png">
+    <link rel="icon" type="image/png" sizes="180x180" href="/images/favicon180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/images/favicon192x192.png">
+
+    <link rel="manifest" href="/manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
+    <meta name="theme-color" content="#6748fe">
+
+    <title>@_loc["SiteTitle"] - @ViewData["Title"] </title>
+
+    <link rel="stylesheet" href="~/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/bootstrap-rtl.min.css" />
+    <link rel="stylesheet" href="~/css/fonts.css" />
+    <link rel="stylesheet" href="~/font-awesome/css/font-awesome.css" />
+    <link rel="stylesheet" href="~/font-awesome/css/font-awesome-animation.min.css" />
+    <link rel="stylesheet" href="~/css/site-@(cultureAccessor.GetCultureDirection()).css" asp-append-version="true" />
+    <style>
+        .mt-5, .my-5 {
+            margin-top: 1rem !important;
+        }
+
+        .logoText {
+            font-family: Lalezar;
+            color: #ffffff !important;
+            font-size: 25px;
+        }
+
+        .IsInActive {
+            text-decoration: #cdcdcd line-through;
+            font-weight: lighter;
+        }
+
+        .IsActive {
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .text-sm {
+            font-size: 13px;
+        }
+
+        .language-div {
+            text-align: center;
+            margin-top: 20px !important;
+        }
+    </style>
+
+    @await RenderSectionAsync("styles", required: false)
+</head>
+<body class="">
+    <div class="container">
+            @RenderBody()
+    </div>
+
+    <script src="~/js/jquery.min.js"></script>
+    <script src="~/js/jquery.unobtrusive-ajax.min.js"></script>
+    <script src="~/js/bootstrap.bundle.min.js"></script>
+    <script src="~/Vendor/sweetalert2/sweetalert2.all.min.js" type="text/javascript"></script>
+    <script src="/js/jquery.blockUI.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("scripts", required: false)
+</body>
+</html>

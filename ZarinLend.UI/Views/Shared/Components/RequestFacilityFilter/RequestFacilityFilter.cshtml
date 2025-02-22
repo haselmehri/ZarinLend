@@ -1,0 +1,336 @@
+﻿@model RequestFacilityFilterModel
+
+@if (Model != null)
+{
+    @section styles {
+    @*<link href="~/persianDatePicker/css/persianDatepicker-lightorang.css" rel="stylesheet" />*@
+    <style type="text/css">
+    </style>
+    }
+    <div class="row my-0 my-md-1">
+        <div class=" col-md-6 col-sm-12">
+            <div class="form-group">
+                <fieldset class="form-group position-relative has-icon-left">
+                    <input class="form-control bg-transparent shamsi-datepicker" readonly="readonly" id="txtStartDate" name="txtStartDate" maxlength="10" placeholder="تاریخ درخواست از" style="text-align:center;direction:ltr" type="text" value="" data-fromdate="" />
+                    <div class="form-control-position">
+                        <i class="bx bx-calendar"></i>
+                    </div>
+                </fieldset>
+                <input asp-for="StartDate" type="hidden" />
+                <span asp-validation-for="StartDate" class="text-danger"></span>
+            </div>
+        </div>
+        <div class=" col-md-6 col-sm-12">
+            <div class="form-group">
+                <fieldset class="form-group position-relative has-icon-left">
+                    <input class="form-control bg-transparent shamsi-datepicker" readonly="readonly" id="txtEndDate" name="txtEndDate" maxlength="10" placeholder="تاریخ درخواست تا" style="text-align:center;direction:ltr" type="text" value="" data-fromdate="" />
+                    <div class="form-control-position">
+                        <i class="bx bx-calendar"></i>
+                    </div>
+                </fieldset>
+                <input asp-for="EndDate" type="hidden" />
+                <span asp-validation-for="EndDate" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    <div class="row my-0 my-md-1">
+        <div class=" col-md-6 col-sm-12">
+            <div class="form-group">
+                <input type="text" class="form-control bg-transparent number-thousand-separator" asp-for="StartAmountThousandSeparator" placeholder="مبلغ درخواستی از(ريال)" style="text-align:center;direction:ltr" />
+                <span asp-validation-for="StartAmountThousandSeparator" class="text-danger"></span>
+            </div>
+        </div>
+        <div class=" col-md-6 col-sm-12">
+            <div class="form-group">
+                <input type="text" class="form-control bg-transparent number-thousand-separator" asp-for="EndAmountThousandSeparator" placeholder="مبلغ درخواستی تا(ريال)" style="text-align:center;direction:ltr" />
+                <span asp-validation-for="EndAmountThousandSeparator" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    @if (ViewBag.IsInSearchLeasingRequest == true)
+    {
+        <div class="row my-0 my-md-1">
+            <div class=" col-md-6 col-sm-12">
+                <div class="form-group">
+                    <fieldset class="form-group position-relative has-icon-left">
+                        <input class="form-control bg-transparent shamsi-datepicker" readonly="readonly" id="txtPaymentFacilityStartDate" name="txtPaymentFacilityStartDate" maxlength="10" placeholder="تاریخ پرداخت تسهیلات از" style="text-align:center;direction:ltr" type="text" value="" data-fromdate="" />
+                        <div class="form-control-position">
+                            <i class="bx bx-calendar"></i>
+                        </div>
+                    </fieldset>
+                    <input asp-for="PaymentFacilityStartDate" type="hidden" />
+                    <span asp-validation-for="PaymentFacilityStartDate" class="text-danger"></span>
+                </div>
+            </div>
+            <div class=" col-md-6 col-sm-12">
+                <div class="form-group">
+                    <fieldset class="form-group position-relative has-icon-left">
+                        <input class="form-control bg-transparent shamsi-datepicker" readonly="readonly" id="txtPaymentFacilityEndDate" name="txtPaymentFacilityEndDate" maxlength="10" placeholder="تاریخ پرداخت تسهیلات تا" style="text-align:center;direction:ltr" type="text" value="" data-fromdate="" />
+                        <div class="form-control-position">
+                            <i class="bx bx-calendar"></i>
+                        </div>
+                    </fieldset>
+                    <input asp-for="PaymentFacilityEndDate" type="hidden" />
+                    <span asp-validation-for="PaymentFacilityEndDate" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+    }
+    @if (ViewBag.ShowWaitingSteps)
+    {
+        <div class="row my-0 my-md-1">
+            <div class=" col-md-6 col-sm-12">
+                <div class="form-group">
+                    <select name="WaitingStepId" asp-for="WaitingStepId" class="form-control bg-transparent text-muted" asp-items="Model.WorkFlowSteps">
+                        <option value="" >مرحله جاری</option>
+                    </select>
+                    <span asp-validation-for="WaitingStepId" class="text-danger"></span>
+                </div>
+            </div>
+            <div class=" col-md-6 col-sm-12">
+                <div class="form-group">
+                    <input type="text" class="form-control bg-transparent" asp-for="NationalCode" placeholder="کد ملی" type="number" pattern="[0-9]*" inputmode="numeric" style="text-align:center;direction:ltr;letter-spacing:2px" />
+                    <span asp-validation-for="NationalCode" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+        <div class="row my-0 my-md-1">
+            <div class=" col-md-6 col-sm-12">
+                <div class="form-group">
+                    <input type="text" class="form-control bg-transparent" asp-for="FName" placeholder="نام" style="" />
+                    <span asp-validation-for="FName" class="text-danger"></span>
+                </div>
+            </div>
+            <div class=" col-md-6 col-sm-12">
+                <div class="form-group">
+                    <input type="text" class="form-control bg-transparent" asp-for="LName" placeholder="نام خانوادگی" style="" />
+                    <span asp-validation-for="LName" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row my-0 my-md-1">
+            <div class=" col-md-4 col-sm-12">
+                <div class="form-group">
+                    <input type="text" class="form-control bg-transparent" asp-for="NationalCode" placeholder="کد ملی" type="number" pattern="[0-9]*" inputmode="numeric" style="text-align:center;direction:ltr;letter-spacing:5px" />
+                    <span asp-validation-for="NationalCode" class="text-danger"></span>
+                </div>
+            </div>
+            <div class=" col-md-4 col-sm-12">
+                <div class="form-group">
+                    <input type="text" class="form-control bg-transparent" asp-for="FName" placeholder="نام" style="" />
+                    <span asp-validation-for="FName" class="text-danger"></span>
+                </div>
+            </div>
+            <div class=" col-md-4 col-sm-12">
+                <div class="form-group">
+                    <input type="text" class="form-control bg-transparent" asp-for="LName" placeholder="نام خانوادگی" style="" />
+                    <span asp-validation-for="LName" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+    }
+    @if (@User.IsInRole(RoleEnum.AdminBankLeasing.ToString()) || @User.IsInRole(RoleEnum.SupervisorLeasing.ToString()))
+    {
+        <div class="row my-0 my-md-1">
+            <div class=" col-md-6 col-sm-12">
+                <div class="form-group">
+                    <select name="SearchOperatorId" id="SearchOperatorId" class="form-control bg-transparent " asp-items="ViewBag.OrganizationUsers"
+                            data-val="true" data-val-required="کارشناس را انتخاب کنید!">
+                        <option value="">انتخاب کارشناس</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    }
+    @if (ViewBag.ShowFacilityStatus)
+    {
+        <div class="row my-0 my-md-1">
+            <div class="col-lg-2 col-md-6 col-sm-12">
+                <div class="radio radio-primary radio-glow radio-md">
+                    <input type="radio" checked="checked" class="verifyRadio" name="facilityStatus" id="inlineRadio1" value="@((long)FacilityStatus.WaitingRequest)" />
+                    <label class="font-small-3 primary darken-4 text-bold-400 line-height-23" for="inlineRadio1">تسهیلات منتظر اقدام</label>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-6 col-sm-12">
+                <div class="radio radio-info radio-glow radio-md">
+                    <input type="radio" class="verifyRadio" name="facilityStatus" id="inlineRadio7" value="@((long)FacilityStatus.OpenRequest)" />
+                    <label class="font-small-3 info darken-4 text-bold-400 line-height-23" for="inlineRadio7">تسهیلات فعال(جاری)</label>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 col-sm-12">
+                <div class="radio radio-success radio-glow radio-md">
+                    <input type="radio" class="verifyRadio" name="facilityStatus" id="inlineRadio2" value="@((long)FacilityStatus.ApprovedRequest)" />
+                    <label class="font-small-3 success darken-4 text-bold-400 line-height-23" for="inlineRadio2">تسهیلات پایان یافته</label>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 col-sm-12">
+                <div class="radio radio-danger radio-glow radio-md">
+                    <input type="radio" class="verifyRadio" name="facilityStatus" id="inlineRadio3" value="@((long)FacilityStatus.RejectCancelRequest)" />
+                    <label class="font-small-3 danger darken-4 text-bold-400 line-height-23" for="inlineRadio3">تسهیلات رد شده/انصراف یافته</label>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-6 col-sm-12">
+                <div class="radio radio-warning radio-glow radio-md">
+                    <input type="radio" name="facilityStatus" id="inlineRadio4" value="@((long)FacilityStatus.AllRequest)" />
+                    <label class="font-small-3 warning darken-4 text-bold-400 line-height-23" for="inlineRadio4">همه تسهیلات</label>
+                </div>
+            </div>
+        </div>
+    }
+    <script on-content-loaded="true">
+        $(() => {
+            let startDate = null;
+            let endDate = null;
+            let paymentFacilityStartDate = null;
+            let paymentFacilityEndDate = null;
+
+            $('#PaymentFacilityStartDate').val('@ViewBag.PaymentFacilityStartDate');
+            $('#txtPaymentFacilityStartDate').val('@ViewBag.PersianPaymentFacilityStartDate');
+
+            $('#PaymentFacilityEndDate').val('@ViewBag.PaymentFacilityEndDate');
+            $('#txtPaymentFacilityEndDate').val('@ViewBag.PersianPaymentFacilityEndDate');
+
+            $('#StartDate').val('@ViewBag.StartDate');
+            $('#txtStartDate').val('@ViewBag.PersianStartDate');
+
+            $('#EndDate').val('@ViewBag.EndDate');
+            $('#txtEndDate').val('@ViewBag.PersianEndDate');
+
+            $('#NationalCode').mask('9999999999', { placeholder: "کد ملی" });
+
+            startDate = $("#txtStartDate").persianDatepicker(
+                {
+                    months: ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"],
+                    dowTitle: ["شنبه", "یکشنبه", "دوشنبه", "سه شنبه", "چهارشنبه", "پنج شنبه", "جمعه"],
+                    shortDowTitle: ["ش", "ی", "د", "س", "چ", "پ", "ج"],
+                    theme: 'lightorang',
+                    showGregorianDate: !1,
+                    persianNumbers: !0,
+                    formatDate: "YYYY/0M/0D",
+                    selectedBefore: !1,
+                    selectedDate: '@ViewBag.PersianStartDate',
+                    prevArrow: '\u25c4',
+                    nextArrow: '\u25ba',
+                    alwaysShow: !1,
+                    selectableYears: null,
+                    selectableMonths: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                    cellWidth: 45, // by px
+                    cellHeight: 35, // by px
+                    fontSize: 16, // by px
+                    isRTL: 1,
+                    calendarPosition: {
+                        x: 0,
+                        y: 0,
+                    },
+                    onSelect: function () {
+                        //alert($("#txtBirthDate").attr("data-gdate"));
+                        $('#StartDate').val($("#txtStartDate").attr("data-gdate"));
+                    },
+                    onShow: function () { },
+                    onHide: function () { },
+                    onRender: function () { }
+                });
+
+            endDate = $("#txtEndDate").persianDatepicker(
+                {
+                    months: ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"],
+                    dowTitle: ["شنبه", "یکشنبه", "دوشنبه", "سه شنبه", "چهارشنبه", "پنج شنبه", "جمعه"],
+                    shortDowTitle: ["ش", "ی", "د", "س", "چ", "پ", "ج"],
+                    theme: 'lightorang',
+                    showGregorianDate: !1,
+                    persianNumbers: !0,
+                    formatDate: "YYYY/0M/0D",
+                    selectedBefore: !1,
+                    selectedDate: '@ViewBag.PersianEndDate',
+                    prevArrow: '\u25c4',
+                    nextArrow: '\u25ba',
+                    alwaysShow: !1,
+                    selectableYears: null,
+                    selectableMonths: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                    cellWidth: 45, // by px
+                    cellHeight: 35, // by px
+                    fontSize: 16, // by px
+                    isRTL: 1,
+                    calendarPosition: {
+                        x: 0,
+                        y: 0,
+                    },
+                    onSelect: function () {
+                        $('#EndDate').val($("#txtEndDate").attr("data-gdate"));
+                    },
+                    onShow: function () { },
+                    onHide: function () { },
+                    onRender: function () { }
+                });
+
+            paymentFacilityStartDate = $("#txtPaymentFacilityStartDate").persianDatepicker(
+                {
+                    months: ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"],
+                    dowTitle: ["شنبه", "یکشنبه", "دوشنبه", "سه شنبه", "چهارشنبه", "پنج شنبه", "جمعه"],
+                    shortDowTitle: ["ش", "ی", "د", "س", "چ", "پ", "ج"],
+                    theme: 'lightorang',
+                    showGregorianDate: !1,
+                    persianNumbers: !0,
+                    formatDate: "YYYY/0M/0D",
+                    selectedBefore: !1,
+                    selectedDate: '@ViewBag.PersianStartDate',
+                    prevArrow: '\u25c4',
+                    nextArrow: '\u25ba',
+                    alwaysShow: !1,
+                    selectableYears: null,
+                    selectableMonths: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                    cellWidth: 45, // by px
+                    cellHeight: 35, // by px
+                    fontSize: 16, // by px
+                    isRTL: 1,
+                    calendarPosition: {
+                        x: 0,
+                        y: 0,
+                    },
+                    onSelect: function () {
+                        //alert($("#txtPaymentFacilityStartDate").attr("data-gdate"));
+                        $('#PaymentFacilityStartDate').val($("#txtPaymentFacilityStartDate").attr("data-gdate"));
+                    },
+                    onShow: function () { },
+                    onHide: function () { },
+                    onRender: function () { }
+                });
+
+            paymentFacilityEndDate = $("#txtPaymentFacilityEndDate").persianDatepicker(
+                {
+                    months: ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"],
+                    dowTitle: ["شنبه", "یکشنبه", "دوشنبه", "سه شنبه", "چهارشنبه", "پنج شنبه", "جمعه"],
+                    shortDowTitle: ["ش", "ی", "د", "س", "چ", "پ", "ج"],
+                    theme: 'lightorang',
+                    showGregorianDate: !1,
+                    persianNumbers: !0,
+                    formatDate: "YYYY/0M/0D",
+                    selectedBefore: !1,
+                    selectedDate: '@ViewBag.PersianEndDate',
+                    prevArrow: '\u25c4',
+                    nextArrow: '\u25ba',
+                    alwaysShow: !1,
+                    selectableYears: null,
+                    selectableMonths: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                    cellWidth: 45, // by px
+                    cellHeight: 35, // by px
+                    fontSize: 16, // by px
+                    isRTL: 1,
+                    calendarPosition: {
+                        x: 0,
+                        y: 0,
+                    },
+                    onSelect: function () {
+                        //alert($("#txtPaymentFacilityEndDate").attr("data-gdate"));
+                        $('#PaymentFacilityEndDate').val($("#txtPaymentFacilityEndDate").attr("data-gdate"));
+                    },
+                    onShow: function () { },
+                    onHide: function () { },
+                    onRender: function () { }
+                });
+        });
+    </script>
+}

@@ -1,0 +1,241 @@
+﻿@using static Common.Enums;
+@model IEnumerable<DocumentModel>
+
+<style type="text/css">
+</style>
+@if (Model == null || !Model.Any())
+{
+    <div class="bg-white p-2 rounded-lg">
+        <div class="text-bold-700 dark font-medium-2">مدارک هویتی</div>
+        <div class="mt-2 p-2 edit-user-bg ">
+            هنوز هیچ مدرکی بارگذاری نشده است!
+        </div>
+    </div>
+}
+else
+{
+    <div class="bg-white p-2 rounded-lg">
+        <div class="text-bold-700 dark font-medium-2">مدارک هویتی</div>
+@*         <div class="mt-2 p-2 edit-user-bg rounded-lg">
+            <div class="text-bold-900 secondary darken-4 font-medium-3">
+                شناسنامه
+            </div>
+            <div class="mt-2">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="d-flex flex-column align-items-start">
+                            <div class="text-bold-700 dark">
+                                تصویر صفحه اول شناسنامه
+                            </div>
+                            @if (Model.Any(p => p.DocumentType == DocumentType.BirthCertificatePage1))
+                            {
+                                var birthCertificatePage1 = Model.First(p => p.DocumentType == DocumentType.BirthCertificatePage1);
+                                var filePath = $"{birthCertificatePage1.FilePath}?ver={birthCertificatePage1.Version}";
+                                <a target='_blank' href='@filePath'>
+                                    <div class="w-100 text-center">
+                                        <img src="@filePath" class="img-fluid mt-75" />
+                                    </div>
+                                </a>
+                            }
+                            else
+                            {
+                                <div class="w-100 text-center">
+                                    <img src="/new-layout/images/no-docs-img.svg" class="img-fluid mt-75" />
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <div class="col-md-6 mt-3 mt-md-0">
+                        <div class="d-flex flex-column align-items-start">
+                            <div class="text-bold-700 dark">
+                                تصویر توضیحات شناسنامه
+                            </div>
+                            @if (Model.Any(p => p.DocumentType == DocumentType.BirthCertificateDescription))
+                            {
+                                var birthCertificateDescription = Model.First(p => p.DocumentType == DocumentType.BirthCertificateDescription);
+                                var filePath = $"{birthCertificateDescription.FilePath}?ver={birthCertificateDescription.Version}";
+                                <a target='_blank' href='@filePath'>
+                                    <div class="w-100 text-center">
+                                        <img src="@filePath" class="img-fluid mt-75" />
+                                    </div>
+                                </a>
+                            }
+                            else
+                            {
+                                <div class="w-100 text-center">
+                                    <img src="/new-layout/images/no-docs-img.svg" class="img-fluid mt-75" />
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> *@
+        <div class="mt-2 p-2 edit-user-bg rounded-lg">
+            <div class="text-bold-900 secondary darken-4 font-medium-3">
+                کارت ملی
+            </div>
+            <div class="mt-2">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="d-flex flex-column align-items-start">
+                            <div class="text-bold-700 dark">
+                                تصویر روی کارت ملی
+                            </div>
+                            @if (Model.Any(p => p.DocumentType == DocumentType.NationalCardFront))
+                            {
+                                var nationalCardFront = Model.First(p => p.DocumentType == DocumentType.NationalCardFront);
+                                var filePath = $"{nationalCardFront.FilePath}?ver={nationalCardFront.Version}";
+                                <a target='_blank' href='@filePath'>
+                                    <div class="w-100 text-center">
+                                        <img src="@filePath" class="img-fluid mt-75" />
+                                    </div>
+                                </a>
+                            }
+                            else
+                            {
+                                <div class="w-100 text-center">
+                                    <img src="/new-layout/images/no-docs-img.svg" class="img-fluid mt-75" />
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <div class="col-md-6 mt-3 mt-md-0">
+                        <div class="d-flex flex-column align-items-start">
+                            <div class="text-bold-700 dark">
+                                تصویر پشت کارت ملی
+                            </div>
+                            @if (Model.Any(p => p.DocumentType == DocumentType.NationalCardBack))
+                            {
+                                var nationalCardBack = Model.First(p => p.DocumentType == DocumentType.NationalCardBack);
+                                var filePath = $"{nationalCardBack.FilePath}?ver={nationalCardBack.Version}";
+                                <a target='_blank' href='@filePath'>
+                                    <div class="w-100 text-center">
+                                        <img src="@filePath" class="img-fluid mt-75" />
+                                    </div>
+                                </a>
+                            }
+                            else
+                            {
+                                <div class="w-100 text-center">
+                                    <img src="/new-layout/images/no-docs-img.svg" class="img-fluid mt-75" />
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @*     <div class="mt-2 p-2 edit-user-bg rounded-lg">
+            <div class="text-bold-900 secondary darken-4 font-medium-3">
+                مدرک شغلی
+            </div>
+            <div class="mt-2">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="d-flex flex-column align-items-start">
+                            <div class="text-bold-700 dark">تصویر مدرک شغلی</div>
+                            @if (Model.Any(p => p.DocumentType == DocumentType.JobDocument))
+                            {
+                                if (Model.Count(p => p.DocumentType == DocumentType.JobDocument) == 2)
+                                {
+                                    foreach (var jobDocument in Model.Where(p => p.DocumentType == DocumentType.JobDocument))
+                                    {
+                                        var filePath = $"{jobDocument.FilePath}?ver={jobDocument.Version}";
+                                        <a target='_blank' href='@filePath'>
+                                            <div class="w-50 text-center">
+                                                <img src="@filePath" class="img-fluid mt-75" />
+                                            </div>
+                                        </a>
+                                    }
+                                }
+                                else
+                                {
+                                    var jobDocument = Model.First(p => p.DocumentType == DocumentType.JobDocument);
+                                    var filePath = $"{jobDocument.FilePath}?ver={jobDocument.Version}";
+                                    <a target='_blank' href='@filePath'>
+                                        <div class="w-100 text-center">
+                                            <img src="@filePath" class="img-fluid mt-75" />
+                                        </div>
+                                    </a>
+                                }
+                            }
+                            else
+                            {
+                                <div class="w-100 text-center">
+                                    <img src="/new-layout/images/no-docs-img.svg" class="img-fluid mt-75" />
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <div class="col-md-4 mt-3 mt-md-0">
+                        <div class="d-flex flex-column align-items-start">
+                            <div class="text-bold-700 dark">
+                                تصویر اجاره نامه یا سند مالکیت
+                            </div>
+                            @if (Model.Any(p => p.DocumentType == DocumentType.AddressDocument))
+                            {
+                                if (Model.Count(p => p.DocumentType == DocumentType.AddressDocument) == 2)
+                                {
+                                    foreach (var addressDocument in Model.Where(p => p.DocumentType == DocumentType.AddressDocument))
+                                    {
+                                        var filePath = $"{addressDocument.FilePath}?ver={addressDocument.Version}";
+                                        <a target='_blank' href='@filePath'>
+                                            <div class="w-50 text-center">
+                                                <img src="@filePath" class="img-fluid mt-75" />
+                                            </div>
+                                        </a>
+                                    }
+                                }
+                                else
+                                {
+                                    var addressDocument = Model.First(p => p.DocumentType == DocumentType.AddressDocument);
+                                    var filePath = $"{addressDocument.FilePath}?ver={addressDocument.Version}";
+                                    <a target='_blank' href='@filePath'>
+                                        <div class="w-100 text-center">
+                                            <img src="@filePath" class="img-fluid mt-75" />
+                                        </div>
+                                    </a>
+                                }
+                            }
+                            else
+                            {
+                                <div class="w-100 text-center">
+                                    <img src="/new-layout/images/no-docs-img.svg" class="img-fluid mt-75" />
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <div class="col-md-4 mt-3 mt-md-0">
+                        <div class="d-flex flex-column align-items-start">
+                            <div class="text-bold-700 dark">
+                                صورتحساب
+                            </div>
+                            @if (Model.Any(p => p.DocumentType == DocumentType.AccountStatement))
+                            {
+                                var accountStatement = Model.First(p => p.DocumentType == DocumentType.AccountStatement);
+                                var filePath = $"{accountStatement.FilePath}?ver={accountStatement.Version}";
+                                var fileLogo = FileExtensions.GetFileType(accountStatement.FilePath) == Enums.FileType.Pdf ? "/images/icons/pdf2.png" : "/images/icons/excel.png";
+                                <a target='_blank' href='@filePath'>
+                                    <div class="w-100 text-center">
+                                        <img src="@fileLogo" class="img-fluid mt-75" />
+                                    </div>
+                                </a>
+                            }
+                            else
+                            {
+                                <div class="w-100 text-center">
+                                    <img src="/new-layout/images/no-docs-img.svg" class="img-fluid mt-75" />
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> *@
+    </div>
+}
+
+<script on-content-loaded="true">
+
+</script>

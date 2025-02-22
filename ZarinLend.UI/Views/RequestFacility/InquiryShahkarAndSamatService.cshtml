@@ -1,0 +1,69 @@
+﻿@model int
+@{
+    ViewData["Title"] = "مشاهده نتیجه استعلام سمات و شاهکار";
+}
+@section styles
+{
+    <style type="text/css">
+    </style>
+}
+
+<form method="post">
+    <div class="card">
+        <div class="card-header" >مشاهده نتیجه استعلام سمات و شاهکار</div>
+        <div class="card-body">
+            <div class="accordion" id="accordionSamatAndShahkar">
+                <div class="card">
+                    <div class="card-header btn btn-info ex-card-header" id="headingUserActiveFacilities">
+                        <h2 class="mb-0">
+                            @*<i class="fa fa-align-justify" aria-hidden="true"></i>*@
+                            <button class="btn btn-link ex-btn-link" type="button" data-toggle="collapse" data-target="#collapseUserActiveFacilities" aria-expanded="true" aria-controls="collapseUserActiveFacilities">
+                                <svg class="bi bi-list" width="1em" height="1em" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd" d="M4.5 13.5A.5.5 0 015 13h10a.5.5 0 010 1H5a.5.5 0 01-.5-.5zm0-4A.5.5 0 015 9h10a.5.5 0 010 1H5a.5.5 0 01-.5-.5zm0-4A.5.5 0 015 5h10a.5.5 0 010 1H5a.5.5 0 01-.5-.5z" clip-rule="evenodd"></path>
+                                </svg>
+                                اطلاعات تسهیلات فعال
+                            </button>
+                            @*<label class="date-update">تاریخ بروزرسانی : @Model.CustomerInfoDateUpdate</label>*@
+                        </h2>
+                    </div>
+                    <div id="collapseUserActiveFacilities" class="collapse show" aria-labelledby="headingUserActiveFacilities" data-parent="#accordionSamatAndShahkar">
+                        @await Component.InvokeAsync("UserActiveFacilities", new { requestFacilityId = @Model })
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header btn btn-info ex-card-header" id="headingUserBackCheques">
+                        <h2 class="mb-0">
+                            @*<i class="fa fa-align-justify" aria-hidden="true"></i>*@
+                            <button class="btn btn-link ex-btn-link" type="button" data-toggle="collapse" data-target="#collapseUserBackCheques" aria-expanded="true" aria-controls="collapseUserBackCheques">
+                                <svg class="bi bi-list" width="1em" height="1em" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd" d="M4.5 13.5A.5.5 0 015 13h10a.5.5 0 010 1H5a.5.5 0 01-.5-.5zm0-4A.5.5 0 015 9h10a.5.5 0 010 1H5a.5.5 0 01-.5-.5zm0-4A.5.5 0 015 5h10a.5.5 0 010 1H5a.5.5 0 01-.5-.5z" clip-rule="evenodd"></path>
+                                </svg>
+                                اطلاعات چکهای برگشتی
+                            </button>
+                            @*<label class="date-update">تاریخ بروزرسانی : @Model.CustomerInfoDateUpdate</label>*@
+                        </h2>
+                    </div>
+                    <div id="collapseUserBackCheques" class="collapse show" aria-labelledby="headingUserBackCheques" data-parent="#accordionSamatAndShahkar">
+                            @await Component.InvokeAsync("UserBackCheques", new { requestFacilityId = @Model })
+                    </div>
+                </div>
+            </div>
+        </div>
+            <div class="card-footer" style="text-align:left">
+                <a class="btn btn-outline-secondary" asp-controller="requestfacility" asp-action="List">
+                    بازگشت به لیست درخواست تسهیلات&nbsp;<i class="fal fa-list-alt"></i>
+                </a>
+            </div>
+    </div>
+</form>
+@section scripts{
+    @*<partia name="_ValidationScriptsPartial" />*@
+    @{
+        await Html.RenderPartialAsync("~/Views/Shared/_ValidationScriptsPartial.cshtml");
+    }
+    <script>
+        $(document).ready(function () {
+
+        });
+    </script>
+}

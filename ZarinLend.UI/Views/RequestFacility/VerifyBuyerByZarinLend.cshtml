@@ -1,0 +1,1227 @@
+﻿@model RequestFacilityInfoModel
+@{
+    ViewData["Title"] = ViewBag.Title;
+    Layout = "~/Views/Shared/_NewLayoutWithoutRightMenu.cshtml";
+}
+@section styles
+    {
+    @if (Model.CurrentStepForm == WorkFlowFormEnum.DepositFacilityAmount)
+    {
+        <link href="~/persianDatePicker/css/persianDatepicker-lightorang.css" rel="stylesheet" />
+    }
+    <style type="text/css">
+        @if ( Model.CurrentStepForm == WorkFlowFormEnum.PendingForVerifyResult)
+        {
+            <text>
+                  .modal-dialog, .modal-content {
+                      max-width: 1330px !important;
+                  }
+            </text>
+        }
+    </style>
+}
+@section responsiveMenu
+    {
+    <div class="collapse navbar-collapse d-lg-flex justify-content-between align-items-center" id="navbarNav">
+        <ul class="navbar-nav d-flex d-lg-none mt-1 mt-lg-0">
+            <li class="nav-item">
+                <a class="nav-link dark text-bold-500 top-menu" href="javascript:void(0)" data-target-div='requestFacilityDetailContent'>
+                    <span class="d-flex align-items-center">جزییات تسهیلات درخواستی</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link dark text-bold-500 top-menu" href="javascript:void(0)" data-target-div='userInfoContent'>
+                    <span class="d-flex align-items-center">اطلاعات هویتی و حساب بانکی</span>
+                </a>
+            </li>          
+            <li class="nav-item">
+                <a class="nav-link dark text-bold-500 top-menu" href="javascript:void(0)" data-target-div='userDocuments'>
+                    <span class="d-flex align-items-center">مدارک هویتی</span>
+                </a>
+            </li>
+            @*<li class="nav-item">
+                <a class="nav-link dark text-bold-500 top-menu" href="javascript:void(0)" data-target-div='userJobInfo'>
+                    <span class="d-flex align-items-center">اطلاعات شغلی</span>
+                </a>
+            </li>*@
+            <li class="nav-item">
+                <a class="nav-link dark text-bold-500 top-menu" href="javascript:void(0)" data-target-div="userScoreAndRisk">
+                    <span class="d-flex align-items-center">امتیاز و ریسک</span>
+                </a>
+            </li>
+            @*<li class="nav-item">
+                <a class="nav-link dark text-bold-500" href="#">
+                <span class="d-flex align-items-center">تسهیلات فعال (سمات)</span>
+                </a>
+                </li>
+                <li class="nav-item">
+                <a class="nav-link dark text-bold-500"
+                href="./document-upload.html">
+                <span class="d-flex align-items-center">اطلاعات چک های برگشتی</span>
+                </a>
+              </li>
+            <li class="nav-item">
+                <a class="nav-link dark text-bold-500 top-menu" href="javascript:void(0)" data-target-div="userCheque">
+                    <span class="d-flex align-items-center">تضامین</span>
+                </a>
+            </li>*@ 
+            <li class="nav-item">
+                <a class="nav-link dark text-bold-500 top-menu" href="javascript:void(0)" data-target-div="promissoryContent">
+                    <span class="d-flex align-items-center">سفته</span>
+                </a>
+            </li>
+            <li class="navigation-header"></li>
+            <li class="nav-item">
+                <a class="nav-link dark text-bold-500 top-menu" href="javascript:void(0)" data-target-div="userApplicantValidationResult">
+                    <span class="d-flex align-items-center">نتیجه استعلام های 8 گانه</span>
+                </a>
+            </li>
+            <li class="navigation-header"></li>
+            <li class="nav-item">
+                <a class="nav-link dark text-bold-500 top-menu" href="javascript:void(0)" data-target-div="userCardIssuanceDetail">
+                    <span class="d-flex align-items-center top-menu">شماره تسهیلات، شماره انتظامی و اطلاعات بن کارت</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link dark text-bold-500 top-menu" href="javascript:void(0)" data-target-div="requestFacilityStepsHistory">
+                    <span class="d-flex align-items-center">تاریخچه مراحل درخواست  تسهیلات</span>
+                </a>
+            </li>
+        </ul>
+        <ul class="navbar-nav d-none d-lg-flex">
+            <li class="nav-item mr-1">
+                <a class="nav-link" href="#"><i class="bx bx-bell font-medium-5"></i></a>
+            </li>
+            <li class="nav-item mr-1">
+                <a class="nav-link" href="#"><i class="bx bx-user font-medium-5" style="color:green"></i></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="@Url.Action("Logout","Account")"><i class="bx bx-log-out font-medium-5" style="color:red"></i></a>
+            </li>
+        </ul>
+    </div>
+}
+<form id="frmVerifyBuyer" method="post">
+    <div class="row">
+        <div class="col-12 col-md-6 mb-2">
+            <div class="d-flex align-items-center">
+                <a id="backAnchor" href="@Url.Action("SearchRequest", "RequestFacility")" class="dark bg-white rounded-lg px-1 py-50 mr-50 d-flex align-items-center" title="بازگشت">
+                    <i class="bx bx-arrow-back rotate-180 font-large-1"></i>
+                </a>
+                <div class="ml-75">
+                    <div class="d-flex flex-column">
+                        <div class="font-medium-3 secondary darken-4 text-bold-700">
+                            پرونده @Model.UserIdentityInfo.FName @Model.UserIdentityInfo.LName
+                        </div>
+                        <div class="mt-50 font-small-3 text-bold-400 text-muted">
+                            کد ملی : @Model.UserIdentityInfo.NationalCode
+                        </div>
+                    </div>
+                </div>
+                <div class="ml-75 badge badge-pill badge-light-info">
+                    <div class="d-flex align-items-center">
+                        <i class="bx bxs-circle font-size-xxsmall mr-25"></i>
+                        @Model.LastStatusDescription
+                        @if (Model.RequestFacilityDetail.CancelByUser)
+                        {
+                            <span style='color:red'>(انصراف توسط کاربر)</span>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 mb-2">
+            <div class="d-flex align-items-center justify-content-end">
+                <button id="btnRequestFacilityWorkFlowSteps" class="btn btn-outline-secondary mr-1">
+                    تاریخچه درخواست
+                </button>
+                @if (Model.WaitingForZarinLend && (!User.IsInRole(RoleEnum.BankLeasing.ToString()) || Model.OperatorId == new Guid(User.Identity.GetUserId())))
+                {
+                    <button id="btnVerifyRequest" class="btn white zl-bg-secondary">
+                        تایید درخواست
+                    </button>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 mt-1">
+            @await Component.InvokeAsync("WorkFlowStepWizardHorizental", new { workFlow = WorkFlowEnum.RequestFacility, requestId = Model.Id })
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="d-none d-lg-flex col-12 col-lg-4 full-height">
+            <div class="w-100 p-2 rounded-lg bg-white">
+                <a href="javascript:void(0)" data-target-div='requestFacilityDetailContent'
+                   class="d-flex flex-row align-items-center justify-content-between w-100 mt-1 left-menu">
+                    <span class="dark text-bold-500">جزییات تسهیلات درخواستی</span>
+                    <i class="bx bx-chevron-left text-muted font-medium-5"></i>
+                </a>
+                <a href="javascript:void(0)" data-target-div='userInfoContent'
+                   class="d-flex flex-row align-items-center justify-content-between w-100 mt-1 left-menu">
+                    <span class="zl-text-primary text-bold-500">اطلاعات هویتی و حساب بانکی</span>
+                    <i class="zl-text-primary bx bx-chevron-left font-medium-5"></i>
+                </a>                
+                <a href="javascript:void(0)" data-target-div='userDocuments'
+                   class="d-flex flex-row align-items-center justify-content-between w-100 mt-1 left-menu">
+                    <span class="dark text-bold-500">مدارک هویتی</span>
+                    <i class="bx bx-chevron-left text-muted font-medium-5"></i>
+                </a>
+                @*<a href="javascript:void(0)" data-target-div='userJobInfo'
+                   class="d-flex flex-row align-items-center justify-content-between w-100 mt-1 left-menu">
+                    <span class="dark text-bold-500">اطلاعات شغلی</span>
+                    <i class="bx bx-chevron-left text-muted font-medium-5"></i>
+                </a>*@
+                <a href="javascript:void(0)" data-target-div="userScoreAndRisk"
+                   class="d-flex flex-row align-items-center justify-content-between w-100 mt-1 left-menu">
+                    <span class="dark text-bold-500">امتیاز و ریسک</span>
+                    <i class="bx bx-chevron-left text-muted font-medium-5"></i>
+                </a>
+                @*<a href="javascript:void(0)"
+                    class="d-flex flex-row align-items-center justify-content-between w-100 mt-1">
+                    <span class="dark text-bold-500">تسهیلات فعال (سمات)</span>
+                    <i class="bx bx-chevron-left text-muted font-medium-5"></i>
+                    </a>
+                    <a href="javascript:void(0)"
+                    class="d-flex flex-row align-items-center justify-content-between w-100 mt-1">
+                    <span class="dark text-bold-500">اطلاعات چک های برگشتی</span>
+                    <i class="bx bx-chevron-left text-muted font-medium-5"></i>
+                    </a>
+                <a href="javascript:void(0)" data-target-div="userCheque"
+                   class="d-flex flex-row align-items-center justify-content-between w-100 mt-1 left-menu">
+                    <span class="dark text-bold-500">تضامین</span>
+                    <i class="bx bx-chevron-left text-muted font-medium-5"></i>
+                </a>*@
+                 <a href="javascript:void(0)" data-target-div="promissoryContent"
+                   class="d-flex flex-row align-items-center justify-content-between w-100 mt-1 left-menu">
+                    <span class="dark text-bold-500">سفته</span>
+                    <i class="bx bx-chevron-left text-muted font-medium-5"></i>
+                </a>                
+                <a href="javascript:void(0)" data-target-div="userApplicantValidationResult"
+                   class="d-flex flex-row align-items-center justify-content-between w-100 mt-1 left-menu">
+                    <span class="dark text-bold-500">نتیجه استعلام های 8 گانه</span>
+                    <i class="bx bx-chevron-left text-muted font-medium-5"></i>
+                </a>
+                <a href="javascript:void(0)" data-target-div="userCardIssuanceDetail"
+                   class="d-flex flex-row align-items-center justify-content-between w-100 mt-1 left-menu">
+                    <span class="dark text-bold-500">شماره تسهیلات، شماره انتظامی و اطلاعات بن کارت</span>
+                    <i class="bx bx-chevron-left text-muted font-medium-5"></i>
+                </a>
+                @*<a href="javascript:void(0)" data-target-div="requestFacilityStepsHistory"
+                    class="d-flex flex-row align-items-center justify-content-between w-100 mt-1 left-menu">
+                    <span class="dark text-bold-500">تاریخچه مراحل درخواست  تسهیلات</span>
+                    <i class="bx bx-chevron-left text-muted font-medium-5"></i>
+                    </a>*@
+            </div>
+        </div>
+        <div class="col-12 col-lg-8">
+            <div id="userInfoContent" class="content-div">
+                @await Component.InvokeAsync("UserIdentityInfo", new { userIdentityInfo = @Model.UserIdentityInfo })
+            </div>
+            <div id="requestFacilityDetailContent" class="content-div" style="display:none">
+                @await Component.InvokeAsync("RequestFacilityDetail", new { requestFacilityDetail = @Model.RequestFacilityDetail })
+            </div>
+            <div id="userDocuments" class="content-div" style="display:none">
+                @await Component.InvokeAsync("UserIdentityDocuments", new { userIdentitydocuments = @Model.BuyerIdentityDocuments })
+            </div>
+            @*<div id="userJobInfo" class="content-div" style="display:none">
+                 @await Component.InvokeAsync("PersonJobInfo", new { personId = @Model.UserIdentityInfo.PersonId })
+            </div>*@
+            <div id="userScoreAndRisk" class="content-div" style="display:none">
+                @await Component.InvokeAsync("UserIranCreditScoringHistory", new { userId = @Model.UserId })
+            </div>
+            @*<div id="userCheque" class="content-div" style="display:none">
+                @await Component.InvokeAsync("RequestFacilityWarranty", new { userId = @Model.UserId, requestFacilityId = @Model.Id })
+            </div>*@
+             <div id="promissoryContent" class="content-div" style="display:none">
+                @await Component.InvokeAsync("RequestFacilityPromissory", new { userId = @Model.UserId, requestFacilityId = @Model.Id })
+            </div>
+            <div id="userApplicantValidationResult" class="content-div" style="display:none">
+                @await Component.InvokeAsync("ApplicantValidationResult", new { requestFacilityId = @Model.Id, leasingId = @Model.LeasingId })
+            </div>
+            <div id="userCardIssuanceDetail" class="content-div" style="display:none">
+                @await Component.InvokeAsync("CardIssuanceDetail", new
+                {
+                    cardIssuance = @Model.CardIssuanceModel,
+                signedContractByBankFileName = Model.RequestFacilityDetail.SignedContractByBankFileName,
+                policeNumber = Model.RequestFacilityDetail.PoliceNumber,
+                facilityNumber = Model.RequestFacilityDetail.FacilityNumber
+                })
+            </div>
+            @*<div id="requestFacilityStepsHistory" class="content-div" style="display:none">
+                @await Component.InvokeAsync("RequestFacilityWorkFlowStepsHistory", new {  requestFacilityId = @Model.Id})
+                </div>*@
+        </div>
+    </div>
+    @if (Model.WaitingForZarinLend)
+    {
+        var modalHeaderTitle = string.Empty;
+        var returnToCorrectionTitle = string.Empty;
+        var confirm_reject_button_title = string.Empty;
+        var modal_class = "modal-xl";
+        if (Model.CurrentStepForm == WorkFlowFormEnum.VerifyZarrinLend)
+        {
+            confirm_reject_button_title = "ثبت وضعیت";
+            modalHeaderTitle = "انتخاب نهاد مالی/بررسی درخواست";
+            returnToCorrectionTitle = "برگشت جهت اصلاح/ویرایش";
+        }
+        else if (Model.CurrentStepForm == WorkFlowFormEnum.VerifyCheckByZarinLend)
+        {
+            modal_class = "modal-md";
+            confirm_reject_button_title = "ثبت وضعیت";
+            modalHeaderTitle = "بررسی تصویر چک/سفته توسط کارشناس زرین لند";
+            returnToCorrectionTitle = "برگشت جهت اصلاح تصویر چک و اطلاعات چک ضمانت";
+        }
+        else if (Model.CurrentStepForm == WorkFlowFormEnum.CardIssuance)
+        {
+            modal_class = "modal-md";
+            confirm_reject_button_title = "ثبت اطلاعات بن کارت";
+            modalHeaderTitle = "صدور بن کارت";
+        }
+        else if (Model.CurrentStepForm == WorkFlowFormEnum.CompleteBonCardInfo)
+        {
+            modal_class = "modal-md";
+            confirm_reject_button_title = "تکمیل اطلاعات بن کارت";
+            modalHeaderTitle = "تکمیل اطلاعات بن کارت";
+        }
+        else if (Model.CurrentStepForm == WorkFlowFormEnum.CardRecharge)
+        {
+            /* confirm_reject_button_title = "شارژ بن کارت مشتری";
+            modal_class = "modal-md";
+            modalHeaderTitle = ViewBag.Title; */
+        }
+        <div class="modal fade text-left" id="pendingRequestModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel18" style="display: none;" data-backdrop="static" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable @modal_class" role="document">
+                <div class="modal-content rounded-lg @modal_class">
+                    <div class="modal-header">
+                        <h4 class="modal-title dark" id="myModalLabel18">
+                            @modalHeaderTitle
+                        </h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="بستن">
+                            <i class="bx bx-x"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body line-height-2">
+                        <div class="row">
+                            @if (Model.CurrentStepForm == WorkFlowFormEnum.VerifyZarrinLend ||
+                                 Model.CurrentStepForm == WorkFlowFormEnum.VerifyCheckByZarinLend)
+                            {
+                                <div class="col-xl-3 col-md-6 col-xs-12">                                    
+                                    <fieldset>
+                                        <div class="radio radio-success radio-glow radio-sm">
+                                            <input type="radio" name="requestStatusRadio" id="approveRadio" value="@((int)StatusEnum.Approved)" />
+                                            <label class="font-small-3 success darken-4 text-bold-400 line-height-23" for="approveRadio">تایید درخواست</label>
+                                        </div>
+                                    </fieldset>                                    
+                                </div>
+                            }
+                            @if (Model.CurrentStepForm == WorkFlowFormEnum.CardIssuance || Model.CurrentStepForm == WorkFlowFormEnum.CompleteBonCardInfo)
+                            {
+                                <div class="col-md-12 form-group">                                    
+                                    <fieldset>
+                                        <div class="radio radio-success radio-glow radio-sm">
+                                            <input type="radio" name="requestStatusRadio" id="approveRadio" value="@((int)StatusEnum.Approved)" />
+                                            <label class="font-small-3 success darken-4 text-bold-400 line-height-23" for="approveRadio">تایید درخواست</label>
+                                        </div>
+                                    </fieldset>                                   
+                                </div>
+                            }
+                            @if (Model.CurrentStepForm == WorkFlowFormEnum.VerifyZarrinLend || Model.CurrentStepForm == WorkFlowFormEnum.VerifyCheckByZarinLend)
+                            {
+                                <div class="col-xl-3 col-md-6 col-xs-12">                                    
+                                    <fieldset>
+                                        <div class="radio radio-info radio-glow radio-sm">
+                                            <input type="radio" name="requestStatusRadio" id="returnToCorrectionRadio" value="@((int)StatusEnum.ReturnToCorrection)" />
+                                            <label class="font-small-3 info darken-4 text-bold-400 line-height-23" for="returnToCorrectionRadio">@returnToCorrectionTitle</label>
+                                        </div>
+                                    </fieldset>                                    
+                                </div>
+                            }
+                            @if (Model.CurrentStepForm == WorkFlowFormEnum.VerifyZarrinLend || Model.CurrentStepForm == WorkFlowFormEnum.VerifyCheckByZarinLend)
+                            {
+                                <div class="col-xl-3 col-md-6 col-xs-12">                                    
+                                    <fieldset>
+                                        <div class="radio radio-warning radio-glow radio-sm">
+                                            <input type="radio" name="requestStatusRadio" id="rejectRadio" value="@((int)StatusEnum.Rejected)" />
+                                            <label class="font-small-3 warning darken-4 text-bold-400 line-height-23" for="rejectRadio">رد درخواست</label>
+                                        </div>
+                                    </fieldset>                                    
+                                </div>
+                            }
+                            @if (Model.CurrentStepForm == WorkFlowFormEnum.VerifyZarrinLend)
+                            {
+                                if (!Model.RequestFacilityDetail.GuarantorIsRequired)
+                                {
+                                    <div class="col-xl-3 col-md-6 col-xs-12">                                        
+                                        <fieldset>
+                                            <div class="radio radio-danger radio-glow radio-sm">
+                                                <input type="radio" name="requestStatusRadio" id="radioButton100" value="100" />
+                                                <label class="font-small-3 danger darken-4 text-bold-400 line-height-23" for="radioButton100">پرونده نیاز به ضامن دارد!تغییر وضعیت پرونده به حالت در انتظار معرفی ضامن</label>
+                                            </div>
+                                        </fieldset>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="col-xl-3 col-md-6 col-xs-12">                                        
+                                        <fieldset>
+                                            <div class="radio radio-primary radio-glow radio-sm">
+                                                <input type="radio" name="requestStatusRadio" id="radioButton101" value="101" />
+                                                <label class="font-small-3 primary darken-4 text-bold-400 line-height-23" for="radioButton101">پرونده نیاز به ضامن ندارد</label>
+                                            </div>
+                                        </fieldset>                                       
+                                    </div>
+                                }
+                            }
+                        </div>
+                        @if (Model.CurrentStepForm == WorkFlowFormEnum.VerifyZarrinLend)
+                        {
+                            <hr />
+                            <div class="row mt-1" id="selectLeasing" style="display:none">
+                                <div class="col-md-6 col-sm-12">
+                                    <div class="form-group">
+                                        <select name="LeasingId" asp-for="LeasingId" class="form-control bg-transparent " asp-items="Model.Leasings">
+                                            <option value="" >@ResourceFile.SelectLeasing</option>
+                                        </select>
+                                        <span asp-validation-for="LeasingId" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mt-1" id="validationMustBeRepeatedDiv" style="display:none">
+                                <div class="col-xl-3 col-md-6 col-xs-12">
+                                    <div class="form-group form-group-ex">
+                                        <label class="control-label font-small-3">وضعیت اعتبارسنجی ایرانیان</label>
+                                    </div>
+                                </div>
+                                <div class="col-xl-3 col-md-6 col-xs-12">
+                                    <div class="">
+                                        <fieldset>
+                                            <div class="radio radio-primary radio-glow radio-sm">
+                                                <input type="radio" name="validationMustBeRepeated" id="validationMustBeRepeated1" value="false" />
+                                                <label class="font-small-3 primary darken-4 text-bold-400 line-height-23" for="validationMustBeRepeated1">لازم است اعتبارسنجی مجددا انجام شود</label>
+                                            </div>
+                                        </fieldset>
+                                    </div>
+                                </div>
+                                <div class="col-xl-3 col-md-6 col-xs-12">
+                                    <div class="">
+                                        <fieldset>
+                                            <div class="radio radio-info radio-glow radio-sm">
+                                                <input type="radio" name="validationMustBeRepeated" id="validationMustBeRepeated2" value="false" />
+                                                <label class="font-small-3 info darken-4 text-bold-400 line-height-23" for="validationMustBeRepeated2">اعتبارسنجی مجددا لازم نیست</label>
+                                            </div>
+                                        </fieldset>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mt-1" id="defaultErrorList" style="display:none">
+                            </div>
+                        }
+                        else if (Model.CurrentStepForm == WorkFlowFormEnum.VerifyCheckByZarinLend)
+                        {
+                            //محتوای فرم خاص مربوط به این مرحله خاص
+                        }
+                        else if (Model.CurrentStepForm == WorkFlowFormEnum.InsuranceIssuance)
+                        {
+                            /*<fieldset>
+                                <legend>صدور بیمه و اطلاع رسانی به مشتری</legend>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label class="control-label" asp-for="InsuranceIssuanceModel.InsuranceNumber"></label>
+                                            <input asp-for="InsuranceIssuanceModel.InsuranceNumber" class="form-control" style="text-align:center;direction:ltr" />
+                                            <span asp-validation-for="InsuranceIssuanceModel.InsuranceNumber" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label class="control-label">فایل پیوست</label>
+                                            <input type="file" name="file" id="file" class="form-control" accept="image/*;capture=camera">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-8"></div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label class="control-label" asp-for="InsuranceIssuanceModel.Description"></label>
+                                            <textarea asp-for="InsuranceIssuanceModel.Description" class="form-control" style=" direction:rtl"></textarea>
+                                            <span asp-validation-for="InsuranceIssuanceModel.Description" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </fieldset>*/
+                        }
+                        else if (Model.CurrentStepForm == WorkFlowFormEnum.CardIssuance)
+                        {
+                            <div class="row">
+                                <div class="col-md-6 col-sm-12">
+                                    <div class="form-group">
+                                        <label class="control-label" asp-for="CardIssuanceModel!.CardNumber"></label>
+                                        <input asp-for="CardIssuanceModel!.CardNumber" class="form-control" style="text-align:center;direction:ltr;letter-spacing:3px" />
+                                        <span asp-validation-for="CardIssuanceModel!.CardNumber" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-sm-12">
+                                    <div class="form-group">
+                                        <label class="control-label" asp-for="CardIssuanceModel!.AccountNumber"></label>
+                                        <input asp-for="CardIssuanceModel!.AccountNumber" class="form-control" style="text-align: center; direction: ltr; letter-spacing: 3px" />
+                                        <span asp-validation-for="CardIssuanceModel!.AccountNumber" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 col-sm-12">
+                                    <div class="form-group">
+                                        <label class="control-label" asp-for="CardIssuanceModel!.Cvv"></label>
+                                        <input asp-for="CardIssuanceModel!.Cvv" class="form-control" style="text-align:center;direction:ltr;letter-spacing:3px" />
+                                        <span asp-validation-for="CardIssuanceModel!.Cvv" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-sm-12">
+                                    <div class="form-group">
+                                        <label class="control-label" asp-for="CardIssuanceModel!.SecondPassword"></label>
+                                        <input asp-for="CardIssuanceModel!.SecondPassword" class="form-control" style="text-align: center; direction: ltr; letter-spacing: 3px" />
+                                        <span asp-validation-for="CardIssuanceModel!.SecondPassword" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 col-sm-12">
+                                    <div class="form-group">
+                                        <label class="control-label" asp-for="CardIssuanceModel!.ExpireMonth"></label>
+                                        <input asp-for="CardIssuanceModel!.ExpireMonth" class="form-control" style="text-align:center;direction:ltr;letter-spacing:3px" />
+                                        <span asp-validation-for="CardIssuanceModel!.ExpireMonth" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-sm-12">
+                                    <div class="form-group">
+                                        <label class="control-label" asp-for="CardIssuanceModel!.ExpireYear"></label>
+                                        <input asp-for="CardIssuanceModel!.ExpireYear" class="form-control" style="text-align: center; direction: ltr; letter-spacing: 3px" />
+                                        <span asp-validation-for="CardIssuanceModel!.ExpireYear" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        else if (Model.CurrentStepForm == WorkFlowFormEnum.CompleteBonCardInfo)
+                        {
+                            <input asp-for="BonCardEditModel!.Id" type="hidden" />
+                            <div class="row">
+                                <div class="col-md-6 col-sm-12">
+                                    <div class="form-group">
+                                        <label class="control-label" asp-for="CardIssuanceModel!.CardNumber"></label>
+                                        <input asp-for="CardIssuanceModel!.CardNumber" disabled="disabled" readonly="readonly" class="form-control" style="text-align:center;direction:ltr;letter-spacing:3px" />
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-sm-12">
+                                    <div class="form-group">
+                                        <label class="control-label" asp-for="CardIssuanceModel!.AccountNumber"></label>
+                                        <input asp-for="CardIssuanceModel!.AccountNumber" disabled="disabled" readonly="readonly" class="form-control" style="text-align: center; direction: ltr; letter-spacing: 3px" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 col-sm-12">
+                                    <div class="form-group">
+                                        <label class="control-label" asp-for="BonCardEditModel!.Cvv"></label>
+                                        <input asp-for="BonCardEditModel!.Cvv" class="form-control" style="text-align:center;direction:ltr;letter-spacing:3px" />
+                                        <span asp-validation-for="BonCardEditModel!.Cvv" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-sm-12">
+                                    <div class="form-group">
+                                        <label class="control-label" asp-for="BonCardEditModel!.SecondPassword"></label>
+                                        <input asp-for="BonCardEditModel!.SecondPassword" class="form-control" style="text-align: center; direction: ltr; letter-spacing: 3px" />
+                                        <span asp-validation-for="BonCardEditModel!.SecondPassword" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 col-sm-12">
+                                    <div class="form-group">
+                                        <label class="control-label" asp-for="BonCardEditModel!.ExpireMonth"></label>
+                                        <input asp-for="BonCardEditModel!.ExpireMonth" class="form-control" style="text-align:center;direction:ltr;letter-spacing:3px" />
+                                        <span asp-validation-for="BonCardEditModel!.ExpireMonth" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-sm-12">
+                                    <div class="form-group">
+                                        <label class="control-label" asp-for="BonCardEditModel!.ExpireYear"></label>
+                                        <input asp-for="BonCardEditModel!.ExpireYear" class="form-control" style="text-align: center; direction: ltr; letter-spacing: 3px" />
+                                        <span asp-validation-for="BonCardEditModel!.ExpireYear" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        else if (Model.CurrentStepForm == WorkFlowFormEnum.CardRecharge)
+                        {
+                            /* @await Component.InvokeAsync("CardRecharge", new
+                            {
+                                model = new RequestFacilityCardRechargeModel()
+                                {
+                                    AccountNumber = Model.CardIssuanceModel.AccountNumber,
+                                    CardNumber = Model.CardIssuanceModel.CardNumber,
+                                    Amount = Model.RequestFacilityDetail.Amount,
+                                    RequesterFullName = $"{Model.UserIdentityInfo.FName} {Model.UserIdentityInfo.LName}",
+                                    RequestFacilityId = Model.Id,
+                                }
+                            })
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <fieldset>
+                                        <div class="checkbox checkbox-success checkbox-glow checkbox-sm">
+                                            <input type="checkbox" name="cardRechargeCheckBox" id="cardRechargeCheckBox" />
+                                            <label class="font-small-3 success darken-4 text-bold-400 line-height-23" for="cardRechargeCheckBox">آیا برای شارژ بن کارت مطمئن هستید؟</label>
+                                        </div>
+                                    </fieldset>
+                                </div>
+                            </div> */
+                        }
+                        <div class="row mt-1">
+                            <div class="col-sm-12">
+                                <div class="form-group form-group-ex">
+                                    <label class="control-label font-small-3">توضیحات کارشناس</label>
+                                    <textarea id="description_admin" name="description_admin" class="form-control" placeholder="توضیحات کارشناس"></textarea>
+                                    <span class="text-danger field-validation-valid" data-valmsg-for="description_admin" data-valmsg-replace="true"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <div class="text-right">
+                            <a href="#" class="btn btn-outline-secondary" data-dismiss="modal">
+                                <span>انصراف</span>
+                            </a>
+                            <button id="btnChangeStatus" class="btn btn-zl-primary white">
+                                <span>@confirm_reject_button_title</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</form>
+
+@section scripts{
+    @{
+        await Html.RenderPartialAsync("~/Views/Shared/_ValidationScriptsPartial.cshtml");
+    }
+    @if (Model.CurrentStepForm == WorkFlowFormEnum.CardIssuance)
+    {
+       
+    }
+    else if (Model.CurrentStepForm == WorkFlowFormEnum.DepositFacilityAmount)
+    {
+        <script src="~/persianDatePicker/js/persianDatepicker.min.js"></script>
+    }
+    <script>
+        $(document).ready(function() {
+            if (document.referrer != '' && document.referrer != null &&
+               (document.referrer.includes('portal.zarinlend.ir') || document.referrer.includes('lend.mypmo.ir') || document.referrer.includes('localhost:9091')))
+               $('#backAnchor').attr('href',document.referrer);
+
+            if (@((int)Model.CurrentStepForm) == @((int)WorkFlowFormEnum.CardIssuance)) {
+                $('#CardIssuanceModel_CardNumber').mask('6362-1499-9999-9999', { placeholder: "6362-14__-____-____" });
+                $('#CardIssuanceModel_AccountNumber').mask('9999999999999', { placeholder: "_____________" });
+                $('#CardIssuanceModel_Cvv').mask('99999', { placeholder: "_____" });
+                $('#CardIssuanceModel_ExpireYear').mask('9999', { placeholder: "____" });
+                $('#CardIssuanceModel_ExpireMonth').mask('99', { placeholder: "__" });
+                $('#CardIssuanceModel_SecondPassword').mask('999999999999999', { placeholder: "_______________" });
+            }
+            else if (@((int)Model.CurrentStepForm) == @((int)WorkFlowFormEnum.CompleteBonCardInfo)) {
+                $('#BonCardEditModel_Cvv').mask('99999', { placeholder: "_____" });
+                $('#BonCardEditModel_ExpireYear').mask('9999', { placeholder: "____" });
+                $('#BonCardEditModel_ExpireMonth').mask('99', { placeholder: "__" });
+                $('#BonCardEditModel_SecondPassword').mask('999999999999999', { placeholder: "_______________" });
+            }
+
+            //load default errors
+            $.ajax({
+                type: 'post',
+                data: '{}',
+                datatype: "json",
+                contentType: "application/json; charset=utf-8",
+                url: '/api/v1/WorkFlow/GetWorkFlowDefaultErrors/@((int)WorkFlowEnum.RequestFacility)',
+                success: function(result) {
+                    hideWaiting('frmVerifyBuyer');
+                    debugger;
+                    if (result.isSuccess && result.data != null) {
+                        result.data.forEach(messageItem =>{
+                            $('#defaultErrorList').append(`<div class="col-12 col-sm-12 mx-auto">
+                                                               <fieldset>
+                                                                   <div class="checkbox checkbox-warning">
+                                                                       <input type="checkbox" class='default-message-error' id="chk${messageItem.id}" value='${messageItem.id}' />
+                                                                       <label class='font-small-3' for="chk${messageItem.id}">${messageItem.message}(مرحله : ${messageItem.stepName})</label>
+                                                                   </div>
+                                                               </fieldset>
+                                                           </div>`);
+                        });
+                    }
+                },
+                error: function(error) {
+                    hideWaiting('frmVerifyBuyer');
+                    const exception = getExceptionMessageFromError(error);
+                    if (exception != null)
+                        showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                    else
+                        showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                }
+            });
+        });
+
+        $('.left-menu,.top-menu').click(function(sender) {
+            debugger;
+            const targetElement = $($(sender)[0].currentTarget);
+            const targetDivId = targetElement.data('target-div');
+            const contentDiv = $(`#${targetDivId}`);
+            $('.content-div').hide();
+            contentDiv.show(500);
+
+            $('a.left-menu > span').removeClass('zl-text-primary');
+            $('a.left-menu > span').addClass('dark');
+            $('a.left-menu > i').removeClass('zl-text-primary');
+            $('a.left-menu > i').addClass('text-muted');
+            $('a.top-menu > span').removeClass('zl-text-primary');
+            $('a.top-menu > span').addClass('dark');
+
+
+            targetElement.children().first().removeClass('dark').addClass('zl-text-primary');
+            targetElement.children().last().removeClass('text-muted').addClass('zl-text-primary');
+            $([document.documentElement, document.body]).animate({
+                scrollTop: $(`#${targetDivId}`).offset().top - 80
+            }, 2000);
+        });
+
+        $('#btnVerifyRequest').click(function(e) {
+            e.preventDefault();
+            $('#pendingRequestModal').modal();
+        });
+
+        $('#btnRequestFacilityWorkFlowSteps').click((e) => {
+            debugger;
+            e.preventDefault();
+            loadRequestFacilitySteps(@Model.Id);
+            $('#requestFacilityStepsHistoryModal').modal();
+        });
+
+         if (@((int)Model.CurrentStepForm) == @((int)WorkFlowFormEnum.VerifyZarrinLend)) {
+              $('input[name=requestStatusRadio]').change(() => {
+                    debugger;
+                    if ($('input[name=requestStatusRadio]:checked').val() == '@((short)StatusEnum.Approved)')
+                    {
+                        $('#selectLeasing').show(500);
+                        $('#defaultErrorList').hide(500);
+                        $('#validationMustBeRepeatedDiv').hide(500);
+                    }
+                    else if ($('input[name=requestStatusRadio]:checked').val() == '@((short)StatusEnum.Rejected)' || 
+                             $('input[name=requestStatusRadio]:checked').val() == '@((short)StatusEnum.ReturnToCorrection)')    
+                    {
+                        $('#selectLeasing').hide(500);
+                        $('#defaultErrorList').show(500);
+                        $('#validationMustBeRepeatedDiv').show(500);
+                    }
+                    else if ($('input[name=requestStatusRadio]:checked').val() == 100/*زمانی که پرونده نیاز به ضامن دارد*/)
+                    {
+                        $('#selectLeasing').hide(500);
+                        $('#validationMustBeRepeatedDiv').hide(500);
+                        $('#defaultErrorList').show(500);                        
+                    }
+                    else{
+                        $('#selectLeasing').hide(500);
+                        $('#defaultErrorList').hide(500);
+                        $('#validationMustBeRepeatedDiv').hide(500);
+                    }
+                });
+         }
+
+        if (@((int)Model.CurrentStepForm) == @((int)WorkFlowFormEnum.VerifyZarrinLend)) {           
+            $('#btnChangeStatus').click(function(e) {
+                e.preventDefault();
+                    debugger;
+                    const formIsValid = $('#frmVerifyBuyer').valid();
+                    const requestStatus = $('input[name=requestStatusRadio]:checked').val();
+                    if (requestStatus == undefined) {
+                        showMessage('@ResourceFile.InfoTitle', 'لطفا وضعیت درخواست را مشخص کنید!', icons.warning, '@ResourceFile.Close');
+                        return;
+                    }
+
+                    /* var selectedMessagesCheckBoxes = $('input[type=checkbox].default-message-error:checked');
+                    if(selectedMessagesCheckBoxes.length == 0 && 
+                       (requestStatus == '@((short)StatusEnum.ReturnToCorrection)' || requestStatus == '@((short)StatusEnum.Rejected)') || requestStatus == 100)
+                    {
+                        showMessage('@ResourceFile.InfoTitle', 'لطفا یک یا چند دلیل برای برگشت جهت اصلاح یا رد پرونده انتخاب کنید،موارد انتخاب شده توسط شما به درخواست دهنده تسهیلات نشان داده خواهد شد!', icons.warning, '@ResourceFile.Close');
+                        return;
+                    } */
+                    const selectedErrorMessageIds = [];
+                    /* selectedMessagesCheckBoxes.map((index, element) => {
+                        selectedErrorMessageIds.push(element.value);
+                    }); */
+
+                    const validationMustBeRepeated = $('input[name=validationMustBeRepeated]:checked').val();
+                    if (validationMustBeRepeated == undefined &&
+                        (requestStatus == '@((short)StatusEnum.ReturnToCorrection)' || requestStatus == '@((short)StatusEnum.Rejected)')) {
+                        showMessage('@ResourceFile.InfoTitle', 'لطفا وضعیت انجام یا عدم انجام مجدد اعتبارسنجی را مشخص کنید!', icons.warning, '@ResourceFile.Close');
+                        return;
+                    }
+
+                    let leasingId = null;
+                    if (requestStatus == '@((short)StatusEnum.Approved)')
+                        leasingId = $('#LeasingId').val();
+
+                    if (formIsValid) {
+                        showWaiting('frmVerifyBuyer', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                        if (requestStatus != 100 && requestStatus != 101)//request required to register 'Guarantor'
+                        {
+                            const postData = {
+                                RequestFacilityId: '@Model.Id',
+                                Status: requestStatus,
+                                LeasingId: leasingId,
+                                ErrorMessageIds : selectedErrorMessageIds,
+                                ValidationMustBeRepeated:validationMustBeRepeated,
+                                StatusDescription: $('#description_admin').val()
+                            };
+
+                            $.ajax({
+                                type: 'post',
+                                data: JSON.stringify(postData),
+                                datatype: "json",
+                                contentType: "application/json; charset=utf-8",
+                                url: '/api/v1/RequestFacility/VerifyByZarinLend',
+                                success: function (result) {
+                                    hideWaiting('frmVerifyBuyer');
+                                    debugger;
+                                    if (result.isSuccess) {
+                                        showMessage('@ResourceFile.InfoTitle', '@ResourceFile.MessageSuccess', icons.success, '@ResourceFile.Close',
+                                        ()=>{
+                                            window.location.replace('@Url.Action("SearchRequest", "requestfacility")');
+                                        });
+                                    }
+                                },
+                                error: function (error) {
+                                    hideWaiting('frmVerifyBuyer');
+                                    const exception = getExceptionMessageFromError(error);
+                                    if (exception != null)
+                                        showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                                    else
+                                        showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                                }
+                            });
+                        }
+                        else {
+                            const postData = {
+                                RequestFacilityId: '@Model.Id',
+                                GuarantorIsRequired : requestStatus == 100,
+                                StatusDescription: $('#description_admin').val()
+                            };
+
+                            $.ajax({
+                                type: 'post',
+                                data: JSON.stringify(postData),
+                                datatype: "json",
+                                contentType: "application/json; charset=utf-8",
+                                url: '/api/v1/RequestFacility/SetGuarantorIsRequired',
+                                success: function (result) {
+                                    hideWaiting('frmVerifyBuyer');
+                                    debugger;
+                                    if (result.isSuccess) {
+                                        showMessage('@ResourceFile.InfoTitle', '@ResourceFile.MessageSuccess', icons.success, '@ResourceFile.Close');
+                                        setTimeout(function () {
+                                            window.location.replace('@Url.Action("SearchRequest", "requestfacility")');
+                                        }, 2500);
+                                    }
+                                },
+                                error: function (error) {
+                                    hideWaiting('frmVerifyBuyer');
+                                    const exception = getExceptionMessageFromError(error);
+                                    if (exception != null)
+                                        showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                                    else
+                                        showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                                }
+                            });
+                        }
+                    }
+                    else {
+                        scrollToFirstError();
+                    }
+            });
+        }
+        else if (@((int)Model.CurrentStepForm) == @((int)WorkFlowFormEnum.VerifyCheckByZarinLend)) {
+            $('#btnChangeStatus').click(function (e) {
+                    e.preventDefault();
+                    debugger;
+                    const formIsValid = $('#frmVerifyBuyer').valid();
+                    const requestStatus = $('input[name=requestStatusRadio]:checked').val();
+                    if (requestStatus == undefined) {
+                        showMessage('@ResourceFile.InfoTitle', 'لطفا وضعیت درخواست را مشخص کنید!', icons.warning, '@ResourceFile.Close');
+                        return;
+                    }
+
+                    if (formIsValid) {
+                        showWaiting('frmVerifyBuyer', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                        const postData = {
+                            RequestFacilityId: '@Model.Id',
+                            Status: requestStatus,
+                            StatusDescription: $('#description_admin').val()
+                        };
+
+                        $.ajax({
+                            type: 'post',
+                            data: JSON.stringify(postData),
+                            datatype: "json",
+                            contentType: "application/json; charset=utf-8",
+                            url: '/api/v1/RequestFacility/VerifyCheckByZarinLend',
+                            success: function (result) {
+                                hideWaiting('frmVerifyBuyer');
+                                debugger;
+                                if (result.isSuccess) {
+                                    showMessage('@ResourceFile.InfoTitle', '@ResourceFile.MessageSuccess', icons.success, '@ResourceFile.Close');
+                                    setTimeout(function () {
+                                        window.location.replace('@Url.Action("SearchRequest", "requestfacility")');
+                                    }, 2500);
+                                }
+                            },
+                            error: function (error) {
+                                hideWaiting('frmVerifyBuyer');
+                                const exception = getExceptionMessageFromError(error);
+                                if (exception != null)
+                                    showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                                else
+                                    showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                            }
+                        });
+                    }
+                    else {
+                        scrollToFirstError();
+                    }
+                });
+        }
+        else if (@((int)Model.CurrentStepForm) == @((int)WorkFlowFormEnum.InsuranceIssuance)) {
+            /* $('#btnChangeStatus').click(function (e) {
+                e.preventDefault();
+                    debugger;
+                    const formIsValid = $('#frmVerifyBuyer').valid();
+                    const file = $("#file")[0];
+                    //if (file.files.length == 0) {
+                    //    showMessage('@ResourceFile.InfoTitle', 'لطفا تصویر چک را بارگذاری کنید', icons.warning, '@ResourceFile.Close');
+                    //    return;
+                    //}
+
+                    if (formIsValid) {
+                        showWaiting('frmVerifyBuyer', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                        let data = new FormData();
+                        if (file.files.length > 0) {
+                            data.append('file', file.files[0]);
+                        }
+
+                        data.append('Description', $('#description_admin').val());
+                        data.append('InsuranceNumber', $('#InsuranceIssuanceModel_InsuranceNumber').val());
+                        data.append('RequestFacilityId', @Model.Id);
+
+                        $.ajax({
+                            type: 'post',
+                            //dataType: 'json',
+                            //contentType: "application/json; charset=utf-8",
+                            processData: false,
+                            contentType: false,
+                            url: '/api/v1/RequestFacilityInsuranceIssuance/InsuranceIssuance',
+                            data: data,// JSON.stringify(model),
+                            success: function (result) {
+                                hideWaiting('frmVerifyBuyer');
+                                debugger;
+                                if (result.isSuccess) {
+                                    showMessage('@ResourceFile.InfoTitle', '@ResourceFile.MessageSuccess', icons.success, '@ResourceFile.Close');
+                                    setTimeout(function () {
+                                        window.location.replace('@Url.Action("SearchRequest","RequestFacility")');
+                                    }, 2500);
+                                }
+                            },
+                            error: function (error) {
+                                hideWaiting('frmVerifyBuyer');
+                                const exception = getExceptionMessageFromError(error);
+                                if (exception != null)
+                                    showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                                else
+                                    showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                            }
+                        });
+                    }
+                    else {
+                        scrollToFirstError();
+                    }
+            }); */
+        }
+        else if (@((int)Model.CurrentStepForm) == @((int)WorkFlowFormEnum.CardRecharge)) {
+            /* $('#btnChangeStatus').click(function(e) {
+                e.preventDefault();
+                debugger;
+                const formIsValid = $('#frmVerifyBuyer').valid();
+
+                if (!$('#cardRechargeCheckBox').prop('checked')) {
+                    showMessage('@ResourceFile.InfoTitle', 'لطفا گزینه <b>آیا برای شارژ بن کارت مطمئن هستید؟</b> را انتخاب نمایید!', icons.warning, '@ResourceFile.Close');
+                    return;
+                }
+                if (formIsValid) {
+                    showWaiting('frmVerifyBuyer', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                    let data = new FormData();
+                    debugger;
+                    //data.append('DepositDocumentNumber', $('#DepositDocumentNumber').val());
+
+                    $.ajax({
+                        type: 'post',
+                        //dataType: 'json',
+                        //contentType: "application/json; charset=utf-8",
+                        processData: false,
+                        contentType: false,
+                        url: '/api/v1/RequestFacility/CardRecharge/@Model.Id',
+                        //data: data,// JSON.stringify(model),
+                        success: function(result) {
+                            hideWaiting('frmVerifyBuyer');
+                            debugger;
+                            if (result.isSuccess) {
+                                showMessage('@ResourceFile.InfoTitle', '@ResourceFile.MessageSuccess', icons.success, '@ResourceFile.Close',
+                                    () => { window.location.replace('@Url.Action("SearchRequest","RequestFacility")'); });
+                            }
+                        },
+                        error: function(error) {
+                            hideWaiting('frmVerifyBuyer');
+                            const exception = getExceptionMessageFromError(error);
+                            if (exception != null)
+                                showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                            else
+                                showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                        }
+                    });
+                }
+                else {
+                    scrollToFirstError();
+                }
+            }); */
+        }
+        else if (@((int)Model.CurrentStepForm) == @((int)WorkFlowFormEnum.CardIssuance)) {
+            $('#btnChangeStatus').click(function(e) {
+                e.preventDefault();
+                 const formIsValid = $('#frmVerifyBuyer').valid();
+                const requestStatus = $('input[name=requestStatusRadio]:checked').val();
+                    if (requestStatus == undefined) {
+                        showMessage('@ResourceFile.InfoTitle', 'لطفا وضعیت درخواست را مشخص کنید!', icons.warning, '@ResourceFile.Close');
+                        return;
+                    }
+                debugger;
+
+
+                if (formIsValid) {
+                    showWaiting('frmVerifyBuyer', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                    let data = new FormData();
+
+                    data.append('AccountNumber', $('#CardIssuanceModel_AccountNumber').val());
+                    data.append('CardNumber', $('#CardIssuanceModel_CardNumber').val());
+                    data.append('SecondPassword', $('#CardIssuanceModel_SecondPassword').val());
+                    data.append('Cvv', $('#CardIssuanceModel_Cvv').val());
+                    data.append('ExpireYear', $('#CardIssuanceModel_ExpireYear').val());
+                    data.append('ExpireMonth', $('#CardIssuanceModel_ExpireMonth').val());
+                    data.append('RequestFacilityId', @Model.Id);                    
+
+                    $.ajax({
+                        type: 'post',
+                        //dataType: 'json',
+                        //contentType: "application/json; charset=utf-8",
+                        processData: false,
+                        contentType: false,
+                        url: '/api/v1/RequestFacilityCardIssuance/CardIssuance',
+                        data: data,// JSON.stringify(model),
+                        success: function (result) {
+                            hideWaiting('frmVerifyBuyer');
+                            debugger;
+                            if (result.isSuccess) {
+                                showMessage('@ResourceFile.InfoTitle', '@ResourceFile.MessageSuccess', icons.success, '@ResourceFile.Close');
+                                setTimeout(function () {
+                                    window.location.replace('@Url.Action("SearchRequest","RequestFacility")');
+                                }, 2500);
+                            }
+                        },
+                        error: function (error) {
+                            hideWaiting('frmVerifyBuyer');
+                            const exception = getExceptionMessageFromError(error);
+                            if (exception != null)
+                                showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                            else
+                                showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                        }
+                    });
+                }
+                else {
+                    scrollToFirstError();
+                }
+            });
+
+            /* $('#btnReInquiryAndAllocation').click(function(e) {
+                e.preventDefault();
+                debugger;
+                const formIsValid = $('#frmVerifyBuyer').valid();
+                const requestStatus = $('input[name=requestStatusRadio]:checked').val();
+                if (requestStatus == undefined) {
+                    showMessage('@ResourceFile.InfoTitle', 'لطفا وضعیت درخواست را مشخص کنید!', icons.warning, '@ResourceFile.Close');
+                    return;
+                }
+
+                if (requestStatus == 2 && $('#PoliceNumber').val() == '') {
+                    showMessage('@ResourceFile.InfoTitle', 'لطفا شماره انتظامی را وارد کنید!', icons.warning, '@ResourceFile.Close');
+                    return;
+                }
+
+                if (formIsValid) {
+                    showWaiting('frmVerifyBuyer', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                    const postData = {
+                        RequestFacilityId: '@Model.Id',
+                        Status: requestStatus,
+                        PoliceNumber: $('#PoliceNumber').val(),
+                        StatusDescription: $('#description_admin').val()
+                    };
+
+                    debugger;
+                    $.ajax({
+                        type: 'post',
+                        data: JSON.stringify(postData),
+                        datatype: "json",
+                        contentType: "application/json; charset=utf-8",
+                        url: '',
+                        success: function(result) {
+                            hideWaiting('frmVerifyBuyer');
+                            debugger;
+                            if (result.isSuccess) {
+                                showMessage('@ResourceFile.InfoTitle', '@ResourceFile.MessageSuccess', icons.success, '@ResourceFile.Close', () => { window.location.replace('@Url.Action("SearchLeasingRequest","RequestFacility")'); });
+                            }
+                        },
+                        error: function(error) {
+                            hideWaiting('frmVerifyBuyer');
+                            const exception = getExceptionMessageFromError(error);
+                            if (exception != null)
+                                showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                            else
+                                showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                        }
+                    });
+                }
+                else {
+                    scrollToFirstError();
+                }
+            }); */
+        }
+        else if (@((int)Model.CurrentStepForm) == @((int)WorkFlowFormEnum.CompleteBonCardInfo)) {
+            $('#btnChangeStatus').click(function(e) {
+                e.preventDefault();
+                 const formIsValid = $('#frmVerifyBuyer').valid();
+                const requestStatus = $('input[name=requestStatusRadio]:checked').val();
+                    if (requestStatus == undefined) {
+                        showMessage('@ResourceFile.InfoTitle', 'لطفا وضعیت درخواست را مشخص کنید!', icons.warning, '@ResourceFile.Close');
+                        return;
+                    }
+                debugger;
+
+
+                if (formIsValid) {
+                    showWaiting('frmVerifyBuyer', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                    let data = new FormData();
+
+                    data.append('Id', $('#BonCardEditModel_Id').val());
+                    data.append('SecondPassword', $('#BonCardEditModel_SecondPassword').val());
+                    data.append('Cvv', $('#BonCardEditModel_Cvv').val());
+                    data.append('ExpireYear', $('#BonCardEditModel_ExpireYear').val());
+                    data.append('ExpireMonth', $('#BonCardEditModel_ExpireMonth').val());
+                    data.append('RequestFacilityId', @Model.Id);                    
+
+                    $.ajax({
+                        type: 'post',
+                        processData: false,
+                        contentType: false,
+                        url: '/api/v1/RequestFacilityCardIssuance/EditBonCard',
+                        data: data,// JSON.stringify(model),
+                        success: function (result) {
+                            hideWaiting('frmVerifyBuyer');
+                            debugger;
+                            if (result.isSuccess) {
+                                showMessage('@ResourceFile.InfoTitle', '@ResourceFile.MessageSuccess', icons.success, '@ResourceFile.Close');
+                                setTimeout(function () {
+                                    window.location.replace('@Url.Action("SearchRequest","RequestFacility")');
+                                }, 2500);
+                            }
+                        },
+                        error: function (error) {
+                            hideWaiting('frmVerifyBuyer');
+                            const exception = getExceptionMessageFromError(error);
+                            if (exception != null)
+                                showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                            else
+                                showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                        }
+                    });
+                }
+                else {
+                    scrollToFirstError();
+                }
+            });
+        }
+        else {
+            $('#btnEdit').click(function(e) {
+                e.preventDefault();
+                debugger;
+                const formIsValid = $('#frmVerifyBuyer').valid();
+                const requestStatus = $('input[name=requestStatusRadio]:checked').val();
+                if (requestStatus == undefined) {
+                    showMessage('@ResourceFile.InfoTitle', 'لطفا وضعیت درخواست را مشخص کنید!', icons.warning, '@ResourceFile.Close');
+                    return;
+                }
+
+                if (formIsValid) {
+                    showWaiting('frmVerifyBuyer', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                    const postData = {
+                        RequestFacilityId: '@Model.Id',
+                        Status: requestStatus,
+                        StatusDescription: $('#description_admin').val()
+                    };
+
+                    $.ajax({
+                        type: 'post',
+                        data: JSON.stringify(postData),
+                        datatype: "json",
+                        contentType: "application/json; charset=utf-8",
+                        url: '',
+                        success: function(result) {
+                            hideWaiting('frmVerifyBuyer');
+                            debugger;
+                            if (result.isSuccess) {
+                                showMessage('@ResourceFile.InfoTitle', '@ResourceFile.MessageSuccess', icons.success, '@ResourceFile.Close', () => { window.location.replace('@Url.Action("SearchLeasingRequest","RequestFacility")'); });
+                            }
+                        },
+                        error: function(error) {
+                            hideWaiting('frmVerifyBuyer');
+                            const exception = getExceptionMessageFromError(error);
+                            if (exception != null)
+                                showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                            else
+                                showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                        }
+                    });
+                }
+                else {
+                    scrollToFirstError();
+                }
+            });
+        }
+
+        const forceDescriptionToBeRequire = () => {
+            $('#description_admin').attr('data-val', true);
+            $('#description_admin').attr('data-val-required', 'توضیحات اجباری است!');
+        }
+
+        const forceDescriptionToBeOptional = () => {
+            $('#description_admin').removeAttr('data-val');
+            $('#description_admin').removeAttr('data-val-required');
+        }
+    </script>
+}

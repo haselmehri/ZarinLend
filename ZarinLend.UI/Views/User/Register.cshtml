@@ -1,0 +1,1116 @@
+﻿@model UserAddModel
+@{
+    ViewData["Title"] = ResourceFile.RegisterSellerBuyer;
+    Layout = "~/Views/Shared/_NewLayoutWithoutRightMenu.cshtml";
+}
+@section styles
+    {
+    <link rel="stylesheet" type="text/css" href="~/new-layout/css/wizard.css" />
+    <link href="~/persianDatePicker/css/persianDatepicker-lightorang.css" rel="stylesheet" />
+    <style type="text/css">
+        .bx {
+            margin-right: 1.3rem !important;
+        }
+
+        .form-control:disabled, .form-control[readonly] {
+            opacity: 0.5 !important;
+            background-color: #9692921a !important;
+            border: 1px solid #DFE3E7 !important;
+        }
+    </style>
+}
+<div id="contentDiv" class="p-2 bg-white rounded-lg">
+    <div class="col-12 col-md-10 col-lg-8 col-xl-7 mx-auto">
+        <section class="mt-3" id="icon-tabs">
+            <form id="frmRegister" method="post" class="wizard-horizontal" autocomplete="off">
+                <input type="hidden" id="IsDead" />
+                <!-- Step 1 -->
+                <h6>
+                    <i class="step-icon"></i>
+                    <span class="fonticon-wrap">
+                        <i class="livicon-evo"></i>
+                    </span>
+                </h6>
+                <!-- Step 1 end-->
+                <!-- body content step 1 -->
+                <fieldset>
+                    <div class="row ">
+                        <div class="col-12">
+                            <h6 class="secondary darken-4 mb-3 font-medium-6 text-center text-bold-700">
+                                لطفا اطلاعات فردی خود را تکمیل نمایید
+                            </h6>
+                        </div>
+                    </div>
+                    <div class="row mb-1">
+                        <div class="col-md-12">
+                            <div class="d-flex align-items-center justify-content-around">
+                                <fieldset>
+                                    <div class="radio radio-success radio-glow radio-sm">
+                                        <input type="radio" name="getCivilRegistryDataRadio" id="radioGetCivilRegistry" value="1" checked="checked" />
+                                        <label class="font-small-3 success darken-4 text-bold-400 line-height-23" for="radioGetCivilRegistry">دریافت اطلاعات هویتی از ثبت احوال</label>
+                                    </div>
+                                </fieldset>
+                                <fieldset>
+                                    <div class="radio radio-warning radio-glow radio-sm">
+                                        <input type="radio" name="getCivilRegistryDataRadio" id="radioInputDataManually" value="2" />
+                                        <label class="font-small-3 warning darken-4 text-bold-400 line-height-23" for="radioInputDataManually">وارد کردن اطلاعات هویتی بصورت دستی</label>
+                                    </div>
+                                </fieldset>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <input type="text" class="form-control bg-transparent" asp-for="NationalCode" placeholder="کد ملی" style="text-align:center;direction:ltr;letter-spacing:5px" />
+                                <span asp-validation-for="NationalCode" class="text-danger"></span>
+                                <input type="hidden" id="hdnNationalCode" value="" />
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <fieldset class="form-group position-relative has-icon-left">
+                                <input class="form-control bg-transparent shamsi-datepicker" autocomplete="off" asp-for="ShamsiBirthDate" maxlength="10" placeholder="تاریخ تولد" style="text-align:center;direction:ltr"
+                                       type="text" value="" data-fromdate="" data-jdate="@ViewBag.PersianBirthDate" data-gdate="@ViewBag.BirthDate" />
+                                <div class="form-control-position">
+                                    <i class="bx bx-calendar"></i>
+                                </div>
+                                <span asp-validation-for="ShamsiBirthDate" class="text-danger"></span>
+                            </fieldset>
+                            <input asp-for="BirthDate" type="hidden" />
+                            <input type="hidden" id="hdnShamsiBirthDate" value="" />
+                        </div>
+                    </div>
+                    <div class="row" id="btnGetCivilRegistryDataRow">
+                        <div class="col-md-12" style="text-align:left">
+                            <button id="btnGetCivilRegistryData" class="btn btn-zl-primary ml-1">دریافت اطلاعات هویتی</button>
+                        </div>
+                    </div>
+                    <hr class="mt-1 p-0" id="hr_search" />
+                    <div class="row ">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <input asp-for="FName" class="form-control bg-transparent CivilRegistryData" placeholder="نام" disabled />
+                                <span asp-validation-for="FName" class="text-danger"></span>
+                                <input type="hidden" id="hdnFName" value="" />
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <input type="text" class="form-control bg-transparent CivilRegistryData" asp-for="LName" placeholder="نام خانوادگی" disabled />
+                                <span asp-validation-for="LName" class="text-danger"></span>
+                                <input type="hidden" id="hdnLName" value="" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row my-0">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <input type="text" class="form-control bg-transparent CivilRegistryData" asp-for="FatherName" placeholder="نام پدر" disabled />
+                                <span asp-validation-for="FatherName" class="text-danger"></span>
+                                <input type="hidden" id="hdnFatherName" value="" />
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <input type="text" class="form-control bg-transparent CivilRegistryData" asp-for="SSID" placeholder="شماره شناسنامه" disabled />
+                                <span asp-validation-for="SSID" class="text-danger"></span>
+                                <input type="hidden" id="hdnSSID" value="" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row my-0">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <input type="text" class="form-control bg-transparent CivilRegistryData" asp-for="BirthCertificateSerial" placeholder="سريال شناسنامه" />
+                                <span asp-validation-for="BirthCertificateSerial" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <select name="Gender" asp-for="Gender" class="form-control bg-transparent  CivilRegistryData" disabled>
+                                    <option value="" selected="selected" >SelectGender</option>
+                                    <option value="1" >Male</option>
+                                    <option value="2" >Female</option>
+                                </select>
+                                <span asp-validation-for="Gender" class="text-danger"></span>
+                                <input type="hidden" id="hdnGender" value="" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row my-0">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <select name="ProvinceOfBirthId" asp-for="ProvinceOfBirthId" class="form-control bg-transparent "
+                                        asp-items="Model.Provinces">
+                                    <option value="" >SelectProvinceOfBirth</option>
+                                </select>
+                                <span asp-validation-for="ProvinceOfBirthId" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <select name="CityOfBirthId" asp-for="CityOfBirthId" class="form-control bg-transparent ">
+                                    <option value="" >SelectCityOfBirth</option>
+                                </select>
+                                <span asp-validation-for="CityOfBirthId" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row my-0">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <select name="ProvinceOfIssueId" asp-for="ProvinceOfIssueId" class="form-control bg-transparent "
+                                        asp-items="Model.Provinces">
+                                    <option value="" >SelectProvinceOfIssue</option>
+                                </select>
+                                <span asp-validation-for="ProvinceOfIssueId" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <select name="CityOfIssueId" asp-for="CityOfIssueId" class="form-control bg-transparent ">
+                                    <option value="" >SelectCityOfIssue</option>
+                                </select>
+                                <span asp-validation-for="CityOfIssueId" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row my-0">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <input type="text" class="form-control bg-transparent" asp-for="SanaNumber" placeholder="شماره ثنا" />
+                                <span asp-validation-for="SanaNumber" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                        </div>
+                    </div>
+                </fieldset>
+                <!-- body content step 1 end-->
+                <!-- Step 2 -->
+                <h6>
+                    <i class="step-icon"></i>
+                    <span class="fonticon-wrap">
+                        <i class="livicon-evo"></i>
+                    </span>
+                </h6>
+                <!-- Step 2 end-->
+                <!-- body content of step 2 -->
+                <fieldset>
+                    <div class="row">
+                        <div class="col-12">
+                            <h6 class="secondary darken-4 mb-3 font-medium-6 text-center text-bold-700">
+                                لطفا اطلاعات شغلی خود را تکمیل نمایید
+                            </h6>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <select name="job"
+                                        class="form-control bg-transparent ">
+                                    <option>شغل (اختیاری)</option>
+                                    <option value="1">کارمند دولتی</option>
+                                    <option value="2">دانشجو</option>
+                                    <option value="3">شغل آزاد</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <select name="income"
+                                        class="form-control bg-transparent ">
+                                    <option>میزان درآمد (اختیاری)</option>
+                                    <option value="1">کمتر از یک میلیون تومان</option>
+                                    <option value="2">ده تا پانزده میلیون تومان</option>
+                                    <option value="3">بیشتر از بیست میلیون تومان</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row my-0">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <input type="text"
+                                       class="form-control bg-transparent"
+                                       id="tel1"
+                                       placeholder="تلفن محل کار (اختیاری)" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-5">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <input type="text"
+                                       class="form-control bg-transparent"
+                                       id="emailAddress1"
+                                       placeholder="آدرس محل کار" />
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+                <!-- body content of step 2 end-->
+                <!-- Step 3 -->
+                <h6>
+                    <i class="step-icon"></i>
+                    <span class="fonticon-wrap">
+                        <i class="livicon-evo"></i>
+                    </span>
+                </h6>
+                <!-- Step 3 end-->
+                <!-- body content of Step 3 -->
+                <fieldset>
+                    <div class="row">
+                        <div class="col-12">
+                            <h6 class="secondary darken-4 mb-3 font-medium-6 text-center text-bold-700">
+                                لطفا اطلاعات تماس و محل اقامت خود را تکمیل نمایید
+                            </h6>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <input asp-for="Mobile" class="form-control bg-transparent" style="text-align:center; direction:ltr;letter-spacing:5px" placeholder="شماره موبایل" />
+                                <span asp-validation-for="Mobile" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <input asp-for="PhoneNumber" class="form-control bg-transparent" style="text-align:center; direction:ltr" placeholder="شماره تلفن" />
+                                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row my-0">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <select name="ProvinceId" asp-for="ProvinceId" class="form-control bg-transparent " asp-items="Model.Provinces">
+                                    <option value="" >SelectProvince</option>
+                                </select>
+                                <span asp-validation-for="ProvinceId" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <select name="CityId" asp-for="CityId" class="form-control bg-transparent ">
+                                    <option value="" >SelectCity</option>
+                                </select>
+                                <span asp-validation-for="CityId" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <input class="form-control bg-transparent" asp-for="PostalCode" style="text-align:center; direction:ltr" placeholder="کد پستی" />
+                                <span asp-validation-for="PostalCode" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <input asp-for="Email" class="form-control bg-transparent" style="text-align:center; direction:ltr" placeholder="ایمیل" />
+                                <span asp-validation-for="Email" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-0 mt-md-1 mb-5">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <textarea class="form-control bg-transparent" asp-for="Address" placeholder="آدرس محل سکونت" style=" direction:rtl"></textarea>
+                                <span asp-validation-for="Address" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+                <!-- body content of Step 3 end-->
+                <!-- Step 4 -->
+                <h6>
+                    <i class="step-icon"></i>
+                    <span class="fonticon-wrap">
+                        <i class="livicon-evo"></i>
+                    </span>
+                </h6>
+                <!-- Step 4 end-->
+                <!-- body content of Step 4 -->
+                <fieldset>
+                    <div class="row">
+                        <div class="col-12">
+                            <h6 class="secondary darken-4 mb-3 font-medium-6 text-center text-bold-700">
+                                لطفا شماره کارت بانک آینده خود را تکمیل نمایید
+                            </h6>
+                        </div>
+                    </div>
+                    <div class="row mb-5">
+                        <div class="col-12">
+                            <fieldset>
+                                <div class="input-group">
+                                    <input asp-for="CardNumber" class="form-control bg-transparent" style="text-align:center;direction:ltr" placeholder="دکمه در چپ"
+                                           aria-describedby="button-addon2" />
+                                    <div class="input-group-append" id="button-addon2">
+                                        <button id="btnCardToIBAN" class="btn btn-primary" type="button">
+                                            دریافت شماره شبا و حساب
+                                        </button>
+                                    </div>
+                                </div>
+                            </fieldset>
+                            <span asp-validation-for="CardNumber" class="text-danger"></span>
+                        </div>
+                        <input type="hidden" asp-for="DepositOwners" />
+                        <input type="hidden" asp-for="DepositStatus" />
+                        <input type="hidden" asp-for="BankName" />
+                        <input type="hidden" asp-for="AccountNumber" />
+                        <input type="hidden" asp-for="CustomerNumber" />
+                        <input type="hidden" asp-for="IBAN" />
+                        <div class="col-12 mt-1">
+                            <div class="border rounded-lg">
+                                <div class="d-flex flex-column flex-sm-row">
+                                    <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                                        <span class="font-small-2 text-bold-500">نام بانک</span>
+                                        <span id="lblBankName" class="dark mt-50 text-bold-700">@Model.BankName</span>
+                                    </div>
+                                    <div class="border-left border-top"></div>
+                                    <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                                        <span class="font-small-2 text-bold-500">صاحب حساب</span>
+                                        <span id="lblDepositOwners" class="dark mt-50 text-bold-700">@Model.DepositOwners</span>
+                                    </div>
+                                </div>
+                                <hr class="m-0 p-0" />
+                                <div class="d-flex flex-column flex-sm-row">
+                                    <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                                        <span class="font-small-2 text-bold-500">شماره حساب</span>
+                                        <span id="lblAccountNumber" class="dark mt-50 text-bold-700">@Model.AccountNumber</span>
+                                    </div>
+                                    <div class="border-left border-top"></div>
+                                    <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                                        <span class="font-small-2 text-bold-500">شماره شبا</span>
+                                        <span id="lblIBAN" class="dark mt-50 text-bold-700">@Model.IBAN</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+                <!-- body content of Step 4 end-->
+                <!-- Step 5 -->
+                <h6>
+                    <i class="step-icon"></i>
+                    <span class="fonticon-wrap">
+                        <i class="livicon-evo"></i>
+                    </span>
+                </h6>
+                <!-- Step 5 end-->
+                <!-- body content of Step 5 -->
+                <fieldset>
+                    <div class="row">
+                        <div class="col-12">
+                            <h6 class="secondary darken-4 mb-3 font-medium-6 text-center text-bold-700">
+                                کلمه عبور خود را وارد کنید
+                            </h6>
+                            <div class="alert zl-bg-alert-warning border-warning border-accent-4 alert-dismissible my-2" role="alert">
+                                <button type="button" class="close" data-dismiss="alert" aria-label="بستن">
+                                    <span aria-hidden="true">×</span>
+                                </button>
+                                <div class="d-flex">
+                                    <i class="bx bx-error-circle font-large-1"></i>
+                                    <span class="text-muted text-bold-400 font-small-3">
+                                        <ul>
+                                            <li>
+                                                بصورت پیش فرض <span style="font-weight:bold">کد ملی</span> شما بعنوان نام کاربری در نظر گرفته میشود
+                                            </li>
+                                            <li>
+                                                لطفا کلمه عبوری انتخاب کنید که قابل حدس زدن نباشد
+                                            </li>
+                                        </ul>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-column flex-sm-row">
+                        <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                            <span class="font-small-2 text-bold-500">نام کاربری</span>
+                            <input type="text" class="form-control bg-transparent" asp-for="UserName" disabled />
+                        </div>
+                    </div>
+                    <div class="row my-0">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <input type="password" class="form-control bg-transparent" asp-for="Password" placeholder="کلمه عبور" />
+                                <span asp-validation-for="Password" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <input type="password" class="form-control bg-transparent" asp-for="ConfirmPassword" placeholder="تکرار کلمه عبور" />
+                                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+                <!-- body content of Step 5 end-->
+            </form>
+        </section>
+    </div>
+</div>
+@section scripts{
+    @{
+        await Html.RenderPartialAsync("~/Views/Shared/_ValidationScriptsPartial.cshtml");
+    }
+    <script src="~/persianDatePicker/js/persianDatepicker.min.js"></script>
+    <script src="~/new-layout/js/jquery.steps.min.js"></script>
+    @*<script src="~/new-layout/js/wizard-form.js"></script>*@
+<script>
+        $(document).ready(function () {
+            $('#CardNumber').mask('6362-1400-0000-0000',
+                {
+                    placeholder: "6362-14__-____-____",
+                    translation: {
+                        6: { pattern: /6/ },
+                        3: { pattern: /3/ },
+                        2: { pattern: /2/ },
+                        1: { pattern: /1/ },
+                        4: { pattern: /4/ },
+                        0: { pattern: /[0-9]/ }
+                    }
+                });
+            $('#NationalCode').mask('9999999999', { placeholder: "__________" });
+            $('#Mobile').mask('ZN000000000',
+                {
+                    placeholder: "09_________",
+                    translation: {
+                        Z: { pattern: /0/ },
+                        N: { pattern: /9/ },
+                        0: { pattern: /[0-9]/ }
+                    }
+                });
+
+            //$('#ShamsiBirthDate').mask('9999/99/99', { placeholder: "____/__/__" });
+            $('#BirthDate').val('@ViewBag.BirthDate');
+            $('#hdnShamsiBirthDate').val('@ViewBag.PersianBirthDate');
+            $('#ShamsiBirthDate').val('@ViewBag.PersianBirthDate');
+            $("#ShamsiBirthDate").persianDatepicker({
+                //startDate: '1300/01/01',
+                endDate: new persianDate().now().addYear(-18).toString("YYYY/MM/DD"),
+                months: ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"],
+                dowTitle: ["شنبه", "یکشنبه", "دوشنبه", "سه شنبه", "چهارشنبه", "پنج شنبه", "جمعه"],
+                shortDowTitle: ["ش", "ی", "د", "س", "چ", "پ", "ج"],
+                theme: 'lightorang',
+                showGregorianDate: !1,
+                persianNumbers: !0,
+                formatDate: "YYYY/0M/0D",
+                selectedBefore: 0,
+                selectedDate: '@ViewBag.PersianBirthDate',
+                prevArrow: '\u25c4',
+                nextArrow: '\u25ba',
+                alwaysShow: !1,
+                selectableYears: null,
+                selectableMonths: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                cellWidth: 35, // by px
+                cellHeight: 30, // by px
+                fontSize: 14, // by px
+                isRTL: !1,
+                calendarPosition: {
+                    x: 0,
+                    y: 0,
+                },
+                onSelect: function () {
+                    //alert($("#ShamsiBirthDate").attr("data-gdate"));
+                    if (moment().diff($("#ShamsiBirthDate").attr("data-gdate"), 'years') < 18) {
+                        showMessage("اخطار", "کاربر گرامی حداقل سن برای درخواست تسهیلات 18 سال می باشد!", icons.warning, 'متوجه شدم');
+                    }
+                    $('#BirthDate').val($("#ShamsiBirthDate").attr("data-gdate"));
+                },
+                onShow: function () { },
+                onHide: function () { },
+                onRender: function () { }
+            });
+
+            if ('@Model.LoginFromZarinpal' == 'True')
+            {
+                $('#radioInputDataManually').prop('checked', true);
+                $('#btnGetCivilRegistryDataRow').hide();
+                $('#hr_search').hide();
+                $('#@nameof(UserAddModel.FName)').prop('disabled', false);
+                $('#@nameof(UserAddModel.LName)').prop('disabled', false);
+                $('#@nameof(UserAddModel.FatherName)').prop('disabled', false);
+                $('#@nameof(UserAddModel.SSID)').prop('disabled', false);
+                $('#@nameof(UserAddModel.Gender)').prop('disabled', false);
+            }
+        });
+        //    Wizard tabs with icons setup
+        // ------------------------------
+        const stepWizard = $(".wizard-horizontal").steps({
+            headerTag: "h6",
+            bodyTag: "fieldset",
+            transitionEffect: "fade",
+            titleTemplate:
+                '<span class="step d-flex align-items-center justify-content-center">#index#</span> #title#',
+            labels: {
+                cancel: "انصراف",
+                current: "قدم کنونی:",
+                pagination: "صفحه بندی",
+                finish: "ثبت",
+                next: "بعدی",
+                previous: "قبلی",
+                loading: "در حال بارگذاری ...",
+            },
+            //Events
+            onStepChanging: function (event, currentIndex, newIndex) {
+                debugger;
+                if ($('input[name=getCivilRegistryDataRadio]:checked').val() == "1")//load from Civil Registery Data
+                {
+                    if ($('#IsDead').val() == 'true') {
+                        showMessage('اخطار', 'امکان  ثبت درخواست برای شخص مورد نظر وجود ندارد<br/>با توجه به اطلاعات دریافتی از ثبت احوال شخص مورد نظر در قید حیات نمی باشد', icons.warning, 'متوجه شدم');
+                        return false;
+                    }
+                    if ($('#@nameof(UserAddModel.FName)').val() != $('#hdnFName').val() ||
+                        $('#@nameof(UserAddModel.LName)').val() != $('#hdnLName').val() ||
+                        $('#@nameof(UserAddModel.FatherName)').val() != $('#hdnFatherName').val() ||
+                        $('#@nameof(UserAddModel.NationalCode)').val() != $('#hdnNationalCode').val() ||
+                        $('#@nameof(UserAddModel.ShamsiBirthDate)').val() != $('#hdnShamsiBirthDate').val() ||
+                        $('#Gender').val() != $('#hdnGender').val()) {
+                        showMessage("اخطار", "اطلاعات دریافتی از ثبت احوال با اطلاعات فرم یکسان نمی باشد!", icons.warning, 'متوجه شدم');
+                        return false;
+                    }
+                }
+                if ($('#frmRegister').valid() || currentIndex > newIndex) {
+                    if (currentIndex == 0 && moment().diff($("#ShamsiBirthDate").attr("data-gdate"), 'years') < 18) {
+                        showMessage("اخطار", "کاربر گرامی حداقل سن برای درخواست تسهیلات 18 سال می باشد!", icons.warning, 'متوجه شدم');
+                        return false;
+                    }
+                    if (currentIndex == 3 && currentIndex < newIndex &&
+                        ($('#BankName').val() == '' || $('#AccountNumber').val() == '' || $('#IBAN').val() == '' || $('#DepositOwners').val() == '' || $('#DepositStatus').val() == '')) {
+                        showMessage('@ResourceFile.InfoTitle', 'شماره کارت را بطور صحیح وارد کنید، و سپس روی دکمه <b>دریافت شماره شبا و حساب</b> کلیک کنید تا اطلاعات حساب شما دریافت شود', icons.warning, 'متوجه شدم');
+
+                        return false;
+                    }
+                    else
+                        return true;
+                }
+                else {
+                    return false;
+                }
+                //if (currentIndex == 2) {
+                //    return false;
+                //}
+                //else {
+                //    return true;
+                //}
+            },
+            onFinished: function (event, currentIndex) {
+                debugger;
+                if ($('#frmRegister').valid()) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            },
+        });
+
+        // Icon change on state
+
+        // if click on next button icon change
+        $(".actions [href='#next']").click(function (e) {
+            debugger;
+            if ($('#frmRegister').valid()) {
+                $(".done")
+                    .find(".step-icon")
+                    .removeClass("bx bx-time-five")
+                    .addClass("bx bx-check-circle");
+                $(".current")
+                    .find(".step-icon")
+                    .removeClass("bx bx-check-circle")
+                    .addClass("bx bx-time-five");
+                // live icon color change on next button's on click
+                //$(".current").find(".fonticon-wrap .livicon-evo").updateLiveiconEvo({
+                //    strokeColor: "#17c3b2",
+                //});
+                //$(".current")
+                //    .prev("li")
+                //    .find(".fonticon-wrap .livicon-evo")
+                //    .updateLiviconEvo({
+                //        strokeColor: "#39DA8A",
+                //    });
+            }
+        });
+
+        $(".actions [href='#previous']").click(function () {
+            // live icon color change on next button's on click
+            //$(".current").find(".fonticon-wrap .livicon-evo").updateLiveiconEvo({
+            //    strokeColor: "#17c3b2",
+            //});
+            //$(".current")
+            //    .next("li")
+            //    .find(".fonticon-wrap .livicon-evo")
+            //    .updateLiviconEvo({
+            //        strokeColor: "#adb5bd",
+            //    });
+        });
+
+        // if click on  submit   button icon change
+        $(".actions [href='#finish']").click(function () {
+            if ($('#frmRegister').valid()) {
+
+                const formIsValid = $('#frmRegister').valid();
+
+                if (formIsValid) {
+                    showWaiting('contentDiv', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                    //const postdata = $('#frmRegister').serialize();
+                    //const model = {
+                    //    FName: $("#FName").val(),
+                    //    LName: $("#LName").val(),
+                    //};
+                    let data = new FormData();
+                    data.append('FName', $("#FName").val());
+                    data.append('LName', $("#LName").val());
+                    data.append('FatherName', $("#FatherName").val());
+                    data.append('Mobile', $("#Mobile").val());
+                    data.append('NationalCode', $("#NationalCode").val());
+                    data.append('BirthCertificateSerial', $("#BirthCertificateSerial").val());
+                    data.append('UserName', $("#NationalCode").val());
+                    data.append('Email', $("#Email").val());
+                    data.append('Password', $("#Password").val());
+                    data.append('ConfirmPassword', $("#Password").val());
+                    data.append('Address', $("#Address").val());
+                    data.append('PhoneNumber', $("#PhoneNumber").val());
+                    data.append('ProvinceId', $("#ProvinceId").val());
+                    data.append('CityId', $("#CityId").val());
+                    data.append('ProvinceOfIssueId', $("#ProvinceOfIssueId").val());
+                    data.append('CityOfIssueId', $("#CityOfIssueId").val());
+                    data.append('ProvinceOfBirthId', $("#ProvinceOfBirthId").val());
+                    data.append('CityOfBirthId', $("#CityOfBirthId").val());
+                    data.append('Gender', $("#Gender").val());
+                    data.append('BirthDate', $("#BirthDate").val());
+                    data.append('ShamsiBirthDate', $("#ShamsiBirthDate").val());
+                    data.append('SSID', $("#SSID").val());
+                    data.append('AccountNumber', $("#AccountNumber").val());
+                    data.append('CustomerNumber', $("#CustomerNumber").val());
+                    data.append('SanaNumber', $('#SanaNumber').val());
+                    data.append('CardNumber', $('#CardNumber').val());
+                    data.append('BankName', $('#BankName').val());
+                    data.append('IBAN', $('#IBAN').val());
+                    data.append('DepositOwners', $('#DepositOwners').val());
+                    data.append('DepositStatus', $('#DepositStatus').val());
+                    data.append('PostalCode', $("#PostalCode").val());
+                    data.append('GetIdentityDataFromCivilRegistryData', $('input[name=getCivilRegistryDataRadio]:checked').val() == "1");
+                    $.ajax({
+                        type: 'post',
+                        //dataType: 'json',
+                        //contentType: "application/json; charset=utf-8",
+                        processData: false,
+                        contentType: false,
+                        url: '/api/v1/User/RegisterBuyer',
+                        data: data,// JSON.stringify(model),
+                        success: function (result) {
+                            hideWaiting('contentDiv');
+                            debugger;
+                            if (result.isSuccess) {
+                                showMessage('@ResourceFile.InfoTitle', '@ResourceFile.MessageSuccess', icons.success, '@ResourceFile.Close');
+                                setTimeout(function () {
+                                    window.location.replace('@Url.Action("Index","Home")');
+                                }, 3000);
+
+                                $(".done")
+                                    .find(".step-icon")
+                                    .removeClass("bx-time-five")
+                                    .addClass("bx bx-check-circle");
+                                //$(".last.current.done").find(".fonticon-wrap .livicon-evo").updateLiviconEvo({
+                                //    strokeColor: "#39DA8A",
+                                //});
+                            }
+                        },
+                        error: function (error) {
+                            hideWaiting('contentDiv');
+                            const exception = getExceptionMessageFromError(error);
+                            if (exception != null)
+                                showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                            else
+                                showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                        }
+                    });
+                }
+                else {
+                    scrollToFirstError();
+                }
+            }
+        });
+
+        // add primary btn class
+        $('.actions a[role="menuitem"]').addClass("btn btn-zl-primary");
+        $('.icon-tab [role="menuitem"]').addClass("glow ");
+        $('.wizard-vertical [role="menuitem"]')
+            .removeClass("btn-zl-primary")
+            .addClass("btn-light-primary");
+
+        $('#NationalCode').change((e) => {
+            $('#UserName').val($('#NationalCode').val());
+        });
+
+        $('#ProvinceOfBirthId').change(e => {
+            const provinceId = $(e.target).val();
+
+            if (provinceId != undefined && provinceId != '') {
+                showWaiting('contentDiv', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                $.ajax({
+                    type: 'get',
+                    //dataType: 'json',
+                    contentType: "application/json; charset=utf-8",
+                    //processData: false,
+                    //contentType: false,
+                    url: `/api/v1/Location/SelectCityByProvince/${provinceId}`,
+                    success: function (result) {
+                        hideWaiting('contentDiv');
+                        if (result.isSuccess && result.data != undefined && result.data.length > 0) {
+                            $('#CityOfBirthId').empty().append('<option value="">@ResourceFile.SelectCityOfBirth</option>');
+                            result.data.map(city => {
+                                $('#CityOfBirthId').append(`<option value="${city.value}">${city.text}</option>`);
+                            });
+                        }
+                        else {
+                            $('#CityOfBirthId').empty().append('<option value="">@ResourceFile.SelectCityOfBirth</option>');
+                        }
+                    },
+                    error: function (error) {
+                        hideWaiting('contentDiv');
+                        const exception = getExceptionMessageFromError(error);
+                        if (exception != null)
+                            showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                        else
+                            showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                    }
+                });
+            }
+            else {
+                $('#CityOfBirthId').empty().append('<option value="">@ResourceFile.SelectCityOfBirth</option>');
+            }
+        });
+
+        $('#ProvinceOfIssueId').change(e => {
+            const provinceId = $(e.target).val();
+
+            if (provinceId != undefined && provinceId != '') {
+                showWaiting('contentDiv', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                $.ajax({
+                    type: 'get',
+                    //dataType: 'json',
+                    contentType: "application/json; charset=utf-8",
+                    //processData: false,
+                    //contentType: false,
+                    url: `/api/v1/Location/SelectCityByProvince/${provinceId}`,
+                    success: function (result) {
+                        hideWaiting('contentDiv');
+                        if (result.isSuccess && result.data != undefined && result.data.length > 0) {
+                            $('#CityOfIssueId').empty().append('<option value="">@ResourceFile.SelectCityOfIssue</option>');
+                            result.data.map(city => {
+                                $('#CityOfIssueId').append(`<option value="${city.value}">${city.text}</option>`);
+                            });
+                        }
+                        else {
+                            $('#CityOfIssueId').empty().append('<option value="">@ResourceFile.SelectCityOfIssue</option>');
+                        }
+                    },
+                    error: function (error) {
+                        hideWaiting('contentDiv');
+                        const exception = getExceptionMessageFromError(error);
+                        if (exception != null)
+                            showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                        else
+                            showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                    }
+                });
+            }
+            else {
+                $('#CityOfIssueId').empty().append('<option value="">@ResourceFile.SelectCityOfIssue</option>');
+            }
+        });
+
+        $('#ProvinceId').change(e => {
+            const provinceId = $(e.target).val();
+
+            if (provinceId != undefined && provinceId != '') {
+                showWaiting('contentDiv', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                $.ajax({
+                    type: 'get',
+                    //dataType: 'json',
+                    contentType: "application/json; charset=utf-8",
+                    //processData: false,
+                    //contentType: false,
+                    url: `/api/v1/Location/SelectCityByProvince/${provinceId}`,
+                    success: function (result) {
+                        hideWaiting('contentDiv');
+                        if (result.isSuccess && result.data != undefined && result.data.length > 0) {
+                            $('#CityId').empty().append('<option value="">@ResourceFile.SelectCity</option>');
+                            result.data.map(city => {
+                                $('#CityId').append(`<option value="${city.value}">${city.text}</option>`);
+                            });
+                        }
+                        else {
+                            $('#CityId').empty().append('<option value="">@ResourceFile.SelectCity</option>');
+                        }
+                    },
+                    error: function (error) {
+                        hideWaiting('contentDiv');
+                        const exception = getExceptionMessageFromError(error);
+                        if (exception != null)
+                            showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                        else
+                            showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                    }
+                });
+            }
+            else {
+                $('#CityId').empty().append('<option value="">@ResourceFile.SelectCity</option>');
+            }
+        });
+
+        $('#btnCardToIBAN').on('click', (e) => {
+            e.preventDefault();
+            debugger;
+
+            const cardNumber = $('#CardNumber').val().replace(/\-+/g, '');
+            if (cardNumber.length != 16) {
+                showMessage('@ResourceFile.InfoTitle', 'شماره کارت را بطور صحیح وارد کنید', icons.warning, '@ResourceFile.Close');
+                return;
+            }
+            $.ajax({
+                type: 'post',
+                dataType: 'json',
+                contentType: "application/json; charset=utf-8",
+                url: `/api/v1/Finotech/CifInquiry/${$('#NationalCode').val()}`,
+                data: '{}',
+                success: function (resultValue) {
+                    hideWaiting('contentDiv');
+                    debugger;
+                    if (resultValue != null && resultValue.isSuccess && resultValue.data != null) {
+                        $('#CustomerNumber').val(resultValue.data);
+
+                        //$('#ibanInfo').hide();
+                        $('#lblBankName').text("");
+                        $('#BankName').val("");
+                        $('#lblAccountNumber').text("");
+                        $('#AccountNumber').val("");
+                        $('#lblIBAN').text("");
+                        $('#IBAN').val("");
+                        $('#lblDepositOwners').text("");
+                        $('#DepositOwners').val("");
+                        $('#DepositStatus').val("");
+                        showWaiting('contentDiv', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                        $.ajax({
+                            type: 'post',
+                            dataType: 'json',
+                            contentType: "application/json; charset=utf-8",
+                            url: `/api/v1/Finotech/CardToIBAN/${cardNumber}`,
+                            data: '{}',
+                            success: function (result) {
+                                hideWaiting('contentDiv');
+                                debugger;
+                                if (result != null && result.isSuccess) {
+                                    if (result.data != null) {
+                                        if (result.data.result != null) {
+                                            //$('#ibanInfo').show();
+                                            $('#lblBankName').text(result.data.result.bankName);
+                                            $('#BankName').val(result.data.result.bankName);
+
+                                            $('#lblAccountNumber').text(result.data.result.deposit);
+                                            $('#AccountNumber').val(result.data.result.deposit);
+
+                                            $('#lblIBAN').text(result.data.result.iban);
+                                            $('#IBAN').val(result.data.result.iban);
+
+                                            $('#lblDepositOwners').text(result.data.result.depositOwners);
+                                            $('#DepositOwners').val(result.data.result.depositOwners);
+
+                                            $('#DepositStatus').val(result.data.result.depositStatus);
+                                        }
+                                        else if (result.data.error != null) {
+                                            showMessage('@ResourceFile.ErrorTitle', result.data.error.message, icons.error, '@ResourceFile.Close');
+                                        }
+                                    }
+                                }
+                                else {
+                                    showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                                }
+                            },
+                            error: function (error) {
+                                hideWaiting('contentDiv');
+                                const exception = getExceptionMessageFromError(error);
+                                if (exception != null)
+                                    showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                                else
+                                    showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                            }
+                        });
+                    }
+                    else {
+                        showMessage('@ResourceFile.ErrorTitle', 'با کد ملی شما شماره مشتری در بانک آینده وجود ندارد', icons.error, '@ResourceFile.Close');
+                    }
+                },
+                error: function (error) {
+                    hideWaiting('contentDiv');
+                    const exception = getExceptionMessageFromError(error);
+                    if (exception != null)
+                        showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                    else
+                        showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                }
+            });
+        });
+
+        $('input[name=getCivilRegistryDataRadio]').change((e) => {
+            debugger;
+            if ($(e.target).val() == 1) {
+                $('#btnGetCivilRegistryDataRow').show();
+                $('#hr_search').show();
+                $('#@nameof(UserAddModel.FName)').prop('disabled', true);
+                $('#@nameof(UserAddModel.LName)').prop('disabled', true);
+                $('#@nameof(UserAddModel.FatherName)').prop('disabled', true);
+                $('#@nameof(UserAddModel.SSID)').prop('disabled', true);
+                $('#@nameof(UserAddModel.Gender)').prop('disabled', true);
+            }
+            else {
+                $('#btnGetCivilRegistryDataRow').hide();
+                $('#hr_search').hide();
+                $('#@nameof(UserAddModel.FName)').prop('disabled', false);
+                $('#@nameof(UserAddModel.LName)').prop('disabled', false);
+                $('#@nameof(UserAddModel.FatherName)').prop('disabled', false);
+                $('#@nameof(UserAddModel.SSID)').prop('disabled', false);
+                $('#@nameof(UserAddModel.Gender)').prop('disabled', false);
+                $('#@nameof(UserAddModel.FName)').val('');
+                $('#@nameof(UserAddModel.LName)').val('');
+                $('#@nameof(UserAddModel.FatherName)').val('');
+                $('#@nameof(UserAddModel.SSID)').val('');
+                $('#@nameof(UserAddModel.Gender)').val('');
+                $('#IsDead').val('');
+                $('#hdnNationalCode').val('');
+                $('#hdnShamsiBirthDate').val('');
+                $('#hdnFName').val('');
+                $('#hdnLName').val('');
+                $('#hdnFatherName').val('');
+                $('#hdnSSID').val('');
+                $('#hdnGender').val('');
+            }
+        });
+
+        $('#btnGetCivilRegistryData').click(function (e) {
+            e.preventDefault();
+            debugger;
+            if ($('#NationalCode').val() != '' && $('#ShamsiBirthDate').val() != '' && $('#BirthDate').val() != '' &&
+                $("#ShamsiBirthDate").attr("data-gdate") != '' && $("#ShamsiBirthDate").attr("data-gdate") != undefined) {
+                const model = { NationalCode: $('#NationalCode').val(), ShamsiBirthDate: $('#ShamsiBirthDate').val() };
+                showWaiting('mainContentDiv', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                $.ajax({
+                    type: 'post',
+                    data: JSON.stringify(model),
+                    datatype: "json",
+                    contentType: "application/json; charset=utf-8",
+                    url: '/api/v1/NeginHub/GetCivilRegistryData',
+                    success: function (result) {
+                        hideWaiting('contentDiv');
+                        debugger;
+                        if (result.isSuccess) {
+                            $('#@nameof(UserAddModel.FName)').val(result.data.firstName);
+                            $('#@nameof(UserAddModel.LName)').val(result.data.lastName);
+                            $('#@nameof(UserAddModel.FatherName)').val(result.data.fatherName);
+                            $('#@nameof(UserAddModel.SSID)').val((result.data.identityId != undefined && result.data.identityId != '0')
+                                ? result.data.identityId
+                                : result.data.nationalCode);
+                            $('#@nameof(UserAddModel.Gender)').val(result.data.gender == "Male" ? "1" : "2");
+                            $('#IsDead').val(result.data.isDead);
+                            $('#hdnNationalCode').val($('#NationalCode').val());
+                            $('#hdnShamsiBirthDate').val($('#ShamsiBirthDate').val());
+                            $('#hdnFName').val(result.data.firstName);
+                            $('#hdnLName').val(result.data.lastName);
+                            $('#hdnFatherName').val(result.data.fatherName);
+                            $('#hdnSSID').val((result.data.identityId != undefined && result.data.identityId != '0')
+                                ? result.data.identityId
+                                : result.data.nationalCode);
+                            $('#hdnGender').val(result.data.gender == "Male" ? "1" : "2");
+                            if (result.data.isDead) {
+                                showMessage('اخطار', 'امکان  ثبت درخواست برای شخص مورد نظر وجود ندارد<br/>با توجه به اطلاعات دریافتی از ثبت احوال شخص مورد نظر در قید حیات نمی باشد', icons.warning, '@ResourceFile.Close');
+                            }
+                        }
+                        else {
+                            $('#@nameof(UserAddModel.FName)').val('');
+                            $('#@nameof(UserAddModel.LName)').val('');
+                            $('#@nameof(UserAddModel.FatherName)').val('');
+                            $('#@nameof(UserAddModel.SSID)').val('');
+                            $('#@nameof(UserAddModel.Gender)').val('');
+                            $('#IsDead').val('');
+                            $('#hdnNationalCode').val('');
+                            $('#hdnShamsiBirthDate').val('');
+                            $('#hdnFName').val('');
+                            $('#hdnLName').val('');
+                            $('#hdnFatherName').val('');
+                            $('#hdnSSID').val('');
+                            $('#hdnGender').val('');
+                            showMessage('اخطار', 'اطلاعاتی هویتی یافت نشد<br/>در صورتی کد ملی و تاریخ تولد را بدرستی وارد کرده اید و همچنان در دریافت اطلاعات با مشکل مواجه میشوید،اطلاعات هویتی خود را بصورت دستی وارد کنید', icons.warning, '@ResourceFile.Close');
+                        }
+                    },
+                    error: function (error) {
+                        hideWaiting('contentDiv');
+                        const exception = getExceptionMessageFromError(error);
+                        if (exception != null)
+                            showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                        else
+                            showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                    }
+                });
+            }
+            else {
+                showMessage("اخطار", 'کد ملی و تاریخ تولد خود را بصورت دقیق وارد کنید!', icons.warning, '@ResourceFile.Close');
+            }
+        });
+
+        $('.card-number-css').on('keyup',
+            function (event) {
+                debugger;
+                if (event.keyCode == 46 || event.keyCode == 8 || event.which == 8 || event.which == 46) {
+                    return;
+                }
+                var digit = $(this).val();
+                while (digit.indexOf('-', 0) != -1) {
+                    digit = digit.replace('-', '');
+                }
+                if (digit != '' && digit.length < 16) {
+                    //$(this).val(digit.replace(/(\d)(?=(\d\d\d\d)+(?!\d))/g, "$1-"));
+                    $(this).val(digit.replace(/(\d{4}(?!\s))/g, "$1-"));
+                }
+            }).on('blur',
+                function () {
+                    //if ($(this).hasClass('price-css'))
+                    //$('#' + this.id).tooltip('hide');
+                }).on('keydown',
+                    function (event) {
+                        if (event.keyCode == 46 || event.keyCode == 8 || event.which == 8 || event.which == 46) {
+                            return;
+                        }
+                        var maxLength = $(this).attr('maxlength');
+                        if (maxLength != undefined) {
+                            var digit = $(this).val();
+                            while (digit.indexOf('-', 0) != -1) {
+                                digit = digit.replace('-', '');
+                            }
+                            let currentLength = digit.length; // + 1;
+                            var splitCount = parseInt(currentLength / 3, 0);
+                            if (currentLength + splitCount > maxLength) {
+                                event.preventDefault();
+                            }
+                        }
+                    }).on('focusout',
+                        function () {
+                            var digit = $(this).val();
+                            while (digit.indexOf(',', 0) != -1) {
+                                digit = digit.replace('-', '');
+                            }
+                            if ($(this).val() != '') {
+                                $(this).val(digit.replace(/(\d)(?=(\d\d\d\d)+(?!\d))/g, "$1-"));
+                            }
+                        }).focus(function () {
+                            $(this).select();
+                            var digit = $(this).val();
+                            while (digit.indexOf(',', 0) != -1) {
+                                digit = digit.replace(',', '');
+                            }
+                            //showTooltip($('#' + this.id), wordifyRials(digit));
+                        });
+</script>
+}

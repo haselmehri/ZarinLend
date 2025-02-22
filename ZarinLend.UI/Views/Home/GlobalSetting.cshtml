@@ -1,0 +1,390 @@
+﻿@model Services.Model.GlobalSetting.GlobalSettingModel
+@{
+    ViewData["Title"] = "تنظیمات کلی";
+    Layout = "~/Views/Shared/_NewLayout.cshtml";
+}
+@section styles
+{
+    <style type="text/css">
+        .number-style
+        {
+            direction:ltr;
+            text-align: center;
+            letter-spacing: 2px
+        }
+    </style>
+}
+<div id="requestGridDiv" class="p-2 bg-white rounded-lg">
+    <div class="font-medium-3 secondary darken-4 text-bold-800 d-flex align-items-center">
+        <i class="bx bx-align-right zl-text-secondary mr-25"></i>
+        <span>تاریخچه تنظیمات سرارسری</span>
+    </div>
+    <div class="row mt-1">
+        <div class="col-md-12">
+            <div class="form-group">
+                <button type="button" id="btnAddGlobalSetting" data-toggle="modal" data-target="#globalSettingModal" class="btn btn-outline-primary">
+                    ثبت تنظیمات سراسری جدید&nbsp;<i class="fal fa-save"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    <table id="globalSettingList" class="display" style="width:100%">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th >کارمزد تسهیلات برای مشتریان زرین پال<br />زرین لند(درصد)</th>
+                <th >کارمزد تسهیلات<br />زرین لند(درصد)</th>
+                <th >کارمزد تسهیلات<br />نهاد مالی(درصد)</th>
+                <th >هزینه اعتبار سنجی(ريال)</th>
+                <th >مدت اعتبار نتیجه اعتبارسنجی(روز)</th>
+                <th >مبلغ ضمانت نامه(درصد)</th>
+                <th >سود تسهیلات(درصد)</th>
+                <th >ایجاد کننده<br />تاریخ ایجاد</th>
+                <th >ویرایش کننده<br />تاریخ ویرایش</th>
+                <th >وضعیت</th>
+            </tr>
+        </thead>
+    </table>
+</div>
+<form id="frmGlobalSetting" method="post" enctype="multipart/form-data">
+    <div class="modal fade text-left" id="globalSettingModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel18" style="display: none;" data-backdrop="static" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl" role="document">
+            <div class="modal-content rounded-lg modal-xl">
+                <div class="modal-header">
+                    <h4 class="modal-title dark" id="myModalLabel18">
+                        ثبت تنظیمات سراسری
+                    </h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="بستن">
+                        <i class="bx bx-x"></i>
+                    </button>
+                </div>
+                <div class="modal-body line-height-2" id="globalSettingModalContent">
+                    <div class="row">
+                        <div class="col-md-4 col-sm-12">
+                            <div class="form-group">
+                                <label asp-for="LendTechFacilityForZarinpalClientFee" class="control-label"></label>
+                                <input asp-for="LendTechFacilityForZarinpalClientFee" type="text" class="form-control number-style" />
+                                <span asp-validation-for="LendTechFacilityForZarinpalClientFee" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-12">
+                            <div class="form-group">
+                                <label asp-for="LendTechFacilityFee" class="control-label"></label>
+                                <input asp-for="LendTechFacilityFee" type="text" class="form-control number-style" />
+                                <span asp-validation-for="LendTechFacilityFee" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-12">
+                            <div class="form-group">
+                                <label asp-for="FinancialInstitutionFacilityFee" class="control-label"></label>
+                                <input asp-for="FinancialInstitutionFacilityFee" type="text" class="form-control number-style" />
+                                <span asp-validation-for="FinancialInstitutionFacilityFee" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-group">
+                                <label asp-for="WarantyPercentage" class="control-label"></label>
+                                <input asp-for="WarantyPercentage" type="text" class="form-control number-style" />
+                                <span asp-validation-for="WarantyPercentage" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-group">
+                                <label asp-for="FacilityInterest" class="control-label"></label>
+                                <input asp-for="FacilityInterest" type="text" class="form-control number-style" />
+                                <span asp-validation-for="FacilityInterest" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-group">
+                                <label asp-for="ValidationFee" class="control-label"></label>
+                                <input asp-for="ValidationFeeThousandSeparator" class="form-control number-thousand-separator number-style" />
+                                <span asp-validation-for="ValidationFeeThousandSeparator" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-group">
+                                <label asp-for="ValidityPeriodOfValidation" class="control-label"></label>
+                                <input asp-for="ValidityPeriodOfValidation" class="form-control number-thousand-separator number-style" />
+                                <span asp-validation-for="ValidityPeriodOfValidation" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="text-right">
+                        <a href="#" class="btn btn-outline-secondary" data-dismiss="modal">
+                            <span>انصراف</span>
+                        </a>
+                        <button id="btnSave" class="btn btn-outline-success">
+                            @ResourceFile.Save&nbsp;<i class="fal fa-send"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+@section scripts {
+        @{
+            await Html.RenderPartialAsync("~/Views/Shared/_ValidationScriptsPartial.cshtml");
+        }
+<script>
+        let dataTableResponsive;
+        $(document).ready(() => {
+            $('div').removeClass('zl-active');
+            $('#globalSetting').addClass('zl-active');
+            loadGlobalSettings();
+        });
+
+        //$('#btnAddGlobalSetting').click(function (e) {
+        //    e.preventDefault();
+        //    $('#globalSettingModal').modal();
+        //});
+        const loadGlobalSettings = () => {
+            dataTableResponsive = $('#globalSettingList')
+                .on('preXhr.dt', function (e, settings, data, a, b) {
+                    //trigger before ajax call
+                    //debugger;
+                    //alert('preXhr');
+                    showWaiting('globalSettingList', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                })
+                .on('xhr.dt', function (e, settings, json, xhr) {
+                    //trigger after ajax call
+                    //debugger;
+                    //alert('xhr');
+                })
+                .DataTable({
+                    order: [],
+                    processing: true,
+                    serverSide: true,
+                    responsive: true,
+                    rowReorder: false,
+                    select: true,
+                    searching: false,
+                    paging: true,
+                    ordering: false,
+                    searching: false,
+                    filtering: false,
+                    info: true,
+                    lengthMenu: [
+                        [5, 10, 25, 50],
+                        [5, 10, 25, 50]
+                    ],
+                    pageLength: 5,
+                    //columnDefs: [{
+                    //    targets: 0,
+                    //    Id: function (td, cellData, rowData, row, col) {
+                    //        debugger;
+                    //        if (rowData[5] === 'Inactive') {
+                    //            $(td).css('color', 'red');
+                    //        }
+                    //    }
+                    //}],
+                    columnDefs: [
+                        //{ "visible": false, "targets": 0 },
+                        //and in this case the < a href="//legacy.datatables.net/ref#bStateSave" > bStateSave</a> works regularly ....but then I would like to have responsive columns indicating responsive: {
+                        {
+                            details: false,
+                            breakpoints: [
+                                { name: 'desktop', width: Infinity },
+                                { name: 'tablet-l', width: 1200 },
+                                { name: 'tablet-p', width: 992 },
+                                { name: 'mobile-l', width: 576 },
+                                { name: 'mobile-p', width: 320 }
+                            ]
+                        },
+                        {
+                            targets: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10],
+                            className: 'dt-center',
+                        },
+                        {
+                            targets: 4,
+                            render: function (data, type, row, meta) {
+                                return splitNumber(data);
+                            }
+                        },
+                        {
+                            targets: 8,
+                            render: function (data, type, row, meta) {
+                                return `${row.creator}<br/>${data}`;
+                            }
+                        },
+                        {
+                            targets: 9,
+                            render: function (data, type, row, meta) {
+                                return `${row.updater}<br/>${data}`;
+                            }
+                        },
+                        {
+                            responsivePriority: 1,
+                            targets: 10,
+                            render: function (data, type, row, meta) {
+                                return `${data ? '<span style="color:green">فعال</span>' : '<span style="color:red">غیرفعال</span>'}`;
+                            }
+                        }],
+                    rowCallback: function (row, data) {
+                        //$('td:eq(0)', row).css('text-align', 'center');
+                    },
+                    //ajax: {
+                    //    url: `/api/v1/RequestFacilityInstallment/SelectInstallment2/${$('#drpApprovalFacility').val()}`,
+                    //    type: 'POST',
+                    //    dataSrc: function(data) {
+                    //        data.recordsTotal = data.data.length;
+                    //        data.recordsFiltered = data.data.length;
+                    //        return data.data;
+                    //    },
+                    //    datatype: "json",
+                    //    //contentType: "application/json",
+                    //    contentType: "application/json; charset=utf-8",
+                    //    data: function(input) {
+                    //        debugger;
+                    //        //if ($('#FacilityTypeId').val() != '')
+                    //        //    input.FacilityTypeId = $('#FacilityTypeId').val();
+
+                    //        return JSON.stringify(input);
+                    //    },
+                    //},
+                    ajax: (data, callback, setting) => {
+                        getGlobalSettings(data).then(function (_data) {
+                            callback(_data);
+                        });
+                    },
+                    drawCallback: function (settings) {
+                        hideWaiting('globalSettingList');
+                    },
+                    initComplete: function (settings, json) {
+                    },
+                    rowCallback: (row, data, displayNum, displayIndex, dataIndex) => {
+                        $('td:eq(0)', row).html(displayIndex + 1);
+                        return row;
+                    },
+                    columns: [
+                        { "data": null },
+                        { "data": "lendTechFacilityForZarinpalClientFee" },
+                        { "data": "lendTechFacilityFee" },
+                        { "data": "financialInstitutionFacilityFee" },
+                        { "data": "validationFee" },
+                        { "data": "validityPeriodOfValidation" },
+                        { "data": "warantyPercentage" },
+                        { "data": "facilityInterest" },
+                        { "data": "shamsiCreateDate" },
+                        { "data": "shamsiUpdateDate" },
+                        { "data": "isActive" }
+                    ],
+                    language: {
+                        url: '/new-layout/datatables.net/fa.json'
+                    }
+                });
+
+            const getGlobalSettings = (data) => {
+                const postData = {
+                    Page: Math.floor(data.start / data.length) + 1,
+                    PageSize: data.length,
+                    SortDirection: null,
+                    SortOrder: null,
+                    FilterList: []
+                };
+
+                return new Promise(function (resolve, reject) {
+                    console.log('Loading data');
+
+                    $.ajax({
+                        type: 'post',
+                        datatype: "json",
+                        data: JSON.stringify(postData),
+                        contentType: "application/json; charset=utf-8",
+                        url: `/api/v1/GlobalSetting/GetGlobalSettingList`,
+                        success: function (result) {
+                            if (result != undefined && result.isSuccess == true) {
+                                resolve({
+                                    data: result.data.data,
+                                    recordsTotal: result.data.totalRowCount,
+                                    recordsFiltered: result.data.totalRowCount
+                                });
+                            }
+                        },
+                        error: function (error) {
+                            debugger;
+                            const exception = getExceptionMessageFromError(error);
+                            if (exception != null)
+                                showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                            else
+                                showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                        },
+                        complete: function () {
+
+                        },
+                    });
+                });
+            }
+        }
+
+        $('#btnSave').click(function (e) {
+            e.preventDefault();
+            debugger;
+            const formIsValid = $('#frmGlobalSetting').valid();
+            const amount = parseInt(replaceAllComma($('#ValidationFeeThousandSeparator').val()));
+            if ($("#ValidityPeriodOfValidation").val() <= 0) {
+                showMessage('@ResourceFile.ErrorTitle', 'مدت زمان اعتبار نتیجه اعتبارسنجی ایرانیان باید بزرگتر از صفر باشد', icons.error, '@ResourceFile.Close');
+                return;
+            }
+            if (amount <= 0) {
+                showMessage('@ResourceFile.ErrorTitle', 'هزینه اعتبار سنجی باید بزرگتر از صفر باشد', icons.error, '@ResourceFile.Close');
+                return;
+            }
+            if (formIsValid) {
+                showWaiting('globalSettingModalContent', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+
+                let data = new FormData();
+                data.append('ValidityPeriodOfValidation', $("#ValidityPeriodOfValidation").val());
+                data.append('LendTechFacilityFee', $('#LendTechFacilityFee').val());
+                data.append('LendTechFacilityForZarinpalClientFee', $('#LendTechFacilityForZarinpalClientFee').val());
+                data.append('FinancialInstitutionFacilityFee', $('#FinancialInstitutionFacilityFee').val());
+                data.append('FacilityInterest', $('#FacilityInterest').val());
+                data.append('WarantyPercentage', $('#WarantyPercentage').val());
+                data.append('ValidationFee', amount);
+                data.append('ValidationFeeThousandSeparator', $('#ValidationFeeThousandSeparator').val());
+
+                $.ajax({
+                    type: 'post',
+                    //dataType: 'json',
+                    //contentType: "application/json; charset=utf-8",
+                    //enctype: 'multipart/form-data',
+                    contentType: false,
+                    processData: false,
+                    url: '/api/v1/GlobalSetting/Add',
+                    //data: JSON.stringify(model),
+                    data: data,
+                    success: function (result) {
+                        if (result.isSuccess) {
+                            dataTableResponsive.page(0);
+                            dataTableResponsive.ajax.reload(null, false);
+                            hideWaiting('globalSettingModalContent');
+                            showMessage('@ResourceFile.InfoTitle', '@ResourceFile.MessageSuccess', icons.success, '@ResourceFile.Close');
+                            $('#globalSettingModal').modal('hide');
+                        }
+                        else if (!result.isSuccess) {
+                            showMessage('@ResourceFile.ErrorTitle', result.message, icons.error, '@ResourceFile.Close');
+                        }
+                    },
+                    error: function (error) {
+                        hideWaiting('globalSettingModalContent');
+                        const exception = getExceptionMessageFromError(error);
+                        if (exception != null)
+                            showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                        else
+                            showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                    }
+                });
+            }
+            else {
+                scrollToFirstError();
+            }
+        });
+</script>
+}

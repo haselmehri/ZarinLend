@@ -1,0 +1,17 @@
+﻿@model RequestFacilityModel
+@{
+    ViewData["Title"] = "جستجوی پیشرفته";
+    Layout = "/Views/Shared/_LayoutReport.cshtml";
+}
+@*@section styles
+    {
+    <style type="text/css">
+
+    </style>
+}*@
+@Html.StiNetCoreViewer(new StiNetCoreViewerOptions() {
+Actions =
+{
+    GetReport = "GetReport",
+    ViewerEvent = "ViewerEvent"
+}})

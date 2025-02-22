@@ -1,0 +1,49 @@
+﻿.visible {
+    animation-name: visible;
+    animation-duration: .80s;
+    animation-timing-function: ease-out;
+}
+
+.hidden {
+    display: block;
+    visibility: hidden;
+}
+
+.modal-c {
+    position: fixed;
+    top: 200px;
+    width: 100%;
+    right: 0;
+    z-index: 15000002;
+}
+
+.modal-cov {
+    position: fixed;
+    background-color: rgba(0,0,0,0.7);
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 15000001;
+}
+
+.modal-c .modal-b {
+    width: 70%;
+    margin: 0 auto;
+}
+
+.left-b {
+    text-align: left;
+}
+
+@keyframes visible {
+    from {
+        opacity: .3;
+        visibility: hidden !important;
+    }
+
+    to {
+        visibility: visible !important;
+        opacity: 1;
+    }
+}

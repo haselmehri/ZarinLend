@@ -1,0 +1,487 @@
+﻿@{
+    ViewData["Title"] = ViewBag.Title;
+    Layout = "~/Views/Shared/_NewLayout.cshtml";
+}
+@section styles{
+    <style type="text/css">
+        .zl-app-content {
+            padding-right: 1rem !important;
+            padding-left: 1rem !important;
+        }
+
+        .dt-error-message {
+            font-size: 13px;
+            color: red;
+            text-wrap: nowrap;
+            text-align: right
+        }
+    </style>
+}
+<div id="planGridDiv" class="p-2 bg-white rounded-lg">
+    <div class="font-medium-3 secondary darken-4 text-bold-800 d-flex align-items-center">
+        <i class="bx bx-align-right zl-text-secondary mr-25"></i>
+        <span>@ViewBag.Title</span>
+    </div>
+    <div class="row my-0 my-md-1">
+        <div class="col-md-12">
+            <div class="form-group">
+                <a class="btn btn-outline-primary" asp-controller="Plan" asp-action="Add">
+                    طرح جدید&nbsp;<i class="fal fa-save"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    <table id="planList" class="display" style="width:100%">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th >نام طرح</th>
+                <th >نام شرکت</th>
+                <th >نوع تسهیلات</th>
+                <th >مبلغ ضمانت/چک</th>
+                <th >مبلغ تسهیلات</th>
+                <th >وضعیت</th>
+                <th >لیست فایلها</th>
+                <th >عملیات</th>
+            </tr>
+        </thead>
+    </table>
+</div>
+<div class="modal fade text-left" id="memberListModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel190" style="display: none;" data-backdrop="static" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl modal-dialog-full-screen" role="document">
+        <div class="modal-content rounded-lg modal-xl modal-content-full-screen">
+            <div class="modal-header">
+                <h4 class="modal-title dark" id="myModalLabel190">
+                    لیست اعضای طرح
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="بستن">
+                    <i class="bx bx-x"></i>
+                </button>
+            </div>
+            <div class="modal-body line-height-2" id="memberListModalContent">
+                <table id="planMemberList" class="display" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th >کد ملی</th>
+                            <th >نام</th>
+                            <th >نام خانوادگی</th>
+                            <th >استان-شهر محل تولد<br />استان-شهر محل سکونت</th>
+                            <th >مبلغ درخواستی</th>
+                            <th >وضعیت نهایی</th>
+                            <th >وضعیت انتقال</th>
+                            <th >لیست خطاها</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script>
+        let planDatatable;
+        let planMembersDatatable;
+        let planId = -1;
+        let initialized = false;
+        $(document).ready(function () {
+            $('div').removeClass('zl-active');
+            $('#plans').addClass('zl-active');
+
+            loadPlans();
+            loadPlanMembers();
+        });
+
+        const loadPlans = () => {
+            planDatatable = $('#planList')
+                .on('preXhr.dt', function (e, settings, data, a, b) {
+                    //trigger before ajax call
+                    //debugger;
+                    //alert('preXhr');
+                    showWaiting('planList', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                })
+                .on('xhr.dt', function (e, settings, json, xhr) {
+                    //trigger after ajax call
+                    //debugger;
+                    //alert('xhr');
+                })
+                .DataTable({
+                    order: [],
+                    processing: true,
+                    serverSide: true,
+                    responsive: true,
+                    rowReorder: false,
+                    select: true,
+                    searching: false,
+                    paging: true,
+                    ordering: false,
+                    searching: false,
+                    filtering: false,
+                    info: true,
+                    lengthMenu: [
+                        [5, 10, 25, 50],
+                        [5, 10, 25, 50]
+                    ],
+                    pageLength: 5,
+                    columnDefs: [
+                        //{ "visible": false, "targets": 0 },
+                        //and in this case the < a href="//legacy.datatables.net/ref#bStateSave" > bStateSave</a> works regularly ....but then I would like to have responsive columns indicating responsive: {
+                        {
+                            details: false,
+                            breakpoints: [
+                                { name: 'desktop', width: Infinity },
+                                { name: 'tablet-l', width: 1200 },
+                                { name: 'tablet-p', width: 992 },
+                                { name: 'mobile-l', width: 576 },
+                                { name: 'mobile-p', width: 320 }
+                            ]
+                        },
+                        {
+                            targets: [0, 1, 2, 3, 4, 5, 6, 7, 8],
+                            className: 'dt-center',
+                        },
+                        {
+                            targets: 4,
+                            render: function (data, type, row, meta) {
+                                return splitNumber(data);
+                            }
+                        },
+                        {
+                            targets: 5,
+                            render: function (data, type, row, meta) {
+                                return (data != null ? splitNumber(data) : '-');
+                            }
+                        },
+                        {
+                            targets: 6,
+                            render: function (data, type, row, meta) {
+                                debugger;
+                                return data ? 'فعال' : 'غیر فعال';
+                            }
+                        },
+                        {
+                            targets: 7,
+                            render: function (data, type, row, meta) {
+                                return renderFileList(data);
+                            }
+                        },
+                        {
+                            targets: 8,
+                            responsivePriority: 3,
+                            data: { aa: 'bb' },
+                            render: function (data, type, row, meta) {
+                                let buttonsHtml = `<button data-plan-id=${data.id} class="btn btn-outline-primary member-list" style='width:100px'>جزئیات فایل</button>`;
+                                return buttonsHtml;
+                            }
+                        }],
+                    rowCallback: function (row, data) {
+                        //$('td:eq(0)', row).css('text-align', 'center');
+                    },
+                    ajax: (data, callback, setting) => {
+                        getData(data).then(function (_data) {
+                            callback(_data);
+                        });
+                    },
+                    drawCallback: function (settings) {
+                        hideWaiting('planList');
+                    },
+                    initComplete: function (settings, json) {
+                        $('#planList tbody').on('click', 'button.member-list', function (e) {
+                            e.preventDefault();
+                            var data = planDatatable.row($(this).parents('tr')).data();
+                            planId = data.id;
+                            planMembersDatatable.page(0);
+                            planMembersDatatable.ajax.reload(null, false);
+                            $('#memberListModal').modal();
+                        });
+                    },
+                    rowCallback: (row, data, displayNum, displayIndex, dataIndex) => {
+                        $('td:eq(0)', row).html(displayIndex + 1);
+                        return row;
+                    },
+                    columns: [
+                        //{
+                        //    //For Row Number
+                        //    "data": "Id",
+                        //    render: function (data, type, row, meta) {
+                        //        return meta.settings.oAjaxData.start + meta.row + 1;
+                        //    }
+                        //},
+                        //{
+                        //    "data": "PersonFirstName",
+                        //    render: function (data, type) {
+                        //        //debugger;
+                        //        //if (type === 'display') {
+                        //        //    let link = 'http://datatables.net';
+
+                        //        //    if (data[0] < 'H') {
+                        //        //        link = 'http://cloudtables.com';
+                        //        //    } else if (data[0] < 'S') {
+                        //        //        link = 'http://editor.datatables.net';
+                        //        //    }
+
+                        //        //    return '<a href="' + link + '">' + data + '</a>';
+                        //        //}
+
+                        //        return data;
+                        //    },
+                        //},
+                        { "data": null },
+                        { "data": "name" },
+                        { "data": "facilityTypeTitle" },
+                        { "data": "organizationName" },
+                        { "data": "amountWaranty" },
+                        { "data": "facilityAmount" },
+                        { "data": "isActive" },
+                        { "data": "planFileUrlList" },
+                        { "data": null }
+                    ],
+                    language: {
+                        url: '/new-layout/datatables.net/fa.json'
+                    }
+                });
+
+            const getData = (data) => {
+                const postData = {
+                    Page: Math.floor(data.start / data.length) + 1,
+                    PageSize: data.length,
+                    SortDirection: null,
+                    SortOrder: null,
+                    FilterList: []
+                };
+
+                //postData.FilterList.push({
+                //    PropertyName: 'RequestStatus',
+                //    Operator: @((int)Services.Dto.Operator.Equal),
+                //    PropertyValue: parseInt(facilityStatusValue)
+                //});
+                return new Promise(function (resolve, reject) {
+                    console.log('Loading data');
+
+                    $.ajax({
+                        type: 'post',
+                        datatype: "json",
+                        data: JSON.stringify(postData),
+                        contentType: "application/json; charset=utf-8",
+                        url: `/api/v1/Plan/SelectPlans`,
+                        success: function (result) {
+                            if (result != undefined && result.isSuccess == true) {
+                                resolve({
+                                    data: result.data.data,
+                                    recordsTotal: result.data.totalRowCount,
+                                    recordsFiltered: result.data.totalRowCount
+                                });
+                            }
+                        },
+                        error: function (error) {
+                            debugger;
+                            const exception = getExceptionMessageFromError(error);
+                            if (exception != null)
+                                showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                            else
+                                showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                        },
+                        complete: function () {
+
+                        },
+                    });
+                });
+            }
+
+            const renderFileList = (planFileUrlList) => {
+                debugger;
+                if (planFileUrlList != null && planFileUrlList.length > 0) {
+                    let fileUrls = planFileUrlList.map((fileUrl, index) => {
+                        if (index == 0)
+                            return `<a target='_blank' href='${fileUrl}'>فایل شماره ${1 + index}</a>`;
+                        else
+                            return `<br/><a target='_blank' href='${fileUrl}'>فایل شماره ${1 + index}</a>`;
+                    });
+
+                    return fileUrls;
+                }
+                return null;
+            }
+        }
+
+        const loadPlanMembers = () => {
+            planMembersDatatable = $('#planMemberList')
+                .on('preXhr.dt', function (e, settings, data, a, b) {
+                    //trigger before ajax call
+                    //debugger;
+                    //alert('preXhr');
+                    //showWaiting('planMemberList', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                })
+                .on('xhr.dt', function (e, settings, json, xhr) {
+                    //trigger after ajax call
+                    //debugger;
+                    //alert('xhr');
+                })
+                .DataTable({
+                    order: [],
+                    processing: true,
+                    serverSide: true,
+                    responsive: true,
+                    rowReorder: false,
+                    select: true,
+                    searching: false,
+                    paging: false,
+                    ordering: false,
+                    searching: false,
+                    filtering: false,
+                    info: true,
+                    //lengthMenu: [
+                    //    [10, 25, 50, -1],
+                    //    [10, 25, 50, 'همه']
+                    //],
+                    pageLength: -1,
+                    columnDefs: [
+                        //{ "visible": false, "targets": 0 },
+                        //and in this case the < a href="//legacy.datatables.net/ref#bStateSave" > bStateSave</a> works regularly ....but then I would like to have responsive columns indicating responsive: {
+                        {
+                            details: false,
+                            breakpoints: [
+                                { name: 'desktop', width: Infinity },
+                                { name: 'tablet-l', width: 1200 },
+                                { name: 'tablet-p', width: 992 },
+                                { name: 'mobile-l', width: 576 },
+                                { name: 'mobile-p', width: 320 }
+                            ]
+                        },
+                        {
+                            targets: [0, 1, 2, 3, 4, 5, 6, 7],
+                            className: 'dt-center',
+                        },
+                        {
+                            targets: 4,
+                            render: function (data, type, row, meta) {
+                                return `<span style='display:inline-block'>${data.provinceOfBirthName}-${data.cityOfBirthName}<br/>${data.provinceName}-${data.cityName}</span>`;
+                            }
+                        },
+                        {
+                            targets: 5,
+                            render: function (data, type, row, meta) {
+                                return (data != null ? splitNumber(data) : '')
+                            }
+                        },
+                        {
+                            targets: 6,
+                            render: function (data, type, row, meta) {
+                                return (data ? "<i class='fa fa-times-circle' style='color:red;'></i>" : "<i class='fa fa-check-circle' style='color:green;'></i>")
+                            }
+                        },
+                        {
+                            targets: 7,
+                            render: function (data, type, row, meta) {
+                                return ((data != null && data) ? "<i class='fa fa-check-circle' style='color:green;'></i>" : "<i class='fa fa-exclamation-triangle' style='color:red;'></i>")
+                            }
+                        },
+                        {
+                            targets: 8,
+                            className: "dt-error-message"
+                        }],
+                    rowCallback: function (row, data) {
+                        //$('td:eq(8)', row).css('text-align', 'right');
+                        //$('td', row).eq(1).css('color', 'red');
+                    },
+                    ajax: (data, callback, setting) => {
+                        getPlanMembers(data).then(function (_data) {
+                            callback(_data);
+                        });
+                    },
+                    drawCallback: function (settings) {
+                        //hideWaiting('planMemberList');
+                    },
+                    initComplete: function (settings, json) {
+                        initialized = true;
+                    },
+                    rowCallback: (row, data, displayNum, displayIndex, dataIndex) => {
+                        $('td:eq(0)', row).html(displayIndex + 1);
+                        return row;
+                    },
+                    columns: [
+                        //{
+                        //    "data": "Id",
+                        //    render: function (data, type, row, meta) {
+                        //        return meta.settings.oAjaxData.start + meta.row + 1;
+                        //    }
+                        //},
+                        //{
+                        //    "data": "PersonFirstName",
+                        //    render: function (data, type) {
+                        //        //debugger;
+                        //        //if (type === 'display') {
+                        //        //    let link = 'http://datatables.net';
+
+                        //        //    if (data[0] < 'H') {
+                        //        //        link = 'http://cloudtables.com';
+                        //        //    } else if (data[0] < 'S') {
+                        //        //        link = 'http://editor.datatables.net';
+                        //        //    }
+
+                        //        //    return '<a href="' + link + '">' + data + '</a>';
+                        //        //}
+
+                        //        return data;
+                        //    },
+                        //},
+                        { "data": null },
+                        { "data": "nationalCode" },
+                        { "data": "fName" },
+                        { "data": "lName" },
+                        { "data": null },
+                        { "data": "facilityAmount" },
+                        { "data": "hasError" },
+                        { "data": "importSuccess" },
+                        { "data": "errorMessage" }
+                    ],
+                    language: {
+                        url: '/new-layout/datatables.net/fa.json'
+                    }
+                });
+
+            const getPlanMembers = (data) => {
+                return new Promise(function (resolve, reject) {
+                    if (!initialized || planId == -1) {
+                        resolve({
+                            data: [],
+                            recordsTotal: 0,
+                            recordsFiltered: 0
+                        });
+                    }
+                    else {
+                        $.ajax({
+                            type: 'post',
+                            datatype: "json",
+                            data: JSON.stringify(data),
+                            contentType: "application/json; charset=utf-8",
+                            url: `/api/v1/Plan/GetMembers/${planId}`,
+                            success: function (result) {
+                                debugger;
+                                if (result != undefined && result.isSuccess == true) {
+                                    resolve({
+                                        data: result.data,
+                                        recordsTotal: result.data.length,
+                                        recordsFiltered: result.data.length
+                                    });
+                                }
+                            },
+                            error: function (error) {
+                                debugger;
+                                const exception = getExceptionMessageFromError(error);
+                                if (exception != null)
+                                    showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                                else
+                                    showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                            },
+                            complete: function () {
+
+                            },
+                        });
+                    }
+                });
+            }
+        }
+    </script>
+}

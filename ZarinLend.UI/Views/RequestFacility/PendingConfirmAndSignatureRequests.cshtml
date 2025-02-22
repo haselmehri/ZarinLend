@@ -1,0 +1,1209 @@
+﻿@model RequestFacilityFilterModel
+
+@{
+    ViewData["Title"] = ViewBag.Title;
+    var ConfirmAndSignatureWorkFlowStepId = ViewBag.PendingWorkFlowId;//در انتظار تایید و امضای مدیر بانک
+    Layout = "~/Views/Shared/_NewLayout.cshtml";
+    var ajaxUrl = "/api/v1/RequestFacility/SearchLeasingRequest";
+}
+@section styles {
+    <link href="~/persianDatePicker/css/persianDatepicker-lightorang.css" rel="stylesheet" />
+    <style type="text/css">
+    </style>
+}
+<div id="requestGridDiv" class="p-2 bg-white rounded-lg">
+    <div class="font-medium-3 secondary darken-4 text-bold-800 d-flex align-items-center">
+        <i class="bx bx-align-right zl-text-secondary mr-25"></i>
+        <span>درخواست های در انتظار تایید و امضاء</span>
+    </div>
+    <div class="p-2 rounded-lg">
+        <form id="filterForm" method="post">
+            @await Component.InvokeAsync("RequestFacilityFilter", new { showWaitingStepsFilter = false, showFacilityStatus = false })
+            <div class="row my-0 my-md-1">
+                <div class="col-md-6 col-sm-12" style="text-align:right">
+                    <div class="form-group">
+                        <button id="btnSignAllContract" style="display:none" tabindex="5" class="btn btn-outline-info">
+                            امضاء گروهی همه قراردادها&nbsp;<i class="fal fa-file-excel-o"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class=" col-md-6 col-sm-12" style="text-align:left">
+                    <button type="button" id="btnSearch" class="btn btn-zl-primary">
+                        <span>جستجو</span>
+                    </button>
+                    <button id="btnExportToExcel" tabindex="5" class="btn btn-outline-info">
+                        خروجی اکسل<i class="fal fa-file-excel-o"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+        <table id="requestList" class="display" style="width:100%">
+            <thead>
+                <tr>
+                    <th><fieldset><div class='checkbox checkbox-primary'><input type='checkbox' id="checkAll" /><label for="checkAll"></label></div></fieldset></th>
+                    <th>#</th>
+                    <th>اعتبار درخواستی(ريال)<br />بازه پرداخت</th>
+                    <th>درخواست کننده<br />کد ملی/شناسه ملی</th>
+                    <th>تاریخ درخواست</th>
+                    <th>تاریخ آخرین اقدام</th>
+                    <th>وضعیت</th>
+                    <th>کارشناس اقدام کننده</th>
+                    <th>اقدام</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+<div class="modal fade text-left" id="pendingRequestModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel18" style="display: none;" data-backdrop="static" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg" role="document">
+        <div class="modal-content rounded-lg modal-lg">
+            <div class="modal-header">
+                <h4 class="modal-title dark" id="myModalLabel18">
+                    تایید نهایی امضاء قرارداد توسط مدیر بانک
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="بستن">
+                    <i class="bx bx-x"></i>
+                </button>
+            </div>
+            <form id="frmVerifyBuyer" method="post">
+                <div class="modal-body line-height-2">
+                    <div class="row d-flex align-items-center justify-content-around mb-1">
+                        <div class="col-md-6 col-sm-12">
+                            <fieldset>
+                                <div class="radio radio-warning radio-glow radio-sm">
+                                    <input type="radio" name="requestStatusRadio" id="approveAndSign" value="101" />
+                                    <label class="font-small-3 warning darken-4 text-bold-400 line-height-23" for="approveAndSign">تایید درخواست(<b>قرارداد را بعدا امضاء میکنم</b>)</label>
+                                </div>
+                            </fieldset>
+                        </div>
+                        <div class="col-md-6 col-sm-12">
+                            <fieldset>
+                                <div class="radio radio-success radio-glow radio-sm">
+                                    <input type="radio" name="requestStatusRadio" id="approveAndSignAfter" value="100" />
+                                    <label class="font-small-3 success darken-4 text-bold-400 line-height-23" for="approveAndSignAfter">تایید درخواست(<b>قرارداد را الان امضاء میکنم</b>)</label>
+                                </div>
+                            </fieldset>
+                        </div>
+                    </div>
+                    <div id="signingMethodContent" class="row" style="display:none">
+                        <hr />
+                        <div class="col-md-6 col-sm-12">
+                            <fieldset>
+                                <div class="radio radio-warning radio-glow radio-sm">
+                                    <input type="radio" name="signingMethod" id="signingByApplication" value="@((int)SigningMethod.MobileApp)" />
+                                    <label class="font-small-3 warning darken-4 text-bold-400 line-height-23" for="signingByApplication">امضاء با اپلیکیشن موبایلی آینده ساین</label>
+                                </div>
+                            </fieldset>
+                        </div>
+                        <div class="col-md-6 col-sm-12">
+                            <fieldset>
+                                <div class="radio radio-success radio-glow radio-sm">
+                                    <input type="radio" name="signingMethod" id="signingByHardwareToken" value="@((int)SigningMethod.HardwareToken)" />
+                                    <label class="font-small-3 success darken-4 text-bold-400 line-height-23" for="signingByHardwareToken">امضاء با توکن سخت اقزاری</label>
+                                </div>
+                            </fieldset>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group form-group-ex">
+                                <label class="control-label">توضیحات نهاد مالی</label>
+                                <textarea id="description_admin" name="description_admin" class="form-control" placeholder="توضیحات نهاد مالی"></textarea>
+                                <span class="text-danger field-validation-valid" data-valmsg-for="description_admin" data-valmsg-replace="true"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="text-right">
+                        <a href="#" class="btn btn-outline-secondary" data-dismiss="modal">
+                            <span>انصراف</span>
+                        </a>
+                        <button id="btnConfirmAndSignatureContract" class="btn btn-zl-primary white">
+                            <span>تایید نهایی و امضاء قرارداد</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal fade text-left" id="signContractModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel18" style="display: none;" data-backdrop="static" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg" role="document">
+        <div class="modal-content rounded-lg modal-lg">
+            <div class="modal-header">
+                <h4 class="modal-title dark" id="myModalLabel18">
+                    امضاء قرارداد توسط مدیر بانک
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="بستن">
+                    <i class="bx bx-x"></i>
+                </button>
+            </div>
+            <form id="frmSignContract" method="post">
+                <div class="modal-body line-height-2">
+                    <div class="row d-flex align-items-center justify-content-around mb-1">
+                        <div class="col-md-6 col-sm-12">
+                            <fieldset>
+                                <div class="radio radio-warning radio-glow radio-sm">
+                                    <input type="radio" name="signingMethodRadio" id="signingByApplicationRadio" value="@((int)SigningMethod.MobileApp)" />
+                                    <label class="font-small-3 warning darken-4 text-bold-400 line-height-23" for="signingByApplicationRadio">امضاء با اپلیکیشن موبایلی آینده ساین</label>
+                                </div>
+                            </fieldset>
+                        </div>
+                        <div class="col-md-6 col-sm-12">
+                            <fieldset>
+                                <div class="radio radio-success radio-glow radio-sm">
+                                    <input type="radio" name="signingMethodRadio" id="signingByHardwareTokenRadio" value="@((int)SigningMethod.HardwareToken)" />
+                                    <label class="font-small-3 success darken-4 text-bold-400 line-height-23" for="signingByHardwareTokenRadio">امضاء با توکن سخت اقزاری</label>
+                                </div>
+                            </fieldset>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="text-right">
+                        <a href="#" class="btn btn-outline-secondary" data-dismiss="modal">
+                            <span>انصراف</span>
+                        </a>
+                        <button id="btnSignContract" class="btn btn-zl-primary white">
+                            <span>امضاء قرارداد</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@section scripts {
+    @{
+        await Html.RenderPartialAsync("~/Views/Shared/_ValidationScriptsPartial.cshtml");
+    }
+    <script src="~/persianDatePicker/js/persianDatepicker.min.js"></script>
+    <script src="~/js/Dastine/Dastine-Config-For-Group-Sign.js"></script>
+    <script src="~/js/Dastine/Dastine.js"></script>
+    <script>
+        let responsiveDatatable;
+        //********************signature methods********************/
+        let selectedCertificateFromTokenByUIResult;
+        let selectedCertificate;
+        let digest;
+        let signature;
+
+        $(document).ready(function () {
+            $('input[name=requestStatusRadio]').change((e) => {
+                debugger;
+                if ($(e.target).val() == 100) {
+                    $('#signingMethodContent').show();
+                }
+                else {
+                    $('#signingMethodContent').hide();
+                }
+            });
+        });
+
+        function SelectCertificateFromTokenByUI(callback) {
+            if (Dastine.isInstalled) {
+                const issuer = '';// document.getElementById('txtSelectCertificateFromTokenByUIIssuer').value;
+                const keyUsages = '';// document.getElementById('txtSelectCertificateFromTokenByUIKeyUsages').value;
+                try {
+                    Dastine.SelectCertificateFromTokenByUI(issuer, keyUsages, function (event) {
+                        selectedCertificateFromTokenByUIResult = event.data.Result;
+                        if (selectedCertificateFromTokenByUIResult == 0)
+                            callback(true);
+                        else {
+                            showMessage('@ResourceFile.InfoTitle', 'خطایی نامشخص رخ داده است،لطفا نسبت به متصل بودن توکن سخت افزاری به سیستم کامپیوتر خود اطمینان حاصل کنید', icons.error, '@ResourceFile.Close');
+                            callback(false);
+                        }
+                    });
+                }
+                catch (e) {
+                    //alert(e);
+                    showMessage('@ResourceFile.InfoTitle', e, icons.error, '@ResourceFile.Close');
+                    callback(false);
+                }
+            } else {
+                if (Dastine.errorMessage == 'DASTINE_NOT_INSTALLED') {
+                    //alert(Dastine.errorMessage + '\n Get it from:\n' + DastineConfig.hostDownloadLink);
+                    showMessage('@ResourceFile.InfoTitle', Dastine.errorMessage + '\n Get it from:\n' + DastineConfig.hostDownloadLink, icons.error, '@ResourceFile.Close');
+                }
+                else {
+                    //alert(Dastine.errorMessage);
+                    showMessage('@ResourceFile.InfoTitle', Dastine.errorMessage, icons.error, '@ResourceFile.Close');
+                }
+
+                callback(false);
+            }
+        }
+
+        function ReadSelectedCertificate(callback) {
+            if (Dastine.isInstalled) {
+                try {
+                    Dastine.GetSelectedCertificate(function (event) {
+                        selectedCertificate = event.data.Result;
+                        callback(true);
+                    });
+                }
+                catch (e) {
+                    //alert(e);
+                    showMessage('@ResourceFile.InfoTitle', e, icons.error, '@ResourceFile.Close');
+                    callback(false);
+                }
+            } else {
+                if (Dastine.errorMessage == 'DASTINE_NOT_INSTALLED') {
+                    //alert(Dastine.errorMessage + '\n Get it from:\n' + DastineConfig.hostDownloadLink);
+                    showMessage('@ResourceFile.InfoTitle', Dastine.errorMessage + '\n Get it from:\n' + DastineConfig.hostDownloadLink, icons.error, '@ResourceFile.Close');
+                }
+                else {
+                    //alert(Dastine.errorMessage);
+                    showMessage('@ResourceFile.InfoTitle', Dastine.errorMessage, icons.error, '@ResourceFile.Close');
+                }
+
+                callback(false);
+            }
+        }
+
+        function SignMessage(digest, callback) {
+            debugger;
+            if (Dastine.isInstalled) {
+                try {
+                    Dastine.Sign(digest, 'SHA1', function (event) {
+                        debugger;
+                        if (event.data.Result == '18' || event.data.Result == '14') {
+                            showMessage('@ResourceFile.InfoTitle', 'کلمه عبور وارد شده اشتباه می باشد!', icons.error, '@ResourceFile.Close');
+                            callback(false);
+                        }
+                        else {
+                            signature = event.data.Result;
+                            callback(true);
+                        }
+                    });
+                }
+                catch (e) {
+                    debugger;
+                    showMessage('@ResourceFile.InfoTitle', e, icons.error, '@ResourceFile.Close');
+                    callback(false);
+                }
+            } else {
+                if (Dastine.errorMessage == 'DASTINE_NOT_INSTALLED') {
+                    showMessage('@ResourceFile.InfoTitle', Dastine.errorMessage + '\n Get it from:\n' + DastineConfig.hostDownloadLink, icons.error, '@ResourceFile.Close');
+                }
+                else {
+                    showMessage('@ResourceFile.InfoTitle', Dastine.errorMessage, icons.error, '@ResourceFile.Close');
+                }
+
+                callback(false);
+            }
+        }
+
+        let requestFacilitySignatureArray = [];
+        $('#btnSignAllContract').click((e) => {
+            e.preventDefault();
+            showWaiting('requestGridDiv', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+            requestFacilitySignatureArray = [];
+            const postData = {
+                FilterList: []
+            };
+
+            fillFilter(postData);
+            //==============get Request Facility IDs for sign by Bank Admin==============
+            $.ajax({
+                type: 'post',
+                data: JSON.stringify({ filter: postData, checkedRequestFacilityIds: requestFacilityIdArray }),
+                datatype: "json",
+                async: false,
+                cache: false,
+                contentType: "application/json; charset=utf-8",
+                url: `/api/v1/RequestFacility/GetAllRequestFacilityIdsForSign`,
+                success: function (result) {
+                    hideWaiting('requestGridDiv');
+                    if (result.isSuccess) {
+                        if (result.data != undefined && result.data.length > 0) {
+                            confirmMessage("هشدار",
+                                `<b>${result.data.length}</b> درخواست در مرحله <b>تایید نهایی و امضاء</b> یا <b>فقط امضاء</b> قرار دارند.
+                                                                                        درخواست هایی که در مرحله تایید نهایی و امضاء هستند،تایید و امضاء میشوند! و همچنین درخواست هایی که قبلا تایید شده اند اما امضاء نشده اند در این فرآیند امضاء گروهی قرارداد آنها امضاء خواهد شد!<br/>
+                                                                                        <span style='color:red'>آیا برای تایید و امضاء قراردادها بصورت گروهی مطمئن هستید؟</span>`
+                                , icons.warning,
+                                'بله،مطمئنم',
+                                "خیر،مطمئن نیستم",
+                                undefined,
+                                () => {
+                                    SelectCertificateFromTokenByUI(function (selectCertificateResult) {
+                                        if (selectCertificateResult == true) {
+                                            ReadSelectedCertificate(function (readCertificateResult) {
+                                                if (readCertificateResult == true) {
+                                                    debugger;
+                                                    for (let i = 0; i < result.data.length; i++) {
+                                                        requestFacilitySignatureArray.push({
+                                                            RequestFacilityId: result.data[i],
+                                                            SelectedCertificate: selectedCertificate,
+                                                            Digest: null,
+                                                            SignCompleted: false,
+                                                        });
+                                                    }
+                                                    debugger;
+                                                    if (requestFacilitySignatureArray.length > 0) {
+                                                        signAllPdf();
+                                                    }
+                                                }
+                                            });
+                                        }
+                                    });
+                                });
+                        }
+                        else {
+                            showMessage('@ResourceFile.InfoTitle', `هیچ درخواستی در مرحله تایید نهایی و امضاء یافت نشد!`, icons.warning, '@ResourceFile.Close');
+                        }
+                    }
+                },
+                error: function (error) {
+                    hideWaiting('requestGridDiv');
+                    const exception = getExceptionMessageFromError(error);
+                    if (exception != null)
+                        showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                    else
+                        showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                }
+            });
+            //==============get Request Facility IDs for sign by Bank Admin==============
+        });
+
+        let indexArray = 0;
+        const signAllPdf = () => {
+            debugger;
+            showWaiting('requestGridDiv', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+            if (indexArray < requestFacilitySignatureArray.length) {
+                //var dataToSign = requestFacilitySignatureArray[indexArray];
+                data = {
+                    RequestFacilityId: requestFacilitySignatureArray[indexArray].RequestFacilityId,
+                    SelectedCertificate: requestFacilitySignatureArray[indexArray].SelectedCertificate
+                };
+                $.ajax({
+                    type: 'post',
+                    data: JSON.stringify(data),
+                    datatype: "json",
+                    async: false,
+                    contentType: "application/json; charset=utf-8",
+                    url: `/api/v1/dastine/JustPDFDigestForMultiSign`,
+                    success: function (result) {
+                        debugger;
+                        if (result.isSuccess) {
+                            requestFacilitySignatureArray[indexArray].Digest = result.data;
+                            SignMessage(requestFacilitySignatureArray[indexArray].Digest, function (signMessageResult) {
+                                if (signMessageResult == true) {
+                                    //======================
+                                    debugger;
+                                    const postData = {
+                                        RequestFacilityId: requestFacilitySignatureArray[indexArray].RequestFacilityId,
+                                        SelectedCertificate: requestFacilitySignatureArray[indexArray].SelectedCertificate,
+                                        Digest: requestFacilitySignatureArray[indexArray].Digest,
+                                        Signature: signature
+                                    };
+                                    $.ajax({
+                                        type: 'post',
+                                        data: JSON.stringify(postData),
+                                        datatype: "json",
+                                        async: false,
+                                        contentType: "application/json; charset=utf-8",
+                                        url: `/api/v1/dastine/PutPDFSignatureForMultiSign`,
+                                        success: function (result) {
+                                            debugger;
+                                            if (result.isSuccess) {
+                                                requestFacilitySignatureArray[indexArray].SignCompleted = true;
+                                                if (indexArray == requestFacilitySignatureArray.length - 1) {
+                                                    responsiveDatatable.page(0);
+                                                    responsiveDatatable.ajax.reload(null, false);
+                                                    hideWaiting('requestGridDiv');
+                                                    showMessage('@ResourceFile.InfoTitle', `امضای ${requestFacilitySignatureArray.length} قرارداد بصورت گروهی با موفقیت انجام شد!`, icons.success, '@ResourceFile.Close');
+                                                    requestFacilitySignatureArray = [];
+                                                }
+                                            }
+                                            indexArray++;
+                                            signAllPdf();
+                                        },
+                                        error: function (error) {
+                                            debugger;
+                                            indexArray++;
+                                            hideWaiting('requestGridDiv');
+                                            const exception = getExceptionMessageFromError(error);
+                                            if (exception != null)
+                                                showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                                            else
+                                                showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+
+                                            signAllPdf();
+                                        }
+                                    });
+
+                                    //======================
+                                }
+                            });
+                        }
+                    },
+                    error: function (error) {
+                        hideWaiting('requestGridDiv');
+                        const exception = getExceptionMessageFromError(error);
+                        if (exception != null)
+                            showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                        else
+                            showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                    }
+                });
+            }
+            else {
+                hideWaiting('requestGridDiv');
+                requestFacilitySignatureArray = [];
+                indexArray = -1;
+            }
+        }
+        //********************signature methods********************/
+        let requestFacilityIdArray = [];
+        // let startDate = null;
+        // let endDate = null;
+        // $('#StartDate').val('@ViewBag.StartDate');
+        // $('#txtStartDate').val('@ViewBag.PersianStartDate');
+
+        // $('#EndDate').val('@ViewBag.EndDate');
+        // $('#txtEndDate').val('@ViewBag.PersianEndDate');
+        let parentGridElementId = 'activeFacilityDiv';
+        $(document).ready(function () {
+            $('div').removeClass('zl-active');
+            $('#pendingConfirmAndSignatureRequests').addClass('zl-active');
+
+            $('input[name=requestStatusRadio]').change((e) => {
+                debugger;
+                if ($(e.target).val() == 100) {
+                    $('#signingMethodContent').show();
+                }
+                else {
+                    $('#signingMethodContent').hide();
+                }
+            });
+
+            loadRequests();
+        });
+
+        $('#checkAll').change((e) => {
+            const checkAllState = $(e.target).prop('checked');
+            $('input[type="checkbox"].select-row').prop('checked', checkAllState);
+
+            $("input[type='checkbox'].select-row").each(function () {
+                var $this = $(this);
+
+                if ($this.is(":checked")) {
+                    if (jQuery.inArray($this.attr("value"), requestFacilityIdArray) === -1)
+                        requestFacilityIdArray.push($this.attr("value"));
+                } else {
+                    requestFacilityIdArray.splice(jQuery.inArray($this.attr("value"), requestFacilityIdArray), 1);
+                }
+            });
+            debugger;
+        });
+
+        $('#btnConfirmAndSignatureContract').click(function (e) {
+            e.preventDefault();
+            debugger;
+            const formIsValid = $('#frmVerifyBuyer').valid();
+            if (!formIsValid) {
+                scrollToFirstError();
+                return;
+            }
+            const requestStatus = $('input[name=requestStatusRadio]:checked').val();
+            if (requestStatus == undefined) {
+                showMessage('@ResourceFile.InfoTitle', 'لطفا وضعیت درخواست را مشخص کنید!', icons.warning, '@ResourceFile.Close');
+                return;
+            }
+
+            debugger;
+            if (requestStatus == 100) {/*confirm and sign contract by leasing admin*/
+                const signingMethod = $('input[name=signingMethod]:checked').val();
+                if (signingMethod == undefined) {
+                    showMessage('@ResourceFile.InfoTitle', 'لطفا روشی که میخواهید با آن امضاء کنید را انتخاب کنید!', icons.warning, '@ResourceFile.Close');
+                    return;
+                }
+                if (signingMethod == @((int)SigningMethod.HardwareToken)) {
+                    SelectCertificateFromTokenByUI(function (selectCertificateResult) {
+                        debugger;
+                        if (selectCertificateResult == true) {
+                            ReadSelectedCertificate(function (readCertificateResult) {
+                                debugger;
+                                if (readCertificateResult == true) {
+                                    data = {
+                                        RequestFacilityId: $(e.currentTarget).data('request-facility-id'),
+                                        SelectedCertificate: selectedCertificate
+                                    };
+                                    $.ajax({
+                                        type: 'post',
+                                        data: JSON.stringify(data),
+                                        datatype: "json",
+                                        contentType: "application/json; charset=utf-8",
+                                        url: `/api/v1/dastine/PDFDigestForMultiSign`,
+                                        success: function (result) {
+                                            hideWaiting('frmVerifyBuyer');
+                                            debugger;
+                                            if (result.isSuccess) {
+                                                digest = result.data;
+                                                SignMessage(digest, function (signMessageResult) {
+                                                    debugger;
+                                                    if (signMessageResult == true) {
+                                                        //======================
+                                                        const postData = {
+                                                            RequestFacilityId: $(e.currentTarget).data('request-facility-id'),
+                                                            SelectedCertificate: selectedCertificate,
+                                                            Digest: digest,
+                                                            Signature: signature
+                                                        };
+                                                        $.ajax({
+                                                            type: 'post',
+                                                            data: JSON.stringify(postData),
+                                                            datatype: "json",
+                                                            contentType: "application/json; charset=utf-8",
+                                                            url: `/api/v1/dastine/PutPDFSignatureForMultiSign`,
+                                                            success: function (result) {
+                                                                hideWaiting('frmVerifyBuyer');
+                                                                debugger;
+                                                                if (result.isSuccess) {
+                                                                    responsiveDatatable.page(0);
+                                                                    responsiveDatatable.ajax.reload(null, false);
+                                                                    //$('#a_finalContractUrl').show();
+                                                                    //$('#a_finalContractUrl').attr('href', `/UploadFiles/RequestFacilityContract/${result.data}`);
+                                                                    showMessage('@ResourceFile.InfoTitle', 'امضای قرارداد با موفقیت انجام شد', icons.success, '@ResourceFile.Close');
+                                                                    $('#pendingRequestModal').modal('hide');
+                                                                }
+                                                            },
+                                                            error: function (error) {
+                                                                hideWaiting('frmVerifyBuyer');
+                                                                const exception = getExceptionMessageFromError(error);
+                                                                if (exception != null)
+                                                                    showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                                                                else
+                                                                    showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                                                            }
+                                                        });
+                                                        //======================
+                                                    }
+                                                });
+                                            }
+                                        },
+                                        error: function (error) {
+                                            hideWaiting('frmVerifyBuyer');
+                                            const exception = getExceptionMessageFromError(error);
+                                            if (exception != null)
+                                                showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                                            else
+                                                showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    });
+                }
+                else if (signingMethod == @((int)SigningMethod.MobileApp)) {
+                    showWaiting('frmVerifyBuyer', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                    debugger;
+                    $.ajax({
+                        type: 'post',
+                        //dataType: 'json',
+                        //contentType: "application/json; charset=utf-8",
+                        processData: false,
+                        contentType: false,
+                        url: `/api/v1/SignContract/SignContractByManagerOnAyandehSign/${$(e.currentTarget).data('request-facility-id')}`,
+                        success: function (result) {
+                            hideWaiting('frmVerifyBuyer');
+                            debugger;
+                            if (result.isSuccess) {
+                                showMessage('@ResourceFile.InfoTitle', 'درخواست امضاء دیجیتال قرارداد تسهیلات به برنامه آینده ساین ارسال گردید،لطفا اقدام به امضاء قرارداد نمایید', icons.success, '@ResourceFile.Close');
+                                $('#pendingRequestModal').modal('hide');
+                                responsiveDatatable.page(0);
+                                responsiveDatatable.ajax.reload(null, false);
+                            }
+                        },
+                        error: function (error) {
+                            hideWaiting('frmVerifyBuyer');
+                            const exception = getExceptionMessageFromError(error);
+                            if (exception != null)
+                                showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                            else
+                                showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                        }
+                    });
+                }
+            }
+            else if (requestStatus == 101) {/*just confirm and Sign contract later*/
+                const postData = {
+                    RequestFacilityId: $(e.currentTarget).data('request-facility-id'),
+                    Status: @((int)StatusEnum.Approved),
+                    StatusDescription: $('#description_admin').val()
+                };
+
+                $.ajax({
+                    type: 'post',
+                    data: JSON.stringify(postData),
+                    datatype: "json",
+                    contentType: "application/json; charset=utf-8",
+                    url: `/api/v1/RequestFacility/ApprovedAdminLeasingWithoutSignContract`,
+                    success: function (result) {
+                        hideWaiting('frmVerifyBuyer');
+                        debugger;
+                        if (result.isSuccess) {
+                            responsiveDatatable.page(0);
+                            responsiveDatatable.ajax.reload(null, false);
+                            showMessage('@ResourceFile.InfoTitle',
+                                'تایید نهایی با موفقیت انجام شد،و قرارداد جهت واریز تسهیلات به کارشناسان ارجاع داده شد<br/>بخاطر داشته باشید قرارداد تسهیلات فوق توسط شما امضاء نشده است،در اولین فرصت اقدام به امضاء آن نمایید',
+                                icons.success,
+                                '@ResourceFile.Close');
+                            $('#pendingRequestModal').modal('hide');
+                        }
+                    },
+                    error: function (error) {
+                        hideWaiting('frmVerifyBuyer');
+                        const exception = getExceptionMessageFromError(error);
+                        if (exception != null)
+                            showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                        else
+                            showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                    }
+                });
+            }
+        });
+
+        $('#btnSignContract').click(function (e) {
+            e.preventDefault();
+            debugger;
+            const formIsValid = $('#frmSignContract').valid();
+            if (!formIsValid) {
+                scrollToFirstError();
+                return;
+            }
+
+            const signingMethod = $('input[name=signingMethodRadio]:checked').val();
+            if (signingMethod == undefined) {
+                showMessage('@ResourceFile.InfoTitle', 'لطفا روشی که میخواهید با آن امضاء کنید را انتخاب کنید!', icons.warning, '@ResourceFile.Close');
+                return;
+            }
+            debugger;
+            if (signingMethod == @((int)SigningMethod.HardwareToken)) {
+                SelectCertificateFromTokenByUI(function (selectCertificateResult) {
+                    debugger;
+                    if (selectCertificateResult == true) {
+                        ReadSelectedCertificate(function (readCertificateResult) {
+                            debugger;
+                            if (readCertificateResult == true) {
+                                data = {
+                                    RequestFacilityId: $(e.currentTarget).data('request-facility-id'),
+                                    SelectedCertificate: selectedCertificate
+                                };
+                                $.ajax({
+                                    type: 'post',
+                                    data: JSON.stringify(data),
+                                    datatype: "json",
+                                    contentType: "application/json; charset=utf-8",
+                                    url: `/api/v1/dastine/PDFDigestForMultiSign`,
+                                    success: function (result) {
+                                        hideWaiting('frmSignContract');
+                                        debugger;
+                                        if (result.isSuccess) {
+                                            digest = result.data;
+                                            SignMessage(digest, function (signMessageResult) {
+                                                debugger;
+                                                if (signMessageResult == true) {
+                                                    //======================
+                                                    const postData = {
+                                                        RequestFacilityId: $(e.currentTarget).data('request-facility-id'),
+                                                        SelectedCertificate: selectedCertificate,
+                                                        Digest: digest,
+                                                        Signature: signature
+                                                    };
+                                                    $.ajax({
+                                                        type: 'post',
+                                                        data: JSON.stringify(postData),
+                                                        datatype: "json",
+                                                        contentType: "application/json; charset=utf-8",
+                                                        url: `/api/v1/dastine/PutPDFSignatureForMultiSign`,
+                                                        success: function (result) {
+                                                            hideWaiting('frmSignContract');
+                                                            debugger;
+                                                            if (result.isSuccess) {
+                                                                responsiveDatatable.page(0);
+                                                                responsiveDatatable.ajax.reload(null, false);
+                                                                //$('#a_finalContractUrl').show();
+                                                                //$('#a_finalContractUrl').attr('href', `/UploadFiles/RequestFacilityContract/${result.data}`);
+                                                                showMessage('@ResourceFile.InfoTitle', 'امضای قرارداد با موفقیت انجام شد', icons.success, '@ResourceFile.Close');
+                                                                $('#signContractModal').modal('hide');
+                                                            }
+                                                        },
+                                                        error: function (error) {
+                                                            hideWaiting('frmSignContract');
+                                                            const exception = getExceptionMessageFromError(error);
+                                                            if (exception != null)
+                                                                showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                                                            else
+                                                                showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                                                        }
+                                                    });
+                                                    //======================
+                                                }
+                                            });
+                                        }
+                                    },
+                                    error: function (error) {
+                                        hideWaiting('frmSignContract');
+                                        const exception = getExceptionMessageFromError(error);
+                                        if (exception != null)
+                                            showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                                        else
+                                            showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+            else if (signingMethod == @((int)SigningMethod.MobileApp)) {
+                showWaiting('frmSignContract', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                debugger;
+                $.ajax({
+                    type: 'post',
+                    //dataType: 'json',
+                    //contentType: "application/json; charset=utf-8",
+                    processData: false,
+                    contentType: false,
+                    url: `/api/v1/SignContract/SignContractByManagerOnAyandehSignWithoutChangeStatus/${$(e.currentTarget).data('request-facility-id')}`,
+                    success: function (result) {
+                        hideWaiting('frmSignContract');
+                        debugger;
+                        if (result.isSuccess) {
+                            showMessage('@ResourceFile.InfoTitle', 'درخواست امضاء دیجیتال قرارداد تسهیلات به برنامه آینده ساین ارسال گردید،لطفا اقدام به امضاء قرارداد نمایید', icons.success, '@ResourceFile.Close');
+                            $('#signContractModal').modal('hide');
+                            responsiveDatatable.page(0);
+                            responsiveDatatable.ajax.reload(null, false);
+                        }
+                    },
+                    error: function (error) {
+                        hideWaiting('frmSignContract');
+                        const exception = getExceptionMessageFromError(error);
+                        if (exception != null)
+                            showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                        else
+                            showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                    }
+                });
+            }
+        });
+
+        $('#btnSearch').click((e) => {
+            e.preventDefault();
+            responsiveDatatable.page(0);
+            responsiveDatatable.ajax.reload(null, false);
+        });
+
+        const loadRequests = () => {
+            responsiveDatatable = $('#requestList')
+                .on('preXhr.dt', function (e, settings, data, a, b) {
+                    //trigger before ajax call
+                    //debugger;
+                    //alert('preXhr');
+                    showWaiting('requestList', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                })
+                .on('xhr.dt', function (e, settings, json, xhr) {
+                    //trigger after ajax call
+                    //debugger;
+                    //alert('xhr');
+                })
+                .DataTable({
+                    order: [],
+                    processing: true,
+                    serverSide: true,
+                    responsive: true,
+                    rowReorder: false,
+                    select: true,
+                    searching: false,
+                    paging: true,
+                    ordering: false,
+                    searching: false,
+                    filtering: false,
+                    info: true,
+                    lengthMenu: [
+                        [5, 10, 25, 50],
+                        [5, 10, 25, 50]
+                    ],
+                    pageLength: 10,
+                    //columnDefs: [{
+                    //    targets: 0,
+                    //    Id: function (td, cellData, rowData, row, col) {
+                    //        debugger;
+                    //        if (rowData[5] === 'Inactive') {
+                    //            $(td).css('color', 'red');
+                    //        }
+                    //    }
+                    //}],
+                    columnDefs: [
+                        //{ "visible": false, "targets": 0 },
+                        //and in this case the < a href="//legacy.datatables.net/ref#bStateSave" > bStateSave</a> works regularly ....but then I would like to have responsive columns indicating responsive: {
+                        {
+                            details: false,
+                            breakpoints: [
+                                { name: 'desktop', width: Infinity },
+                                { name: 'tablet-l', width: 1200 },
+                                { name: 'tablet-p', width: 992 },
+                                { name: 'mobile-l', width: 576 },
+                                { name: 'mobile-p', width: 320 }
+                            ]
+                        },
+                        {
+                            targets: [0, 1, 2, 3, 4, 5, 6, 7, 8],
+                            className: 'dt-center',
+                        },
+                        {
+                            targets: 0,
+                            render: function (data, type, row, meta) {
+                                return `<div class='checkbox checkbox-primary'><input type='checkbox' class='select-row' value='${data}' id='chk_${data}'/><label for='chk_${data}'></label></div>`;
+                            }
+                        },
+                        {
+                            targets: 2,
+                            render: function (data, type, row, meta) {
+                                return `${splitNumber(data)}<br/>${row.monthCountTitle}`;
+                            }
+                        },
+                        {
+                            targets: 3,
+                            render: function (data, type, row, meta) {
+                                return `${data}<br/>${row.nationalCode}`;
+                            }
+                        },
+                        {
+                            targets: 6,
+                            responsivePriority: 2,
+                            render: function (data, type, row, meta) {
+                                let waitingStep = '';
+                                if (data.cancelByUser) {
+                                    const cancelByUserDescription = "<span style='color:red'>انصراف توسط کاربر</span>";
+                                    if ('@((short)StatusEnum.Approved)' == data.statusId)
+                                        waitingStep = `${data.lastStatusDescription}(${cancelByUserDescription})`;
+                                    else if ('@((short)StatusEnum.Rejected)' == data.statusId)
+                                        waitingStep = `${data.lastStatusDescription}(${cancelByUserDescription})`;
+                                    else
+                                        waitingStep = `${data.lastStatusDescription}(${cancelByUserDescription})`;
+                                }
+                                else {
+                                    if ('@((short)StatusEnum.Approved)' == data.statusId)
+                                        waitingStep += data.lastStatusDescription;
+                                    else if ('@((short)StatusEnum.Rejected)' == data.statusId)
+                                        waitingStep = data.lastStatusDescription;
+                                    else {
+                                        waitingStep = data.lastStatusDescription;
+                                    }
+                                }
+                                return `<div class="badge badge-pill zl-badge-upload-document"><div class="d-flex align-items-center"><i class="bx bxs-circle font-size-xxsmall mr-25"></i>${waitingStep}</div></div>`;
+                            }
+                        },
+                        {
+                            targets: 8,
+                            responsivePriority: 3,
+                            render: function (data, type, row, meta) {
+                                let cancelButtonHtml = '';
+                                let buttonsHtml = `<a class="dropdown-item change-status" href='@Url.Action("Detail", "RequestFacility")/${data.id}'><i class="bx bx-detail font-medium-5 secondary darken-4 mr-75"></i>جزئیات</a>`;
+
+                                if (!data.cancelByUser) {
+                                    debugger;
+                                    if (data.formUrl != null)
+                                        buttonsHtml = `<a href='${data.formUrl}' class='dropdown-item change-status'><i class="bx bx-news font-medium-5 secondary darken-4 mr-75"></i>اقدام</a>` + buttonsHtml;
+
+                                    if (data.canAdminLeasingSignContract) {
+                                        if (data.requestFacilityWorkFlowStepList.find(x => x.workFlowStepId == 100023 && x.statusId == null) != null)
+                                            buttonsHtml = `<a href='javascript:void(0)' class='dropdown-item confirm-and-signature'><i class="bx bx-key font-medium-5 secondary darken-4 mr-75"></i>تایید و امضاء</a>` + buttonsHtml;
+                                        else
+                                            buttonsHtml = `<a href='javascript:void(0)' class='dropdown-item sign-contract'><i class="bx bx-key font-medium-5 secondary darken-4 mr-75"></i>امضاء</a>` + buttonsHtml;
+                                    }
+                                }
+
+                                buttonsHtml = buttonsHtml + `<a id='requestHistory' class="dropdown-item request-history" href='javascript:void(0)'><i class="bx bx-detail font-medium-5 secondary darken-4 mr-75"></i>تاریخچه مراحل تسهیلات</a>`;
+
+                                return `<div class="btn-group dropright"><a href="#" class="dark" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="bx bx-dots-horizontal"></i></a><div class="dropdown-menu">${buttonsHtml}</div></div>`;
+                            }
+                        }],
+                    rowCallback: function (row, data) {
+                        //$('td:eq(0)', row).css('text-align', 'center');
+                    },
+                    //ajax: {
+                    //    url: `/api/v1/RequestFacilityInstallment/SelectInstallment2/${$('#drpApprovalFacility').val()}`,
+                    //    type: 'POST',
+                    //    dataSrc: function(data) {
+                    //        data.recordsTotal = data.data.length;
+                    //        data.recordsFiltered = data.data.length;
+                    //        return data.data;
+                    //    },
+                    //    datatype: "json",
+                    //    //contentType: "application/json",
+                    //    contentType: "application/json; charset=utf-8",
+                    //    data: function(input) {
+                    //        debugger;
+                    //        //if ($('#FacilityTypeId').val() != '')
+                    //        //    input.FacilityTypeId = $('#FacilityTypeId').val();
+
+                    //        return JSON.stringify(input);
+                    //    },
+                    //},
+                    ajax: (data, callback, setting) => {
+                        getFacilityRequestData(data).then(function (_data) {
+                            callback(_data);
+                        });
+                    },
+                    drawCallback: function (settings) {
+                        hideWaiting('requestList');
+                    },
+                    initComplete: function (settings, json) {
+                    },
+                    rowCallback: (row, data, displayNum, displayIndex, dataIndex) => {
+                        $('td:eq(1)', row).html(displayIndex + 1);
+                        return row;
+                    },
+                    columns: [
+                        //{
+                        //    //For Row Number
+                        //    "data": "Id",
+                        //    render: function (data, type, row, meta) {
+                        //        return meta.settings.oAjaxData.start + meta.row + 1;
+                        //    }
+                        //},
+                        //{
+                        //    "data": "PersonFirstName",
+                        //    render: function (data, type) {
+                        //        //debugger;
+                        //        //if (type === 'display') {
+                        //        //    let link = 'http://datatables.net';
+
+                        //        //    if (data[0] < 'H') {
+                        //        //        link = 'http://cloudtables.com';
+                        //        //    } else if (data[0] < 'S') {
+                        //        //        link = 'http://editor.datatables.net';
+                        //        //    }
+
+                        //        //    return '<a href="' + link + '">' + data + '</a>';
+                        //        //}
+
+                        //        return data;
+                        //    },
+                        //},
+                        { "data": 'id' },
+                        { "data": null },
+                        { "data": "amount" },
+                        { "data": "requester" },
+                        { "data": "shamsiCreateDate" },
+                        { "data": "shamsiLastActionDate" },
+                        { "data": null },
+                        { "data": "operator" },
+                        { "data": null },
+                    ],
+                    language: {
+                        url: '/new-layout/datatables.net/fa.json'
+                    }
+                });
+
+            const getFacilityRequestData = (data) => {
+                const postData = {
+                    Page: Math.floor(data.start / data.length) + 1,
+                    PageSize: data.length,
+                    SortDirection: null,
+                    SortOrder: null,
+                    FilterList: []
+                };
+
+                fillFilter(postData);
+                return new Promise(function (resolve, reject) {
+                    console.log('Loading data');
+
+                    $.ajax({
+                        type: 'post',
+                        datatype: "json",
+                        data: JSON.stringify(postData),
+                        contentType: "application/json; charset=utf-8",
+                        url: '@ajaxUrl',
+                        success: function (result) {
+                            if (result != undefined && result.isSuccess == true) {
+                                resolve({
+                                    data: result.data.data,
+                                    recordsTotal: result.data.totalRowCount,
+                                    recordsFiltered: result.data.totalRowCount
+                                });
+                            }
+                        },
+                        error: function (error) {
+                            debugger;
+                            const exception = getExceptionMessageFromError(error);
+                            if (exception != null)
+                                showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                            else
+                                showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                        },
+                        complete: function () {
+
+                        },
+                    });
+                });
+            }
+
+            $('#requestList tbody').on('click', 'a#requestHistory', function (e) {
+                e.preventDefault();
+                var data = responsiveDatatable.row($(this).parents('tr')).data();
+                loadRequestFacilitySteps(data.id);
+                $('#requestFacilityStepsHistoryModal').modal();
+            });
+
+            //$("input[type='checkbox'].select-row").change((e) => {
+            $('#requestList tbody').on('change', 'input[type="checkbox"].select-row', function (e) {
+                debugger;
+                if ($(e.target).is(":checked")) {
+                    if (jQuery.inArray(parseInt($(e.target).attr("value")), requestFacilityIdArray) === -1)
+                        requestFacilityIdArray.push(parseInt($(e.target).attr("value")));
+                    if ($("input[type='checkbox'].select-row").length == $("input[type='checkbox'].select-row:checked").length)
+                        $('#checkAll').prop('checked', true);
+                } else {
+                    requestFacilityIdArray.splice(parseInt(jQuery.inArray($(e.target).attr("value")), requestFacilityIdArray), 1);
+                    $('#checkAll').prop('checked', false);
+                }
+                debugger;
+            });
+
+            $('#requestList').on('page.dt', function () {
+                debugger;
+                var info = responsiveDatatable.page.info();
+                //$('#pageInfo').html('Showing page: ' + info.page + ' of ' + info.pages);
+                console.log('Showing page: ' + info.page + ' of ' + info.pages);
+            });
+
+            $('#requestList tbody').on('click', 'a.confirm-and-signature', function (e) {
+                e.preventDefault();
+                let data = responsiveDatatable.row(this).data();
+                if (data == undefined)
+                    data = responsiveDatatable.row($(this).parents('tr')).data();
+                e.preventDefault();
+                $('#pendingRequestModal').modal();
+                $('#btnConfirmAndSignatureContract').data('request-facility-id', data.id);
+            });
+
+            $('#requestList tbody').on('click', 'a.sign-contract', function (e) {
+                e.preventDefault();
+                let data = responsiveDatatable.row(this).data();
+                if (data == undefined)
+                    data = responsiveDatatable.row($(this).parents('tr')).data();
+                e.preventDefault();
+                $('#signContractModal').modal();
+                $('#btnSignContract').data('request-facility-id', data.id);
+            });
+        }
+
+        $('#btnExportToExcel').click((e) => {
+            e.preventDefault();
+            // if (!$('#filterForm').valid())
+            //     return;
+
+            showWaiting('requestGridDiv', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');;
+
+            const postData = {
+                Page: -1,
+                PageSize: -1,
+                SortDirection: null,
+                SortOrder: null,
+                FilterList: []
+            };
+
+            fillFilter(postData);
+            debugger;
+
+            $.ajax({
+                type: 'post',
+                data: JSON.stringify(postData),
+                datatype: "json",
+                contentType: "application/json; charset=utf-8",
+                url: '/api/v1/RequestFacility/SearchLeasingRequestExport',
+                success: function (result) {
+                    hideWaiting('requestGridDiv');;
+                    if (result !== undefined && result !== null && result.data != null && result.isSuccess === true) {
+                        debugger;
+                        const downloadJsonLink = document.createElement("a");
+                        downloadJsonLink.href = `data:application/vnd.ms-excel;base64,${result.data}`;
+                        downloadJsonLink.download = "PendingConfirmAndSignatureRequests.xlsx";
+                        downloadJsonLink.click();
+                    }
+                },
+                error: function (error) {
+                    hideWaiting('requestGridDiv');;
+                    const exception = getExceptionMessageFromError(error);
+                    if (exception != null)
+                        showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                    else
+                        showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                }
+            });
+        });
+
+        const fillFilter = (postData) => {
+            if ($('#FName').val() != undefined && $('#FName').val() != null && $('#FName').val() != '')
+                postData.FilterList.push({
+                    PropertyName: 'FName',
+                    Operator: @((int)Operator.Contain),
+                    PropertyValue: $('#FName').val()
+                });
+
+            if ($('#LName').val() != undefined && $('#LName').val() != null && $('#LName').val() != '')
+                postData.FilterList.push({
+                    PropertyName: 'LName',
+                    Operator: @((int)Operator.Contain),
+                    PropertyValue: $('#LName').val()
+                });
+
+            if ($('#StartDate').val() != undefined && $('#StartDate').val() != null && $('#StartDate').val() != '')
+                postData.FilterList.push({
+                    PropertyName: 'StartDate',
+                    Operator: @((int)Operator.GreaterThanOrEqual),
+                    PropertyValue: $('#StartDate').val()
+                });
+
+            if ($('#EndDate').val() != undefined && $('#EndDate').val() != null && $('#EndDate').val() != '')
+                postData.FilterList.push({
+                    PropertyName: 'EndDate',
+                    Operator: @((int)Operator.LesserThanOrEqual),
+                    PropertyValue: $('#EndDate').val()
+                });
+
+            if ($('#NationalCode').val() != undefined && $('#NationalCode').val() != null && $('#NationalCode').val() != '')
+                postData.FilterList.push({
+                    PropertyName: 'NationalCode',
+                    Operator: @((int)Operator.Equal),
+                    PropertyValue: $('#NationalCode').val()
+                });
+
+            //if ($('#WaitingStepId').val() != undefined && $('#WaitingStepId').val() != null && $('#WaitingStepId').val() != '')
+            //postData.FilterList.push({
+            //    PropertyName: 'WaitingStepId',
+            //    Operator: @((int)Operator.Equal),
+            //    PropertyValue: @ConfirmAndSignatureWorkFlowStepId
+            //});
+
+            if ($('#StartAmountThousandSeparator').val() != undefined && $('#StartAmountThousandSeparator').val() != null && $('#StartAmountThousandSeparator').val() != '')
+                postData.FilterList.push({
+                    PropertyName: 'StartAmount',
+                    Operator: @((int)Operator.GreaterThanOrEqual),
+                    PropertyValue: parseInt($('#StartAmountThousandSeparator').val().replaceAll(',', ''))
+                });
+
+            if ($('#EndAmountThousandSeparator').val() != undefined && $('#EndAmountThousandSeparator').val() != null && $('#EndAmountThousandSeparator').val() != '')
+                postData.FilterList.push({
+                    PropertyName: 'EndAmount',
+                    Operator: @((int)Operator.LesserThanOrEqual),
+                    PropertyValue: parseInt($('#EndAmountThousandSeparator').val().replaceAll(',', ''))
+                });
+
+            //let facilityStatusValue = $('input[type="radio"][name="facilityStatus"]:checked').val();
+            postData.FilterList.push({
+                PropertyName: 'FacilityStatus',
+                Operator: @((int)Operator.Equal),
+                PropertyValue: @((long)FacilityStatus.JustShowWaitingSignatureRequest)
+                                            });
+        }
+    </script>
+}

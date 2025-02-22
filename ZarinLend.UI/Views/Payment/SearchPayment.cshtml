@@ -1,0 +1,569 @@
+﻿@using Core.Entities.Business.Payment
+@model SamanIpgFilterModel
+@{
+    ViewData["Title"] = ViewBag.Title;
+    Layout = "~/Views/Shared/_NewLayout.cshtml";
+}
+@section styles{
+    <link href="~/persianDatePicker/css/persianDatepicker-lightorang.css" rel="stylesheet" />
+    <style type="text/css">
+    </style>
+}
+<div id="requestGridDiv" class="p-2 bg-white rounded-lg">
+    <div class="font-medium-3 secondary darken-4 text-bold-800 d-flex align-items-center">
+        <i class="bx bx-align-right zl-text-secondary mr-25"></i>
+        <span>جستجوی پیشرفته</span>
+    </div>
+    <div class="p-2 rounded-lg">
+        <form id="filterForm" method="post">
+            <div class="row my-0 my-md-1">
+                <div class=" col-md-6 col-sm-12">
+                    <div class="form-group">
+                        <fieldset class="form-group position-relative has-icon-left">
+                            <input class="form-control bg-transparent shamsi-datepicker" id="txtStartDate" name="txtStartDate" maxlength="10" placeholder="تاریخ از" style="text-align:center;direction:ltr" type="text" value="" data-fromdate="" />
+                            <div class="form-control-position">
+                                <i class="bx bx-calendar"></i>
+                            </div>
+                        </fieldset>
+                        <input asp-for="StartDate" type="hidden" />
+                        <span asp-validation-for="StartDate" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class=" col-md-6 col-sm-12">
+                    <div class="form-group">
+                        <fieldset class="form-group position-relative has-icon-left">
+                            <input class="form-control bg-transparent shamsi-datepicker" id="txtEndDate" name="txtEndDate" maxlength="10" placeholder="تاریخ تا" style="text-align:center;direction:ltr" type="text" value="" data-fromdate="" />
+                            <div class="form-control-position">
+                                <i class="bx bx-calendar"></i>
+                            </div>
+                        </fieldset>
+                        <input asp-for="EndDate" type="hidden" />
+                        <span asp-validation-for="EndDate" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row my-0 my-md-1">
+                <div class=" col-md-6 col-sm-12">
+                    <div class="form-group">
+                        <input type="text" class="form-control bg-transparent" asp-for="ResNum" placeholder="شناسه خرید" style="text-align:center;direction:ltr;letter-spacing:3px" />
+                        <span asp-validation-for="ResNum" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class=" col-md-6 col-sm-12">
+                    <div class="form-group">
+                        <input type="text" class="form-control bg-transparent" asp-for="NationalCode" placeholder="کد ملی" style="text-align:center;direction:ltr;letter-spacing:5px" />
+                        <span asp-validation-for="NationalCode" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row my-0 my-md-1">
+                <div class=" col-md-6 col-sm-12">
+                    <div class="form-group">
+                        <select name="PaymentType" asp-for="PaymentType" class="form-control bg-transparent">
+                            <option value="" >نوع پرداخت</option>
+                            <option value="@((int)PaymentType.PayValidationFee)" >@PaymentType.PayValidationFee.ToDisplay()</option>
+                            @*<option value="@PaymentType.PayValidationFee" >پرداخت هزینه اعتبارسنجی(تسهیلات گیرنده)</option>*@
+                            <option value="@((int)PaymentType.PayInstallment)" >@PaymentType.PayInstallment.ToDisplay()</option>
+                            <option value="@((int)PaymentType.PaySalesCommission)" >@PaymentType.PaySalesCommission.ToDisplay()</option>
+                            <option value="@((int)PaymentType.PayForBuyByBuyer)" >@PaymentType.PayForBuyByBuyer.ToDisplay()</option>
+                        </select>
+                        <span asp-validation-for="PaymentType" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            @*            <div class="row my-0 my-md-1">
+            <div class=" col-md-6 col-sm-12">
+            <div class="form-group">
+            <input type="text" class="form-control bg-transparent" asp-for="FName" placeholder="نام" style="" />
+            <span asp-validation-for="FName" class="text-danger"></span>
+            </div>
+            </div>
+            <div class=" col-md-6 col-sm-12">
+            <div class="form-group">
+            <input type="text" class="form-control bg-transparent" asp-for="LName" placeholder="نام خانوادگی" style="" />
+            <span asp-validation-for="LName" class="text-danger"></span>
+            </div>
+            </div>
+            </div>*@
+            <div class="row my-0 my-md-1">
+                <div class="col-lg-3 col-md-6 col-sm-12">
+                    <div class="radio radio-primary radio-glow radio-sm">
+                        <input type="radio" checked="checked" class="verifyRadio" name="isSuccess" id="inlineRadio1" value="1" />
+                        <label class="font-small-3 primary darken-4 text-bold-400 line-height-23" for="inlineRadio1">پرداخت موفق</label>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 col-sm-12">
+                    <div class="radio radio-info radio-glow radio-sm">
+                        <input type="radio" class="verifyRadio" name="isSuccess" id="inlineRadio2" value="2" />
+                        <label class="font-small-3 info darken-4 text-bold-400 line-height-23" for="inlineRadio2">پرداخت ناموفق</label>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 col-sm-12">
+                    <div class="radio radio-success radio-glow radio-sm">
+                        <input type="radio" class="verifyRadio" name="isSuccess" id="inlineRadio3" value="3" />
+                        <label class="font-small-3 success darken-4 text-bold-400 line-height-23" for="inlineRadio3">پرداخت نامشخص</label>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 col-sm-12">
+                    <div class="radio radio-warning radio-glow radio-sm">
+                        <input type="radio" name="isSuccess" id="inlineRadio4" value="-1" />
+                        <label class="font-small-3 warning darken-4 text-bold-400 line-height-23" for="inlineRadio4">همه</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row my-0 my-md-1">
+                <div class=" col-md-12" style="text-align:left">
+                    <button type="button" id="btnSearch" class="btn btn-zl-primary">
+                        جستجو&nbsp;<i class="fal fa-search"></i>
+                    </button>
+                    <button id="btnExportToExcel" tabindex="5" class="btn btn-outline-info">
+                        خروجی اکسل&nbsp;<i class="fal fa-file-excel-o"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+        <table id="samanIpgList" class="display" style="width:100%">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th >مبلغ(ريال)</th>
+                    <th >سهم زرین لند(ريال)<br />درصد</th>
+                    <th >سهم نهاد مالی(ريال)<br />درصد</th>
+                    <th >پرداخت کننده<br />کد ملی/شناسه ملی</th>
+                    <th >شناسه خرید</th>
+                    <th >وضعیت پرداخت</th>
+                    <th >نوع پرداخت</th>
+                    <th >شماره کارت</th>
+                    <th >تاریخ تراکنش</th>
+                    <th >جزئیات پرداخت</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+@section scripts{
+    @{
+        await Html.RenderPartialAsync("~/Views/Shared/_ValidationScriptsPartial.cshtml");
+        <script src="~/persianDatePicker/js/persianDatepicker.min.js"></script>
+    }
+<script>
+        let responsiveDatatable;
+        $(document).ready(function () {
+            $('div').removeClass('zl-active');
+            $('#samanIpgReportPage').addClass('zl-active');
+            $('#NationalCode').mask('9999999999', { placeholder: "__________" });
+
+            let startDate = null;
+            let endDate = null;
+            $('#StartDate').val('@ViewBag.StartDate');
+            $('#txtStartDate').val('@ViewBag.PersianStartDate');
+
+            $('#EndDate').val('@ViewBag.EndDate');
+            $('#txtEndDate').val('@ViewBag.PersianEndDate');
+
+            startDate = $("#txtStartDate").persianDatepicker(
+                {
+                    months: ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"],
+                    dowTitle: ["شنبه", "یکشنبه", "دوشنبه", "سه شنبه", "چهارشنبه", "پنج شنبه", "جمعه"],
+                    shortDowTitle: ["ش", "ی", "د", "س", "چ", "پ", "ج"],
+                    theme: 'lightorang',
+                    showGregorianDate: !1,
+                    persianNumbers: !0,
+                    formatDate: "YYYY/0M/0D",
+                    selectedBefore: !1,
+                    selectedDate: '@ViewBag.PersianStartDate',
+                    prevArrow: '\u25c4',
+                    nextArrow: '\u25ba',
+                    alwaysShow: !1,
+                    selectableYears: null,
+                    selectableMonths: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                    cellWidth: 50, // by px
+                    cellHeight: 40, // by px
+                    fontSize: 17, // by px
+                    isRTL: !1,
+                    calendarPosition: {
+                        x: 0,
+                        y: 0,
+                    },
+                    onSelect: function () {
+                        $('#StartDate').val($("#txtStartDate").attr("data-gdate"));
+                    },
+                    onShow: function () { },
+                    onHide: function () { },
+                    onRender: function () { }
+                });
+
+            endDate = $("#txtEndDate").persianDatepicker(
+                {
+                    months: ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"],
+                    dowTitle: ["شنبه", "یکشنبه", "دوشنبه", "سه شنبه", "چهارشنبه", "پنج شنبه", "جمعه"],
+                    shortDowTitle: ["ش", "ی", "د", "س", "چ", "پ", "ج"],
+                    theme: 'lightorang',
+                    showGregorianDate: !1,
+                    persianNumbers: !0,
+                    formatDate: "YYYY/0M/0D",
+                    selectedBefore: !1,
+                    selectedDate: '@ViewBag.PersianEndDate',
+                    prevArrow: '\u25c4',
+                    nextArrow: '\u25ba',
+                    alwaysShow: !1,
+                    selectableYears: null,
+                    selectableMonths: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                    cellWidth: 50, // by px
+                    cellHeight: 40, // by px
+                    fontSize: 17, // by px
+                    isRTL: !1,
+                    calendarPosition: {
+                        x: 0,
+                        y: 0,
+                    },
+                    onSelect: function () {
+                        $('#EndDate').val($("#txtEndDate").attr("data-gdate"));
+                    },
+                    onShow: function () { },
+                    onHide: function () { },
+                    onRender: function () { }
+                });
+
+            loadSamanIpgData();
+        });
+
+        //============
+        const loadSamanIpgData = () => {
+            responsiveDatatable = $('#samanIpgList')
+                .on('preXhr.dt', function (e, settings, data, a, b) {
+                    //trigger before ajax call
+                    //debugger;
+                    //alert('preXhr');
+                    showWaiting('samanIpgList', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                })
+                .on('xhr.dt', function (e, settings, json, xhr) {
+                    //trigger after ajax call
+                    //debugger;
+                    //alert('xhr');
+                })
+                .DataTable({
+                    order: [],
+                    processing: true,
+                    serverSide: true,
+                    responsive: true,
+                    rowReorder: false,
+                    select: true,
+                    searching: false,
+                    paging: true,
+                    ordering: false,
+                    searching: false,
+                    filtering: false,
+                    info: true,
+                    lengthMenu: [
+                        [5, 10, 25, 50],
+                        [5, 10, 25, 50]
+                    ],
+                    pageLength: 10,
+                    columnDefs: [
+                        {
+                            details: false,
+                            breakpoints: [
+                                { name: 'desktop', width: Infinity },
+                                { name: 'tablet-l', width: 1200 },
+                                { name: 'tablet-p', width: 992 },
+                                { name: 'mobile-l', width: 576 },
+                                { name: 'mobile-p', width: 320 }
+                            ]
+                        },
+                        {
+                            targets: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                            className: 'dt-center',
+                        },
+                        {
+                            targets: 1,
+                            render: function (data, type, row, meta) {
+                                return splitNumber(data);
+                            }
+                        },
+                        {
+                            targets: 2,
+                            render: function (data, type, row, meta) {
+                                if (@((int)PaymentType.PaySalesCommission) == row.paymentType) {
+                                    let valueBase100Percentage = row.lendTechFacilityFee * 100 / (row.lendTechFacilityFee + row.financialInstitutionFacilityFee)
+                                    return `${splitNumber(valueBase100Percentage * row.amount / 100)}<br/>${row.lendTechFacilityFee}%`;
+                                }
+                                else
+                                    return '-';
+                            }
+                        },
+                        {
+                            targets: 3,
+                            render: function (data, type, row, meta) {
+                                if (@((int)PaymentType.PaySalesCommission) == row.paymentType) {
+                                    let valueBase100Percentage = row.financialInstitutionFacilityFee * 100 / (row.lendTechFacilityFee + row.financialInstitutionFacilityFee)
+                                    return `${splitNumber(valueBase100Percentage * row.amount / 100)}<br/>${row.financialInstitutionFacilityFee}%`;
+                                }
+                                else
+                                    return '-';
+                            }
+                        },
+                        {
+                            targets: 4,
+                            render: function (data, type, row, meta) {
+                                return `${data}<br/>${row.payerNationalCode}`;
+                            }
+                        },
+                        {
+                            targets: 6,
+                            render: function (data, type, row, meta) {
+                                let paymentStatus = '<span style="color: gray">نامشخص</span>';
+                                if (data != null) {
+                                    paymentStatus = data ? '<span style="color: limegreen">موفق</span>' : '<span style="color: red">ناموفق</span>';
+                                }
+                                return paymentStatus;
+                            }
+                        },
+                        {
+                            targets: 7,
+                            render: function (data, type, row, meta) {
+                                let paymentType = '';
+                                switch (data) {
+                                    case @((int)PaymentType.PayValidationFeeByGuarantor):
+                                        paymentType = '@PaymentType.PayValidationFeeByGuarantor.ToDisplay()';
+                                        break;
+                                    case @((int)PaymentType.PayValidationFee):
+                                        paymentType = '@PaymentType.PayValidationFee.ToDisplay()';
+                                        break;
+                                    case @((int)PaymentType.PayInstallment):
+                                        paymentType = '@PaymentType.PayInstallment.ToDisplay()';
+                                        break;
+                                    case @((int)PaymentType.PaySalesCommission):
+                                        paymentType = '@PaymentType.PaySalesCommission.ToDisplay()';
+                                        break;
+                                    case @((int)PaymentType.PayForBuyByBuyer):
+                                        paymentType = '@PaymentType.PayForBuyByBuyer.ToDisplay()';
+                                        break;
+                                    default:
+                                        break;
+                                }
+                                return `<span style="">${paymentType}</span>`;
+                            }
+                        },
+                        {
+                            targets: 8,
+                            visible: false,
+                            render: function (data, type, row, meta) {
+                                return `<div style='direction:ltr'>${data}</span>`;
+                            }
+                        },
+                        {
+                            targets: 9,
+                            render: function (data, type, row, meta) {
+                                return data != null && data != ''
+                                    ? data
+                                    : (row.shamsiUpdateDate != null && row.shamsiUpdateDate != ''
+                                            ? row.shamsiUpdateDate
+                                            : row.shamsiCreateDate);
+                            }
+                        },
+                        {
+                            targets: 10,
+                            render: function (data, type, row, meta) {
+                                let detailUrl = '';
+                                switch (data.paymentType) {
+                                    case @((int)PaymentType.PayValidationFeeByGuarantor):
+                                        detailUrl = `<a href='@Url.Action("Detail","RequestFacilityGuarantor")/${data.requestFacilityGuarantorId}' target='_blank'>جزئیات</a>`;
+                                        break;
+                                    case @((int)PaymentType.PayValidationFee):
+                                        detailUrl = `<a href='@Url.Action("Detail","RequestFacility")/${data.requestFacilityId}' target='_blank'>جزئیات</a>`;
+                                        break;
+                                    case @((int)PaymentType.PayInstallment):
+                                        detailUrl = `<a href='@Url.Action("Detail","RequestFacility")/${data.requestFacilityId}' target='_blank'>جزئیات</a>`;
+                                        break;
+                                    case @((int)PaymentType.PaySalesCommission):
+                                        detailUrl = `<a href='@Url.Action("Detail","RequestFacility")/${data.requestFacilityId}' target='_blank'>جزئیات</a>`;
+                                        break;
+                                    default:
+                                        break;
+                                }
+                                return detailUrl;
+                            }
+                        }],
+                    ajax: (data, callback, setting) => {
+                        getSamanIpgData(data).then(function (_data) {
+                            callback(_data);
+                        });
+                    },
+                    drawCallback: function (settings) {
+                        hideWaiting('samanIpgList');
+                    },
+                    initComplete: function (settings, json) {
+                    },
+                    rowCallback: (row, data, displayNum, displayIndex, dataIndex) => {
+                        $('td:eq(0)', row).html(displayIndex + 1);
+                        return row;
+                    },
+                    columns: [
+                        { "data": null },
+                        { "data": "amount" },
+                        { "data": "lendTechFacilityFee" },
+                        { "data": "financialInstitutionFacilityFee" },
+                        { "data": "payer" },
+                        { "data": "resNum" },
+                        { "data": "isSuccess" },
+                        { "data": "paymentType" },
+                        { "data": "maskedPan" },
+                        { "data": "shamsiStraceDate" },
+                        { "data": null },
+                    ],
+                    language: {
+                        url: '/new-layout/datatables.net/fa.json'
+                    }
+                });
+
+            const getSamanIpgData = (data) => {
+                const postData = {
+                    Page: Math.floor(data.start / data.length) + 1,
+                    PageSize: data.length,
+                    SortDirection: null,
+                    SortOrder: null,
+                    FilterList: []
+                };
+
+                fillFilter(postData);
+                return new Promise(function (resolve, reject) {
+                    console.log('Loading data');
+
+                    $.ajax({
+                        type: 'post',
+                        datatype: "json",
+                        data: JSON.stringify(postData),
+                        contentType: "application/json; charset=utf-8",
+                        url: '/api/v1/Payment/Search',
+                        success: function (result) {
+                            if (result != undefined && result.isSuccess == true) {
+                                resolve({
+                                    data: result.data.data,
+                                    recordsTotal: result.data.totalRowCount,
+                                    recordsFiltered: result.data.totalRowCount
+                                });
+                            }
+                        },
+                        error: function (error) {
+                            debugger;
+                            const exception = getExceptionMessageFromError(error);
+                            if (exception != null)
+                                showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                            else
+                                showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                        },
+                        complete: function () {
+
+                        },
+                    });
+                });
+            }
+
+            $('#samanIpgList').on('page.dt', function () {
+                debugger;
+                var info = responsiveDatatable.page.info();
+                //$('#pageInfo').html('Showing page: ' + info.page + ' of ' + info.pages);
+                console.log('Showing page: ' + info.page + ' of ' + info.pages);
+            });
+        }
+        //============
+
+        $('#btnSearch').click((e) => {
+            e.preventDefault();
+            responsiveDatatable.page(0);
+            responsiveDatatable.ajax.reload(null, false);
+        });
+
+        $('#btnExportToExcel').click((e) => {
+            e.preventDefault();
+            // if (!$('#filterForm').valid())
+            //     return;
+
+            showWaiting('requestGridDiv', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');;
+
+            const postData = {
+                Page: -1,
+                PageSize: -1,
+                SortDirection: null,
+                SortOrder: null,
+                FilterList: []
+            };
+
+            fillFilter(postData);
+            debugger;
+
+            $.ajax({
+                type: 'post',
+                data: JSON.stringify(postData),
+                datatype: "json",
+                contentType: "application/json; charset=utf-8",
+                url: '/api/v1/Payment/Export',
+                success: function (result) {
+                    hideWaiting('requestGridDiv');;
+                    if (result !== undefined && result !== null && result.data != null && result.isSuccess === true) {
+                        debugger;
+                        const downloadJsonLink = document.createElement("a");
+                        downloadJsonLink.href = `data:application/vnd.ms-excel;base64,${result.data}`;
+                        downloadJsonLink.download = "SamanIpgPayments.xlsx";
+                        downloadJsonLink.click();
+                    }
+                },
+                error: function (error) {
+                    hideWaiting('requestGridDiv');;
+                    const exception = getExceptionMessageFromError(error);
+                    if (exception != null)
+                        showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                    else
+                        showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                }
+            });
+        });
+
+        const fillFilter = (postData) => {
+            if ($('#StartDate').val() != undefined && $('#StartDate').val() != null && $('#StartDate').val() != '')
+                postData.FilterList.push({
+                    PropertyName: 'StartDate',
+                    Operator: @((int)Operator.GreaterThanOrEqual),
+                    PropertyValue: $('#StartDate').val()
+                });
+
+            if ($('#EndDate').val() != undefined && $('#EndDate').val() != null && $('#EndDate').val() != '')
+                postData.FilterList.push({
+                    PropertyName: 'EndDate',
+                    Operator: @((int)Operator.LesserThanOrEqual),
+                    PropertyValue: $('#EndDate').val()
+                });
+
+            if ($('#NationalCode').val() != undefined && $('#NationalCode').val() != null && $('#NationalCode').val() != '')
+                postData.FilterList.push({
+                    PropertyName: 'NationalCode',
+                    Operator: @((int)Operator.Equal),
+                    PropertyValue: $('#NationalCode').val()
+                });
+
+            if ($('#ResNum').val() != undefined && $('#ResNum').val() != null && $('#ResNum').val() != '')
+                postData.FilterList.push({
+                    PropertyName: 'ResNum',
+                    Operator: @((int)Operator.Equal),
+                    PropertyValue: $('#ResNum').val()
+                });
+
+            if ($('#PaymentType').val() != undefined && $('#PaymentType').val() != null && $('#PaymentType').val() != '')
+                postData.FilterList.push({
+                    PropertyName: 'PaymentType',
+                    Operator: @((int)Operator.Equal),
+                    PropertyValue: parseInt($('#PaymentType').val())
+                });
+
+            let isSuccessValue = $('input[type="radio"][name="isSuccess"]:checked').val();
+            if (isSuccessValue != -1) {
+                postData.FilterList.push({
+                    PropertyName: 'IsSuccess',
+                    Operator: @((int)Operator.Equal),
+                    PropertyValue: isSuccessValue == 1 ? true : (isSuccessValue == 2 ? false : null)
+                });
+            }
+        }
+</script>
+}

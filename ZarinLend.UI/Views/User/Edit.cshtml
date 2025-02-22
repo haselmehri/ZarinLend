@@ -1,0 +1,1074 @@
+﻿@model UserEditModel
+@{
+    ViewData["Title"] = "ویرایش اطلاعات";
+    Layout = "~/Views/Shared/_NewLayout.cshtml";
+    var editByZarinLend = false;
+    var updateUserLocationApi = "/api/v1/User/UpdateUserLocation";
+    var updateBankAccountApi = "/api/v1/User/UpdateBankAccount";
+    var updateUserJobApi = "/api/v1/Person/UpdateJobInfo";
+    var getAddressInquiryApi = "/api/v1/NeginHub/GetAddressInquiry";
+    var depositToIban = "/api/v1/NeginHub/DepositToIban";
+    if (User.IsInRole(RoleEnum.SuperAdmin.ToString()) ||
+        User.IsInRole(RoleEnum.Admin.ToString()) ||
+        User.IsInRole(RoleEnum.ZarinLendExpert.ToString()))
+    {
+        editByZarinLend = true;
+        var userId = ViewContext.RouteData.Values["userId"];
+        updateUserLocationApi = $"{updateUserLocationApi}/{userId}";
+        updateBankAccountApi = $"{updateBankAccountApi}/{userId}";
+        updateUserJobApi = $"{updateUserJobApi}/{userId}";
+    }
+}
+@section styles
+{
+    <link href="~/persianDatePicker/css/persianDatepicker-lightorang.css" rel="stylesheet" />
+    <link href="~/css/colors/preset.css" rel="stylesheet" />
+    <style type="text/css">
+        textarea {
+            height: 120px !important;
+        }
+
+        i.bx-error-circle {
+            color: red;
+        }
+
+        .list-group-item {
+            cursor: pointer;
+            padding: 10px;
+            border: 1px solid #ddd;
+            margin-top: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+            .list-group-item:hover {
+                background-color: #f8f9fa;
+            }
+
+            .list-group-item.active {
+                background-color: #76c7c0;
+            }
+    </style>
+}
+@if (Model.RequestFacilityId.HasValue && !editByZarinLend)
+{
+    @await Component.InvokeAsync("WorkFlowStepWizardHorizental", new { workFlow = WorkFlowEnum.RequestFacility, requestId = Model.RequestFacilityId })
+}
+<div class="p-2 bg-white rounded-lg" id="mainContentDiv">
+    <div class="row font-medium-3 secondary darken-4 text-bold-800 d-flex align-items-center">
+        <div class="col-12 col-md-6 col-sm-12 mb-2">
+            <i class="bx bx-align-right zl-text-secondary mr-25"></i>
+            <span>اطلاعات کاربری</span>
+        </div>
+        <div class="col-12 col-md-6 col-sm-12 mb-2">
+            @if (Model.RequestFacilityId.HasValue)
+            {
+                <div class="d-flex align-items-center justify-content-end">
+                    <button id="btnGoToNextStep" class="btn btn-zl-primary ml-1">
+                        تغییری ندارم،به مرحله بعد برو
+                    </button>
+                </div>
+            }
+        </div>
+    </div>
+    
+    @*     <div class="mt-2 p-2 edit-user-bg rounded-lg">
+    <div class="d-flex justify-content-between">
+    <div class="text-bold-900 secondary darken-4 font-medium-3">
+    اطلاعات شغلی
+    </div>
+    <a href="#" data-toggle="modal" data-target="#editUserJobModal" class="d-flex align-items-center">
+    <i class="bx bx-edit-alt zl-text-secondary font-medium-5 mr-25"></i>
+    <span class="font-small-3 zl-text-secondary">ویرایش</span>
+    </a>
+    </div>
+    <div class="border rounded mt-2">
+    <div class="d-flex flex-column flex-sm-row">
+    <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+    <span class="font-small-2 text-bold-500">
+    شغل @if (!Model.JobTitles.Any(p => p.Selected))
+    {
+    <i id="jobTitle-error" class="bx bx-error-circle font-large" title="اجباری" tooltip="اجباری"></i>
+    }
+    </span>
+    <span id="jobTitleValue" class="dark mt-50 text-bold-400">@Model.JobTitle</span>
+    </div>
+    <div class="border-left border-top"></div>
+    <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+    <span class="font-small-2 text-bold-500">
+    میزان درآمد @if (!Model.SalaryRanges.Any(p => p.Selected))
+    {
+    <i id="salaryRangeTitle-error" class="bx bx-error-circle font-large" title="اجباری" tooltip="اجباری"></i>
+    }
+    </span>
+    <span id="salaryRangeTitleValue" class="dark mt-50 text-bold-400">@Model.SalaryRangeTitle</span>
+    </div>
+    <div class="border-left border-top"></div>
+    <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+    <span class="font-small-2 text-bold-500">
+    تلفن @if (string.IsNullOrEmpty(Model.JobPhoneNumber))
+    {
+    <i id="jobPhoneNumber-error" class="bx bx-error-circle font-large" title="اجباری" tooltip="اجباری"></i>
+    }
+    </span>
+    <span id="jobPhoneNumberValue" class="dark mt-50 text-bold-400">@Model.JobPhoneNumber</span>
+    </div>
+    </div>
+    <hr class="m-0 p-0" />
+    <div class="d-flex flex-column flex-sm-row">
+    <div class="d-flex flex-column justify-content-start py-2 px-1">
+    <span class="font-small-2 text-bold-500">
+    آدرس محل کار @if (string.IsNullOrEmpty(Model.JobAddress))
+    {
+    <i id="jobAddress-error" class="bx bx-error-circle font-large" title="اجباری" tooltip="اجباری"></i>
+    }
+    </span>
+    <span id="jobAddressValue" class="dark mt-50 text-bold-400">@Model.JobAddress</span>
+    </div>
+    <div class="d-flex flex-column justify-content-start py-2 px-1 w-50"></div>
+    </div>
+    </div>
+    </div> *@
+    <div class="mt-2 p-2 edit-user-bg rounded-lg">
+        <div class="d-flex justify-content-between">
+            <div class="text-bold-900 secondary darken-4 font-medium-3">
+                اطلاعات تماس و محل سکونت
+            </div>
+            <a href="#" data-toggle="modal" data-target="#editUserLocationModal" class="d-flex align-items-center">
+                <i class="bx bx-edit-alt zl-text-secondary font-medium-5 mr-25"></i>
+                <span class="font-small-3 zl-text-secondary">ویرایش</span>
+            </a>
+        </div>
+        <div class="border rounded mt-2">
+            <div class="d-flex flex-column flex-sm-row">
+                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                    <span class="font-small-2 text-bold-500">شماره موبایل</span>
+                    <span id="mobileValue" class="dark mt-50 text-bold-400">@Model.Mobile</span>
+                </div>
+                <div class="border-left border-top"></div>
+                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                    <span class="font-small-2 text-bold-500">شماره تلفن</span>
+                    <span id="phoneNumberValue" class="dark mt-50 text-bold-400">@Model.PhoneNumber</span>
+                </div>
+            </div>
+            <hr class="m-0 p-0" />
+            <div class="d-flex flex-column flex-sm-row">
+                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                    <span class="font-small-2 text-bold-500">
+                        استان محل سکونت @if (!Model.Provinces.Any(p => p.Selected))
+                        {
+                            <i id="province-error" class="bx bx-error-circle font-large" title="اجباری" tooltip="اجباری"></i>
+                        }
+                    </span>
+                    <span id="provinceValue" class="dark mt-50 text-bold-400">@(Model.Provinces.Any(p => p.Selected) ? Model.Provinces.First(p => p.Selected).Text : "-")</span>
+                </div>
+                <div class="border-left border-top"></div>
+                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                    <span class="font-small-2 text-bold-500">
+                        شهر محل سکونت @if (!Model.Cities.Any(p => p.Selected))
+                        {
+                            <i id="city-error" class="bx bx-error-circle font-large" title="اجباری" tooltip="اجباری"></i>
+                        }
+                    </span>
+                    <span id="cityValue" class="dark mt-50 text-bold-400">@(Model.Cities.Any(p => p.Selected) ? Model.Cities.First(p => p.Selected).Text : "-")</span>
+                </div>
+            </div>
+            <hr class="m-0 p-0" />
+            <div class="d-flex flex-column flex-sm-row">
+                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                    <span class="font-small-2 text-bold-500">
+                        کد پستی @if (string.IsNullOrEmpty(Model.PostalCode))
+                        {
+                            <i id="postalCode-error" class="bx bx-error-circle font-large" title="اجباری" tooltip="اجباری"></i>
+                        }
+                    </span>
+                    <span id="postalCodeValue" class="dark mt-50 text-bold-400">@Model.PostalCode</span>
+                </div>
+                <div class="border-left border-top"></div>
+                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                    <span class="font-small-2 text-bold-500">ایمیل</span>
+                    <span id="emailValue" class="dark mt-50 text-bold-400">@Model.Email</span>
+                </div>
+            </div>
+            <hr class="m-0 p-0" />
+            <div class="d-flex flex-column flex-sm-row">
+                <div class="d-flex flex-column justify-content-start py-2 px-1">
+                    <span class="font-small-2 text-bold-500">
+                        آدرس محل سکونت @if (string.IsNullOrEmpty(Model.Address))
+                        {
+                            <i id="address-error" class="bx bx-error-circle font-large" title="اجباری" tooltip="اجباری"></i>
+                        }
+                    </span>
+                    <span id="addressValue" class="dark mt-50 text-bold-400">@Model.Address</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="mt-2 p-2 edit-user-bg rounded-lg">
+        <div class="d-flex justify-content-between">
+            <div class="text-bold-900 secondary darken-4 font-medium-3">
+                اطلاعات حساب بانک آینده
+            </div>
+            <a href="#" data-toggle="modal" data-target="#editUserAccountModal" class="d-flex align-items-center">
+                <i class="bx bx-edit-alt zl-text-secondary font-medium-5 mr-25"></i>
+                <span class="font-small-3 zl-text-secondary">ویرایش</span>
+            </a>
+        </div>
+        <div class="border rounded mt-2">
+            <div class="d-flex flex-column flex-sm-row">
+                <div class="border-left border-top"></div>
+                <div class="d-flex flex-column justify-content-start py-2 px-1 w-100">
+                    <span class="font-small-2 text-bold-500">
+                        شماره مشتری @if (string.IsNullOrEmpty(Model.CustomerNumber))
+                        {
+                            <i id="customerNumber-error" class="bx bx-error-circle font-large" title="اجباری" tooltip="اجباری"></i>
+                        }
+                    </span>
+                    <span id="customerNumberValue" class="dark mt-50 text-bold-400">@Model.ClientId</span>
+                </div>
+            </div>
+            <hr class="m-0 p-0" />
+            <div class="d-flex flex-column flex-sm-row">
+                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                    <span class="font-small-2 text-bold-500">
+                        نام بانک @if (string.IsNullOrEmpty(Model.BankName))
+                        {
+                            <i id="bank-error" class="bx bx-error-circle font-large" title="اجباری" tooltip="اجباری"></i>
+                        }
+                    </span>
+                    <span id="bankValue" class="dark mt-50 text-bold-400">@Model.BankName</span>
+                </div>
+                <div class="border-left border-top"></div>
+                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                    <span class="font-small-2 text-bold-500">
+                        صاحب حساب @if (string.IsNullOrEmpty(Model.DepositOwners))
+                        {
+                            <i id="depositOwners-error" class="bx bx-error-circle font-large" title="اجباری" tooltip="اجباری"></i>
+                        }
+                    </span>
+                    <span id="depositOwnersValue" class="dark mt-50 text-bold-400">@Model.DepositOwners</span>
+                </div>
+            </div>
+            <hr class="m-0 p-0" />
+            <div class="d-flex flex-column flex-sm-row">
+                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                    <span class="font-small-2 text-bold-500">
+                        شماره حساب
+                        @if (string.IsNullOrEmpty(Model.AccountNumber))
+                        {
+                            <i id="accountNumber-error" class="bx bx-error-circle font-large" title="اجباری" tooltip="اجباری"></i>
+                        }
+                    </span>
+                    <span id="accountNumberValue" class="dark mt-50 text-bold-400">@Model.AccountNumber</span>
+                </div>
+                <div class="border-left border-top"></div>
+                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                    <span class="font-small-2 text-bold-500">
+                        شماره شبا
+                        @if (string.IsNullOrEmpty(Model.IBAN))
+                        {
+                            <i id="iban-error" class="bx bx-error-circle font-large" title="اجباری" tooltip="اجباری"></i>
+                        }
+                    </span>
+                    <span id="ibanValue" class="dark mt-50 text-bold-400">@Model.IBAN</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Start : Modal -->
+@* <form id="frmEditUserJob" autocomplete="off">
+    <div class="modal fade" id="editUserJobModal" tabindex="-1" role="dialog" aria-labelledby="editUserJobModalTitle" data-backdrop="static" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg" role="document">
+            <div class="modal-content rounded-lg">
+                <div class="modal-header">
+                    <h5 class="modal-title secondary darken-4" id="editUserJobModalTitle">
+                        ویرایش اطلاعات شغلی
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="بستن">
+                        <i class="bx bx-x"></i>
+                    </button>
+                </div>
+                <div class="modal-body" id="userJobBody">
+                    <fieldset>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <select name="JobTitleId" asp-for="JobTitleId" class="form-control bg-transparent "
+                                            asp-items="Model.JobTitles">
+                                        <option value="" >شغل خود را انتخاب کنید</option>
+                                    </select>
+                                    <span asp-validation-for="JobTitleId" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <select name="SalaryRangeId" asp-for="SalaryRangeId" class="form-control bg-transparent "
+                                            asp-items="Model.SalaryRanges">
+                                        <option value="" >میزان حقوق خود را انتخاب کنید</option>
+                                    </select>
+                                    <span asp-validation-for="SalaryRangeId" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <input type="text" class="form-control bg-transparent" asp-for="JobPhoneNumber" placeholder="تلفن محل کار" />
+                                    <span asp-validation-for="JobPhoneNumber" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <textarea type="text" class="form-control bg-transparent" asp-for="JobAddress" placeholder="آدرس محل کار"></textarea>
+                                    <span asp-validation-for="JobAddress" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">
+                        <span>انصراف</span>
+                    </button>
+                    <button type="button" id="btnSaveUserJob" class="btn btn-zl-primary">
+                        <span>ثبت تغییرات</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form> *@
+
+<form id="frmEditUserLocation" autocomplete="off">
+    <div class="modal fade" id="editUserLocationModal" tabindex="-1" role="dialog" data-backdrop="static" aria-labelledby="editUserLocationModalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg"
+             role="document">
+            <div class="modal-content rounded-lg">
+                <div class="modal-header">
+                    <h5 class="modal-title secondary darken-4" id="editUserLocationModalTitle">
+                        ویرایش اطلاعات تماس و محل سکونت
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="بستن">
+                        <i class="bx bx-x"></i>
+                    </button>
+                </div>
+                <div class="modal-body" id='userLocationBody'>
+                    <fieldset>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <input asp-for="Mobile" class="form-control bg-transparent" style="text-align:center; direction:ltr;letter-spacing:5px" type="number" pattern="[0-9]*" inputmode="numeric" placeholder="شماره موبایل" />
+                                    <span asp-validation-for="Mobile" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <input asp-for="PhoneNumber" class="form-control bg-transparent" style="text-align:center; direction:ltr" placeholder="شماره تلفن" />
+                                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <select name="ProvinceId" asp-for="ProvinceId" class="form-control bg-transparent " asp-items="Model.Provinces">
+                                        <option value="" >@ResourceFile.SelectProvince</option>
+                                    </select>
+                                    <span asp-validation-for="ProvinceId" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <select name="CityId" asp-for="CityId" asp-items="Model.Cities" class="form-control bg-transparent ">
+                                        <option value="" >@ResourceFile.SelectCity</option>
+                                    </select>
+                                    <span asp-validation-for="CityId" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="input-group">
+                                    <input asp-for="PostalCode" class="form-control bg-transparent" style="text-align:center;direction:ltr" placeholder="کد پستی"
+                                           aria-describedby="button-addon2" />
+                                    <div>
+                                        <button type="button" id="btnAddressInquiry" class="btn btn-primary">
+                                            <span>استعلام کد پستی</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <span asp-validation-for="PostalCode" class="text-danger"></span>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <input asp-for="Email" class="form-control bg-transparent" style="text-align:center; direction:ltr" placeholder="ایمیل" />
+                                    <span asp-validation-for="Email" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <textarea asp-for="Address" class="form-control bg-transparent" placeholder="آدرس محل سکونت" style=" direction:rtl" readonly></textarea>
+                                    <span asp-validation-for="Address" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">
+                        <span>انصراف</span>
+                    </button>
+                    <button type="button" id="btnSaveUserLocation" class="btn btn-zl-primary">
+                        <span>ثبت تغییرات</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+<form id="frmEditUserAccount" autocomplete="off">
+    <div class="modal fade" id="editUserAccountModal" tabindex="-1" role="dialog" data-backdrop="static" aria-labelledby="editUserAccountModalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg"
+             role="document">
+            <div class="modal-content rounded-lg">
+                <div class="modal-header">
+                    <h5 class="modal-title secondary darken-4" id="editUserAccountModalTitle">
+                        ویرایش اطلاعات حساب بانک آینده
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="بستن">
+                        <i class="bx bx-x"></i>
+                    </button>
+                </div>
+                <div class="modal-body" id="userAccountBody">
+                    <fieldset>
+                        <div class="row">
+                            <div class="col-12">
+                                <fieldset>
+                                    <div class="input-group">
+                                        <input id="NationalCodeToAccountNumber" value="@Model.NationalCode" class="form-control bg-transparent" style="text-align:center;direction:ltr" placeholder="کد ملی" readonly/>
+                                        <div class="input-group-append">
+                                            <button id="btnNationalCodeToAccountNumber" class="btn btn-primary" type="button">
+                                                دریافت حساب ها
+                                            </button>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                            </div>
+
+                            <div id="accounts-container" class="col-12 mt-1" hidden>
+                                <label>یکی از حساب‌های خود را انتخاب کنید</label>
+                                <div id="accounts-list" class="list-group"></div>
+                            </div>
+
+                            <input type="hidden" id="AccountNumber" />
+                            <input type="hidden" id="BankName" />
+                            <input type="hidden" id="DepositOwners" />
+                            <input type="hidden" id="IBAN" />
+
+                            <div class="col-12 mt-1">
+                                <div class="border rounded-lg">
+                                    <div class="d-flex flex-column flex-sm-row">
+                                        <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                                            <span class="font-small-2 text-bold-500">نام بانک</span>
+                                            <span id="lblBankName" class="dark mt-50 text-bold-700">بانک آینده</span>
+                                        </div>
+                                        <div class="border-left border-top"></div>
+                                        <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                                            <span class="font-small-2 text-bold-500">صاحب حساب</span>
+                                            <span id="lblDepositOwners" class="dark mt-50 text-bold-700">@(Model.DepositOwners)</span>
+                                        </div>
+                                    </div>
+                                    <hr class="m-0 p-0" />
+                                    <div class="d-flex flex-column flex-sm-row">
+                                        <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                                            <span class="font-small-2 text-bold-500">شماره حساب</span>
+                                            <span id="lblAccountNumber" class="dark mt-50 text-bold-700">@Model.AccountNumber</span>
+                                        </div>
+                                        <div class="border-left border-top"></div>
+                                        <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                                            <span class="font-small-2 text-bold-500">شماره مشتری</span>
+                                            <span id="lblClientId" class="dark mt-50 text-bold-700">@Model.ClientId</span>
+                                        </div>
+                                    </div>
+                                    <hr class="m-0 p-0" />
+                                    <div class="d-flex flex-column flex-sm-row">
+                                        <div class="border-left border-top"></div>
+                                        <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                                            <span class="font-small-2 text-bold-500">شماره شبا</span>
+                                            <span id="lblIBAN" class="dark mt-50 text-bold-700">@Model.IBAN</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">
+                        <span>بستن</span>
+                    </button>
+                    <button type="button" id="btnSaveUserAccount" class="btn btn-zl-primary">
+                    <span>ثبت تغییرات</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <input id="VerifiedAddress" name="VerifiedAddress" hidden></input>
+</form>
+@section scripts {
+    @*<partia name="_ValidationScriptsPartial" />*@
+    @{
+                                                        <script src="~/persianDatePicker/js/persianDatepicker.min.js"></script>
+        await Html.RenderPartialAsync("~/Views/Shared/_ValidationScriptsPartial.cshtml");
+    }
+    <script>
+        $(document).ready(function () {
+            $('div').removeClass('zl-active');
+            $('#myProfile').addClass('zl-active');
+            $('#CardNumber').mask('6362-1499-9999-9999', { placeholder: "6362-14__-____-____" });
+            //$('#NationalCode').mask('9999999999', { placeholder: "__________" });
+            $('#Mobile').mask('09999999999', { placeholder: "09_________" });
+            //$('#txtBirthDate').mask('9999/99/99', { placeholder: "____/__/__" });
+            $('#BirthDate').val('@ViewBag.BirthDate');
+            $('#txtBirthDate').val('@ViewBag.PersianBirthDate');
+            $("#txtBirthDate").persianDatepicker(
+                {
+                    //startDate: '1300/01/01',
+                    initialValue: true,
+                    endDate: new persianDate().now().addYear(-18).toString("YYYY/MM/DD"),
+                    months: ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"],
+                    dowTitle: ["شنبه", "یکشنبه", "دوشنبه", "سه شنبه", "چهارشنبه", "پنج شنبه", "جمعه"],
+                    shortDowTitle: ["ش", "ی", "د", "س", "چ", "پ", "ج"],
+                    theme: 'lightorang',
+                    showGregorianDate: !1,
+                    persianNumbers: !0,
+                    formatDate: "YYYY/0M/0D",
+                    selectedBefore: !1,
+                    selectedDate: '@ViewBag.PersianBirthDate',
+                    prevArrow: '\u25c4',
+                    nextArrow: '\u25ba',
+                    alwaysShow: !1,
+                    selectableYears: null,
+                    selectableMonths: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                    cellWidth: 35, // by px
+                    cellHeight: 30, // by px
+                    fontSize: 14, // by px
+                    isRTL: !1,
+                    responsive: true,
+                    calendarPosition: {
+                        x: 50,
+                        y: -300,
+                    },
+                    onSelect: function () {
+                        //alert($("#txtBirthDate").attr("data-gdate"));
+                        if (moment().diff($("#txtBirthDate").attr("data-gdate"), 'years') < 18) {
+                            showMessage("اخطار", "کاربر گرامی حداقل سن برای درخواست تسهیلات 18 سال می باشد!", icons.warning, 'متوجه شدم');
+                        }
+                        $('#BirthDate').val($("#txtBirthDate").attr("data-gdate"));
+                    },
+                    onShow: function () { },
+                    onHide: function () { },
+                    onRender: function () { }
+                });
+        });
+
+        //$('#NationalCode').change((e) => {
+        //    $('#UserName').val($('#NationalCode').val());
+        //});
+
+        // $('#ProvinceOfBirthId').change(e => {
+        //     const provinceId = $(e.target).val();
+
+        //     if (provinceId != undefined && provinceId != '') {
+        //         showWaiting('userInfoContent', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+        //         $.ajax({
+        //             type: 'get',
+        //             //dataType: 'json',
+        //             contentType: "application/json; charset=utf-8",
+        //             //processData: false,
+        //             //contentType: false,
+        //             url: `/api/v1/Location/SelectCityByProvince/${provinceId}`,
+        //             success: function (result) {
+        //                 hideWaiting('userInfoContent');
+        //                 debugger;
+        //                 if (result.isSuccess && result.data != undefined && result.data.length > 0) {
+        //                     $('#CityOfBirthId').empty().append('<option value="">@ResourceFile.SelectCityOfBirth</option>');
+        //                     result.data.map(city => {
+        //                         $('#CityOfBirthId').append(`<option value="${city.value}">${city.text}</option>`);
+        //                     });
+        //                 }
+        //                 else {
+        //                     $('#CityOfBirthId').empty().append('<option value="">@ResourceFile.SelectCityOfBirth</option>');
+        //                 }
+        //             },
+        //             error: function (error) {
+        //                 hideWaiting('userInfoContent');
+        //                 const exception = getExceptionMessageFromError(error);
+        //                 if (exception != null)
+        //                     showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+        //                 else
+        //                     showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+        //             }
+        //         });
+        //     }
+        //     else {
+        //         $('#CityOfBirthId').empty().append('<option value="">@ResourceFile.SelectCityOfBirth</option>');
+        //     }
+        // });
+
+        // $('#ProvinceOfIssueId').change(e => {
+        //     const provinceId = $(e.target).val();
+
+        //     if (provinceId != undefined && provinceId != '') {
+        //         showWaiting('userInfoContent', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+        //         $.ajax({
+        //             type: 'get',
+        //             //dataType: 'json',
+        //             contentType: "application/json; charset=utf-8",
+        //             //processData: false,
+        //             //contentType: false,
+        //             url: `/api/v1/Location/SelectCityByProvince/${provinceId}`,
+        //             success: function (result) {
+        //                 hideWaiting('userInfoContent');
+        //                 debugger;
+        //                 if (result.isSuccess && result.data != undefined && result.data.length > 0) {
+        //                     $('#CityOfIssueId').empty().append('<option value="">@ResourceFile.SelectCityOfIssue</option>');
+        //                     result.data.map(city => {
+        //                         $('#CityOfIssueId').append(`<option value="${city.value}">${city.text}</option>`);
+        //                     });
+        //                 }
+        //                 else {
+        //                     $('#CityOfIssueId').empty().append('<option value="">@ResourceFile.SelectCityOfIssue</option>');
+        //                 }
+        //             },
+        //             error: function (error) {
+        //                 hideWaiting('userInfoContent');
+        //                 const exception = getExceptionMessageFromError(error);
+        //                 if (exception != null)
+        //                     showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+        //                 else
+        //                     showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+        //             }
+        //         });
+        //     }
+        //     else {
+        //         $('#CityOfIssueId').empty().append('<option value="">@ResourceFile.SelectCity</option>');
+        //     }
+        // });
+
+        $('#ProvinceId').change(e => {
+            const provinceId = $(e.target).val();
+
+            if (provinceId != undefined && provinceId != '') {
+                showWaiting('userLocationBody', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                $.ajax({
+                    type: 'get',
+                    //dataType: 'json',
+                    contentType: "application/json; charset=utf-8",
+                    //processData: false,
+                    //contentType: false,
+                    url: `/api/v1/Location/SelectCityByProvince/${provinceId}`,
+                    success: function (result) {
+                        hideWaiting('userLocationBody');
+                        debugger;
+                        if (result.isSuccess && result.data != undefined && result.data.length > 0) {
+                            $('#CityId').empty().append('<option value="">@ResourceFile.SelectCity</option>');
+                            result.data.map(city => {
+                                $('#CityId').append(`<option value="${city.value}">${city.text}</option>`);
+                            });
+                        }
+                        else {
+                            $('#CityId').empty().append('<option value="">@ResourceFile.SelectCity</option>');
+                        }
+                    },
+                    error: function (error) {
+                        hideWaiting('userLocationBody');
+                        const exception = getExceptionMessageFromError(error);
+                        if (exception != null)
+                            showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                        else
+                            showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                    }
+                });
+            }
+            else {
+                $('#CityId').empty().append('<option value="">@ResourceFile.SelectCity</option>');
+            }
+        });
+
+        $('#btnNationalCodeToAccountNumber').click(function (e) {
+            debugger;
+            e.preventDefault();
+            const nationalCode = $('#NationalCodeToAccountNumber').val();
+            if (nationalCode.length != 10) {
+                showMessage('@ResourceFile.InfoTitle', 'شماره ملی را بطور صحیح وارد کنید', icons.warning, '@ResourceFile.Close');
+                return;
+            }
+            showWaiting('userAccountBody', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+
+            var model = {
+                NationalCode: nationalCode
+            };
+
+            $.ajax({
+                type: 'post',
+                dataType: 'json',
+                contentType: "application/json; charset=utf-8",
+                url: `/api/v1/NeginHub/GetClientIdAndAccountNumbersAyandeh`,
+                data: JSON.stringify(model),
+                success: function (resultValue) {
+                    hideWaiting('userAccountBody');
+                    if (resultValue != null && resultValue.data != null && resultValue.data.accounts != null) {
+                        $('#accounts-container').removeAttr("hidden");
+                        $('#accounts-container').html('');
+                        $('#lblClientId').text(resultValue.data.clientId);
+
+                        for (let i = 0; i < resultValue.data.accounts.length; i++) {
+                            let account = resultValue.data.accounts[i]
+                            if (account.accountType == '010' || account.accountType == '030' || account.accountType == '040') {
+                                var htmlToAppend = `
+                                                    <div class="input-group w-100" style="margin-top:10px">
+                                                        <div account-number="` + account.accountNumber + `" class="border flex-grow-1">
+                                                            <div class="d-flex flex-column flex-sm-row">
+                                                                <div class="d-flex flex-column justify-content-start py-1 px-1 w-100" style="font-size: 0.9rem;">
+                                                                    شماره حساب: ` + account.accountNumber + `
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <button onclick="selectAccount(this, '` + account.accountNumber + `')" class="btn btn-primary" type="button">
+                                                            انتخاب
+                                                        </button>
+                                                    </div>
+                                                `;
+
+                                $('#accounts-container').append(htmlToAppend);
+                            }
+                        }
+                    }
+                    else { 
+                    showMessage('@ResourceFile.ErrorTitle', `حساب بانکی مطابق با کدملی اعلامی یافت نشد.
+                            جهت افتتاح حساب انلاین از طریق نرم افزار آبانک به لینک زیر مراجعه نمایید.
+
+                            <a href="https://abankapp.ir">https://abankapp.ir</a>`, icons.error, '@ResourceFile.Close');
+                    }
+                },
+                error: function (error) {
+                    hideWaiting('userAccountBody');
+                    showMessage('@ResourceFile.ErrorTitle', 'با کد ملی شما شماره مشتری در بانک آینده یافت نشد!', icons.error, '@ResourceFile.Close');
+                }
+            });
+        })
+
+        function depositToIban() {
+            const deposit = $('#AccountNumber').val();
+            showWaiting('userAccountBody', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+
+            var model = {
+                Deposit: deposit,
+                BankCode: '062', //ayandeh bank code,
+                trackId: ''
+            };
+
+            $.ajax({
+                type: 'post',
+                dataType: 'json',
+                contentType: "application/json; charset=utf-8",
+                url: '@depositToIban',
+                data: JSON.stringify(model),
+                success: function (resultValue) {
+                    hideWaiting('userAccountBody');
+                    if (resultValue != null && resultValue.data != null) {
+                        $('#ibanValue').text(resultValue.data.iban);
+                        $('#ibanValue').val(resultValue.data.iban);
+                        $('#customerNumberValue').val($('#lblClientId').text());
+                        $('#customerNumberValue').text($('#lblClientId').text());
+                        $('#depositOwnersValue').val(resultValue.data.depositOwners);
+                        $('#depositOwnersValue').text(resultValue.data.depositOwners);
+                        $('#bankValue').val(resultValue.data.bankName);
+                        $('#bankValue').text(resultValue.data.bankName);
+                        $('#accountNumberValue').val(resultValue.data.deposit);
+                        $('#accountNumberValue').text(resultValue.data.deposit);
+                        $('#lblIBAN').val(resultValue.data.iban);
+                        $('#lblIBAN').text(resultValue.data.iban);
+
+                        $('#lblDepositOwners').val(resultValue.data.depositOwners);
+                        $('#lblDepositOwners').text(resultValue.data.depositOwners);
+                    } 
+                },
+                error: function (error) {
+                    hideWaiting('userAccountBody');
+                    showMessage('@ResourceFile.ErrorTitle', 'با کد ملی شما شماره شبا در بانک آینده یافت نشد!', icons.error, '@ResourceFile.Close');
+                }
+            });
+        }
+
+        @if (Model.RequestFacilityId.HasValue && !editByZarinLend)
+        {
+            <text>
+                $('#btnGoToNextStep').click(function (e) {
+                    e.preventDefault();
+                    showWaiting('mainContentDiv', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                    $.ajax({
+                        type: 'post',
+                        //dataType: 'json',
+                        //contentType: "application/json; charset=utf-8",
+                        processData: false,
+                        contentType: false,
+                        url: '/api/v1/User/GoToNextStepFromProfileToUploadDocuments/@Model.RequestFacilityId.Value',
+                        //data: data,// JSON.stringify(model),
+                        success: function (result) {
+                            hideWaiting('mainContentDiv');
+                            debugger;
+                            if (result.isSuccess) {
+                                window.location.replace('@Url.Action("UploadIdentityDocuments", "User")');
+                            }
+                        },
+                        error: function (error) {
+                            debugger;
+                            hideWaiting('mainContentDiv');
+                            const exception = getExceptionMessageFromError(error);
+                            if (exception != null)
+                                showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                            else
+                                showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                        }
+                    });
+                });
+            </text>
+        }
+
+        $('#btnAddressInquiry').click(function (e) {
+            e.preventDefault();
+            showWaiting('userLocationBody', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+            let postalCode = $('#PostalCode').val();
+            let model = {
+                postalCode: postalCode,
+                inquiryType: 1,
+                trackId: ''
+            };
+
+            if (postalCode != null && postalCode != '' && postalCode.length == 10) {
+                setTimeout(() => {
+                    $.ajax({
+                        type: 'post',
+                        processData: false,
+                        url: '@getAddressInquiryApi',
+                        contentType: 'application/json',
+                        dataType: 'json',
+                        data: JSON.stringify(model),
+                        timeout: 9500,
+                        success: function (result) {
+                            hideWaiting('userLocationBody');
+                            if (result.statusCode == 0) {
+                                $('#Address').val(result.data.data);
+                                $('#VerifiedAddress').val(result.data.data);
+                                $('#Address').attr('readonly', 'readonly');
+                            }
+                            else {
+                                $('#Address').removeAttr('readonly');
+                                showMessage('@ResourceFile.ErrorTitle', 'خطا در هنگام یافتن آدرس از روی کد پستی', icons.error, '@ResourceFile.Close');
+                            }
+                        },
+                        error: function (error) {
+                            hideWaiting('userLocationBody');
+                            $('#Address').attr("placeholder", 'استعلام با خطا مواجه شد لطفا آدرس را وارد کنید');
+                            $('#Address').removeAttr('readonly');
+                        }
+                }, 10000);
+
+                });
+            } else {
+                hideWaiting('userLocationBody');
+            }
+        });
+
+        $('#btnSaveUserLocation').click(function (e) {
+            e.preventDefault();
+            debugger;
+
+            if (1 == 1) {
+                showWaiting('userLocationBody', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+
+                let data = new FormData();
+                data.append('Mobile', $("#Mobile").val());
+                data.append('Email', $("#Email").val());
+                data.append('Address', $("#Address").val());
+                data.append('VerifiedAddress', $("#VerifiedAddress").val());
+                data.append('PhoneNumber', $("#PhoneNumber").val());
+                data.append('ProvinceId', $("#ProvinceId").val());
+                data.append('CityId', $("#CityId").val());
+                data.append('PostalCode', $("#PostalCode").val());
+
+                $.ajax({
+                    type: 'post',
+                    //dataType: 'json',
+                    //contentType: "application/json; charset=utf-8",
+                    processData: false,
+                    contentType: false,
+                    url: '@updateUserLocationApi',
+                    data: data,// JSON.stringify(model),
+                    success: function (result) {
+                        hideWaiting('userLocationBody');
+                        debugger;
+                        if (result.isSuccess) {
+                            $('#mobileValue').html($("#Mobile").val());
+                            $('#emailValue').html($("#Email").val());
+                            $('#addressValue').html($("#Address").val());
+                            $('#postalCodeValue').html($("#PostalCode").val());
+                            $('#phoneNumberValue').html($("#PhoneNumber").val());
+                            $('#provinceValue').html($("#ProvinceId option:selected").text());
+                            $('#cityValue').html($("#CityId option:selected").text());
+
+                            $('#address-error').remove();
+                            $('#postalCode-error').remove();
+                            $('#province-error').remove();
+                            $('#city-error').remove();
+                            showMessage('@ResourceFile.InfoTitle', '@ResourceFile.MessageSuccess', icons.success, '@ResourceFile.Close');
+                            $('#editUserLocationModal').modal('hide');
+                        }
+                    },
+                    error: function (error) {
+                        hideWaiting('userLocationBody');
+                        const exception = getExceptionMessageFromError(error);
+                        if (exception != null)
+                            showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                        else
+                            showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                    }
+                });
+            }
+            else {
+                scrollToFirstError();
+            }
+        });
+
+        $('#btnSaveUserAccount').click(function (e) {
+            e.preventDefault();
+
+            if ($('#lblAccountNumber').text() == '') { 
+                showMessage("اخطار", "لطفا ابتدا یک حساب بانک آینده را انتخاب کنید", icons.warning, 'متوجه شدم');
+                return;
+            }
+
+            showWaiting('userAccountBody', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+
+            let model = {
+                UserId : '@(Model.UserId)',
+                ClientId: $('#lblClientId').text(),
+                AccountNumber: $('#lblAccountNumber').text(),
+                IBan: $('#lblIBAN').text(),
+                DepositOwner: $('#lblDepositOwners').text(),
+            }; 
+
+            $.ajax({
+                type: 'post',
+                dataType: 'json',
+                contentType: "application/json; charset=utf-8",
+                url: '@updateBankAccountApi',
+                data: JSON.stringify(model),
+                success: function (result) {
+                    hideWaiting('userAccountBody');
+                    debugger;
+                    if (result.isSuccess) {
+                        $('#customerNumberValue').text();
+                        $('#editUserAccountModal').modal('hide');
+                        showMessage('@ResourceFile.InfoTitle', '@ResourceFile.MessageSuccess', icons.success, '@ResourceFile.Close');
+                        location.reload();
+                    }
+                },
+                error: function (error) {
+                    hideWaiting('userAccountBody');
+                    const exception = getExceptionMessageFromError(error);
+                    if (exception != null)
+                        showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                    else
+                        showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                }
+            });
+        });
+
+        $('#btnSaveUserJob').click(function (e) {
+            e.preventDefault();
+            debugger;
+
+            if ($('#frmEditUserJob').valid()) {
+                showWaiting('userJobBody', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+
+                let data = new FormData();
+                data.append('JobTitleId', $("#JobTitleId").val());
+                data.append('SalaryRangeId', $("#SalaryRangeId").val());
+                data.append('PhoneNumber', $("#JobPhoneNumber").val());
+                data.append('Address', $("#JobAddress").val());
+
+                $.ajax({
+                    type: 'post',
+                    //dataType: 'json',
+                    //contentType: "application/json; charset=utf-8",
+                    processData: false,
+                    contentType: false,
+                    url: '@updateUserJobApi',
+                    data: data,// JSON.stringify(model),
+                    success: function (result) {
+                        hideWaiting('userJobBody');
+                        debugger;
+                        if (result.isSuccess) {
+                            $('#jobPhoneNumberValue').html($("#JobPhoneNumber").val());
+                            $('#jobAddressValue').html($("#JobAddress").val());
+                            $('#jobTitleValue').html($("#JobTitleId option:selected").text());
+                            $('#salaryRangeTitleValue').html($("#SalaryRangeId option:selected").text());
+
+                            $('#jobTitle-error').remove();
+                            $('#salaryRangeTitle-error').remove();
+                            $('#jobPhoneNumber-error').remove();
+                            $('#jobAddress-error').remove();
+                            showMessage('@ResourceFile.InfoTitle', '@ResourceFile.MessageSuccess', icons.success, '@ResourceFile.Close');
+                            $('#editUserJobModal').modal('hide');
+                        }
+                    },
+                    error: function (error) {
+                        hideWaiting('userJobBody');
+                        const exception = getExceptionMessageFromError(error);
+                        if (exception != null)
+                            showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                        else
+                            showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                    }
+                });
+            }
+            else {
+                scrollToFirstError();
+            }
+        });
+
+        function selectAccount(element, accountNumber) {
+            var accountElements = $('div[account-number]');
+
+            for (let i = 0; i < accountElements.length; i++) {
+                let accountElement = accountElements[i]; 
+
+                accountElement.classList.remove('background-color-mediumaquamarine');
+            }
+
+            $(element).parent().children()[0].classList.add('background-color-mediumaquamarine');
+            $('#lblAccountNumber').text($($(element).parent().children()[0]).attr('account-number'));
+            $('#AccountNumber').val($($(element).parent().children()[0]).attr('account-number'));
+
+            depositToIban();
+        }
+
+        $('#Address').keypress(function (event) {
+            if (event.keyCode == 13) {
+                event.preventDefault();
+            }
+        });
+    </script>
+
+}

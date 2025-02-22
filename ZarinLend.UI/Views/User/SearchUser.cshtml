@@ -1,0 +1,426 @@
+﻿@model UserSearchModel
+@{
+    ViewData["Title"] = "جستجوی خریدار";
+    Layout = "~/Views/Shared/_NewLayout.cshtml";
+    var organizationName = User.Identity.GetOrganizationName();
+}
+@section styles
+{
+    <style type="text/css">
+
+        @@media (min-width:768px) {
+            .username-info {
+                margin-top: 40px;
+            }
+        }
+    </style>
+}
+
+<div id="mainDiv" class="p-2 bg-white rounded-lg">
+    <div class="font-medium-3 secondary darken-4 text-bold-800 d-flex align-items-center">
+        <i class="bx bx-search-alt-2 zl-text-secondary mr-25"></i>
+        <span>جستجوی خریدار/انتقال اعتبار از حساب خریدار به فروشنده</span>
+    </div>
+    <div class="alert zl-bg-alert-warning border-warning border-accent-4 alert-dismissible my-2"
+         role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="بستن">
+            <span aria-hidden="true">×</span>
+        </button>
+        <div class="d-flex">
+            <i class="bx bx-info-circle font-large-1"></i>
+            <div class="text-muted text-bold-400 font-small-4">
+                <ul>
+                    <li>
+                        کاربر گرامی درصورتی که اطلاعات نمایش داده صحیح می باشد و مبلغ اعتباری خریدار را تایید می نمایید رو دکمه ارسال لینک پرداخت کلیک کنید
+                    </li>
+                    <li>
+                        لطفا این صفحه را نبندید بعد از پرداخت موفقیت آمیز خریدار بصورت اتوماتیک به صفحه ثبت فاکتور هدایت میشوید
+                    </li>
+                    <li>
+                        همچنین بخاطر داشته باشید لینک پرداخت ارسال شده برای خریدار فقط 15 دقیقه اعتبار دارد
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <form id="frmSearch" method="post">
+        <div class="row">
+            <div class="col-md-1">
+                <div class="form-group">
+                    <label class="control-label" asp-for="NationalCode"></label>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <input asp-for="NationalCode" class="form-control" placeholder="کد ملی" style="text-align:center;direction:ltr;letter-spacing:5px" />
+                    <span asp-validation-for="NationalCode" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md-8" style="">
+                <button id="btnSearch" class="btn btn-outline-primary">
+                    جستجو کاربر&nbsp;<i class="bx bx-search-alt-2"></i>
+                </button>
+            </div>
+            @if (ViewBag.Error != null)
+            {
+                <p style="color:red;text-align:center">
+                    @Html.Raw(ViewBag.Error)
+                </p>
+            }
+        </div>
+    </form>
+    <fieldset id="resultBox" style="display:none">
+        <div class="text-bold-900 secondary darken-4 font-medium-3">
+            اطلاعات هویتی
+        </div>
+        <div class="border rounded mt-2 mb-1">
+            <div class="d-flex flex-column flex-sm-row">
+                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                    <span class="font-small-2 text-bold-500">کد ملی</span>
+                    <span id="lblNationalCode" class="dark mt-50 text-bold-400"></span>
+                </div>
+                <div class="border-left border-top"></div>
+                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                    <span class="font-small-2 text-bold-500">نام</span>
+                    <span id="lblFName" class="dark mt-50 text-bold-400"></span>
+                </div>
+                <div class="border-left border-top"></div>
+                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                    <span class="font-small-2 text-bold-500">نام خانوادگی</span>
+                    <span id="lblLName" class="dark mt-50 text-bold-400"></span>
+                </div>
+            </div>
+            @*  <hr class="m-0 p-0" />
+            <div class="d-flex flex-column flex-sm-row">
+            <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+            <span class="font-small-2 text-bold-500">شماره موبایل</span>
+            <span id="lblMobile" class="dark mt-50 text-bold-400"></span>
+            </div>
+            <div class="border-left border-top"></div>
+            <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+            <span class="font-small-2 text-bold-500">کل اعتبار(ريال)</span>
+            <span id="lblUserBalance" class="dark mt-50 text-bold-400"></span>
+            </div>
+            <div class="border-left border-top"></div>
+            <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+            <span class="font-small-2 text-bold-500">مدارک هویتی</span>
+            <span id="identityDocumentsDiv" class="dark mt-50 text-bold-400"></span>
+            </div>
+            </div> *@
+            <hr class="m-0 p-0" />
+            <div class="d-flex flex-column flex-sm-row">
+                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                    <span class="font-small-2 text-bold-500">کل اعتبار(ريال)</span>
+                    <span id="lblUserBalance" class="dark mt-50 text-bold-400 font-medium"></span>
+                </div>
+                <div class="border-left border-top"></div>
+                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                    <span class="font-small-2 text-bold-500">کارمزد(ريال)</span>
+                    <span id="lblFee" class="dark mt-50 text-bold-400 font-medium"></span>
+                </div>
+                <div class="border-left border-top"></div>
+                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                    <span class="font-small-2 text-bold-500">دریافتی فروشگاه(ريال)</span>
+                    <span id="lblShopShare" class="dark mt-50 text-bold-400 font-medium-4"></span>
+                </div>
+            </div>
+        </div>
+        @*             <div id="sendPaymentLink" style="display:none">
+        <div class="alert zl-bg-alert-success border-success border-accent-4 alert-dismissible my-2"
+        role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="بستن">
+        <span aria-hidden="true">×</span>
+        </button>
+        <div class="d-flex">
+        <i class="bx bx-info-circle font-large-1"></i>
+        <div class="text-muted text-bold-400 font-small-4">
+        <ul>
+        <li>
+        کاربر گرامی درصورتی که اطلاعات نمایش داده صحیح می باشد و مبلغ اعتباری خریدار را تایید می نمایید رو دکمه ارسال لینک پرداخت کلیک کنید
+        </li>
+        <li>
+        لطفا این صفحه را نبندید بعد از پرداخت موفقیت آمیز خریدار بصورت اتوماتیک به صفحه ثبت فاکتور هدایت میشوید
+        </li>
+        <li>
+        همچنین بخاطر داشته باشید لینک پرداخت ارسال شده برای خریدار فقط 15 دقیقه اعتبار دارد
+        </li>
+        </ul>
+        <p style="text-align:center">
+        <button type="button" id="btnSendPaymentLink" class="btn btn-outline-info">
+        ارسال لینک پرداخت به خریدار&nbsp;<i class="bx bx-money"></i>
+        </button>
+        </p>
+        </div>
+        </div>
+        </div>
+        </div> *@
+
+        <form id="frmSendSmsVerification" style="display:none">
+            <div class="row">
+                @* <div class="col-md-3">
+                <div class="form-group">
+                <label class="control-label">میزان اعتبار جهت خرید(ريال)</label>
+                </div>
+                </div>
+                <div class="col-md-4">
+                <div class="form-group">
+                <input asp-for="Amount" class="form-control price-css" style="text-align:center;direction:ltr" />
+                <span asp-validation-for="Amount" class="text-danger"></span>
+                </div>
+                </div> *@
+                <div class="col-md-12" style="">
+                    <div class="form-group">
+                        <button id="btnSendVerificationCode" class="btn btn-outline-info">
+                            ارسال پیامک تایید به خریدار&nbsp;<i class="bx bx-message"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <form id="frmTransferCreditAmount" style="display:none">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <input asp-for="VerificationCode" class="form-control" placeholder="کد تایید" style="text-align:center;direction:ltr;letter-spacing:3px" />
+                        <span asp-validation-for="VerificationCode" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-9" style="">
+                    <button id="btnTransferCreditAmount" class="btn btn-outline-success">
+                        انتقال اعتبار از حساب خریدار به حساب فروشنده&nbsp;<i class="fal fa-save"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </fieldset>
+</div>
+
+@section scripts {
+    @{
+        await Html.RenderPartialAsync("~/Views/Shared/_ValidationScriptsPartial.cshtml");
+    }
+    <script src="~/persianDatePicker/js/persianDatepicker.min.js"></script>
+    @*<partia name="_ValidationScriptsPartial" />*@
+    <script>
+        let findBuyerId = null;
+        let buyerAmount = null;
+        let cardNumber = null;
+        $(document).ready(function () {
+            $('div').removeClass('zl-active');
+            $('#searchUser').addClass('zl-active');
+            $('#NationalCode').mask('9999999999', { placeholder: "__________" });
+            $('#VerificationCode').mask('999999', { placeholder: "______" });
+        });
+
+        $('#btnTransferCreditAmount').click(function (e) {
+            e.preventDefault();
+            const formIsValid = $('#frmTransferCreditAmount').valid();
+
+            if (formIsValid) {
+                showWaiting('mainDiv', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                const model = {
+                    BuyerId: findBuyerId,
+                    Amount: buyerAmount,    
+                    CardNumber:cardNumber,
+                    VerificationCode: $('#VerificationCode').val()
+                };
+
+                $.ajax({
+                    type: 'post',
+                    //dataType: 'json',
+                    contentType: "application/json; charset=utf-8",
+                    url: '/api/v1/PaymentInfo/VerifyVerificationCode',
+                    data: JSON.stringify(model),
+                    success: function (result) {
+                        hideWaiting('mainDiv');
+                        debugger;
+                        if (result.isSuccess && result.data != undefined) {
+                            var form = document.createElement("form");
+                            form.method = "POST";
+                            //form.action = `/payment/BuyerPayementInShop/${result.data}`;
+                            form.action = `/payment/BuyerPayementInShop`;
+                            var input = document.createElement("input");
+                            input.setAttribute("type", "hidden");
+                            input.setAttribute("name", "paymentInfoEncryptId");
+                            input.setAttribute("value", result.data);
+                            form.appendChild(input);
+
+                            document.body.appendChild(form);
+
+                            form.submit();
+                        }
+                        else {
+                            showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                        }
+                    },
+                    error: function (error) {
+                        hideWaiting('mainDiv');
+                        const exception = getExceptionMessageFromError(error);
+                        if (exception != null)
+                            showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                        else
+                            showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                    }
+                });
+            }
+            else {
+                scrollToFirstError();
+            }
+        });
+
+        $('#btnSendVerificationCode').click(function (e) {
+            e.preventDefault();
+            const formIsValid = $('#frmSendSmsVerification').valid();
+
+            if (formIsValid) {
+                showWaiting('mainDiv', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+
+                $.ajax({
+                    type: 'post',
+                    //dataType: 'json',
+                    contentType: "application/json; charset=utf-8",
+                    url: `/api/v1/PaymentInfo/SendVerificationCode/${findBuyerId}/${cardNumber}`,
+                    //data: JSON.stringify(model),
+                    success: function (result) {
+                        hideWaiting('mainDiv');
+                        debugger;
+                        if (result.isSuccess) {
+                            $('#frmTransferCreditAmount').show();
+                            $('#frmSendSmsVerification').hide();
+                            showMessage('@ResourceFile.InfoTitle', 'کد تایید برای خریدار ارسال شد!', icons.success, '@ResourceFile.Close');
+                        }
+                        else {
+                            showMessage('@ResourceFile.InfoTitle', 'ارسال کد تایید با خطا مواجه شد!', icons.error, '@ResourceFile.Close');
+                            $('#frmTransferCreditAmount').hide();
+                        }
+                    },
+                    error: function (error) {
+                        hideWaiting('mainDiv');
+                        $('#frmTransferCreditAmount').hide();
+                        const exception = getExceptionMessageFromError(error);
+                        if (exception != null)
+                            showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                        else
+                            showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                    }
+                });
+            }
+            else {
+                scrollToFirstError();
+            }
+        });
+
+        $('#btnSearch').click(function (e) {
+            e.preventDefault();
+            $('#resultBox').hide();
+            $('#frmSendSmsVerification').hide();
+            $('#frmTransferCreditAmount').hide();
+            const formIsValid = $('#frmSearch').valid();
+
+            if (formIsValid) {
+                showWaiting('mainDiv', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                const model = {
+                    NationalCode: $("#NationalCode").val()
+                };
+
+                $.ajax({
+                    type: 'post',
+                    //dataType: 'json',
+                    contentType: "application/json; charset=utf-8",
+                    url: `/api/v1/User/SearchUser`,
+                    data: JSON.stringify(model),
+                    success: function (result) {
+                        hideWaiting('mainDiv');
+                        if (result.isSuccess && result.data != undefined) {
+                            $('#resultBox').show();
+                            if (result.data.balance > 0) {
+                                findBuyerId = result.data.userDetail.id;
+                                buyerAmount = result.data.balance;
+                                cardNumber = result.data.cardNumber;
+                                $('#frmSendSmsVerification').show();
+                            }
+                            else {
+                                findBuyerId = null;
+                                buyerAmount = null;
+                                cardNumber = null;
+                                $('#frmSendSmsVerification').hide();
+                                showMessage('@ResourceFile.InfoTitle', 'اعتبار فرد مورد نظر صفر می باشد!', icons.warning, '@ResourceFile.Close');
+                            }
+                            $('#lblFName').text(result.data.userDetail.fName);
+                            $('#lblLName').text(result.data.userDetail.lName);
+                            //$('#lblMobile').text(result.data.userDetail.mobile);
+                            $('#lblNationalCode').text(result.data.userDetail.nationalCode);
+                            $('#lblUserBalance').text(splitNumber(result.data.balance));
+                            $('#lblShopShare').text(splitNumber(result.data.shopShare));
+                            $('#lblFee').text(`${splitNumber(result.data.fee)}(${result.data.feePercentage}%)`);
+                            //$('#identityDocumentsDiv').html(generateDocumentsLink(result.data.userIdentityDocuments, 'مدارک هویتی'));
+                        }
+                        else {
+                            findBuyerId = null;
+                            buyerAmount = null;
+                            cardNumber = null;
+                            $('#resultBox').hide();
+                            $('#frmSendSmsVerification').hide();
+                            showMessage('@ResourceFile.InfoTitle', 'اطلاعاتی یافت نشد<br/>خریدار باید درخواست تسهیلاتی که تایید نهایی  شده باشد!', icons.warning, '@ResourceFile.Close');
+                        }
+                    },
+                    error: function (error) {
+                        findBuyerId = null;
+                        buyerAmount = null;
+                        cardNumber = null;
+                        $('#resultBox').hide();
+                        $('#frmSendSmsVerification').hide();
+                        hideWaiting('mainDiv');
+                        const exception = getExceptionMessageFromError(error);
+                        if (exception != null)
+                            showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                        else
+                            showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                    }
+                });
+            }
+            else {
+                scrollToFirstError();
+            }
+        });
+
+        // $('#btnSendPaymentLink').click(function (e) {
+        //     e.preventDefault();
+        //     debugger;
+
+        //     if (findBuyerId == null) {
+        //         showMessage('@ResourceFile.InfoTitle', 'اطلاعات فرد مورد نظر یافت نشد!', icons.warning, '@ResourceFile.Close');
+        //         return;
+        //     }
+
+        //     showWaiting('mainDiv', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+        //     const model = {
+        //         BuyerId : findBuyerId,
+        //         Amount: buyerAmount,
+        //     };
+
+        //     $.ajax({
+        //         type: 'post',
+        //         //dataType: 'json',
+        //         contentType: "application/json; charset=utf-8",
+        //         url: `/api/v1/PaymentInfo/GeneratePaymentLink`,
+        //         data: JSON.stringify(model),
+        //         success: function (result) {
+        //             hideWaiting('mainDiv');
+        //             debugger;
+        //             if (result.isSuccess) {
+        //                 showMessage('@ResourceFile.InfoTitle', 'لینک پرداخت با موفقیت به شماره موبایل مشتری ارسال شد!', icons.warning, '@ResourceFile.Close');
+        //             }
+        //         },
+        //         error: function (error) {
+        //             hideWaiting('mainDiv');
+        //             const exception = getExceptionMessageFromError(error);
+        //             if (exception != null)
+        //                 showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+        //             else
+        //                 showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+        //         }
+        //     });
+        // });
+    </script>
+}

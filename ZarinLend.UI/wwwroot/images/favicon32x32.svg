@@ -1,0 +1,43 @@
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1920 1920">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: none;
+      }
+
+      .cls-2 {
+        clip-path: url(#clip-path);
+      }
+
+      .cls-3 {
+        fill: url(#linear-gradient);
+      }
+
+      .cls-4 {
+        fill: #57bdba;
+      }
+
+      .cls-5 {
+        fill: url(#linear-gradient-2);
+      }
+    </style>
+    <clipPath id="clip-path">
+      <rect class="cls-1" x="158.7209" y="274.2857" width="1602.5581" height="1371.4286"/>
+    </clipPath>
+    <linearGradient id="linear-gradient" x1="959.9899" y1="13616.9061" x2="959.9899" y2="12887.5857" gradientTransform="matrix(1, 0, 0, -1, 0, 13882)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffd60d"/>
+      <stop offset="0.999" stop-color="#f5be10"/>
+    </linearGradient>
+    <linearGradient id="linear-gradient-2" x1="959.9899" y1="13109.8382" x2="959.9899" y2="12490.7056" gradientTransform="matrix(1, 0, 0, -1, 0, 13882)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#57bdba"/>
+      <stop offset="1" stop-color="#30a7a6"/>
+    </linearGradient>
+  </defs>
+  <g class="cls-2">
+    <g>
+      <path class="cls-3" d="M1518.58,832.8658c0,308.5084-250.0719,558.6021-558.58,558.6021-308.5056,0-558.6-250.0937-558.6-558.6021s250.0948-558.58,558.6032-558.58S1518.58,524.3586,1518.58,832.8658Z"/>
+      <path class="cls-4" d="M1759.1205,982.4915a813.0624,813.0624,0,0,1-1598.2372,0c-14.5145-77.8643,45.9128-149.6257,125.1106-149.6257H401.4007c0,308.5084,250.0937,558.6021,558.6021,558.6021,308.5055,0,558.5774-250.0937,558.5774-558.6021h115.4083C1713.2078,832.8658,1773.611,904.6272,1759.1205,982.4915Z"/>
+      <path class="cls-5" d="M1518.58,832.8658c0,308.5084-250.0719,558.6021-558.58,558.6021-308.5056,0-558.6-250.0937-558.6-558.6021H547.6553a126.8642,126.8642,0,0,1,121.3605,89.3047c38.2437,124.3913,154.2226,215.051,290.987,215.051,136.7424,0,252.7186-90.66,290.9841-215.051a126.8154,126.8154,0,0,1,121.3386-89.3047Z"/>
+    </g>
+  </g>
+</svg>

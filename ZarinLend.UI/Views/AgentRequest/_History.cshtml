@@ -1,0 +1,58 @@
+﻿@model List<AgentRequestLogModel>
+
+@section styles{
+    <style type="text/css">
+    </style>
+}
+<div class="card">
+    <div class="card-header bg-danger" style="color:white" localize-content>RequestHistory</div>
+    <div class="card-body" id="agentRequestHistoryGridDiv" style="padding:0px">
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover table-custom">
+                <thead>
+                    <tr class="table-secondary">
+                        <th scope="col">#</th>
+                        <th scope="col" data-sortorder="Tedad" localize-content>HistoryStatus</th>
+                        <th scope="col" data-sortorder="Mablagh" localize-content>HistoryDate</th>
+                        <th scope="col" data-sortorder="Tedad" localize-content>Creator</th>
+                        <th scope="col" data-sortorder="Mablagh" localize-content>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (var i = 0; i < Model.Count; i++)
+                    {
+                        <tr class="@(i % 2 == 0 ? "table-info" : "table-light")">
+                            <td>
+                                @(i + 1)
+                            </td>
+                            <td>
+                                @Model[i].StatusDescription
+                            </td>
+                            <td>
+                                @(cultureAccessor.GetCurrentCulture() == Common.Utilities.CultureHelpaer.CultureEnum.FA
+                                    ? Model[i].ShamsiCreateDate
+                                    : Model[i].CreateDate.ToString())
+                            </td>
+                            <td>
+                                @Model[i].CreatorFullName
+                            </td>
+                            <td style="color:red">
+                                @if (Model[i].Description != null)
+                                {
+                                    @Html.Raw(Model[i].Description.Replace("\n", "<br />"));
+                                }
+                            </td>
+                        </tr>
+                    }
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card-footer"></div>
+</div>
+@section scripts{
+    <script>
+
+    </script>
+}

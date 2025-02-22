@@ -1,0 +1,64 @@
+﻿@model RequestFacilityStepWizardModel
+
+@if (Model != null)
+{
+    <link href="~/Vendor/step-wizard/jquery-smart-wizard.css" rel="stylesheet" />
+    <style type="text/css">
+    </style>
+    <div class="card" style="padding-top: 15px;padding-right: 5px;padding-left: 5px;">
+        <div class="row">
+            <div id="smartwizard" class="col-md-12 sw sw-justified sw-theme-dots">
+                <ul class="nav">
+                    @{
+                        var lastStepInRejectedOrNotResponsed = false;
+                        var manualSteps = Model.WorkFlowSteps.Where(p => p.StepIsManual).ToList();
+                        for (var i = 0; i < manualSteps.Count; i++)
+                        {
+                            if (Model.CompletedWorkFlowStepModels != null && !lastStepInRejectedOrNotResponsed)
+                            {
+                                var stepClassName = "inactive";
+
+                                var lastStepCompleted = Model.CompletedWorkFlowStepModels.Where(p => p.WorkFlowStepId.Equals(manualSteps[i].Id))
+                                .OrderByDescending(p => p.CreateDate)
+                                .FirstOrDefault();
+                                if (lastStepCompleted != null)
+                                {
+                                    if (!lastStepCompleted.StatusId.HasValue)
+                                    {
+                                        lastStepInRejectedOrNotResponsed = true;
+                                        stepClassName = "active";
+                                    }
+                                    else if (lastStepCompleted.StatusId == (short)StatusEnum.Approved)
+                                        stepClassName = "done";
+                                    else if (lastStepCompleted.StatusId == (short)StatusEnum.Rejected)
+                                    {
+                                        lastStepInRejectedOrNotResponsed = true;
+                                        stepClassName = "rejected";
+                                    }
+                                }
+
+                                <li class="nav-item">
+                                    <a class="nav-link @stepClassName" href="javascript:void(0)">
+                                        <strong>مرحله @(i + 1)</strong> <br>@manualSteps[i].Name
+                                    </a>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link @(i == 0 ? "active" : "inactive")" href="javascript:void(0)">
+                                        <strong>مرحله @(i + 1)</strong> <br>@manualSteps[i].Name
+                                    </a>
+                                </li>
+                            }
+                        }
+
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+    <script on-content-loaded="true">
+
+    </script>
+}

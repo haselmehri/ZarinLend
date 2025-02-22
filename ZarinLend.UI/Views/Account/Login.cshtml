@@ -1,0 +1,379 @@
+﻿@model LoginModel
+@{
+    ViewData["Title"] = ResourceFile.Login;
+    Layout = "_LoginRegisterLayout";
+}
+
+<div class="form-group">
+    <div class="col-xl-5 col-lg-8 col-md-9 col-sm-12 my-2" style="margin-left:auto;margin-right:auto">
+        @*<h2 class="text-center text-dark mt-5" >LoginTitle</h2>*@
+        <form id="frmLogin" autocomplete="off" class="card">
+            <div class="form-horizontal">
+                <div class="panel panel-primary">
+                    <div class="panel-body">
+                        <div class="text-center">
+                            <img src="~/images/ZarrinLendLogo.png?v=1" class="img-fluid my-3 login-logo"
+                                 alt="profile">
+                        </div>
+                        <div id="loginWithUsername" style="display:none">
+                            <div class="form-group">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text" id="inputUserGroupPrepend">
+                                                <i style="font-size: 16pt;color: #2cacab;" class="fal fa-user"></i>
+                                            </span>
+                                        </div>
+                                        <input type="text" class="form-control" autocomplete="off" aria-describedby="inputUserGroupPrepend"
+                                               style="text-align:center; direction:ltr" placeholder='نام کاربری(کد ملی)' asp-for="Username">
+                                    </div>
+                                    <span asp-validation-for="Username" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text" id="inputPasswordGroupPrepend">
+                                                <i style="font-size: 16pt;color: #2cacab;" class="fal fa-key"></i>
+                                            </span>
+                                        </div>
+                                        <input type="password" class="form-control" autocomplete="off" aria-describedby="inputPasswordGroupPrepend"
+                                               style="text-align:center; direction:ltr" placeholder='@ResourceFile.Password' asp-for="Password">
+                                    </div>
+                                    <span asp-validation-for="Password" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="loginWithMobile">
+                            <div class="form-group" id="mobileDiv">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text" id="inputMobileGroupPrepend">
+                                                <i style="font-size: 16pt;color: #2cacab;" class="fal fa-mobile"></i>
+                                            </span>
+                                        </div>
+                                        <input type="text" class="form-control" autocomplete="off" aria-describedby="inputMobileGroupPrepend"
+                                               style="text-align: center; direction: ltr; letter-spacing: 5px; font-size: 1.3rem"  pattern="[0-9]*" inputmode="numeric" asp-for="Mobile">
+                                    </div>
+                                    <span asp-validation-for="Mobile" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div id="otpDiv" style="display:none">
+                                <div class="form-group">
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        <p id="otpDescription">
+
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text" id="inputOtpGroupPrepend">
+                                                    <i style="font-size: 16pt;color: #2cacab;" class="fal fa-key"></i>
+                                                </span>
+                                            </div>
+                                            <input type="text" class="form-control" autocomplete="one-time-code" aria-describedby="inputOtpGroupPrepend"
+                                                   style="text-align:center; direction:ltr;letter-spacing:10px;font-size:15pt" type="number" pattern="[0-9]*" inputmode="numeric" asp-for="Otp">
+                                        </div>
+                                        <span asp-validation-for="Otp" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="form-group" style="text-align:left">
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        <span id="countDownTimer"></span>
+                                        <button type="button" id="btnReGenerateOtp" style="display:none" class="btn btn-outline-primary" >ارسال مجدد کد تایید</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <div style="text-align:left">
+                            @* <a class="btn btn-outline-warning" asp-route="forgotpassword" >@ResourceFile.ForgotPassword</a> *@
+                            <a class="btn btn-outline-info" asp-controller="account" asp-action="loginbyzarinpal"><i class="bx bx-user bx-extend font-medium-5"></i>مشتریان درگاه زرین پال</a>
+                            <a class="btn btn-outline-info" asp-route="Register_Step1" >@ResourceFile.Register</a>
+                            <button type="button" id="btnLoginWithMobile" style="display:none" class="btn btn-outline-primary" >ورود با شماره موبایل</button>
+                            <button type="button" id="btnLoginWithUsername" class="btn btn-outline-info" >ورود با نام کاربری</button>
+                            <button type="button" id="btnGenerateOtp" class="btn btn-outline-primary" >دریافت کد تایید</button>
+                            <button type="button" id="btnLogin" style="display:none" data-returnUrl="@Model.ReturnUrl" class="btn btn-outline-success" >@ResourceFile.Login</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+@section styles
+    {
+    <style type="text/css">
+        .input-group-text {
+            min-width: 50px !important;
+        }
+
+        #countDownTimer {
+            font-size: 20pt;
+            color: #36afae;
+            letter-spacing:2px;
+        }
+    </style>
+}
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        let intervalId;
+        let LoginType = 'LoginWithMobile';
+        $(document).ready(() => {
+            $('#Mobile').mask('ZN000000000',
+                {
+                    placeholder: "شماره موبایل",
+                    translation: {
+                        Z: { pattern: /0/ },
+                        N: { pattern: /9/ },
+                        0: { pattern: /[0-9]/ }
+                    }
+                });
+
+            $('#Otp').mask('00000',
+                {
+                    placeholder: "_____",
+                    translation: {
+                        0: { pattern: /[0-9]/ }
+                    }
+                });
+        });
+
+        const startTimer = (duration, display) => {
+            let timer = duration, minutes, seconds;
+            display.text('');
+            display.show();
+            $('#btnLogin').show();
+            intervalId = setInterval(function() {
+                minutes = parseInt(timer / 60, 10)
+                seconds = parseInt(timer % 60, 10);
+
+                minutes = minutes < 10 ? "0" + minutes : minutes;
+                seconds = seconds < 10 ? "0" + seconds : seconds;
+
+                display.text(minutes + ":" + seconds);
+
+                if (--timer < 0) {
+                    $('#btnReGenerateOtp').show();
+                    $('#btnLogin').hide();
+                    display.hide();
+                    clearInterval(intervalId);
+                    //timer = duration;
+                }
+            }, 1000);
+        }
+
+        $('#btnLoginWithUsername').click((e) => {
+            e.preventDefault();
+            clearInterval(intervalId);
+            LoginType = 'LoginWithUsername';
+            $('#loginWithMobile').hide();
+            $('#btnGenerateOtp').hide();
+            $('#btnLoginWithUsername').hide();
+            $('#btnLoginWithMobile').show();
+            $('#loginWithUsername').show();
+            $('#btnLogin').show();
+        });
+
+        $('#btnLoginWithMobile').click((e) => {
+            e.preventDefault();
+            clearInterval(intervalId);
+            LoginType = 'LoginWithMobile';
+            $('#loginWithMobile').show();
+            $('#btnGenerateOtp').show();
+            $('#btnLoginWithUsername').show();
+            $('#mobileDiv').show();
+            $('#otpDiv').hide();
+            $('#btnLoginWithMobile').hide();
+            $('#loginWithUsername').hide();
+            $('#btnLogin').hide();
+        });
+
+        $('#btnGenerateOtp').click((e) => {
+            e.preventDefault();
+            clearInterval(intervalId);
+            if ($("#frmLogin").valid()) {
+                showWaiting('frmLogin', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                $.ajax({
+                    type: 'post',
+                    //dataType: 'json',
+                    contentType: "application/json; charset=utf-8",
+                    url: '/api/v1/user/SendOtpForLogin',
+                    data: JSON.stringify({ Mobile: $('#Mobile').val() }),
+                    success: function(result) {
+                        hideWaiting('frmLogin');
+                        if (result.isSuccess) {
+                            $('#otpDescription').html(`در این قسمت کد 5 رقمی پیامک شده به شماره <b style='letter-spacing:2px'>${$('#Mobile').val()}</b> وارد کنید.`);
+                            $('#mobileDiv').hide();
+                            $(e.target).hide();
+                            const count = 60 * 2;
+                            const display = $('#countDownTimer');
+                            startTimer(count, display);
+                            $('#otpDiv').show();
+                        }
+                    },
+                    error: function(error) {
+                        hideWaiting('frmLogin');
+                        const exception = getExceptionMessageFromError(error);
+                        if (exception != null)
+                            showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                        else
+                            showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                    }
+                });
+            }
+        });
+
+        $('#btnReGenerateOtp').click((e) => {
+            e.preventDefault();
+            clearInterval(intervalId);
+            $.ajax({
+                type: 'post',
+                //dataType: 'json',
+                contentType: "application/json; charset=utf-8",
+                url: '/api/v1/user/SendOtpForLogin',
+                data: JSON.stringify({ Mobile: $('#Mobile').val() }),
+                success: function(result) {
+                    hideWaiting('frmLogin');
+                    if (result.isSuccess) {
+                        $(e.target).hide();
+                        const count = 60 * 2;
+                        const display = $('#countDownTimer');
+                        startTimer(count, display);
+                    }
+                },
+                error: function(error) {
+                    hideWaiting('frmLogin');
+                    const exception = getExceptionMessageFromError(error);
+                    if (exception != null)
+                        showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                    else
+                        showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                }
+            });
+        });
+
+        $('#frmLogin').keypress(function(e) {
+            if (e.which == 13 || e.keyCode == 13)  // the enter key code
+            {
+                $("#btnLogin").click();
+                return false;
+            }
+        });
+
+        function confirmFuc(a, b) {
+            alert(`a : ${a} , b : ${b}`);
+        }
+        function cancelFuc() {
+            alert('cancel button clicked!');
+        }
+        function denyFuc(a) {
+            alert(a);
+        }
+
+        $("#btnLogin").click(function(e) {
+            e.preventDefault();
+            if ($("#frmLogin").valid()) {
+                showWaiting('frmLogin', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                if (LoginType == 'LoginWithUsername') {
+                    const model = {
+                        Password: $("#Password").val(),
+                        Username: $("#Username").val(),
+                        RememberMe: true// $("#RememberMe").prop('checked')
+                    };
+
+                    $.ajax({
+                        type: 'post',
+                        //dataType: 'json',
+                        contentType: "application/json; charset=utf-8",
+                        url: '/api/v1/user/Login',
+                        data: JSON.stringify(model),
+                        success: function(result) {
+                            hideWaiting('frmLogin');
+                            if (result.isSuccess) {
+                                window.location = $("#btnLogin").attr("data-returnUrl");
+                            }
+                            else
+                                showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                        },
+                        error: function(error) {
+                            hideWaiting('frmLogin');
+                            const exception = getExceptionMessageFromError(error);
+                            if (exception != null)
+                                showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                            else
+                                showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                        }
+                    });
+                }
+                else if (LoginType == 'LoginWithMobile') {
+                    const model = {
+                        Mobile: $("#Mobile").val(),
+                        Otp: $("#Otp").val()
+                    };
+
+                    $.ajax({
+                        type: 'post',
+                        //dataType: 'json',
+                        contentType: "application/json; charset=utf-8",
+                        url: '/api/v1/user/LoginWithOtp',
+                        data: JSON.stringify(model),
+                        success: function(result) {
+                            hideWaiting('frmLogin');
+                            if (result.isSuccess) {
+                                window.location = $("#btnLogin").attr("data-returnUrl");
+                            }
+                            else
+                                showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                        },
+                        error: function(error) {
+                            hideWaiting('frmLogin');
+                            const exception = getExceptionMessageFromError(error);
+                            if (exception != null)
+                                showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                            else
+                                showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                        }
+                    });
+                }
+            }
+        });
+
+        if ('OTPCredential' in window) {
+            window.addEventListener('DOMContentLoaded', e => {
+                const input = document.querySelector('input[autocomplete="one-time-code"]');
+                const btnLogin = document.querySelector('#btnLogin');
+                if (!input) return;
+                const ac = new AbortController();
+                const form = input.closest('form');
+                if (form) {
+                    //debugger;
+                    form.addEventListener('submit', e => {
+                        ac.abort();
+                    });
+                }
+                navigator.credentials.get({
+                    otp: { transport: ['sms'] },
+                    signal: ac.signal
+                }).then(otp => {
+                    //debugger;
+                    if (otp && otp.code) {
+                        input.value = otp.code;
+                        btnLogin.click();
+                    }
+                    //if (form) form.submit();
+                }).catch(err => {
+                    //debugger;
+                    console.log(err);
+                });
+            });
+        }
+    </script>
+}

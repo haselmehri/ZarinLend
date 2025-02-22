@@ -1,0 +1,251 @@
+﻿@using Core.Entities.Business.Payment
+@{
+    ViewData["Title"] = ViewBag.Title;
+    Layout = "~/Views/Shared/_NewLayout.cshtml";
+}
+@section styles {
+    <style type="text/css">
+        .ipg-img {
+            width: 40px;
+            border-radius: 5px;
+        }
+    </style>
+}
+<div id="requestGridDiv" class="p-2 bg-white rounded-lg">
+    <div class="font-medium-3 secondary darken-4 text-bold-800 d-flex align-items-center">
+        <i class="bx bx-align-right zl-text-secondary mr-25"></i>
+        <span>@ViewBag.Title</span>
+    </div>
+    <div class="p-2 rounded-lg">
+        <table id="samanIpgList" class="display" style="width:100%">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th >مبلغ(ريال)</th>
+                    <th >وضعیت پرداخت</th>
+                    <th >رسید دیجیتالی خرید</th>
+                    <th >شماره رهگیری</th>
+                    <th >شماره مرجع</th>
+                    <th >نوع پرداخت</th>
+                    <th >شماره کارت</th>
+                    <th >تاریخ پرداخت</th>
+                    <th >درگاه پرداختی</th>
+                    @* <th >جزئیات پرداخت</th> *@
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+@section scripts {
+    <script>
+        let responsiveDatatable;
+        $(document).ready(function () {
+            $('div').removeClass('zl-active');
+            $('#paymentList').addClass('zl-active');
+
+            loadPaymentList();
+        });
+
+        //============
+        const loadPaymentList = () => {
+            responsiveDatatable = $('#samanIpgList')
+                .on('preXhr.dt', function (e, settings, data, a, b) {
+                    //trigger before ajax call
+                    //debugger;
+                    //alert('preXhr');
+                    showWaiting('samanIpgList', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                })
+                .on('xhr.dt', function (e, settings, json, xhr) {
+                    //trigger after ajax call
+                    //debugger;
+                    //alert('xhr');
+                })
+                .DataTable({
+                    order: [],
+                    processing: true,
+                    serverSide: true,
+                    responsive: true,
+                    rowReorder: false,
+                    select: true,
+                    searching: false,
+                    paging: true,
+                    ordering: false,
+                    searching: false,
+                    filtering: false,
+                    info: true,
+                    lengthMenu: [
+                        [5, 10, 25, 50],
+                        [5, 10, 25, 50]
+                    ],
+                    pageLength: 10,
+                    columnDefs: [
+                        {
+                            details: false,
+                            breakpoints: [
+                                { name: 'desktop', width: Infinity },
+                                { name: 'tablet-l', width: 1200 },
+                                { name: 'tablet-p', width: 992 },
+                                { name: 'mobile-l', width: 576 },
+                                { name: 'mobile-p', width: 320 }
+                            ]
+                        },
+                        {
+                            targets: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+                            className: 'dt-center',
+                        },
+                        {
+                            targets: 1,
+                            render: function (data, type, row, meta) {
+                                return splitNumber(data);
+                            }
+                        },
+                        {
+                            targets: 2,
+                            render: function (data, type, row, meta) {
+                                let paymentStatus = '<span style="color: gray">نامشخص</span>';
+                                if (data != null) {
+                                    paymentStatus = data ? '<span style="color: limegreen">موفق</span>' : '<span style="color: red">ناموفق</span>';
+                                }
+                                return paymentStatus;
+                            }
+                        },
+                        {
+                            targets: 6,
+                            render: function (data, type, row, meta) {
+                                let paymentType = '';
+                                switch (data) {
+                                    case @((int)PaymentType.PayValidationFeeByGuarantor):
+                                        paymentType = '@PaymentType.PayValidationFeeByGuarantor.ToDisplay()';
+                                        break;
+                                    case @((int)PaymentType.PayValidationFee):
+                                        paymentType = '@PaymentType.PayValidationFee.ToDisplay()';
+                                        break;
+                                    case @((int)PaymentType.PayInstallment):
+                                        paymentType = '@PaymentType.PayInstallment.ToDisplay()';
+                                        break;
+                                    case @((int)PaymentType.PaySalesCommission):
+                                        paymentType = '@PaymentType.PaySalesCommission.ToDisplay()';
+                                        break;
+                                    case @((int)PaymentType.PayForBuyByBuyer):
+                                        paymentType = '@PaymentType.PayForBuyByBuyer.ToDisplay()';
+                                        break;
+                                    default:
+                                        break;
+                                }
+                                return `<span style="">${paymentType}</span>`;
+                            }
+                        },
+                        {
+                            targets: 7,
+                            render: function (data, type, row, meta) {
+                                return `<div style='direction:ltr'>${data}</span>`;
+                            }
+                        },
+                        {
+                            targets: 8,
+                            render: function (data, type, row, meta) {
+                                return (row.shamsiUpdateDate != null && row.shamsiUpdateDate != ''
+                                        ? row.shamsiUpdateDate
+                                        : row.shamsiCreateDate);
+                            }
+                        },
+                        {
+                            targets: 9,
+                            render: function (data, type, row, meta) {
+                                if (data == @((int)IpgType.SamanIPG))
+                                    return `<fieldset>
+                                                 <img src="/images/ipg/saman.jpg" class="ipg-img" id="imgSaman" for="samanIpg" />
+                                                 <label class="font-small-3 success darken-4 text-bold-400 line-height-23" for="samanIpg">درگاه سامان</label>
+                                            </fieldset>`;
+                                else
+                                    return `<fieldset>
+                                                 <img src="/images/ipg/zarinpal.png" class="ipg-img" id="imgZarinpal" for="zarinpalIpg" />
+                                                 <label class="font-small-3 success darken-4 text-bold-400 line-height-23" for="zarinpalIpg">درگاه زرین پال</label>
+                                            </fieldset>`;
+                            }
+                        },
+                    ],
+                    ajax: (data, callback, setting) => {
+                        getSamanIpgData(data).then(function (_data) {
+                            callback(_data);
+                        });
+                    },
+                    drawCallback: function (settings) {
+                        hideWaiting('samanIpgList');
+                    },
+                    initComplete: function (settings, json) {
+                    },
+                    rowCallback: (row, data, displayNum, displayIndex, dataIndex) => {
+                        $('td:eq(0)', row).html(displayIndex + 1);
+                        return row;
+                    },
+                    columns: [
+                        { "data": null },
+                        { "data": "amount" },
+                        { "data": "isSuccess" },
+                        { "data": "refNum" },
+                        { "data": "traceNum" },
+                        { "data": "rrn" },
+                        { "data": "paymentType" },
+                        { "data": "maskedPan" },
+                        { "data": null },
+                        { "data": "ipgType" },
+                        //{ "data": null },
+                    ],
+                    language: {
+                        url: '/new-layout/datatables.net/fa.json'
+                    }
+                });
+
+            const getSamanIpgData = (data) => {
+                const postData = {
+                    Page: Math.floor(data.start / data.length) + 1,
+                    PageSize: data.length,
+                    SortDirection: null,
+                    SortOrder: null,
+                    FilterList: []
+                };
+
+                return new Promise(function (resolve, reject) {
+                    console.log('Loading data');
+
+                    $.ajax({
+                        type: 'post',
+                        datatype: "json",
+                        data: JSON.stringify(postData),
+                        contentType: "application/json; charset=utf-8",
+                        url: '/api/v1/Payment/GetPaymentList',
+                        success: function (result) {
+                            if (result != undefined && result.isSuccess == true) {
+                                resolve({
+                                    data: result.data.data,
+                                    recordsTotal: result.data.totalRowCount,
+                                    recordsFiltered: result.data.totalRowCount
+                                });
+                            }
+                        },
+                        error: function (error) {
+                            debugger;
+                            const exception = getExceptionMessageFromError(error);
+                            if (exception != null)
+                                showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                            else
+                                showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                        },
+                        complete: function () {
+
+                        },
+                    });
+                });
+            }
+
+            $('#samanIpgList').on('page.dt', function () {
+                debugger;
+                var info = responsiveDatatable.page.info();
+                //$('#pageInfo').html('Showing page: ' + info.page + ' of ' + info.pages);
+                console.log('Showing page: ' + info.page + ' of ' + info.pages);
+            });
+        }
+        //============
+    </script>
+}

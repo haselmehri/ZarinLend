@@ -1,0 +1,142 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
+<center>
+    <h1>Audio Clip Recorder</h1>
+    <p><button id="record">Record</button></p>
+    <div id="sound-clip"></div>
+</center>
+<br />
+<button id="get-access">Get access to camera and audio</button>
+<video autoplay></video>
+<audio autoplay></audio>
+<br />
+<canvas></canvas>
+<img id="img" />
+<button id="grabFrame">grabFrame</button>
+<button id="takePhoto">takePhoto</button>
+
+
+@section Scripts {
+    <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+    <script>
+        var canvas = document.querySelector('canvas');
+        // Set up the AudioContext.
+        const audioCtx = new AudioContext();
+
+        // Top-level variable keeps track of whether we are recording or not.
+        let recording = false;
+        let imageCapture;
+        var grabFrameButton = document.querySelector('button#grabFrame');
+        var takePhotoButton = document.querySelector('button#takePhoto');
+        var img = document.querySelector('img#img');
+
+        //navigator.getBattery().then((a,b,c)=>
+        //{
+        //    debugger;
+        //});
+
+        document.querySelector('#get-access').addEventListener('click', async function init(e) {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    audio: true,
+                    video: {
+                        facingMode: {
+                            exact: 'environment'
+                        }
+                    }
+                });
+                debugger;
+                const videoTracks = stream.getVideoTracks();
+                const audioTracks = stream.getAudioTracks();
+                //const microphone = audioCtx.createMediaStreamSource(stream);
+                imageCapture = new ImageCapture(videoTracks[0]);
+                const videoDevice = videoTracks[0];
+                const AudioDevice = audioTracks[0];
+                alert(`Getting video from: ${videoDevice.label} , Getting audio from: ${AudioDevice.label}`);
+
+                document.querySelector('video').srcObject = stream;
+                document.querySelector('audio').srcObject = stream;
+                document.querySelector('#get-access').setAttribute('hidden', true);
+
+                //====for audio====
+                // Instantiate the media recorder.
+                const mediaRecorder = new MediaRecorder(stream);
+
+                // Create a buffer to store the incoming data.
+                let chunks = [];
+                mediaRecorder.ondataavailable = (event) => {
+                    chunks.push(event.data);
+                }
+
+                // When you stop the recorder, create a empty audio clip.
+                mediaRecorder.onstop = (event) => {
+                    const audio = new Audio();
+                    audio.setAttribute("controls", "");
+                    $("#sound-clip").append(audio);
+                    $("#sound-clip").append("<br />");
+
+                    // Combine the audio chunks into a blob, then point the empty audio clip to that blob.
+                    const blob = new Blob(chunks, { "type": "audio/ogg; codecs=opus" });
+                    audio.src = window.URL.createObjectURL(blob);
+
+                    // Clear the `chunks` buffer so that you can record again.
+                    chunks = [];
+                };
+
+                // Set up event handler for the "Record" button.
+                $("#record").on("click", () => {
+                    if (recording) {
+                        mediaRecorder.stop();
+                        recording = false;
+                        $("#record").html("Record");
+                    } else {
+                        mediaRecorder.start();
+                        recording = true;
+                        $("#record").html("Stop");
+                    }
+                });
+                //====for audio====
+            }
+            catch (error) {
+                alert(`${error.name}`);
+                console.error(error);
+            }
+        });
+
+        grabFrameButton.onclick = grabFrame;
+        function grabFrame() {
+            debugger;
+            imageCapture.grabFrame()
+                .then(function (imageBitmap) {
+                    console.log('Grabbed frame:', imageBitmap);
+                    canvas.width = imageBitmap.width;
+                    canvas.height = imageBitmap.height;
+                    canvas.getContext('2d').drawImage(imageBitmap, 0, 0);
+                    canvas.classList.remove('hidden');
+                })
+                .catch(function (error) {
+                    console.log('grabFrame() error: ', error);
+                });
+        }
+
+        takePhotoButton.onclick = takePhoto;
+        // Get a Blob from the currently selected camera source and
+        // display this with an img element.
+        function takePhoto() {
+            debugger;
+            imageCapture.takePhoto().then(function (blob) {
+                console.log('Took photo:', blob);
+                img.classList.remove('hidden');
+                img.src = URL.createObjectURL(blob);
+            }).catch(function (error) {
+                console.log('takePhoto() error: ', error);
+            });
+        }
+    </script>
+}

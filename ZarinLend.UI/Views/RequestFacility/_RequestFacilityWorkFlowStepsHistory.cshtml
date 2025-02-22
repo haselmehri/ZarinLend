@@ -1,0 +1,255 @@
+﻿@model int
+<style type="text/css">
+</style>
+<div class="modal fade text-left" id="requestFacilityStepsHistoryModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel19" style="display: none;" data-backdrop="static" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl modal-dialog-full-screen" role="document">
+        <div class="modal-content rounded-lg modal-xl modal-content-full-screen">
+            <div class="modal-header">
+                <h4 class="modal-title dark" id="myModalLabel19">
+                    مراحل درخواست مرتب شده بصورت نزولی
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="بستن">
+                    <i class="bx bx-x"></i>
+                </button>
+            </div>
+            <div class="modal-body px-1" id="requestFacilityStepsHistoryModalContent">
+                <div class="" id="requestFacilityStepsHistoryContainer">
+                    <div class="table-responsive table-sm">
+                        <table class="display requestFacilityStepsHistory" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th >عنوان مرحله</th>
+                                    <th >وضعیت</th>
+                                    <th >اقدام کننده</th>
+                                    <th >تاریخ اقدام</th>
+                                    <th >توضیحات</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="text-right">
+                    <a href="#" class="btn btn-outline-secondary" data-dismiss="modal">
+                        <span>بستن</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    let requestFacilityStepsHistoryDatatable;
+    let RFID = 0;
+    $(document).ready(function () {
+        //$.fn.dataTable.Responsive.breakpoints.push({
+        //    name: 'desktop-large',
+        //    width: 1500
+        //});
+        if ('@Model'> 0) {
+            RFID ='@Model';
+        }
+        loadRequestFacilityStepsHistory();
+    });
+
+     const loadRequestFacilityStepsHistory = () => {
+            requestFacilityStepsHistoryDatatable = $('.requestFacilityStepsHistory')
+                //.on('xhr.dt', function(e, settings, json, xhr) {
+                //    debugger;
+                //    //json.recordsTotal = 300;
+                //})
+                .DataTable({
+                    order: [],
+                    processing: true,
+                    serverSide: true,
+                    responsive: true,
+                    rowReorder: false,
+                    select: true,
+                    searching: false,
+                    paging: false,
+                    ordering: false,
+                    searching: false,
+                    filtering: false,
+                    info: true,
+                    //lengthMenu: [
+                    //    [10, 25, 50, -1],
+                    //    [10, 25, 50, 'همه']
+                    //],
+                    pageLength: -1,
+                    //columnDefs: [{
+                    //    targets: 0,
+                    //    Id: function (td, cellData, rowData, row, col) {
+                    //        debugger;
+                    //        if (rowData[5] === 'Inactive') {
+                    //            $(td).css('color', 'red');
+                    //        }
+                    //    }
+                    //}],
+                    columnDefs: [
+                        //{ "visible": false, "targets": 0 },
+                        //and in this case the < a href="//legacy.datatables.net/ref#bStateSave" > bStateSave</a> works regularly ....but then I would like to have responsive columns indicating responsive: {
+                        {
+                            //details: false,
+                            breakpoints: [
+                                { name: 'desktop', width: Infinity },
+                                { name: 'desktop-large', width: 1500 },
+                                { name: 'tablet-l', width: 1024 },
+                                { name: 'tablet-p', width: 768 },
+                                { name: 'mobile-l', width: 480 },
+                                { name: 'mobile-p', width: 320 }
+                            ]
+                        },
+                        {
+                            targets: [0, 1, 2, 3, 4, 5],
+                            className: 'dt-center',
+                        },
+                        {
+                            targets: 2,
+                            render: function (data, type, row, meta) {
+                                return (row.statusName != undefined ? row.statusName : '');
+                            }
+                        },
+                        {
+                            targets: 3,
+                            render: function (data, type, row, meta) {
+                                return (row.statusName != undefined ? row.operator : '');
+                            }
+                        },
+                        {
+                            targets: 5,
+                            className: 'desktop',
+                            render: function (data, type, row, meta) {
+                                return (row.statusDescription != undefined ? row.statusDescription : '');
+                            }
+                        }],
+                    rowCallback: function (row, data) {
+                        $('td:eq(0)', row).css('text-align', 'center');
+                        $('td:eq(1)', row).css('text-align', 'center');
+                        $('td:eq(2)', row).css('text-align', 'center');
+                        $('td:eq(3)', row).css('text-align', 'center');
+                        $('td:eq(4)', row).css('text-align', 'center');
+                        $('td:eq(5)', row).css('text-align', 'center');
+                        //$('td', row).eq(1).css('color', 'red');
+                    },
+                    //ajax: {
+                    //    url: `/api/v1/RequestFacilityInstallment/SelectInstallment2/${$('#drpApprovalFacility').val()}`,
+                    //    type: 'POST',
+                    //    dataSrc: function(data) {
+                    //        data.recordsTotal = data.data.length;
+                    //        data.recordsFiltered = data.data.length;
+                    //        return data.data;
+                    //    },
+                    //    datatype: "json",
+                    //    //contentType: "application/json",
+                    //    contentType: "application/json; charset=utf-8",
+                    //    data: function(input) {
+                    //        debugger;
+                    //        //if ($('#FacilityTypeId').val() != '')
+                    //        //    input.FacilityTypeId = $('#FacilityTypeId').val();
+
+                    //        return JSON.stringify(input);
+                    //    },
+                    //},
+                    ajax: (data, callback, setting) => {
+                        getRequestFacilityStepsHistory(data).then(function (_data) {
+                            callback(_data);
+                        });
+                    },
+                    drawCallback: function (settings) {
+                    },
+                    initComplete: function (settings, json) {
+                    },
+                    rowCallback: (row, data, displayNum, displayIndex, dataIndex) => {
+                        $('td:eq(0)', row).html(displayIndex + 1);
+                        return row;
+                    },
+                    columns: [
+                        //{
+                        //    "data": "Id",
+                        //    render: function (data, type, row, meta) {
+                        //        return meta.settings.oAjaxData.start + meta.row + 1;
+                        //    }
+                        //},
+                        //{
+                        //    "data": "PersonFirstName",
+                        //    render: function (data, type) {
+                        //        //debugger;
+                        //        //if (type === 'display') {
+                        //        //    let link = 'http://datatables.net';
+
+                        //        //    if (data[0] < 'H') {
+                        //        //        link = 'http://cloudtables.com';
+                        //        //    } else if (data[0] < 'S') {
+                        //        //        link = 'http://editor.datatables.net';
+                        //        //    }
+
+                        //        //    return '<a href="' + link + '">' + data + '</a>';
+                        //        //}
+
+                        //        return data;
+                        //    },
+                        //},
+                        { "data": null },
+                        { "data": "workFlowStepName" },
+                        { "data": "statusName" },
+                        { "data": "operator" },
+                        { "data": "shamsiUpdateDate" },
+                        { "data": "statusDescription", className: 'desktop' }
+                    ],
+                    language: {
+                        url: '/new-layout/datatables.net/fa.json'
+                    }
+                });
+
+            const getRequestFacilityStepsHistory = (data) => {
+                return new Promise(function (resolve, reject) {
+                    if (RFID == 0) {
+                        resolve({
+                            data: [],
+                            recordsTotal: 0,
+                            recordsFiltered: 0
+                        });
+                    }
+
+                    console.log('Loading data');
+                    if (RFID != 0) {
+                        $.ajax({
+                            type: 'post',
+                            datatype: "json",
+                            data: JSON.stringify(data),
+                            contentType: "application/json; charset=utf-8",
+                            url: `/api/v1/RequestFacility/GetRequestFacilityStepsHistory/${RFID}`,
+                            success: function (result) {
+                                if (result != undefined && result.isSuccess == true) {
+                                    resolve({
+                                        data: result.data,
+                                        recordsTotal: result.data.length,
+                                        recordsFiltered: result.data.length
+                                    });
+                                }
+                            },
+                            error: function (error) {
+                                debugger;
+                                const exception = getExceptionMessageFromError(error);
+                                if (exception != null)
+                                    showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                                else
+                                    showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                            },
+                            complete: function () {
+
+                            },
+                        });
+                    }
+                });
+            }
+        }
+
+    function loadRequestFacilitySteps(id){
+        RFID = id;
+        requestFacilityStepsHistoryDatatable.page(0);
+        requestFacilityStepsHistoryDatatable.ajax.reload(null, false);
+    }
+</script>

@@ -1,0 +1,257 @@
+﻿@{
+    ViewData["Title"] = "لیست درخواست ها";
+}
+@section styles{
+    <style type="text/css">
+
+    </style>
+}
+<div class="card">
+    <div class="card-header" localize-content>لیست درخواست تسهیلات</div>
+    <div class="card-body" id="requestGridDiv">
+        <div class="paging-div"></div>
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover table-custom">
+                <thead>
+                    <tr class="table-secondary">
+                        <th scope="col">#</th>
+                        <th scope="col" data-sortorder="date" localize-content>اعتبار درخواستی(ريال)</th>
+                        <th scope="col" data-sortorder="Tedad" localize-content>بازه پرداخت</th>
+                        <th scope="col" data-sortorder="Tedad" localize-content>درخواست کننده</th>
+                        <th scope="col" data-sortorder="Tedad" localize-content>کد ملی/شناسه ملی</th>
+                        <th scope="col" data-sortorder="Tedad" localize-content>ضامن نیاز دارد<br />نام ضامن<br />وضعیت</th>
+                        <th scope="col" data-sortorder="Tedad" localize-content>نام نهاد مالی</th>
+                        <th scope="col" data-sortorder="Tedad" localize-content>تاریخ درخواست</th>
+                        <th scope="col" data-sortorder="Tedad" localize-content>تاریخ آخرین اقدام</th>
+                        <th scope="col" data-sortorder="Tedad" localize-content>وضعیت</th>
+                        <th scope="col" data-sortorder="Tedad" localize-content>اقدام</th>
+                    </tr>
+                </thead>
+                <tbody id="requestGridRows">
+                    <tr>
+                        <td colspan="10" localize-content>
+                            NoRows
+                        </td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    @*<tr class="table-primary" style="font-weight:bold">
+                            <td scope="row"></td>
+                            <td></td>
+                            <td></td>
+                            <td>جمع کل</td>
+                            <td id="Mablagh_Sum"></td>
+                            <td id="DaftariEghtesadi_Sum"></td>
+                        </tr>*@
+                </tfoot>
+            </table>
+        </div>
+        <div class="paging-div"></div>
+    </div>
+    <div class="card-footer"></div>
+</div>
+<input type="hidden" id="hdnSortOrder" value="CreateDate" />
+<input type="hidden" id="hdnSortDirection" value="DESC" />
+@section scripts{
+    <script>
+        const PAGE_SIZE = 10;
+
+        $(document).ready(function () {
+            loadBuyerRequest();
+        });
+
+        $('#requestGridDiv').on('click', 'thead th', function () {
+            renderSortColumn(this, 'hdnSortOrder', 'hdnSortDirection', () => { loadBuyerRequest(); })
+        });
+
+       const loadBuyerRequest = (sender) => {
+            showWaiting('requestGridDiv', '@_loc["PleaseWait"]', '@_loc["Loading"]');;
+
+            const sortDirectionValue = $('#hdnSortDirection').val();
+            const sortOrderValue = $('#hdnSortOrder').val();
+            let currentPage = 1;
+            if (typeof $(sender).attr('current-page') !== typeof undefined && $(sender).attr('current-page') !== false)
+                currentPage = $(sender).attr('current-page');
+
+            const postData = {
+                Page: currentPage,
+                PageSize: PAGE_SIZE,
+                SortDirection: sortDirectionValue,
+                SortOrder: sortOrderValue
+            };
+
+            $.ajax({
+                type: 'post',
+                data: JSON.stringify(postData),
+                datatype: "json",
+                contentType: "application/json; charset=utf-8",
+                url: '/api/v1/RequestFacility/SearchRequest',
+                success: function (result) {
+                    hideWaiting('requestGridDiv');
+                    debugger;
+                    if (result !== undefined && result !== null && result.isSuccess === true) {
+                        renderRequestGrid(result.data.data, result.data.currentPage, PAGE_SIZE);
+                        renderNavigation('requestGridDiv', result.data.totalRowCount, result.data.currentPage, result.data.totalPages);
+                        resetGridStyle('requestGridDiv', 'hdnSortOrder', 'hdnSortDirection');
+                    }
+                },
+                error: function (error) {
+                    debugger;
+                    hideWaiting('requestGridDiv');
+                    const exception = getExceptionMessageFromError(error);
+                    if (exception != null)
+                        showMessage('@_loc["ErrorTitle"]', exception, icons.error, '@_loc["Close"]');
+                    else
+                        showMessage('@_loc["ErrorTitle"]', '@_loc["UnhandledError"]', icons.error, '@_loc["Close"]');
+                },
+                complete: function () {
+
+                },
+            });
+        }
+
+        const renderRequestGrid = (data, currentPage, pageSize) => {
+            let rows = '<tr><td colspan="10">@_loc["NoRows"]</td></tr>';
+            if (data.length > 0) {
+                rows = '';
+                for (var i = 0; i < data.length; i++) {
+                    rows += '<tr class="' + (i % 2 == 0 ? 'table-info' : 'table-light') + '">';
+                    rows += "<td style=''>" + (((currentPage - 1) * pageSize) + i + 1) + "</td>";
+                    rows += "<td style='direction:ltr'>" + splitNumber(data[i].amount) + "</td>";
+                    rows += "<td>" + data[i].monthCountTitle + "</td>";
+                    rows += "<td>" + data[i].requester + "</td>";
+                    rows += "<td>" + data[i].nationalCode + "</td>";
+                    let guarantorDesc = 'خیر';
+                    if (data[i].guarantorIsRequired)
+                    {
+                        guarantorDesc='بله';
+                        if (data[i].lastGuarantorFullName != null)
+                            guarantorDesc += `<br/>${data[i].lastGuarantorFullName}`;
+                    }
+                    rows += "<td style='text-wrap: nowrap;'>" + guarantorDesc + "</td>";
+                    rows += "<td>" + data[i].leasingName + "</td>";
+                    rows += "<td style='direction:ltr'>" + data[i].shamsiCreateDate + "</td>";
+                    rows += "<td style='direction:ltr'>" + data[i].shamsiLastActionDate + "</td>";
+
+                    let buttonsHtml = `<a href='@Url.Action("Detail","RequestFacility")/${data[i].id}' target='_blank' class='btn btn-outline-info change-status'>جزئیات</a>`;
+                    if (data[i].cancelByUser) {
+                        const cancelByUserDescription = "<span style='color:red'>انصراف توسط کاربر</span>";
+                           if ('@((short)StatusEnum.Approved)' == data[i].statusId)
+                            rows += `<td style='color:green;'>${data[i].lastStatusDescription}(${cancelByUserDescription})</td>`;
+                        else if ('@((short)StatusEnum.Rejected)' == data[i].statusId)
+                            rows += `<td style='color:red'>${data[i].lastStatusDescription}(${cancelByUserDescription})</td>`;
+                        else
+                            rows += `<td style='color:darkorange'>${data[i].lastStatusDescription}(${cancelByUserDescription})</td>`;                       
+                    }
+                    else {
+                        if (data[i].formUrl != null)
+                            buttonsHtml += `&nbsp;<a href='${data[i].formUrl}'  class='btn btn-outline-primary change-status'>اقدام</a>`;
+                        if ('@((short)StatusEnum.Approved)' == data[i].statusId)
+                            rows += "<td style='color:green;'>" + data[i].lastStatusDescription + "</td>";
+                        else if ('@((short)StatusEnum.Rejected)' == data[i].statusId)
+                            rows += "<td style='color:red'>" + data[i].lastStatusDescription + "</td>";
+                        else
+                            rows += "<td style='color:darkorange'>" + data[i].lastStatusDescription + "</td>";
+                    }         
+                   
+                    rows += `<td style=''>${buttonsHtml}</td>`;
+                    rows += '</tr>';
+                }
+            }
+            $('#requestGridRows').html(rows);
+
+            $('.cancel-request').off('click');
+            $('.cancel-request').click((e) => {
+                alert($(e.target).data('id'));
+                showModal($(e.target).data('id'));
+            });
+        }
+
+       const resetGridStyle = (parentGridElementId, hdnSortOrderElementId, hdnSortDirectionElementId) => {
+            const sortDirectionValue = $(`#${hdnSortDirectionElementId}`).val();
+            const sortOrderValue = $(`#${hdnSortOrderElementId}`).val();
+
+            $(`#${parentGridElementId} thead th`).removeClass("sorted-column");
+            $(`#${parentGridElementId} thead th`).addClass("not-sorted-column");
+
+            if (sortOrderValue != undefined || sortOrderValue != '') {
+                let sortCell = $(`#${parentGridElementId} *[data-sortorder='${sortOrderValue}']`);
+                $(sortCell).removeClass('not-sorted-column');
+                $(sortCell).addClass('sorted-column');
+
+                if (sortDirectionValue == undefined || sortDirectionValue == '' || sortDirectionValue.toUpperCase() == "DESC") {
+                    $(`#${parentGridElementId}  thead th span`).remove();
+                    //$(sortCell).append("<span class='fa fa-chevron-down' style='color:red;position:absolute;margin-right:3px'></span>");
+                    $(sortCell).append("<span class='fa fa-chevron-down' style='color:red;margin-right:3px'></span>");
+                } else {
+                    $(`#${parentGridElementId}  thead th span`).remove();
+                    //$(sortCell).append("<span class='fa fa-chevron-up' style='color:green;position:absolute;margin-right:3px'></span>");
+                    $(sortCell).append("<span class='fa fa-chevron-up' style='color:green;margin-right:3px'></span>");
+                }
+            }
+        }
+
+       const renderNavigation = (rootElementId, totalRowCount, currentPage, totalPages) => {
+            let pagingHtml = '';
+            if (totalRowCount > PAGE_SIZE) {
+                if (currentPage != 1) {
+                    pagingHtml += '<li class="page-item"><button class="page-link page-link-active" current-page="1">@_loc["First"]</button></li>';
+                    pagingHtml += '<li class="page-item"><button class="page-link page-link-active" current-page="' + (currentPage - 1) + '">@_loc["Prev"]</button></li>';
+                } else {
+                    pagingHtml += '<li class="page-item disabled"><button class="page-link">@_loc["First"]</button></li>';
+                    pagingHtml += '<li class="page-item disabled"><button class="page-link">@_loc["Prev"]</button></li>';
+                }
+
+                let firstPageToDisplay = currentPage - (PAGE_SIZE / 2);
+
+                if (firstPageToDisplay < 1) {
+                    firstPageToDisplay = 1;
+                }
+
+                for (var pageNumber = firstPageToDisplay; pageNumber < (firstPageToDisplay + PAGE_SIZE); pageNumber++) {
+                    if (pageNumber <= totalPages) {
+                        if (currentPage == pageNumber) {
+                            pagingHtml += '<li class="page-item active">' +
+                                '<button class="page-link page-link-active" current-page="' +
+                                pageNumber +
+                                '">' +
+                                pageNumber +
+                                '<span class="sr-only">(current)</span>' +
+                                '</button>' +
+                                '</li>';
+                        } else {
+                            pagingHtml += '<li class="page-item"><button class="page-link page-link-active" current-page="' + pageNumber + '">' + pageNumber + '</button></li>';
+                        }
+                    } else {
+                        break;
+                    }
+                }
+
+                if (currentPage != totalPages) {
+                    pagingHtml += '<li class="page-item"><button class="page-link page-link-active" current-page="' + (currentPage + 1) + '">@_loc["Next"]</button></li>';
+                    pagingHtml += '<li class="page-item"><button class="page-link page-link-active" current-page="' + totalPages + '">@_loc["Last"]</button></li>';
+                } else {
+                    pagingHtml += '<li class="page-item disabled"><button class="page-link">@_loc["Next"]</button></li>';
+                    pagingHtml += '<li class="page-item disabled"><button class="page-link">@_loc["Last"]</button></li>';
+                }
+            }
+            pagingHtml = '<nav aria-label="Page navigation example" style="text-align:center"><ul class="pagination">' +
+                pagingHtml +
+                '</ul><b style="color:#1e88e5">@_loc["TotalRowCount"] : ' +
+                totalRowCount +
+                '</b></nav>';
+
+            $(`#${rootElementId} .paging-div`).html(pagingHtml);
+            $(`#${rootElementId} .paging-div .page-link-active`).off('click');
+            $(`#${rootElementId} .paging-div .page-link-active`).on('click',
+                function (e) {
+                    e.preventDefault();
+                    switch (rootElementId.toLowerCase()) {
+                        case 'requestgriddiv':
+                            loadBuyerRequest(this);
+                            break;
+                    }
+                });
+        }
+    </script>
+}

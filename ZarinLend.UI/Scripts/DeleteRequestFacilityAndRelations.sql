@@ -1,0 +1,14 @@
+declare @RequestFacilityId as int = 5128
+delete from RequestFacilityGuarantorWarranties where RequestFacilityGuarantorId in (Select Id from RequestFacilityGuarantors where RequestFacilityId=@RequestFacilityId)
+delete from RequestFacilityGuarantorWorkFlowSteps where RequestFacilityGuarantorId in (Select Id from RequestFacilityGuarantors where RequestFacilityId=@RequestFacilityId)
+delete from RequestFacilityGuarantors where RequestFacilityId=@RequestFacilityId
+delete from RequestFacilityGuarantors where RequestFacilityId=@RequestFacilityId
+delete from RequestFacilityCardIssuances where RequestFacilityId=@RequestFacilityId
+delete from ApplicantValidationResults where RequestFacilityId=@RequestFacilityId
+delete from Transactions where RequestFacilityId=@RequestFacilityId
+delete from WalletTransactions where RequestFacilityId=@RequestFacilityId
+delete from RequestFacilityWarranties where RequestFacilityId=@RequestFacilityId
+delete from RequestFacilityWorkFlowSteps where RequestFacilityId=@RequestFacilityId
+delete from RequestFacilityInstallments where RequestFacilityId=@RequestFacilityId
+delete from PaymentReasons where RequestFacilityId= @RequestFacilityId
+delete from RequestFacilities where id = @RequestFacilityId

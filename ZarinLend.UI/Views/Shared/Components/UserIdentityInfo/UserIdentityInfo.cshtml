@@ -1,0 +1,451 @@
+﻿@model UserIdentityInfoModel
+
+<style type="text/css">
+    .zp-id {
+        height: 30px;
+        background-color: #ffe94e;
+        width: 100px;
+        text-align: center;
+        position: relative;
+        border-radius: 10px;
+        padding: 6px;
+    }
+</style>
+@if (Model != null)
+{
+    <div id="user-identity-info" class="p-2 bg-white rounded-lg">
+        <div class="text-bold-900 secondary darken-4 font-medium-3">
+            اطلاعات هویتی
+        </div>
+        <div class="border rounded mt-2">
+            @if (Model.ZP_Id.HasValue)
+            {
+                <div class="d-flex flex-column flex-sm-row">
+                    <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                        <span class="font-small-2 text-bold-500">@Html.DisplayNameFor(p => p.ZP_Id)</span>
+                        <span class="dark mt-50 text-bold-400 zp-id">@Model.ZP_Id</span>
+                    </div>
+                </div>
+                <hr class="m-0 p-0" />
+            }
+            <div class="d-flex flex-column flex-sm-row">
+                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                    <span class="font-small-2 text-bold-500">@Html.DisplayNameFor(p => p.FName)</span>
+                    <span id="fname" class="dark mt-50 text-bold-400">@Model.FName</span>
+                </div>
+                <div class="border-left border-top"></div>
+                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                    <span class="font-small-2 text-bold-500">@Html.DisplayNameFor(p => p.LName)</span>
+                    <span id="lname" class="dark mt-50 text-bold-400">@Model.LName</span>
+                </div>
+                <div class="border-left border-top"></div>
+                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                    <span class="font-small-2 text-bold-500">@Html.DisplayNameFor(p => p.FatherName)</span>
+                    <span id="father-name" class="dark mt-50 text-bold-400">@Model.FatherName</span>
+                </div>
+                <div class="border-left border-top"></div>
+                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                    <span class="font-small-2 text-bold-500">@Html.DisplayNameFor(p => p.PlaceOfBirth)</span>
+                    <span id="place-of-birth" class="dark mt-50 text-bold-400">@Model.PlaceOfBirth</span>
+                </div>
+            </div>
+            <hr class="m-0 p-0" />
+            <div class="d-flex flex-column flex-sm-row">
+                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                    <span class="font-small-2 text-bold-500">@Html.DisplayNameFor(p => p.NationalCode)</span>
+                    <span class="dark mt-50 text-bold-400">@Model.NationalCode</span>
+                </div>
+                <div class="border-left border-top"></div>
+                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                    <span class="font-small-2 text-bold-500">@Html.DisplayNameFor(p => p.SSID)</span>
+                    <span id="ssid" class="dark mt-50 text-bold-400">@Model.SSID</span>
+                </div>
+                <div class="border-left border-top"></div>
+                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                    <span class="font-small-2 text-bold-500">@Html.DisplayNameFor(p => p.ShamsiBirthDate)</span>
+                    <span class="dark mt-50 text-bold-400">@Model.ShamsiBirthDate</span>
+                    @* <span class="font-small-2 text-bold-500">@Html.DisplayNameFor(p => p.BirthCertificateSerial)</span>
+                    <span class="dark mt-50 text-bold-400">@Model.BirthCertificateSerial</span> *@
+                </div>
+                <div class="border-left border-top"></div>
+                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                    <span style="display: flex; justify-content: space-between; align-items: center;">
+                        @if (User.IsInRole(RoleEnum.SuperAdmin.ToString()) || User.IsInRole(RoleEnum.Admin.ToString()) || User.IsInRole(RoleEnum.ZarinLendExpert.ToString()))
+                        {
+                            <button id="btnUserIdentityInfoInquiry" class="btn btn-outline-secondary btn-sm">
+                                <span class="font-small-3 zl-text-secondary">استعلام ثبت احوال</span>
+                            </button>
+                        }
+                    </span>
+                </div>
+            </div>
+            @if (User.IsInRole(RoleEnum.SuperAdmin.ToString()) || User.IsInRole(RoleEnum.Admin.ToString()) || User.IsInRole(RoleEnum.ZarinLendExpert.ToString()) || User.IsInRole(RoleEnum.BankLeasing.ToString()) || User.IsInRole(RoleEnum.SupervisorLeasing.ToString()) || User.IsInRole(RoleEnum.AdminBankLeasing.ToString()))
+            {
+                <hr class="m-0 p-0" />
+                <div class="d-flex flex-column flex-sm-row">
+                    <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                        <span class="font-small-2 text-bold-500">وضعیت ثنا</span>
+                        <span id="sanaInquiryStatus" class="dark mt-50 text-bold-400 row" style="display:none">
+                            @if (!string.IsNullOrEmpty(Model.PersonSanaTrackingId))
+                            {
+                                <div class="col-12">دارد</div>
+                            }
+                        </span>
+                    </div>
+                    <div class="border-left border-top"></div>
+                    <div class="d-flex flex-column justify-content-start py-2 px-1 w-100">
+                        <span class="font-small-2 text-bold-500">کد پاسخ ثنا</span>
+                        <span id="sanaInquiryTrackId" class="dark mt-50 text-bold-400 row" style="display:none">
+                            @if (!string.IsNullOrEmpty(Model.PersonSanaTrackingId))
+                            {
+                                <div class="col-12">@Model.PersonSanaTrackingId</div>
+                            }
+                        </span>
+                    </div>
+                    <div class="border-left border-top"></div>
+                    <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                        <span style="display: flex; justify-content: space-between; align-items: center;">
+                            <button id="btnSanaInquiry" class="btn btn-outline-secondary btn-sm">
+                                <span class="font-small-3 zl-text-secondary">استعلام ثنا</span>
+                            </button>
+                        </span>
+                    </div>
+
+                </div>
+            }
+@*             <hr class="m-0 p-0" />
+            <div class="d-flex flex-column flex-sm-row">
+                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                    <span class="font-small-2 text-bold-500">@Html.DisplayNameFor(p => p.ShamsiBirthDate)</span>
+                    <span class="dark mt-50 text-bold-400">@Model.ShamsiBirthDate</span>
+                </div>
+                <div class="border-left border-top"></div>
+                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                    <span class="font-small-2 text-bold-500">استان-شهر محل تولد</span>
+                    <span class="dark mt-50 text-bold-400">@Model.BirthPlaceProvince-@Model.BirthPlaceCity</span>
+                </div>
+                <div class="border-left border-top"></div>
+                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                    <span class="font-small-2 text-bold-500">استان-شهر محل صدور</span>
+                    <span class="dark mt-50 text-bold-400">@Model.ProvinceOfIssue-@Model.CityOfIssue</span>
+                </div>
+            </div> *@
+        </div>
+    </div>
+    <div class="p-2 mt-2 bg-white rounded-lg">
+        <div class="text-bold-900 secondary darken-4 font-medium-3">
+            اطلاعات تماس و محل اقامت
+        </div>
+        <div class="border rounded mt-2">
+            <div class="d-flex flex-column flex-sm-row">
+                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                    <span class="font-small-2 text-bold-500">@Html.DisplayNameFor(p => p.Mobile)</span>
+                    <span class="dark mt-50 text-bold-400">@Model.Mobile</span>
+                </div>
+                <div class="border-left border-top"></div>
+                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                    <span class="font-small-2 text-bold-500">@Html.DisplayNameFor(p => p.PhoneNumber)</span>
+                    <span class="dark mt-50 text-bold-400">@Model.PhoneNumber</span>
+                </div>
+            </div>
+            <hr class="m-0 p-0" />
+            <div class="d-flex flex-column flex-sm-row">
+                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                    <span class="font-small-2 text-bold-500">@Html.DisplayNameFor(p => p.AddressProvinceName)</span>
+                    <span class="dark mt-50 text-bold-400">@Model.AddressProvinceName</span>
+                </div>
+                <div class="border-left border-top"></div>
+                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                    <span class="font-small-2 text-bold-500">@Html.DisplayNameFor(p => p.AddressCityName)</span>
+                    <span class="dark mt-50 text-bold-400">@Model.AddressCityName</span>
+                </div>
+            </div>
+            <hr class="m-0 p-0" />
+            <div class="d-flex flex-column flex-sm-row">
+                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                    <span class="font-small-2 text-bold-500">@Html.DisplayNameFor(p => p.PostalCode)</span>
+                    <span class="dark mt-50 text-bold-400">@Model.PostalCode</span>
+                </div>
+                <div class="border-left border-top"></div>
+                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                    <span class="font-small-2 text-bold-500">@Html.DisplayNameFor(p => p.Email)</span>
+                    <span class="dark mt-50 text-bold-400">@Model.Email</span>
+                </div>
+            </div>
+            @if (User.IsInRole(RoleEnum.SuperAdmin.ToString()) || User.IsInRole(RoleEnum.Admin.ToString()) || User.IsInRole(RoleEnum.ZarinLendExpert.ToString()) || User.IsInRole(RoleEnum.BankLeasing.ToString()) || User.IsInRole(RoleEnum.SupervisorLeasing.ToString()) || User.IsInRole(RoleEnum.AdminBankLeasing.ToString()))
+            {
+                <hr class="m-0 p-0" />
+                <div class="d-flex flex-column flex-sm-row">
+                    <div class="d-flex flex-column justify-content-start py-2 px-1 w-100">
+                    <span style="display: flex; justify-content: space-between; align-items: center;">
+                        <div class="font-small-2 text-bold-500">@Html.DisplayNameFor(p => p.Address)</div>
+                      
+                            <a id="btnAddressInquiry" href="#" data-toggle="modal" data-target="#editUserLocationModal" class="btn btn-outline-secondary btn-sm">
+                                <span class="font-small-3 zl-text-secondary">استعلام کد پستی</span>
+                            </a>
+                    
+                    </span>
+                    <span class="dark mt-50 text-bold-400">@Model.Address</span>
+                </div>
+            </div>
+            }
+        </div>
+    </div>
+    @if (ViewBag.ShowAccountInfo == null || ViewBag.ShowAccountInfo)
+    {
+        <div class="mt-2 p-2 bg-white rounded-lg">
+            <div class="text-bold-900 secondary darken-4 font-medium-3">
+                اطلاعات حساب
+            </div>
+            <div class="border rounded mt-2">
+                <div class="d-flex flex-column flex-sm-row">
+                    <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                        <span class="font-small-2 text-bold-500"> @Html.DisplayNameFor(p => p.CustomerNumber)</span>
+                        <span class="dark mt-50 text-bold-400">@Model.CustomerNumber</span>
+                    </div>
+                    <div class="border-left border-top"></div>
+                    <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                        <span class="font-small-2 text-bold-500">@Html.DisplayNameFor(p => p.AccountNumber)</span>
+                        <span class="dark mt-50 text-bold-400">@Model.AccountNumber</span>
+                    </div>
+                </div>
+                <hr class="m-0 p-0" />
+                <div class="d-flex flex-column flex-sm-row">
+                    <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                        <span class="font-small-2 text-bold-500">@Html.DisplayNameFor(p => p.IBAN)</span>
+                        <span class="dark mt-50 text-bold-400">@Model.IBAN</span>
+                    </div>
+                    <div class="border-left border-top"></div>
+                    <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                        <span class="font-small-2 text-bold-500">@Html.DisplayNameFor(p => p.DepositOwners)</span>
+                        <span class="dark mt-50 text-bold-400">@Model.DepositOwners</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @if (!string.IsNullOrEmpty(Model.HashCardNumber))
+        {
+            @await Component.InvokeAsync("ZarinpalTransactionsInfo", new { hashCardNumber = Model.HashCardNumber })
+        }
+    }
+}
+
+<div class="modal fade" id="editUserLocationModal" tabindex="-1" role="dialog" data-backdrop="static" aria-labelledby="editUserLocationModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg"
+         role="document">
+        <div class="modal-content rounded-lg">
+            <div class="modal-header">
+                <h5 class="modal-title secondary darken-4" id="editUserLocationModalTitle">
+                    بررسی تطابق آدرس ثبت شده و آدرس استعلامی
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="بستن">
+                    <i class="bx bx-x"></i>
+                </button>
+            </div>
+            <div class="modal-body" id='userLocationBody'>
+                <fieldset>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <textarea asp-for="Address" class="form-control bg-transparent" placeholder="آدرس ثبت شده در سیستم" style=" direction:rtl" readonly></textarea>
+                                <span asp-validation-for="Address" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <textarea asp-for="ValidatedAddress" class="form-control bg-transparent" placeholder="آدرس استعلامی" style=" direction:rtl" readonly></textarea>
+                                <span asp-validation-for="ValidatedAddress" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="btnValidateUserLocation" class="btn btn-zl-primary">
+                    <span>تایید آدرس</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script on-content-loaded="true">
+    $(document).ready(() => {
+        $('#sanaInquiryStatus').removeAttr('style');
+        $('#sanaInquiryTrackId').removeAttr('style');
+    });
+
+    $('#btnAddressInquiry').click(function (e) {
+        showWaiting('userLocationBody', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+
+        e.preventDefault();
+        let postalCode = '' + @Model.PostalCode + '';
+        let model = {
+            postalCode,
+            inquiryType: 1,
+            trackId: ''
+        };
+
+        if (postalCode != null && postalCode != '') {
+            $.ajax({
+                type: 'post',
+                processData: false,
+                url: '/api/v1/NeginHub/GetAddressInquiry',
+                contentType: 'application/json',
+                dataType: 'json',
+                data: JSON.stringify(model),
+                success: function (result) {
+                    hideWaiting('userLocationBody');
+                    if (result.statusCode == 0) {
+                        $('#ValidatedAddress').val(result.data.data);
+                        $('#Address').val(result.data.data);
+                        $('#Address').text(result.data.data);
+                    }
+                    else {
+                        showMessage('@ResourceFile.ErrorTitle', 'خطا در هنگام یافتن آدرس از روی کد پستی', icons.error, '@ResourceFile.Close');
+                    }
+
+                },
+                error: function (error) {
+                    hideWaiting('userLocationBody');
+                }
+            });
+        }
+    });
+
+    $('#btnValidateUserLocation').click(function (e) {
+        e.preventDefault();
+        let postalCode = '' + @Model.PostalCode + '';
+        let verifiedAddress = $('#ValidatedAddress').val();
+
+        let model = {
+            personId: @Model.PersonId,
+            verifiedAddress
+        };
+
+        if (postalCode != null && postalCode != ''
+            && verifiedAddress != null && verifiedAddress != '') {
+            $.ajax({
+                type: 'post',
+                processData: false,
+                url: '/api/v1/NeginHub/ValidateValidatedAddress',
+                contentType: 'application/json',
+                dataType: 'json',
+                data: JSON.stringify(model),
+                success: function (result) {
+                    if (result.statusCode == 0) {
+                        $('#editUserLocationModal').modal('hide');
+                        showMessage('@ResourceFile.InfoTitle', '@ResourceFile.MessageSuccess', icons.success, '@ResourceFile.Close');
+                    }
+                    else {
+                        hideWaiting('editUserLocationModal');
+                        showMessage('@ResourceFile.ErrorTitle', 'خطا در هنگام یافتن آدرس از روی کد پستی', icons.error, '@ResourceFile.Close');
+                    }
+                    location.reload();
+                },
+                error: function (error) {
+
+                }
+            });
+        }
+    });
+
+    $('#btnSanaInquiry').click(function (e) {
+        e.preventDefault();
+        showWaiting('user-identity-info', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+
+        var personSanaTrackingId = '@Model.PersonSanaTrackingId';
+
+        if (personSanaTrackingId == '' || personSanaTrackingId == null) {
+            var model = {
+                NationalCode: '@Model.NationalCode',
+                Type: 1 // 1 for Natural, 2 for Legal
+            };
+
+            $.ajax({
+                type: 'post',
+                processData: false,
+                url: '/api/v1/RequestFacility/SanaInquiry',
+                contentType: 'application/json',
+                dataType: 'json',
+                data: JSON.stringify(model),
+                success: function (result) {
+                    hideWaiting('user-identity-info');
+
+                    if (result.isSuccess == true && result.data != null && result.data.registered == true) {
+                        $('#sanaInquiryStatus').removeAttr('style');
+                        $('#sanaInquiryTrackId').removeAttr('style');
+
+                        $('#sanaInquiryStatus').html('<div class="col-12">دارد</div>');
+                        $('#sanaInquiryTrackId').html('<div class="col-12">' + result.data.trackId + '</div>');
+                    } else if (result.isSuccess == true && result.data != null && result.data.registered == false) {
+                        $('#sanaInquiryStatus').html('<div class="col-12">ندارد</div>');
+                        $('#sanaInquiryStatus').show();
+                    } else {
+                        showMessage('@ResourceFile.ErrorTitle', 'خطا در هنگام استعلام ثنا', icons.error, '@ResourceFile.Close');
+                    }
+                },
+                error: function (error) {
+                    hideWaiting('user-identity-info');
+                }
+            });
+        } else {
+            setTimeout(() => {
+                hideWaiting('user-identity-info');
+            }, 500); 
+
+            $('#sanaInquiryStatus').html('<div class="col-12">دارد</div>');
+            $('#sanaInquiryTrackId').html('<div class="col-12">' + personSanaTrackingId + '</div>');
+        }
+
+        const sanaInquiry = $('#sanaInquiry');
+        if (!sanaInquiry.is(':visible')) {
+            setTimeout(() => {
+                sanaInquiry.fadeIn(500);
+            }, 1000);
+        }
+    });
+
+    $('#btnUserIdentityInfoInquiry').click((e) => { 
+        e.preventDefault();
+        showWaiting('user-identity-info', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+
+        let model = {
+            NationalCode: @Html.Raw(Json.Serialize(Model.NationalCode)),
+            ShamsiBirthDate: @Html.Raw(Json.Serialize(Model.ShamsiBirthDate))
+        };
+
+        $.ajax({
+            type: 'POST',
+            url: '/api/v1/NeginHub/GetCivilRegistryData',
+            contentType: 'application/json',
+            dataType: 'json',
+            data: JSON.stringify(model),
+            success: function (result) {
+                hideWaiting('user-identity-info');
+
+                if (result && result.data) {
+                    $('#fname').val(result.data.firstName);
+                    $('#lname').val(result.data.lastName);
+                    $('#father-name').val(result.data.fatherName);
+                    $('#place-of-birth').val(result.data.placeOfBirth);
+                    $('#ssid').val(result.data.identityId != '0' ? result.data.identityId : '0');
+
+                    $('#fname').text(result.data.firstName);
+                    $('#lname').text(result.data.lastName);
+                    $('#father-name').text(result.data.fatherName);
+                    $('#place-of-birth').text(result.data.placeOfBirth);
+                    $('#ssid').text(result.data.identityId != '0' ? result.data.identityId : '0');
+                } else {
+                    showMessage('@ResourceFile.ErrorTitle', 'خطا در هنگام استعلام از ثبت احوال', icons.error, '@ResourceFile.Close');
+                }
+            },
+            error: function (xhr) {
+                hideWaiting('user-identity-info');
+                showMessage('@ResourceFile.ErrorTitle', 'خطا در هنگام استعلام از ثبت احوال', icons.error, '@ResourceFile.Close');
+            }
+        });
+    });
+</script>

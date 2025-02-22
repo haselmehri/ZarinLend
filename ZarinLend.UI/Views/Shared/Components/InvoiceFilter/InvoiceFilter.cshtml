@@ -1,0 +1,145 @@
+﻿@model Services.Model.Invoice.InvoiceFilterModel
+
+@if (Model != null)
+{
+    @section styles {
+    @*<link href="~/persianDatePicker/css/persianDatepicker-lightorang.css" rel="stylesheet" />*@
+    <style type="text/css">
+    </style>
+    }
+    <div class="row my-0 my-md-1">
+        <div class=" col-md-6 col-sm-12">
+            <div class="form-group">
+                <select name="OrganizationId" id="OrganizationId" class="form-control bg-transparent text-muted" asp-items="Model.Shops">
+                    <option value="" >فروشکاه</option>
+                </select>
+                @*<span asp-validation-for="WaitingStepId" class="text-danger"></span> *@
+            </div>
+        </div>
+        <div class=" col-md-6 col-sm-12">
+            <div class="form-group">
+                <select name="StatusId" id="StatusId" class="form-control bg-transparent text-muted" asp-items="Model.StatusList">
+                    <option value="" >وضعیت</option>
+                </select>
+                @*<span asp-validation-for="WaitingStepId" class="text-danger"></span> *@
+            </div>
+        </div>
+    </div>
+    <div class="row my-0 my-md-1">
+        <div class=" col-md-6 col-sm-12">
+            <div class="form-group">
+                <fieldset class="form-group position-relative has-icon-left">
+                    <input class="form-control bg-transparent shamsi-datepicker" readonly="readonly" id="txtStartDate" name="txtStartDate" maxlength="10" placeholder="تاریخ درخواست از" style="text-align:center;direction:ltr" type="text" value="" data-fromdate="" />
+                    <div class="form-control-position">
+                        <i class="bx bx-calendar"></i>
+                    </div>
+                </fieldset>
+                <input asp-for="StartDate" type="hidden" />
+                <span asp-validation-for="StartDate" class="text-danger"></span>
+            </div>
+        </div>
+        <div class=" col-md-6 col-sm-12">
+            <div class="form-group">
+                <fieldset class="form-group position-relative has-icon-left">
+                    <input class="form-control bg-transparent shamsi-datepicker" readonly="readonly" id="txtEndDate" name="txtEndDate" maxlength="10" placeholder="تاریخ درخواست تا" style="text-align:center;direction:ltr" type="text" value="" data-fromdate="" />
+                    <div class="form-control-position">
+                        <i class="bx bx-calendar"></i>
+                    </div>
+                </fieldset>
+                <input asp-for="EndDate" type="hidden" />
+                <span asp-validation-for="EndDate" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    <div class="row my-0 my-md-1">
+        <div class=" col-md-6 col-sm-12">
+            <div class="form-group">
+                <input type="text" class="form-control bg-transparent number-thousand-separator" asp-for="StartAmountThousandSeparator" placeholder="مبلغ فاکتور از(ريال)" style="text-align:center;direction:ltr" />
+                <span asp-validation-for="StartAmountThousandSeparator" class="text-danger"></span>
+            </div>
+        </div>
+        <div class=" col-md-6 col-sm-12">
+            <div class="form-group">
+                <input type="text" class="form-control bg-transparent number-thousand-separator" asp-for="EndAmountThousandSeparator" placeholder="مبلغ فاکتور تا(ريال)" style="text-align:center;direction:ltr" />
+                <span asp-validation-for="EndAmountThousandSeparator" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+
+    <script on-content-loaded="true">
+        $(() => {
+            let startDate = null;
+            let endDate = null;
+            $('#StartDate').val('@ViewBag.StartDate');
+            $('#txtStartDate').val('@ViewBag.PersianStartDate');
+
+            $('#EndDate').val('@ViewBag.EndDate');
+            $('#txtEndDate').val('@ViewBag.PersianEndDate');
+
+            startDate = $("#txtStartDate").persianDatepicker(
+                {
+                    months: ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"],
+                    dowTitle: ["شنبه", "یکشنبه", "دوشنبه", "سه شنبه", "چهارشنبه", "پنج شنبه", "جمعه"],
+                    shortDowTitle: ["ش", "ی", "د", "س", "چ", "پ", "ج"],
+                    theme: 'lightorang',
+                    showGregorianDate: !1,
+                    persianNumbers: !0,
+                    formatDate: "YYYY/0M/0D",
+                    selectedBefore: !1,
+                    selectedDate: '@ViewBag.PersianStartDate',
+                    prevArrow: '\u25c4',
+                    nextArrow: '\u25ba',
+                    alwaysShow: !1,
+                    selectableYears: null,
+                    selectableMonths: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                    cellWidth: 45, // by px
+                    cellHeight: 35, // by px
+                    fontSize: 16, // by px
+                    isRTL: 1,
+                    calendarPosition: {
+                        x: 0,
+                        y: 0,
+                    },
+                    onSelect: function () {
+                        //alert($("#txtBirthDate").attr("data-gdate"));
+                        $('#StartDate').val($("#txtStartDate").attr("data-gdate"));
+                    },
+                    onShow: function () { },
+                    onHide: function () { },
+                    onRender: function () { }
+                });
+
+            endDate = $("#txtEndDate").persianDatepicker(
+                {
+                    months: ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"],
+                    dowTitle: ["شنبه", "یکشنبه", "دوشنبه", "سه شنبه", "چهارشنبه", "پنج شنبه", "جمعه"],
+                    shortDowTitle: ["ش", "ی", "د", "س", "چ", "پ", "ج"],
+                    theme: 'lightorang',
+                    showGregorianDate: !1,
+                    persianNumbers: !0,
+                    formatDate: "YYYY/0M/0D",
+                    selectedBefore: !1,
+                    selectedDate: '@ViewBag.PersianEndDate',
+                    prevArrow: '\u25c4',
+                    nextArrow: '\u25ba',
+                    alwaysShow: !1,
+                    selectableYears: null,
+                    selectableMonths: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                    cellWidth: 45, // by px
+                    cellHeight: 35, // by px
+                    fontSize: 16, // by px
+                    isRTL: 1,
+                    calendarPosition: {
+                        x: 0,
+                        y: 0,
+                    },
+                    onSelect: function () {
+                        $('#EndDate').val($("#txtEndDate").attr("data-gdate"));
+                    },
+                    onShow: function () { },
+                    onHide: function () { },
+                    onRender: function () { }
+                });
+        });
+    </script>
+}

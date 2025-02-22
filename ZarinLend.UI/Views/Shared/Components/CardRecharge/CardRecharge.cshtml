@@ -1,0 +1,36 @@
+﻿@model RequestFacilityCardRechargeModel
+
+<style type="text/css">
+</style>
+@if (Model != null)
+{
+    <div class="row">
+        <div class="border rounded">
+            <div class="d-flex align-items-center p-1">
+                <span class="font-small-2 w-50 text-bold-500">مبلغ تسهیلات(شارژ)</span><span class="dark w-50 text-bold-400">@Model.Amount.ToString("N0") ريال</span>
+            </div>
+            <hr class="my-0" />
+            <div class="d-flex align-items-center p-1">
+                <span class="font-small-2 w-50 text-bold-500">شماره بن کارت</span><span class="dark w-50 text-bold-400">@Model.CardNumber</span>
+            </div>
+            <hr class="my-0" />
+            <div class="d-flex align-items-center p-1">
+                <span class="font-small-2 w-50 text-bold-500">شماره حساب</span><span class="dark w-50 text-bold-400">@Model.AccountNumber</span>
+            </div>
+            <hr class="my-0" />
+            <div class="d-flex align-items-center p-1">
+                <span class="font-small-2 w-50 text-bold-500">درخواست دهنده تسهیلات</span><span class="dark w-50 text-bold-400">@Model.RequesterFullName</span>
+            </div>
+            <hr class="my-0" />
+            <div class="d-flex align-items-center p-1">
+                <span class="font-small-2 w-50 text-bold-500">تاریخ</span><span class="dark w-50 text-bold-400">@Model.ShamsiCurentDate</span>
+            </div>
+        </div>
+    </div>
+}
+
+<script on-content-loaded="true">
+    // $(document).ready(function() {
+
+    // });
+</script>

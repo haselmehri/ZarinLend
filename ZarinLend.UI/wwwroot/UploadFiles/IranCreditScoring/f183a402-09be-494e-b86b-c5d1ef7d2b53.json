@@ -1,0 +1,156 @@
+{
+  "reportTypes": [
+    "Base",
+    "Score",
+    "Tax"
+  ],
+  "score": {
+    "personInformation": {
+      "name": null,
+      "nationalCode": "21308187",
+      "address": null,
+      "contacts": [],
+      "hasBlockedContract": false,
+      "dateOfBirth": "",
+      "family": null,
+      "fatherName": null,
+      "maritalStatus": null,
+      "placeOfBirth": null,
+      "sex": null,
+      "companyType": null,
+      "registrationNumber": null,
+      "percent": 0,
+      "gradeDescription": "ریسک متوسط"
+    },
+    "scoreCodes": [
+      {
+        "code": "AGE2",
+        "description": "رده سنی جوان",
+        "order": 1
+      }
+    ],
+    "score": 549,
+    "description": "ریسک متوسط",
+    "risk": "C2",
+    "inquiryCreatedDate": "1403/11/12 15:52:575",
+    "perviouScoreDate": null,
+    "perviouScore": false
+  },
+  "report": {
+    "personInformation": {
+      "name": null,
+      "nationalCode": "0021308187",
+      "address": null,
+      "contacts": [
+        {
+          "title": " ",
+          "value": " "
+        },
+        {
+          "title": " ",
+          "value": " "
+        },
+        {
+          "title": " ",
+          "value": " "
+        },
+        {
+          "title": " ",
+          "value": " "
+        }
+      ],
+      "hasBlockedContract": false,
+      "dateOfBirth": "",
+      "family": null,
+      "fatherName": null,
+      "maritalStatus": null,
+      "placeOfBirth": null,
+      "sex": null,
+      "companyType": null,
+      "registrationNumber": null
+    },
+    "inquiryStats": [
+      {
+        "organizationType": "بانک مرکزی",
+        "organizationTypeCode": "25",
+        "lastMonthInquiryCount": 0,
+        "lastYearInquiryCount": 0,
+        "personNegativeStatusCount": 0,
+        "contractNegativeStatusCount": 0
+      },
+      {
+        "organizationType": "بانک ها و موسسات اعتباری",
+        "organizationTypeCode": "3",
+        "lastMonthInquiryCount": 0,
+        "lastYearInquiryCount": 0,
+        "personNegativeStatusCount": 0,
+        "contractNegativeStatusCount": 0
+      },
+      {
+        "organizationType": "تلکام/سازمان هاي خدماتی",
+        "organizationTypeCode": "89",
+        "lastMonthInquiryCount": 0,
+        "lastYearInquiryCount": 0,
+        "personNegativeStatusCount": 0,
+        "contractNegativeStatusCount": 0
+      },
+      {
+        "organizationType": "سازمان های خرده فروشی",
+        "organizationTypeCode": "66",
+        "lastMonthInquiryCount": 0,
+        "lastYearInquiryCount": 0,
+        "personNegativeStatusCount": 0,
+        "contractNegativeStatusCount": 0
+      },
+      {
+        "organizationType": "سازمان های عمومی/دولتی",
+        "organizationTypeCode": "102",
+        "lastMonthInquiryCount": 0,
+        "lastYearInquiryCount": 0,
+        "personNegativeStatusCount": 0,
+        "contractNegativeStatusCount": 0
+      },
+      {
+        "organizationType": "سازمان های قضايی",
+        "organizationTypeCode": "122",
+        "lastMonthInquiryCount": 0,
+        "lastYearInquiryCount": 0,
+        "personNegativeStatusCount": 0,
+        "contractNegativeStatusCount": 0
+      },
+      {
+        "organizationType": "مصرف کنندگان",
+        "organizationTypeCode": "100",
+        "lastMonthInquiryCount": 0,
+        "lastYearInquiryCount": 0,
+        "personNegativeStatusCount": 0,
+        "contractNegativeStatusCount": 0
+      },
+      {
+        "organizationType": "موسسات اعتباري غير متشکل",
+        "organizationTypeCode": "30",
+        "lastMonthInquiryCount": 0,
+        "lastYearInquiryCount": 0,
+        "personNegativeStatusCount": 0,
+        "contractNegativeStatusCount": 0
+      },
+      {
+        "organizationType": "موسسات صادر کننده کارت اعتباری",
+        "organizationTypeCode": "44",
+        "lastMonthInquiryCount": 0,
+        "lastYearInquiryCount": 0,
+        "personNegativeStatusCount": 0,
+        "contractNegativeStatusCount": 0
+      }
+    ],
+    "personRoles": [],
+    "summaryInformationRelatedToContracts": [],
+    "summaryInformationRelatedToContractsSum": [],
+    "directContracts": [],
+    "indirectContracts": [],
+    "contractNegativeStatus": [],
+    "personNegativeStatus": [],
+    "inquiryCreatedDate": "1403/11/12 15:52:16",
+    "reportUniqueId": "8000 9000 1000 0666 4801"
+  }
+}

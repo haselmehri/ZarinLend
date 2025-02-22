@@ -1,0 +1,126 @@
+﻿@model RequestFacilityInsuranceIssuanceModel
+@{
+    ViewData["Title"] = "صدور بیمه و اطلاع رسانی به مشتری";
+}
+@section styles
+    {
+    <style type="text/css">
+        .cheque-data {
+            color: blueviolet;
+        }
+    </style>
+}
+    @await Component.InvokeAsync("WorkFlowStepWizard", new { workFlowId = 1, requestFacilityId = Model.RequestFacilityId })
+    <form id="frmInsuranceIssuance" method="post">
+        <div class="card">
+            <div class="card-header" >صدور بیمه و اطلاع رسانی به مشتری</div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="control-label" asp-for="InsuranceNumber"></label>
+                            <input asp-for="InsuranceNumber" class="form-control" style="text-align:center;direction:ltr" />
+                            <span asp-validation-for="InsuranceNumber" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="control-label">فایل پیوست</label>
+                            <input type="file" name="file" id="file" class="form-control" accept="image/*;capture=camera">
+                        </div>
+                    </div>
+                    <div class="col-md-8"></div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label class="control-label" asp-for="Description"></label>
+                            <textarea asp-for="Description" class="form-control" style=" direction:rtl"></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer" style="text-align:left">
+                <button id="btnSave" class="btn btn-outline-success">
+                    @ResourceFile.Save&nbsp;<i class="fal fa-upload"></i>
+                </button>
+            <a class="btn btn-outline-secondary" asp-controller="RequestFacility" asp-action="SearchRequest">
+                    بازگشت به لیست درخواست تسهیلات&nbsp;<i class="fal fa-list"></i>
+                </a>
+            </div>
+        </div>
+    </form>
+    @section scripts{
+    @*<partia name="_ValidationScriptsPartial" />*@
+    @{
+        await Html.RenderPartialAsync("~/Views/Shared/_ValidationScriptsPartial.cshtml");
+    }
+    <script>
+        $(document).ready(function () {
+
+        });
+
+        $('#btnSave').click(function (e) {
+            e.preventDefault();
+            debugger;
+            const formIsValid = $('#frmInsuranceIssuance').valid();
+            const file = $("#file")[0];
+            //if (file.files.length == 0) {
+            //    showMessage('@ResourceFile.InfoTitle', 'لطفا تصویر چک را بارگذاری کنید', icons.warning, '@ResourceFile.Close');
+            //    return;
+            //}
+
+            if (formIsValid) {
+                showWaiting('frmInsuranceIssuance', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                let data = new FormData();
+                if (file.files.length > 0) {
+                    data.append('file', file.files[0]);
+                }
+
+                data.append('Description', $('#Description').val());
+                data.append('InsuranceNumber', $('#InsuranceNumber').val());
+                data.append('RequestFacilityId', @Model.RequestFacilityId);
+
+                $.ajax({
+                    type: 'post',
+                    //dataType: 'json',
+                    //contentType: "application/json; charset=utf-8",
+                    processData: false,
+                    contentType: false,
+                    url: '/api/v1/RequestFacilityInsuranceIssuance/InsuranceIssuance',
+                    data: data,// JSON.stringify(model),
+                    success: function (result) {
+                        hideWaiting('frmInsuranceIssuance');
+                        debugger;
+                        if (result.isSuccess) {
+                            showMessage('@ResourceFile.InfoTitle', '@ResourceFile.MessageSuccess', icons.success, '@ResourceFile.Close');
+                            setTimeout(function () {
+                                window.location.replace('@Url.Action("SearchRequest","RequestFacility")');
+                            }, 2500);
+                        }
+                    },
+                    error: function (error) {
+                        hideWaiting('frmInsuranceIssuance');
+                        if (error.responseJSON != undefined && error.responseJSON.message != undefined && error.responseJSON.message != '') {
+                            if (IsJsonString(error.responseJSON.message)) {
+                                const exception = JSON.parse(error.responseJSON.message).Exception;
+                                showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                            }
+                            else
+                                showMessage('@ResourceFile.ErrorTitle', error.responseJSON.message, icons.error, '@ResourceFile.Close');
+                        }
+                        else {
+                            showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                        }
+                    }
+                });
+            }
+            else {
+                scrollToFirstError();
+            }
+        });
+    </script>
+}

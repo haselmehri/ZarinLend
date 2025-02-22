@@ -1,0 +1,846 @@
+﻿@model RequestFacilityFilterModel
+@{
+    ViewData["Title"] = ViewBag.Title;
+    Layout = "~/Views/Shared/_NewLayout.cshtml";
+    var ajaxUrl = "/api/v1/RequestFacility/SearchLeasingRequest";
+    var ajaxExportUrl = "/api/v1/RequestFacility/SearchLeasingRequestExport";
+    //if (User.IsInRole(Core.Entities.RoleEnum.AdminBankLeasing.ToString()))
+    //{
+    //    ajaxUrl = "/api/v1/RequestFacility/SearchAdminLeasingRequest";
+    //    ajaxExportUrl = "/api/v1/RequestFacility/SearchAdminLeasingRequestExport";
+    //}
+}
+@section styles{
+    <link href="~/persianDatePicker/css/persianDatepicker-lightorang.css" rel="stylesheet" />
+    <style type="text/css">
+    </style>
+}
+<div id="requestGridDiv" class="p-2 bg-white rounded-lg">
+    <div class="font-medium-3 secondary darken-4 text-bold-800 d-flex align-items-center">
+        <i class="bx bx-align-right zl-text-secondary mr-25"></i>
+        <span>جستجوی پیشرفته</span>
+    </div>
+    <div class="p-2 rounded-lg">
+        <form id="filterForm" method="post">
+            <div class="row my-0 my-md-1">
+                <div class=" col-md-6 col-sm-12">
+                    <div class="form-group">
+                        <fieldset class="form-group position-relative has-icon-left">
+                            <input class="form-control bg-transparent shamsi-datepicker" id="txtStartDate" name="txtStartDate" maxlength="10" placeholder="تاریخ درخواست از" style="text-align:center;direction:ltr" type="text" value="" data-fromdate="" />
+                            <div class="form-control-position">
+                                <i class="bx bx-calendar"></i>
+                            </div>
+                        </fieldset>
+                        <input asp-for="StartDate" type="hidden" />
+                        <span asp-validation-for="StartDate" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class=" col-md-6 col-sm-12">
+                    <div class="form-group">
+                        <fieldset class="form-group position-relative has-icon-left">
+                            <input class="form-control bg-transparent shamsi-datepicker" id="txtEndDate" name="txtEndDate" maxlength="10" placeholder="تاریخ درخواست تا" style="text-align:center;direction:ltr" type="text" value="" data-fromdate="" />
+                            <div class="form-control-position">
+                                <i class="bx bx-calendar"></i>
+                            </div>
+                        </fieldset>
+                        <input asp-for="EndDate" type="hidden" />
+                        <span asp-validation-for="EndDate" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row my-0 my-md-1">
+                <div class=" col-md-6 col-sm-12">
+                    <div class="form-group">
+                        <input type="text" class="form-control bg-transparent number-thousand-separator" asp-for="StartAmountThousandSeparator" placeholder="مبلغ درخواستی از(ريال)" style="text-align:center;direction:ltr" />
+                        <span asp-validation-for="StartAmountThousandSeparator" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class=" col-md-6 col-sm-12">
+                    <div class="form-group">
+                        <input type="text" class="form-control bg-transparent number-thousand-separator" asp-for="EndAmountThousandSeparator" placeholder="مبلغ درخواستی تا(ريال)" style="text-align:center;direction:ltr" />
+                        <span asp-validation-for="EndAmountThousandSeparator" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row my-0 my-md-1">
+                <div class=" col-md-6 col-sm-12">
+                    <div class="form-group">
+                        <select name="WaitingStepId" asp-for="WaitingStepId" class="form-control bg-transparent text-muted" asp-items="Model.WorkFlowSteps">
+                            <option value="" localize-content>مرحله جاری</option>
+                        </select>
+                        <span asp-validation-for="WaitingStepId" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class=" col-md-6 col-sm-12">
+                    <div class="form-group">
+                        <input type="text" class="form-control bg-transparent" asp-for="NationalCode" placeholder="کد ملی" style="text-align:center;direction:ltr" />
+                        <span asp-validation-for="NationalCode" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row my-0 my-md-1">
+                <div class=" col-md-6 col-sm-12">
+                    <div class="form-group">
+                        <input type="text" class="form-control bg-transparent" asp-for="FName" placeholder="نام" style="" />
+                        <span asp-validation-for="FName" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class=" col-md-6 col-sm-12">
+                    <div class="form-group">
+                        <input type="text" class="form-control bg-transparent" asp-for="LName" placeholder="نام خانوادگی" style="" />
+                        <span asp-validation-for="LName" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row my-0 my-md-1">
+                <div class="col-lg-3 col-md-6 col-sm-12">
+                    <div class="radio radio-primary radio-glow radio-sm">
+                        <input type="radio" class="verifyRadio" name="facilityStatus" id="inlineRadio1" value="@((long)FacilityStatus.WaitingRequest)" />
+                        <label class="font-small-3 primary darken-4 text-bold-400 line-height-23" for="inlineRadio1">تسهیلات فعال(جاری)</label>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 col-sm-12">
+                    <div class="radio radio-success radio-glow radio-sm">
+                        <input type="radio" class="verifyRadio" name="facilityStatus" id="inlineRadio2" value="@((long)FacilityStatus.ApprovedRequest)" />
+                        <label class="font-small-3 success darken-4 text-bold-400 line-height-23" for="inlineRadio2">تسهیلات پایان یافته</label>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 col-sm-12">
+                    <div class="radio radio-danger radio-glow radio-sm">
+                        <input type="radio" class="verifyRadio" name="facilityStatus" id="inlineRadio3" value="@((long)FacilityStatus.RejectCancelRequest)" />
+                        <label class="font-small-3 danger darken-4 text-bold-400 line-height-23" for="inlineRadio3">تسهیلات رد شده/انصراف یافته</label>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 col-sm-12">
+                    <div class="radio radio-warning radio-glow radio-sm">
+                        <input type="radio" checked="checked" name="facilityStatus" id="inlineRadio4" value="@((long)FacilityStatus.AllRequest)" />
+                        <label class="font-small-3 warning darken-4 text-bold-400 line-height-23" for="inlineRadio4">همه تسهیلات</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row my-0 my-md-1">
+                <div class=" col-md-12" style="text-align:left">
+                    <button type="button" id="btnSearch" class="btn btn-zl-primary">
+                        جستجو&nbsp;<i class="fal fa-search"></i>
+                    </button>
+                    <button id="btnExportToExcel" tabindex="5" class="btn btn-outline-info">
+                        خروجی اکسل&nbsp;<i class="fal fa-file-excel-o"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+        <div class="paging-div"></div>
+        <div class="table-responsive table-sm">
+            <table class="table zero-configuration">
+                <thead>
+                    <tr>
+                        <th scope="col"><fieldset><div class='checkbox checkbox-primary'><input type='checkbox' id="checkAll" /><label for="checkAll"></label></div></fieldset></th>
+                        <th scope="col">#</th>
+                        <th scope="col" localize-content>اعتبار درخواستی(ريال)</th>
+                        <th scope="col" localize-content>بازه پرداخت</th>
+                        <th scope="col" localize-content>درخواست کننده</th>
+                        <th scope="col" localize-content>کد ملی/شناسه ملی</th>
+                        <th scope="col" localize-content>تاریخ درخواست</th>
+                        <th scope="col" localize-content>تاریخ آخرین اقدام</th>
+                        <th scope="col" localize-content>وضعیت</th>
+                        @if (User.IsInRole(Core.Entities.RoleEnum.AdminBankLeasing.ToString()))
+                        {
+                            <th scope="col" localize-content>امضاء قرارداد</th>
+                        }
+                        <th scope="col" localize-content>اقدام</th>
+                    </tr>
+                </thead>
+                <tbody id="requestGridRows">
+                    @*<tr>
+                        <td colspan="9" localize-content>
+                        NoRows
+                        </td>
+                        </tr>*@
+                </tbody>
+            </table>
+        </div>
+        <div class="paging-div"></div>
+    </div>
+</div>
+@section scripts{
+    @{
+        await Html.RenderPartialAsync("~/Views/Shared/_ValidationScriptsPartial.cshtml");
+        <script src="~/persianDatePicker/js/persianDatepicker.min.js"></script>
+        <script src="~/js/jquery.mask.min.js"></script>
+        @if (User.IsInRole(Core.Entities.RoleEnum.AdminBankLeasing.ToString()))
+        {
+            <script src="~/js/Dastine/Dastine-Config.js"></script>
+            <script src="~/js/Dastine/Dastine.js"></script>
+        }
+    }
+    <script>
+        if ('@User.IsInRole(Core.Entities.RoleEnum.AdminBankLeasing.ToString())' == 'True')
+        {
+            let selectedCertificateFromTokenByUIResult;
+            let selectedCertificate;
+            let digest;
+            let signature;
+            function SelectCertificateFromTokenByUI(callback) {
+                if (Dastine.isInstalled) {
+                    const issuer = '';// document.getElementById('txtSelectCertificateFromTokenByUIIssuer').value;
+                    const keyUsages = '';// document.getElementById('txtSelectCertificateFromTokenByUIKeyUsages').value;
+                    try {
+                        Dastine.SelectCertificateFromTokenByUI(issuer, keyUsages, function (event) {
+                            selectedCertificateFromTokenByUIResult = event.data.Result;
+                            if (selectedCertificateFromTokenByUIResult == 0)
+                                callback(true);
+                            else {
+                                showMessage('@_loc["InfoTitle"]', 'خطایی نامشخص رخ داده است<br/>لطفا نسبت به متصل بودن توکن سخت افزاری به سیستم کامپیوتر خود اطمینان حاصل کنید', icons.error, '@_loc["Close"]');
+                                callback(false);
+                            }
+                        });
+                    }
+                    catch (e) {
+                        //alert(e);
+                        showMessage('@_loc["InfoTitle"]', e, icons.error, '@_loc["Close"]');
+                        callback(false);
+                    }
+                } else {
+                    if (Dastine.errorMessage == 'DASTINE_NOT_INSTALLED') {
+                        //alert(Dastine.errorMessage + '\n Get it from:\n' + DastineConfig.hostDownloadLink);
+                        showMessage('@_loc["InfoTitle"]', Dastine.errorMessage + '\n Get it from:\n' + DastineConfig.hostDownloadLink, icons.error, '@_loc["Close"]');
+                    }
+                    else {
+                        //alert(Dastine.errorMessage);
+                        showMessage('@_loc["InfoTitle"]', Dastine.errorMessage, icons.error, '@_loc["Close"]');
+                    }
+
+                    callback(false);
+                }
+            }
+
+            function ReadSelectedCertificate(callback) {
+                if (Dastine.isInstalled) {
+                    try {
+                        Dastine.GetSelectedCertificate(function (event) {
+                            selectedCertificate = event.data.Result;
+                            callback(true);
+                        });
+                    }
+                    catch (e) {
+                        //alert(e);
+                        showMessage('@_loc["InfoTitle"]', e, icons.error, '@_loc["Close"]');
+                        callback(false);
+                    }
+                } else {
+                    if (Dastine.errorMessage == 'DASTINE_NOT_INSTALLED') {
+                        //alert(Dastine.errorMessage + '\n Get it from:\n' + DastineConfig.hostDownloadLink);
+                        showMessage('@_loc["InfoTitle"]', Dastine.errorMessage + '\n Get it from:\n' + DastineConfig.hostDownloadLink, icons.error, '@_loc["Close"]');
+                    }
+                    else {
+                        //alert(Dastine.errorMessage);
+                        showMessage('@_loc["InfoTitle"]', Dastine.errorMessage, icons.error, '@_loc["Close"]');
+                    }
+
+                    callback(false);
+                }
+            }
+
+            function SignMessage(digest, callback) {
+                if (Dastine.isInstalled) {
+                    try {
+                        Dastine.Sign(digest, 'SHA1', function (event) {
+                            if (event.data.Result == '18' || event.data.Result == '14') {
+                                //alert('کلمه عبور وارد شده اشتباه می باشد!');
+                                showMessage('@_loc["InfoTitle"]', 'کلمه عبور وارد شده اشتباه می باشد!', icons.error, '@_loc["Close"]');
+                                callback(false);
+                            }
+                            else {
+                                signature = event.data.Result;
+                                callback(true);
+                            }
+                        });
+                    }
+                    catch (e) {
+                        //alert(e);
+                        showMessage('@_loc["InfoTitle"]', e, icons.error, '@_loc["Close"]');
+                        callback(false);
+                    }
+                } else {
+                    if (Dastine.errorMessage == 'DASTINE_NOT_INSTALLED') {
+                        //alert(Dastine.errorMessage + '\n Get it from:\n' + DastineConfig.hostDownloadLink);
+                        showMessage('@_loc["InfoTitle"]', Dastine.errorMessage + '\n Get it from:\n' + DastineConfig.hostDownloadLink, icons.error, '@_loc["Close"]');
+                    }
+                    else {
+                        //alert(Dastine.errorMessage);
+                        showMessage('@_loc["InfoTitle"]', Dastine.errorMessage, icons.error, '@_loc["Close"]');
+                    }
+
+                    callback(false);
+                }
+            }
+        }
+        let requestFacilityIdArray = [];
+        const PAGE_SIZE = 10;
+        const SHOW_PAGE_COUNT = 10;
+        let startDate = null;
+        let endDate = null;
+        $('#StartDate').val('@ViewBag.StartDate');
+        $('#txtStartDate').val('@ViewBag.PersianStartDate');
+
+        $('#EndDate').val('@ViewBag.EndDate');
+        $('#txtEndDate').val('@ViewBag.PersianEndDate');
+        $(document).ready(function () {
+            dataTableResponsive = $(".zero-configuration").DataTable({
+                ordering: false,
+                responsive: false,
+                searching: false,
+                paging: false,
+                lengthChange: false,
+                info: false
+            });
+            $('div').removeClass('zl-active');
+            $('#reportPage').addClass('zl-active');
+
+            startDate = $("#txtStartDate").persianDatepicker(
+                {
+                    months: ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"],
+                    dowTitle: ["شنبه", "یکشنبه", "دوشنبه", "سه شنبه", "چهارشنبه", "پنج شنبه", "جمعه"],
+                    shortDowTitle: ["ش", "ی", "د", "س", "چ", "پ", "ج"],
+                    theme: 'lightorang',
+                    showGregorianDate: !1,
+                    persianNumbers: !0,
+                    formatDate: "YYYY/0M/0D",
+                    selectedBefore: !1,
+                    selectedDate: '@ViewBag.PersianStartDate',
+                    prevArrow: '\u25c4',
+                    nextArrow: '\u25ba',
+                    alwaysShow: !1,
+                    selectableYears: null,
+                    selectableMonths: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                    cellWidth: 50, // by px
+                    cellHeight: 40, // by px
+                    fontSize: 17, // by px
+                    isRTL: !1,
+                    calendarPosition: {
+                        x: 0,
+                        y: 0,
+                    },
+                    onSelect: function () {
+                        //alert($("#txtBirthDate").attr("data-gdate"));
+                        $('#StartDate').val($("#txtStartDate").attr("data-gdate"));
+                    },
+                    onShow: function () { },
+                    onHide: function () { },
+                    onRender: function () { }
+                });
+
+            endDate = $("#txtEndDate").persianDatepicker(
+                {
+                    months: ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"],
+                    dowTitle: ["شنبه", "یکشنبه", "دوشنبه", "سه شنبه", "چهارشنبه", "پنج شنبه", "جمعه"],
+                    shortDowTitle: ["ش", "ی", "د", "س", "چ", "پ", "ج"],
+                    theme: 'lightorang',
+                    showGregorianDate: !1,
+                    persianNumbers: !0,
+                    formatDate: "YYYY/0M/0D",
+                    selectedBefore: !1,
+                    selectedDate: '@ViewBag.PersianEndDate',
+                    prevArrow: '\u25c4',
+                    nextArrow: '\u25ba',
+                    alwaysShow: !1,
+                    selectableYears: null,
+                    selectableMonths: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                    cellWidth: 50, // by px
+                    cellHeight: 40, // by px
+                    fontSize: 17, // by px
+                    isRTL: !1,
+                    calendarPosition: {
+                        x: 0,
+                        y: 0,
+                    },
+                    onSelect: function () {
+                        $('#EndDate').val($("#txtEndDate").attr("data-gdate"));
+                    },
+                    onShow: function () { },
+                    onHide: function () { },
+                    onRender: function () { }
+                });
+
+            loadLeasingRequest();
+        });
+
+        $('#checkAll').change((e) => {
+            const checkAllState = $(e.target).prop('checked');
+            $('input[type="checkbox"].select-row').prop('checked', checkAllState);
+
+            $("input[type='checkbox'].select-row").each(function () {
+                var $this = $(this);
+
+                if ($this.is(":checked")) {
+                    if (jQuery.inArray($this.attr("value"), requestFacilityIdArray) === -1)
+                        requestFacilityIdArray.push($this.attr("value"));
+                } else {
+                    requestFacilityIdArray.splice(jQuery.inArray($this.attr("value"), requestFacilityIdArray), 1);
+                }
+            });
+            debugger;
+        });
+
+        $('#btnSearch').click((e) => {
+            e.preventDefault();
+            loadLeasingRequest()
+        });
+
+        $('#requestGridDiv').on('click', 'thead th', function () {
+            renderSortColumn(this, 'hdnSortOrder', 'hdnSortDirection', () => { loadLeasingRequest(); })
+        });
+
+        const loadLeasingRequest = (sender) => {
+            if (!$('#filterForm').valid())
+                return;
+
+            showWaiting('requestGridDiv', '@_loc["PleaseWait"]', '@_loc["Loading"]');;
+
+            const sortDirectionValue = $('#hdnSortDirection').val();
+            const sortOrderValue = $('#hdnSortOrder').val();
+            let currentPage = 1;
+            if (typeof $(sender).attr('current-page') !== typeof undefined && $(sender).attr('current-page') !== false)
+                currentPage = $(sender).attr('current-page');
+
+            const postData = {
+                Page: currentPage,
+                PageSize: PAGE_SIZE,
+                SortDirection: sortDirectionValue,
+                SortOrder: sortOrderValue,
+                FilterList: []
+            };
+
+            fillFilter(postData);
+            debugger;
+
+            $.ajax({
+                type: 'post',
+                data: JSON.stringify(postData),
+                datatype: "json",
+                contentType: "application/json; charset=utf-8",
+                url: '@ajaxUrl',
+                success: function (result) {
+                    hideWaiting('requestGridDiv');
+                    debugger;
+                    if (result !== undefined && result !== null && result.isSuccess === true) {
+                        renderRequestGrid(result.data.data, result.data.currentPage, PAGE_SIZE);
+                        renderNavigation('requestGridDiv', result.data.totalRowCount, result.data.currentPage, result.data.totalPages);
+                        resetGridStyle('requestGridDiv', 'hdnSortOrder', 'hdnSortDirection');
+                    }
+                },
+                error: function (error) {
+                    debugger;
+                    hideWaiting('requestGridDiv');
+                    const exception = getExceptionMessageFromError(error);
+                    if (exception != null)
+                        showMessage('@_loc["ErrorTitle"]', exception, icons.error, '@_loc["Close"]');
+                    else
+                        showMessage('@_loc["ErrorTitle"]', '@_loc["UnhandledError"]', icons.error, '@_loc["Close"]');
+                },
+                complete: function () {
+
+                },
+            });
+        }
+
+        $('#btnExportToExcel').click((e) => {
+            e.preventDefault();
+            if (!$('#filterForm').valid())
+                return;
+
+            showWaiting('requestGridDiv', '@_loc["PleaseWait"]', '@_loc["Loading"]');;
+
+            const postData = {
+                Page: -1,
+                PageSize: -1,
+                SortDirection: null,
+                SortOrder: null,
+                FilterList: []
+            };
+
+            fillFilter(postData);
+            debugger;
+
+            $.ajax({
+                type: 'post',
+                data: JSON.stringify(postData),
+                datatype: "json",
+                contentType: "application/json; charset=utf-8",
+                url: '@ajaxExportUrl',
+                success: function (result) {
+                    hideWaiting('requestGridDiv');;
+                    if (result !== undefined && result !== null && result.data != null && result.isSuccess === true) {
+                        debugger;
+                        const downloadJsonLink = document.createElement("a");
+                        downloadJsonLink.href = `data:application/vnd.ms-excel;base64,${result.data}`;
+                        downloadJsonLink.download = "SearchRequestFacility.xlsx";
+                        downloadJsonLink.click();
+                    }
+                },
+                error: function (error) {
+                    hideWaiting('requestGridDiv');;
+                    const exception = getExceptionMessageFromError(error);
+                    if (exception != null)
+                        showMessage('@_loc["ErrorTitle"]', exception, icons.error, '@_loc["Close"]');
+                    else
+                        showMessage('@_loc["ErrorTitle"]', '@_loc["UnhandledError"]', icons.error, '@_loc["Close"]');
+                }
+            });
+        });
+
+        const fillFilter = (postData) => {
+            if ($('#FName').val() != undefined && $('#FName').val() != null && $('#FName').val() != '')
+                postData.FilterList.push({
+                    PropertyName: 'FName',
+                    Operator: @((int)Operator.Contain),
+                    PropertyValue: $('#FName').val()
+                });
+
+            if ($('#LName').val() != undefined && $('#LName').val() != null && $('#LName').val() != '')
+                postData.FilterList.push({
+                    PropertyName: 'LName',
+                    Operator: @((int)Operator.Contain),
+                    PropertyValue: $('#LName').val()
+                });
+
+            if ($('#StartDate').val() != undefined && $('#StartDate').val() != null && $('#StartDate').val() != '')
+                postData.FilterList.push({
+                    PropertyName: 'StartDate',
+                    Operator: @((int)Operator.GreaterThanOrEqual),
+                    PropertyValue: $('#StartDate').val()
+                });
+
+            if ($('#EndDate').val() != undefined && $('#EndDate').val() != null && $('#EndDate').val() != '')
+                postData.FilterList.push({
+                    PropertyName: 'EndDate',
+                    Operator: @((int)Operator.LesserThanOrEqual),
+                    PropertyValue: $('#EndDate').val()
+                });
+
+            if ($('#NationalCode').val() != undefined && $('#NationalCode').val() != null && $('#NationalCode').val() != '')
+                postData.FilterList.push({
+                    PropertyName: 'NationalCode',
+                    Operator: @((int)Operator.Equal),
+                    PropertyValue: $('#NationalCode').val()
+                });
+
+            if ($('#WaitingStepId').val() != undefined && $('#WaitingStepId').val() != null && $('#WaitingStepId').val() != '')
+                postData.FilterList.push({
+                    PropertyName: 'WaitingStepId',
+                    Operator: @((int)Operator.Equal),
+                    PropertyValue: parseInt($('#WaitingStepId').val())
+                });
+
+            if ($('#StartAmountThousandSeparator').val() != undefined && $('#StartAmountThousandSeparator').val() != null && $('#StartAmountThousandSeparator').val() != '')
+                postData.FilterList.push({
+                    PropertyName: 'StartAmount',
+                    Operator: @((int)Operator.GreaterThanOrEqual),
+                    PropertyValue: parseInt($('#StartAmountThousandSeparator').val().replaceAll(',', ''))
+                });
+
+            if ($('#EndAmountThousandSeparator').val() != undefined && $('#EndAmountThousandSeparator').val() != null && $('#EndAmountThousandSeparator').val() != '')
+                postData.FilterList.push({
+                    PropertyName: 'EndAmount',
+                    Operator: @((int)Operator.LesserThanOrEqual),
+                    PropertyValue: parseInt($('#EndAmountThousandSeparator').val().replaceAll(',', ''))
+                });
+
+            let facilityStatusValue = $('input[type="radio"][name="facilityStatus"]:checked').val();
+            postData.FilterList.push({
+                PropertyName: 'FacilityStatus',
+                Operator: @((int)Operator.Equal),
+                PropertyValue: parseInt(facilityStatusValue)
+            });
+
+            if (requestFacilityIdArray != undefined && requestFacilityIdArray.length > 0) {
+                postData.FilterList.push({
+                    PropertyName: 'CheckedRequestFacilityIds',
+                    Operator: @((int)Operator.Contain),
+                    PropertyValue: requestFacilityIdArray
+                });
+            }
+            if ('@User.IsInRole(RoleEnum.BankLeasing.ToString())' == 'True') {
+                postData.FilterList.push({
+                    PropertyName: 'OperatorId',
+                    Operator: @((int)Operator.Equal),
+                    PropertyValue: '@User.Identity.GetUserId()'
+                });
+            }
+        }
+
+        const renderRequestGrid = (data, currentPage, pageSize) => {
+            let rows = '<tr><td colspan="9">@_loc["NoRows"]</td></tr>';
+            if (data.length > 0) {
+                rows = '';
+                for (var i = 0; i < data.length; i++) {
+                    rows += '<tr>';
+                    rows += `<td style=''><fieldset><div class='checkbox checkbox-primary'><input type='checkbox' class='select-row' value='${data[i].id}' id='chk_${data[i].id}'/><label for='chk_${data[i].id}'></label></div></fieldset></td>`;
+                    rows += "<td style=''>" + (((currentPage - 1) * pageSize) + i + 1) + "</td>";
+                    rows += "<td style='direction:ltr'>" + splitNumber(data[i].amount) + "</td>";
+                    rows += "<td>" + data[i].monthCountTitle + "</td>";
+                    rows += "<td>" + data[i].requester + "</td>";
+                    rows += "<td>" + data[i].nationalCode + "</td>";
+                    rows += "<td style='direction:ltr'>" + data[i].shamsiCreateDate + "</td>";
+                    rows += "<td style='direction:ltr'>" + data[i].shamsiLastActionDate + "</td>";
+
+                    let waitingStep = '';
+                    let buttonsHtml = `<a class="dropdown-item change-status" href='@Url.Action("Detail","RequestFacility")/${data[i].id}'><i class="bx bx-detail font-medium-5 secondary darken-4 mr-75"></i>جزئیات</a>`;
+                    if (data[i].cancelByUser) {
+                        const cancelByUserDescription = "<span style='color:red'>انصراف کاربر</span>";
+                        if ('@((short)StatusEnum.Approved)' == data[i].statusId)
+                            waitingStep = `${data[i].lastStatusDescription}(${cancelByUserDescription})`;
+                        else if ('@((short)StatusEnum.Rejected)' == data[i].statusId)
+                            waitingStep = `${data[i].lastStatusDescription}(${cancelByUserDescription})`;
+                        else
+                            waitingStep = `${data[i].lastStatusDescription}(${cancelByUserDescription})`;
+                    }
+                    else {
+                        if ('@((short)StatusEnum.Approved)' == data[i].statusId)
+                            waitingStep += data[i].lastStatusDescription;
+                        else if ('@((short)StatusEnum.Rejected)' == data[i].statusId)
+                            waitingStep = data[i].lastStatusDescription;
+                        else {
+                            waitingStep = data[i].lastStatusDescription;
+                        }
+                        if (data[i].formUrl != null)
+                            buttonsHtml = `<a href='${data[i].formUrl}' class='dropdown-item change-status'>
+                                                                                                            <i class="bx bx-news font-medium-5 secondary darken-4 mr-75"></i>اقدام</a>` + buttonsHtml;
+                    }
+
+                    if ('@User.IsInRole(Core.Entities.RoleEnum.AdminBankLeasing.ToString())' == 'True') {
+                        if (data[i].canAdminLeasingSignContract) {
+                            rows += `<td style='text-align:center'><button data-id='${data[i].id}' class="btn white zl-bg-secondary sign-contract">امضاء</button></td>`;
+                        }
+                        else {
+                            rows += `<td style='text-align:center'><button disabled class="btn btn-outline-secondary">امضاء</button></td>`;
+                        }
+                    }
+
+                    buttonsHtml = buttonsHtml + `<a class="dropdown-item request-history" data-request-facility-id='${data[i].id}' href='javascript:void(0)'>
+                                                                                                                        <i class="bx bx-detail font-medium-5 secondary darken-4 mr-75"></i>
+                                                                                                                        تاریخچه مراحل تسهیلات
+                                                                                                                        </a>`;
+
+                    rows += `<td><div class="badge badge-pill zl-badge-upload-document">
+                                                        <div class="d-flex align-items-center">
+                                                            <i class="bx bxs-circle font-size-xxsmall mr-25"></i>
+                                                            ${waitingStep}
+                                                        </div>
+                                                        </div></td>`;
+                    rows += `<td>
+                                                                                                <div class="btn-group dropright">
+                                                                                                    <a href="#" class="dark" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                                                                        <i class="bx bx-dots-horizontal"></i>
+                                                                                                    </a>
+                                                                                                    <div class="dropdown-menu">${buttonsHtml}</div>
+                                                                                                </div>
+                                                                                             </td>`;
+
+                    rows += '</tr>';
+                }
+            }
+            $('#requestGridRows').html(rows);
+            $('.request-history').off('click');
+            $('.request-history').click((e) => {
+                debugger;
+                e.preventDefault();
+                loadRequestFacilitySteps($(e.target).data('request-facility-id'));
+                $('#requestFacilityStepsHistoryModal').modal();
+            });
+
+            $("input[type='checkbox'].select-row").off('change');
+            $("input[type='checkbox'].select-row").change((e) => {
+                if ($(e.target).is(":checked")) {
+                    if (jQuery.inArray(parseInt($(e.target).attr("value")), requestFacilityIdArray) === -1)
+                        requestFacilityIdArray.push(parseInt($(e.target).attr("value")));
+                    if ($("input[type='checkbox'].select-row").length == $("input[type='checkbox'].select-row:checked").length)
+                        $('#checkAll').prop('checked', true);
+                } else {
+                    requestFacilityIdArray.splice(parseInt(jQuery.inArray($(e.target).attr("value")), requestFacilityIdArray), 1);
+                    $('#checkAll').prop('checked', false);
+                }
+                debugger;
+            });
+
+            if ('@User.IsInRole(Core.Entities.RoleEnum.AdminBankLeasing.ToString())' == 'True') {
+                $('.sign-contract').off('click');
+                $('.sign-contract').click((e) => {
+                    debugger;
+                    e.preventDefault();
+                    confirmMessage("هشدار",
+                        'آیا برای امضاء قرارداد مطمئن هستید؟'
+                        , icons.warning,
+                        'بله،مطمئنم',
+                        "خیر،مطمئن نیستم",
+                        undefined,
+                        () => {
+                            SelectCertificateFromTokenByUI(function (selectCertificateResult) {
+                                debugger;
+                                if (selectCertificateResult == true) {
+                                    debugger;
+                                    ReadSelectedCertificate(function (readCertificateResult) {
+                                        debugger;
+                                        if (readCertificateResult == true) {
+                                            showWaiting('requestGridDiv', '@_loc["PleaseWait"]', '@_loc["Loading"]');
+                                            data = {
+                                                RequestFacilityId: $(e.target).data('id'),
+                                                SelectedCertificate: selectedCertificate
+                                            };
+                                            $.ajax({
+                                                type: 'post',
+                                                data: JSON.stringify(data),
+                                                datatype: "json",
+                                                contentType: "application/json; charset=utf-8",
+                                                url: `/api/v1/dastine/JustPDFDigestForMultiSign`,
+                                                success: function (result) {
+                                                    hideWaiting('requestGridDiv');
+                                                    debugger;
+                                                    if (result.isSuccess) {
+                                                        digest = result.data;
+                                                        SignMessage(digest, function (signMessageResult) {
+                                                            debugger;
+                                                            if (signMessageResult == true) {
+                                                                //======================
+                                                                const postData = {
+                                                                    RequestFacilityId: $(e.target).data('id'),
+                                                                    SelectedCertificate: selectedCertificate,
+                                                                    Digest: digest,
+                                                                    Signature: signature
+                                                                };
+                                                                debugger;
+                                                                return;
+                                                                $.ajax({
+                                                                    type: 'post',
+                                                                    data: JSON.stringify(postData),
+                                                                    datatype: "json",
+                                                                    contentType: "application/json; charset=utf-8",
+                                                                    url: `/api/v1/dastine/PutPDFSignatureForMultiSign`,
+                                                                    success: function (result) {
+                                                                        hideWaiting('requestGridDiv');
+                                                                        debugger;
+                                                                        if (result.isSuccess) {
+                                                                            const contractLink = `<a href='/UploadFiles/RequestFacilityContract/${result.data}' target='_blank'><b>اینجا<b/></a>`;
+                                                                            showMessage('@_loc["InfoTitle"]', `امضای قرارداد با موفقیت انجام شد<br/>برای مشاهده قرارداد ${contractLink} کلیک کنید!`, icons.success, '@_loc["Close"]');
+                                                                        }
+                                                                    },
+                                                                    error: function (error) {
+                                                                        hideWaiting('requestGridDiv');
+                                                                        const exception = getExceptionMessageFromError(error);
+                                                                        if (exception != null)
+                                                                            showMessage('@_loc["ErrorTitle"]', exception, icons.error, '@_loc["Close"]');
+                                                                        else
+                                                                            showMessage('@_loc["ErrorTitle"]', '@_loc["UnhandledError"]', icons.error, '@_loc["Close"]');
+                                                                    }
+                                                                });
+                                                                //======================
+                                                            }
+                                                        });
+                                                    }
+                                                },
+                                                error: function (error) {
+                                                    hideWaiting('requestGridDiv');
+                                                    const exception = getExceptionMessageFromError(error);
+                                                    if (exception != null)
+                                                        showMessage('@_loc["ErrorTitle"]', exception, icons.error, '@_loc["Close"]');
+                                                    else
+                                                        showMessage('@_loc["ErrorTitle"]', '@_loc["UnhandledError"]', icons.error, '@_loc["Close"]');
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
+                            });
+                        });
+                });
+            }
+        }
+
+        const resetGridStyle = (parentGridElementId, hdnSortOrderElementId, hdnSortDirectionElementId) => {
+            const sortDirectionValue = $(`#${hdnSortDirectionElementId}`).val();
+            const sortOrderValue = $(`#${hdnSortOrderElementId}`).val();
+
+            $(`#${parentGridElementId} thead th`).removeClass("sorted-column");
+            $(`#${parentGridElementId} thead th`).addClass("not-sorted-column");
+
+            if (sortOrderValue != undefined || sortOrderValue != '') {
+                let sortCell = $(`#${parentGridElementId} *[data-sortorder='${sortOrderValue}']`);
+                $(sortCell).removeClass('not-sorted-column');
+                $(sortCell).addClass('sorted-column');
+
+                if (sortDirectionValue == undefined || sortDirectionValue == '' || sortDirectionValue.toUpperCase() == "DESC") {
+                    $(`#${parentGridElementId}  thead th span`).remove();
+                    //$(sortCell).append("<span class='fa fa-chevron-down' style='color:red;position:absolute;margin-right:3px'></span>");
+                    $(sortCell).append("<span class='fa fa-chevron-down' style='color:red;margin-right:3px'></span>");
+                } else {
+                    $(`#${parentGridElementId}  thead th span`).remove();
+                    //$(sortCell).append("<span class='fa fa-chevron-up' style='color:green;position:absolute;margin-right:3px'></span>");
+                    $(sortCell).append("<span class='fa fa-chevron-up' style='color:green;margin-right:3px'></span>");
+                }
+            }
+        }
+
+        const renderNavigation = (rootElementId, totalRowCount, currentPage, totalPages) => {
+            let pagingHtml = '';
+            if (totalRowCount > PAGE_SIZE) {
+                if (currentPage != 1) {
+                    pagingHtml += '<li class="page-item"><button class="page-link page-link-active" current-page="1">@_loc["First"]</button></li>';
+                    pagingHtml += '<li class="page-item"><button class="page-link page-link-active" current-page="' + (currentPage - 1) + '">@_loc["Prev"]</button></li>';
+                } else {
+                    pagingHtml += '<li class="page-item disabled"><button class="page-link">@_loc["First"]</button></li>';
+                    pagingHtml += '<li class="page-item disabled"><button class="page-link">@_loc["Prev"]</button></li>';
+                }
+
+                let firstPageToDisplay = totalPages <= SHOW_PAGE_COUNT ? 1 : currentPage - parseInt((SHOW_PAGE_COUNT / 2));
+
+                if (firstPageToDisplay < 1) {
+                    firstPageToDisplay = 1;
+                }
+
+                for (var pageNumber = firstPageToDisplay; pageNumber < (firstPageToDisplay + SHOW_PAGE_COUNT); pageNumber++) {
+                    if (pageNumber <= totalPages) {
+                        if (currentPage == pageNumber) {
+                            pagingHtml += '<li class="page-item active">' +
+                                '<button class="page-link page-link-active" current-page="' +
+                                pageNumber +
+                                '">' +
+                                pageNumber +
+                                '<span class="sr-only">(current)</span>' +
+                                '</button>' +
+                                '</li>';
+                        } else {
+                            pagingHtml += '<li class="page-item"><button class="page-link page-link-active" current-page="' + pageNumber + '">' + pageNumber + '</button></li>';
+                        }
+                    } else {
+                        break;
+                    }
+                }
+
+                if (currentPage != totalPages) {
+                    pagingHtml += '<li class="page-item"><button class="page-link page-link-active" current-page="' + (currentPage + 1) + '">@_loc["Next"]</button></li>';
+                    pagingHtml += '<li class="page-item"><button class="page-link page-link-active" current-page="' + totalPages + '">@_loc["Last"]</button></li>';
+                } else {
+                    pagingHtml += '<li class="page-item disabled"><button class="page-link">@_loc["Next"]</button></li>';
+                    pagingHtml += '<li class="page-item disabled"><button class="page-link">@_loc["Last"]</button></li>';
+                }
+            }
+            pagingHtml = '<nav aria-label="Page navigation example" style="text-align:center"><ul class="pagination">' +
+                pagingHtml +
+                '</ul><b style="color:#1e88e5">@_loc["TotalRowCount"] : ' +
+                totalRowCount +
+                '</b></nav>';
+
+            $(`#${rootElementId} .paging-div`).html(pagingHtml);
+            $(`#${rootElementId} .paging-div .page-link-active`).off('click');
+            $(`#${rootElementId} .paging-div .page-link-active`).on('click',
+                function (e) {
+                    e.preventDefault();
+                    switch (rootElementId.toLowerCase()) {
+                        case 'requestgriddiv':
+                            loadLeasingRequest(this);
+                            break;
+                    }
+                });
+        }
+    </script>
+}

@@ -1,0 +1,310 @@
+﻿@using static Common.Enums;
+@model List<RequestFacilityWarrantyModel>
+@{
+    ViewData["Title"] = "فرم بارگذاری تصاویر چک/تضامین";
+    Layout = "~/Views/Shared/_NewLayout.cshtml";
+}
+@section styles{
+    <link rel="stylesheet" type="text/css" href="~/new-layout/css/dropzone.min.css" />
+    <link rel="stylesheet" type="text/css" href="~/new-layout/css/dropzone.custom.css" />
+    <style type="text/css">
+        #frmRequestFacilityWaranty,
+        #frmRequestFacilityPromissoryNote {
+            text-align: center;
+        }
+
+        .cheque-data {
+            color: blueviolet;
+        }
+    </style>
+}
+@{
+    RequestFacilityWarrantyModel? cheque = null;
+    RequestFacilityWarrantyModel? promissoryNote = null;
+    DocumentModel? chequeFile = null;
+    DocumentModel? promissoryNoteFile = null;
+    var requestFacilityId = Model.First().RequestFacilityId;
+    if (Model != null)
+    {
+        cheque = Model.FirstOrDefault(p => p.DocumentType == DocumentType.Cheque);
+        promissoryNote = Model.FirstOrDefault(p => p.DocumentType == DocumentType.PromissoryNoteDocument);
+        if (Model.Any(p => p.File != null && p.File.DocumentType == DocumentType.Cheque))
+            chequeFile = Model.First(p => p.File.DocumentType == DocumentType.Cheque).File;
+        if (Model.Any(p => p.File != null && p.File.DocumentType == DocumentType.PromissoryNoteDocument))
+            promissoryNoteFile = Model.First(p => p.File.DocumentType == DocumentType.PromissoryNoteDocument).File;
+    }
+}
+@await Component.InvokeAsync("WorkFlowStepWizardHorizental", new {workFlow = WorkFlowEnum.RequestFacility, requestId =  requestFacilityId })
+<div id="warantyContentDiv">
+    <div class="p-2 bg-white rounded-lg">
+        <div class="d-flex align-items-center">
+            <a href="@Url.Action("List","RequestFacility")" class="dark bg-white rounded-lg px-50 py-25 mr-50 d-flex align-items-center" title="بازگشت">
+                <i class="bx bx-arrow-back rotate-180 font-medium-4"></i>
+            </a>
+            <div class="ml-1">
+                <div class="font-medium-3 secondary darken-4 text-bold-700">
+                    ثبت و بارگذاری تضامین
+                </div>
+            </div>
+        </div>
+        <div class="bg-white mt-2 p-1 p-md-2 p-lg-3 rounded-lg">
+            <div class="alert zl-bg-alert-warning border-warning border-accent-4 alert-dismissible" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="بستن">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <div class="d-flex">
+                    <i class="bx bx-error-circle font-large-1"></i>
+                    <div class="text-muted text-bold-400 font-small-3">
+                        کاربر گرامی لطفا یک فقره چک با مشخصات زیر صادر کنید و سپس
+                        اطلاعات آن را در سامانه صیاد ثبت کنید و در پایان تصویر چک را
+                        بصورت خوانا و واضح بارگذاری نمایید.
+                        <ul>
+                            <li class="dark">مبلغ چک : @cheque.WarantyAmount.ToString("N0") ريال</li>
+                            @*<li class="dark">در وجه : @Model.LeasingTitle به شناسه ملی @Model.LeasingNationalId</li>*@
+                            <li class="dark">در وجه : راهکار مالی هیراد زرین به شناسه ملی 14008746613</li>
+                            <li class="dark">تاریخ چک : @cheque.ShamsiWarantyDate</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-2 p-2 d-flex flex-column align-items-center justify-content-start">
+                <div class="text-bold-700 dark">
+                    تصویر چک پر شده و ثبت شده در سامانه صیاد
+                </div>
+                <div class="text-bold-400 mb-2 mt-1 font-small-2">
+                    فرمت‌های مجاز: png و jpg و gif و bmp و jpeg
+                </div>
+                <div class="w-100">
+                    <form action="#" class="dropzone dropzone-area bg-white" id="frmRequestFacilityWaranty">
+                        @if (chequeFile != null)
+                        {
+                            var filePath = $"{chequeFile.FilePath}?ver={chequeFile.Version}";
+                            <div id="previewRequestFacilityWaranty" class="dz-preview dz-image-preview">
+                                <div class="dz-details">
+                                    <a target='_blank' href='@filePath'>
+                                        <img data-dz-thumbnail="" alt='چک' src="@filePath">
+                                    </a>
+                                </div>
+                            </div>
+                        }
+                        <div class="dz-message font-medium-1">انتخاب فایل ..</div>
+                    </form>
+                </div>
+            </div>
+            <hr class="mt-4 mb-1" />
+            <div class="alert zl-bg-alert-warning border-warning border-accent-4 alert-dismissible" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="بستن">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <div class="d-flex">
+                    <i class="bx bx-error-circle font-large-1"></i>
+                    <div class="text-muted text-bold-400 font-small-3">
+                        کاربر گرامی لطفا یک فقره سفته با مشخصات زیر صادر کنید و سپس
+                        اطلاعات آن را در سامانه مربوطه ثبت کنید و در پایان فایل Pdf را
+                        بارگذاری نمایید.
+                        <ul>
+                            <li class="dark">مبلغ سفته : @promissoryNote.WarantyAmount.ToString("N0") ريال</li>
+                            <li class="dark">در وجه : بانک آینده سهامی عام به شناسه ملی 10320894878</li>
+                            <li class="dark">تاریخ سفته : @promissoryNote.ShamsiWarantyDate</li>
+                            <li class="dark">شماره سفته باید عددی یازده رقمی باشد</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-2 p-2 d-flex flex-column align-items-center justify-content-start">
+                <div class="text-bold-700 dark">
+                    فایل Pdf سفته الکترونیک
+                </div>
+                <div class="text-bold-400 mb-2 mt-1 font-small-2">
+                    فرمت‌های مجاز: pdf
+                </div>
+                <div class="w-100">
+                    <form action="#" class="dropzone dropzone-area bg-white" id="frmRequestFacilityPromissoryNote">
+                        @if (promissoryNoteFile != null)
+                        {
+                            var filePath = $"{promissoryNoteFile.FilePath}?ver={promissoryNoteFile.Version}";
+                            <div id="previewRequestFacilityPromissoryNote" class="dz-preview dz-image-preview">
+                                <div class="dz-details">
+                                    <a target='_blank' href='@filePath'>
+                                        سفته الکترونیکی
+                                    </a>
+                                </div>
+                            </div>
+                        }
+                        <div class="dz-message font-medium-1">انتخاب فایل ..</div>
+                    </form>
+                </div>
+            </div>
+            <form id="frmFields">
+                <div class="row" style="margin-right:7px;margin-left:7px">
+                    <div class="col-md-6 col-sm-12">
+                        <div class="form-group">
+                            <input data-val-regex="شماره سفته را بصورت عددی 11 رقمی وارد کنید" data-val="true" data-val-regex-pattern="^[1-9]{1}[0-9]{10}$" data-val-required="شماره سفته اجباری است!" data-val-length-max="11"
+                                   maxlength="11" name="DocumentNumber" id="DocumentNumber" data-val-length="شماره سفته باید 11 رقمی باشد"
+                                   class="form-control bg-transparent" style="text-align:center;direction:ltr;letter-spacing:5px" placeholder="شماره سفته" />
+                            <span class="text-danger field-validation-valid" data-valmsg-for="DocumentNumber" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-sm-12">
+                    </div>
+                </div>
+            </form>
+            <hr class="mt-4 mb-1" />
+            <div class="text-right">
+                <a class="btn btn-outline-secondary" asp-controller="RequestFacility" asp-action="List">
+                    <span>بازگشت به لیست تسهیلات</span>
+                </a>
+                <button id="btnUploadWaranties" class="btn btn-zl-primary white">
+                    ثبت و بارگذاری تضامین&nbsp;<i class="fal fa-upload"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts{
+    @*<partia name="_ValidationScriptsPartial" />*@
+    <script src="~/new-layout/js/dropzone.min.js"></script>
+    @{
+        await Html.RenderPartialAsync("~/Views/Shared/_ValidationScriptsPartial.cshtml");
+    }
+    <script>
+        var isEditMode = false; //@@Model.IsEditMode.ToString().ToLower();
+        let requestFacilityWarantyFile = null;
+        let promissoryNoteWarantyFile = null;
+        $(document).ready(function () {
+            $('#DocumentNumber').mask('99999999999', { placeholder: "__________" });
+        });
+        const fileIsImage = (file) => {
+            return file.type == 'image/jpg' ||
+                file.type == 'image/jpeg' ||
+                file.type == 'image/png' ||
+                file.type == 'image/gif' ||
+                file.type == 'image/bmp';
+        }
+
+        Dropzone.options.frmRequestFacilityWaranty = {
+            paramName: "file", // The name that will be used to transfer the file
+            maxFilesize: 1, // MB
+            addRemoveLinks: true,
+            dictRemoveFile: "حذف",
+            autoProcessQueue: false,
+            acceptedFiles: ".png,.jpg,.gif,.bmp,.jpeg",
+            maxFiles: 1,
+            accept: function (file, done) {
+                debugger;
+                if ($('#previewRequestFacilityWaranty').length > 0)
+                    $('#previewRequestFacilityWaranty').remove();
+                requestFacilityWarantyFile = file;
+                console.log(typeof (file));
+                done();
+            },
+            init: function () {
+                this.on("maxfilesexceeded", function (file) {
+                    showMessage('@ResourceFile.InfoTitle', 'فقط میتوانید یک فایل بارگذاری کنید!', icons.warning, '@ResourceFile.Close');
+                    this.removeFile(file);
+                });
+                this.on("sending", function (file) {
+                    debugger;
+                });
+                this.on("addedfile", file => {
+                    debugger;
+                    if (!fileIsImage(file)) {
+                        this.removeFile(file);
+                        showMessage('@ResourceFile.InfoTitle', 'فقط فایل های با پسوند .png,.jpg,.gif,.bmp,.jpeg میتوانید انتخاب کنید', icons.warning, '@ResourceFile.Close');
+                    }
+                });
+            }
+        };
+
+        Dropzone.options.frmRequestFacilityPromissoryNote = {
+            paramName: "file", // The name that will be used to transfer the file
+            maxFilesize: 1, // MB
+            addRemoveLinks: true,
+            dictRemoveFile: "حذف",
+            autoProcessQueue: false,
+            acceptedFiles: ".pdf",
+            maxFiles: 1,
+            accept: function (file, done) {
+                debugger;
+                if ($('#previewRequestFacilityPromissoryNote').length > 0)
+                    $('#previewRequestFacilityPromissoryNote').remove();
+                promissoryNoteWarantyFile = file;
+                console.log(typeof (file));
+                done();
+            },
+            init: function () {
+                this.on("maxfilesexceeded", function (file) {
+                    showMessage('@ResourceFile.InfoTitle', 'فقط میتوانید یک فایل بارگذاری کنید!', icons.warning, '@ResourceFile.Close');
+                    this.removeFile(file);
+                });
+                this.on("sending", function (file) {
+                    debugger;
+                });
+                this.on("error", file => {
+                    debugger;
+                });
+                this.on("addedfile", file => {
+                    debugger;
+                    if (file.type != 'application/pdf') {
+                        this.removeFile(file);
+                        showMessage('@ResourceFile.InfoTitle', 'فقط فایل های با پسوند .pdf میتوانید انتخاب کنید', icons.warning, '@ResourceFile.Close');
+                    }
+                });
+            }
+        };
+
+        $('#btnUploadWaranties').click(function (e) {
+            e.preventDefault();
+            debugger;
+            const formIsValid = $('#frmFields').valid();
+            if (isEditMode == false && requestFacilityWarantyFile == null) {
+                showMessage('@ResourceFile.InfoTitle', 'لطفا تصویر چک را بارگذاری کنید', icons.warning, '@ResourceFile.Close');
+                return;
+            }
+
+            if (isEditMode == false && promissoryNoteWarantyFile == null) {
+                showMessage('@ResourceFile.InfoTitle', 'لطفا فایل PDF سفته را بارگذاری کنید', icons.warning, '@ResourceFile.Close');
+                return;
+            }
+
+            if (formIsValid) {
+                showWaiting('warantyContentDiv', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                let data = new FormData();
+                data.append('ChequeFile', requestFacilityWarantyFile);
+                data.append('PromissoryNoteFile', promissoryNoteWarantyFile);
+                data.append('DocumentNumber', $('#DocumentNumber').val());
+                data.append('RequestFacilityId', @requestFacilityId);
+
+                $.ajax({
+                    type: 'post',
+                    //dataType: 'json',
+                    //contentType: "application/json; charset=utf-8",
+                    processData: false,
+                    contentType: false,
+                    url: '/api/v1/RequestFacilityWarranty/UploadWaranties',
+                    data: data,// JSON.stringify(model),
+                    success: function (result) {
+                        hideWaiting('warantyContentDiv');
+                        debugger;
+                        if (result.isSuccess) {
+                            showMessage('@ResourceFile.InfoTitle', 'کاربر گرامی<br/>ثبت و بارگذاری تضامین با موفقیت انجام شد،لطفا اقدام به امضاء قرارداد نمایید تا فرآیند درخواست تسهیلات شما بصورت اتوماتیک به مرحله بعد ارجاع داده شود', icons.success, '@ResourceFile.Close',
+                                () => { window.location.replace('@Url.Action("SignContractByUser","SignContract", new {requestFacilityId = requestFacilityId})'); });
+
+                        }
+                    },
+                    error: function (error) {
+                        hideWaiting('warantyContentDiv');
+                        const exception = getExceptionMessageFromError(error);
+                        if (exception != null)
+                            showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                        else
+                            showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                    }
+                });
+            }
+            else {
+                scrollToFirstError();
+            }
+        });
+    </script>
+}

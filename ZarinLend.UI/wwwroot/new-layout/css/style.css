@@ -1,0 +1,221 @@
+.zl-text-primary {
+    color: #17c3b2 !important;
+}
+
+.zl-bg-primary {
+    background-color: #17c3b2 !important;
+}
+
+.zl-border-primary {
+    border: 1px solid #17c3b2;
+}
+
+.zl-text-danger {
+    color: red !important;
+}
+
+.zl-bg-red {
+    background-color: red !important;
+}
+
+.zl-border-danger {
+    border: 1px solid red;
+}
+
+.zl-text-secondary {
+    color: #6366f1 !important;
+}
+
+.zl-text-secondary-light {
+    color: #a5b4fc !important;
+}
+
+.zl-border-secondary {
+    border: 1px solid #6366f1 !important;
+}
+
+.zl-bg-secondary {
+    background-color: #6366f1 !important;
+}
+
+.zl-border-secondary-light {
+    border: 1px solid #a5b4fc;
+}
+
+.zl-uv-next {
+    border: 2px solid #dfe3e7 !important;
+}
+
+    .zl-uv-next + div {
+        color: #dfe3e7;
+    }
+
+.zl-uv-current {
+    border: 2px solid #a5b4fc !important;
+}
+
+    .zl-uv-current + div {
+        color: #a5b4fc !important;
+    }
+
+.zl-uv-passed {
+    border: 2px solid #17c3b2 !important;
+}
+
+    .zl-uv-passed + div {
+        color: #17c3b2 !important;
+    }
+
+.edit-user-bg {
+    background-color: #f8f8f8 !important;
+}
+
+.btn-zl-primary {
+    border-color: #108885 !important;
+    background-color: #17c3b2 !important;
+    color: #ffffff;
+}
+
+    .btn-zl-primary:hover,
+    .btn-zl-primary.hover {
+        background-color: #108885 !important;
+        color: #ffffff;
+    }
+
+        .btn-zl-primary:hover.glow,
+        .btn-zl-primary.hover.glow {
+            box-shadow: 0 4px 12px 0 rgba(90, 141, 238, 0.6) !important;
+        }
+
+    .btn-zl-primary:focus,
+    .btn-zl-primary:active,
+    .btn-zl-primary.active {
+        background-color: #108885 !important;
+        color: #ffffff !important;
+    }
+
+    .btn-zl-primary.glow {
+        box-shadow: 0 2px 4px 0 rgba(90, 141, 238, 0.5) !important;
+    }
+
+    .btn-zl-primary:disabled,
+    .btn-zl-primary.disabled {
+        color: #ffffff !important;
+    }
+
+.zl-menu-item {
+    border-right: 3px solid transparent !important;
+}
+
+    .zl-menu-item:hover {
+        background-color: #ecfdfb !important;
+        border-right: 4.5px solid transparent !important;
+    }
+
+    .zl-menu-item.zl-active {
+        border-right: 3px solid #17c3b2 !important;
+        background-color: transparent !important;
+    }
+
+.refund-section a.active {
+    background-color: #17c3b2 !important;
+    color: white !important;
+}
+
+.table tr.border {
+    border-radius: 0.6rem !important;
+}
+
+.dropzone {
+    height: 18rem;
+    min-height: 0px !important;
+}
+
+.radio.radio-success input:checked ~ label::before {
+    background-color: #17c3b2;
+    border-color: #108885;
+}
+
+.zl-bg-alert-warning {
+    background-color: #fffbeb !important;
+}
+
+.zl-req-list-container .nav-link.active {
+    color: black !important;
+    border-bottom: 2px solid #17c3b2 !important;
+}
+
+.badge.zl-badge-upload-document {
+    background-color: #eef2ff;
+    color: #6366f1 !important;
+}
+
+.badge.zl-badge-reject {
+    background-color: #fef2f2;
+    color: #ad1977 !important;
+}
+
+.badge.zl-badge-deposited {
+    background-color: #ecfdfb;
+    color: #17c3b2 !important;
+}
+
+.badge.zl-badge-validation {
+    background-color: #fffbeb;
+    color: #fbbf24 !important;
+}
+
+.badge.zl-badge-wage {
+    background-color: #f1f4fe;
+    color: #9933ff !important;
+}
+
+.badge.zl-badge-guarantee-check {
+    background-color: #ecfdfb;
+    color: #0d7066 !important;
+}
+
+.badge.zl-badge-contract {
+    background-color: #f1f4fe;
+    color: #1f43ec !important;
+}
+
+.badge.zl-badge-final-review {
+    background-color: #f5f5f5;
+    color: #ad1977 !important;
+}
+
+@media (min-width: 992px) {
+    .zl-app-content {
+        padding-right: 0.5rem !important;
+        padding-left: 0.5rem !important;
+    }
+}
+
+@media (min-width: 950px) {
+    .zl-app-content {
+        padding-right: 3rem !important;
+        padding-left: 3rem !important;
+    }
+}
+
+@media (min-width: 1100px) {
+    .zl-app-content {
+        padding-right: 7rem !important;
+        padding-left: 7rem !important;
+    }
+}
+
+@media (min-width: 1250px) {
+    .zl-app-content {
+        padding-right: 9rem !important;
+        padding-left: 9rem !important;
+    }
+}
+
+@media (min-width: 1400px) {
+    .zl-app-content {
+        padding-right: 11rem !important;
+        padding-left: 11rem !important;
+    }
+}

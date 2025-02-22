@@ -1,0 +1,629 @@
+﻿@*@model RequestFacilityFilterModel*@
+@{
+    ViewData["Title"] = ViewBag.Title;
+    Layout = "~/Views/Shared/_NewLayout.cshtml";
+    var ajaxUrl = "/api/v1/RequestFacility/SearchRequest";
+    var ajaxExportUrl = "/api/v1/RequestFacility/SearchRequestExport";
+}
+@section styles{
+    <link href="~/persianDatePicker/css/persianDatepicker-lightorang.css" rel="stylesheet" />
+    <style type="text/css">
+    </style>
+}
+<div id="requestGridDiv" class="p-2 bg-white rounded-lg">
+    <div class="font-medium-3 secondary darken-4 text-bold-800 d-flex align-items-center">
+        <i class="bx bx-align-right zl-text-secondary mr-25"></i>
+        <span>جستجوی پیشرفته</span>
+    </div>
+    <div class="p-2 rounded-lg">
+        <form id="filterForm" method="post">
+            @await Component.InvokeAsync("RequestFacilityFilter",new { showWaitingStepsFilter = true, showFacilityStatus = true })  
+            <div class="row my-0 my-md-1">
+                <div class=" col-md-12" style="text-align:left">
+                    <button type="button" id="btnSearch" class="btn btn-zl-primary">
+                        جستجو&nbsp;<i class="fal fa-search"></i>
+                    </button>
+                    <button id="btnExportToExcel" tabindex="5" class="btn btn-outline-info">
+                        خروجی اکسل&nbsp;<i class="fal fa-file-excel-o"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+        <table id="requestList" class="display" style="width:100%">
+            <thead>
+                <tr>
+                    <th><div class='checkbox checkbox-primary'><input type='checkbox' id="checkAll" /><label for="checkAll"></label></div></th>
+                    <th>#</th>
+                    <th >اعتبار درخواستی(ريال)<br />بازه پرداخت</th>
+                    <th >درخواست کننده<br />کد ملی/شناسه ملی</th>
+                    <th >نهاد مالی</th>
+                    <th >ضامن نیاز دارد<br />نام ضامن</th>
+                    <th >تاریخ درخواست</th>
+                    <th >تاریخ آخرین اقدام</th>
+                    <th >وضعیت</th>
+                    <th>کارشناس اقدام کننده</th>
+                    <th >اقدام</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+@section scripts{
+    @{
+        await Html.RenderPartialAsync("~/Views/Shared/_ValidationScriptsPartial.cshtml");
+        <script src="~/persianDatePicker/js/persianDatepicker.min.js"></script>        
+    }
+    <script>
+        let requestFacilityIdArray = [];
+        let responsiveDatatable;
+        //let startDate = null;
+        //let endDate = null;
+        //$('#StartDate').val('@ViewBag.StartDate');
+        //$('#txtStartDate').val('@ViewBag.PersianStartDate');
+
+        //$('#EndDate').val('@ViewBag.EndDate');
+        //$('#txtEndDate').val('@ViewBag.PersianEndDate');
+        $(document).ready(function () {
+            $('div').removeClass('zl-active');
+            $('#reportPage').addClass('zl-active');
+            //$('#NationalCode').mask('9999999999', { placeholder: "__________" });
+
+            //startDate = $("#txtStartDate").persianDatepicker(
+            //    {
+            //        months: ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"],
+            //        dowTitle: ["شنبه", "یکشنبه", "دوشنبه", "سه شنبه", "چهارشنبه", "پنج شنبه", "جمعه"],
+            //        shortDowTitle: ["ش", "ی", "د", "س", "چ", "پ", "ج"],
+            //        theme: 'lightorang',
+            //        showGregorianDate: !1,
+            //        persianNumbers: !0,
+            //        formatDate: "YYYY/0M/0D",
+            //        selectedBefore: !1,
+            //        selectedDate: '@ViewBag.PersianStartDate',
+            //        prevArrow: '\u25c4',
+            //        nextArrow: '\u25ba',
+            //        alwaysShow: !1,
+            //        selectableYears: null,
+            //        selectableMonths: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+            //        cellWidth: 50, // by px
+            //        cellHeight: 40, // by px
+            //        fontSize: 17, // by px
+            //        isRTL: !1,
+            //        calendarPosition: {
+            //            x: 0,
+            //            y: 0,
+            //        },
+            //        onSelect: function () {
+            //            //alert($("#txtBirthDate").attr("data-gdate"));
+            //            $('#StartDate').val($("#txtStartDate").attr("data-gdate"));
+            //        },
+            //        onShow: function () { },
+            //        onHide: function () { },
+            //        onRender: function () { }
+            //    });
+
+            //endDate = $("#txtEndDate").persianDatepicker(
+            //    {
+            //        months: ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"],
+            //        dowTitle: ["شنبه", "یکشنبه", "دوشنبه", "سه شنبه", "چهارشنبه", "پنج شنبه", "جمعه"],
+            //        shortDowTitle: ["ش", "ی", "د", "س", "چ", "پ", "ج"],
+            //        theme: 'lightorang',
+            //        showGregorianDate: !1,
+            //        persianNumbers: !0,
+            //        formatDate: "YYYY/0M/0D",
+            //        selectedBefore: !1,
+            //        selectedDate: '@ViewBag.PersianEndDate',
+            //        prevArrow: '\u25c4',
+            //        nextArrow: '\u25ba',
+            //        alwaysShow: !1,
+            //        selectableYears: null,
+            //        selectableMonths: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+            //        cellWidth: 50, // by px
+            //        cellHeight: 40, // by px
+            //        fontSize: 17, // by px
+            //        isRTL: !1,
+            //        calendarPosition: {
+            //            x: 0,
+            //            y: 0,
+            //        },
+            //        onSelect: function () {
+            //            $('#EndDate').val($("#txtEndDate").attr("data-gdate"));
+            //        },
+            //        onShow: function () { },
+            //        onHide: function () { },
+            //        onRender: function () { }
+            //    });
+
+            loadRequests();
+        });
+
+        //============
+        const loadRequests = () => {
+            responsiveDatatable = $('#requestList')
+                .on('preXhr.dt', function (e, settings, data, a, b) {
+                    //trigger before ajax call
+                    //debugger;
+                    //alert('preXhr');
+                    showWaiting('requestList', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                })
+                .on('xhr.dt', function (e, settings, json, xhr) {
+                    //trigger after ajax call
+                    //debugger;
+                    //alert('xhr');
+                })
+                .DataTable({
+                    order: [],
+                    processing: true,
+                    serverSide: true,
+                    responsive: true,
+                    rowReorder: false,
+                    select: true,
+                    searching: false,
+                    paging: true,
+                    ordering: false,
+                    searching: false,
+                    filtering: false,
+                    info: true,
+                    lengthMenu: [
+                        [5, 10, 25, 50],
+                        [5, 10, 25, 50]
+                    ],
+                    pageLength: 10,
+                    //columnDefs: [{
+                    //    targets: 0,
+                    //    Id: function (td, cellData, rowData, row, col) {
+                    //        debugger;
+                    //        if (rowData[5] === 'Inactive') {
+                    //            $(td).css('color', 'red');
+                    //        }
+                    //    }
+                    //}],
+                    columnDefs: [
+                        //{ "visible": false, "targets": 0 },
+                        //and in this case the < a href="//legacy.datatables.net/ref#bStateSave" > bStateSave</a> works regularly ....but then I would like to have responsive columns indicating responsive: {
+                        {
+                            details: false,
+                            breakpoints: [
+                                { name: 'desktop', width: Infinity },
+                                { name: 'tablet-l', width: 1200 },
+                                { name: 'tablet-p', width: 992 },
+                                { name: 'mobile-l', width: 576 },
+                                { name: 'mobile-p', width: 320 }
+                            ]
+                        },
+                        {
+                            targets: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                            className: 'dt-center',
+                        },
+                        {
+                            targets: 0,
+                            render: function (data, type, row, meta) {
+                                return `<div class='checkbox checkbox-primary'><input type='checkbox' class='select-row' value='${data}' id='chk_${data}'/><label for='chk_${data}'></label></div></fieldset>`;
+                            }
+                        },
+                        {
+                            targets: 2,
+                            render: function (data, type, row, meta) {
+                                return `${splitNumber(data)}<br/>${row.monthCountTitle}`;
+                            }
+                        },
+                        {
+                            targets: 3,
+                            render: function (data, type, row, meta) {
+                                return `${data}<br/>${row.nationalCode}`;
+                            }
+                        },
+                        {
+                            targets: 5,
+                            render: function (data, type, row, meta) {
+                                let guarantorDesc = 'خیر';
+                                if (data) {
+                                    guarantorDesc = 'بله';
+                                    if (row.lastGuarantorFullName != null)
+                                        guarantorDesc += `<br/>${row.lastGuarantorFullName}`;
+                                }
+                                return `<span style='color:red'>${guarantorDesc}</span>`;
+                            }
+                        },
+                        {
+                            targets: 8,
+                            responsivePriority: 2,
+                            render: function (data, type, row, meta) {
+                                let waitingStep = '';
+                                if (data.cancelByUser) {
+                                    const cancelByUserDescription = "<span style='color:red'>انصراف توسط کاربر</span>";
+                                    if ('@((short)StatusEnum.Approved)' == data.statusId)
+                                        waitingStep = `${data.lastStatusDescription}(${cancelByUserDescription})`;
+                                    else if ('@((short)StatusEnum.Rejected)' == data.statusId)
+                                        waitingStep = `${data.lastStatusDescription}(${cancelByUserDescription})`;
+                                    else
+                                        waitingStep = `${data.lastStatusDescription}(${cancelByUserDescription})`;
+                                }
+                                else {
+                                    if ('@((short)StatusEnum.Approved)' == data.statusId)
+                                        waitingStep += data.lastStatusDescription;
+                                    else if ('@((short)StatusEnum.Rejected)' == data.statusId)
+                                        waitingStep = data.lastStatusDescription;
+                                    else {
+                                        waitingStep = data.guarantorIsRequired && data.awaitingIntroductionGuarantor ? `${data.lastStatusDescription}(<span class='text-danger'>در انتظار معرفی ضامن</span>)` : data.lastStatusDescription;
+                                    }
+                                }
+                                return `<div class="badge badge-pill zl-badge-upload-document"><div class="d-flex align-items-center"><i class="bx bxs-circle font-size-xxsmall mr-25"></i>${waitingStep}</div></div>`;
+                            }
+                        },
+                        {
+                            targets: 10,
+                            responsivePriority: 3,
+                            render: function (data, type, row, meta) {
+                                let buttonsHtml = `<a class="dropdown-item change-status" href='@Url.Action("Detail","RequestFacility")/${data.id}'><i class="bx bx-detail font-medium-5 secondary darken-4 mr-75"></i>جزئیات</a>`;
+
+                                if (!data.cancelByUser) {
+                                    if (data.formUrl != null)
+                                        buttonsHtml = `<a href='${data.formUrl}' class='dropdown-item change-status'><i class="bx bx-news font-medium-5 secondary darken-4 mr-75"></i>اقدام</a>` + buttonsHtml;
+                                }
+                                buttonsHtml += `<a id='requestHistory' class="dropdown-item request-history" data-request-facility-id='${data.id}' href='javascript:void(0)'><i class="bx bx-detail font-medium-5 secondary darken-4 mr-75"></i>تاریخچه مراحل تسهیلات</a>`;
+                                buttonsHtml += `<a class="dropdown-item"  href='@Url.Action("Edit","User")/${data.reguesterId}'><i class="bx bx-detail font-medium-5 secondary darken-4 mr-75"></i>ویرایش اطلاعات هویتی</a>`;
+                                if (!data.cancelByUser && '@((short)StatusEnum.Approved)' != data.statusId && '@((short)StatusEnum.Rejected)' != data.statusId)
+                                    buttonsHtml += `<a id='cancelRequest' href='JavaScript:Void(0);' data-id='${data.id}' style='color:red' class='dropdown-item cancel-request'><i class="bx bx-folder-minus font-medium-5 danger darken-1 mr-75"></i>لغو درخواست</a>`;
+
+                                return `<div class="btn-group dropright"><a href="#" class="dark" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="bx bx-dots-horizontal"></i></a><div class="dropdown-menu">${buttonsHtml}</div></div>`;
+                            }
+                        }],
+                    //ajax: {
+                    //    url: `/api/v1/RequestFacilityInstallment/SelectInstallment2/${$('#drpApprovalFacility').val()}`,
+                    //    type: 'POST',
+                    //    dataSrc: function(data) {
+                    //        data.recordsTotal = data.data.length;
+                    //        data.recordsFiltered = data.data.length;
+                    //        return data.data;
+                    //    },
+                    //    datatype: "json",
+                    //    //contentType: "application/json",
+                    //    contentType: "application/json; charset=utf-8",
+                    //    data: function(input) {
+                    //        debugger;
+                    //        //if ($('#FacilityTypeId').val() != '')
+                    //        //    input.FacilityTypeId = $('#FacilityTypeId').val();
+
+                    //        return JSON.stringify(input);
+                    //    },
+                    //},
+                    ajax: (data, callback, setting) => {
+                        getFacilityRequestData(data).then(function (_data) {
+                            callback(_data);
+                        });
+                    },
+                    drawCallback: function (settings) {
+                        hideWaiting('requestList');
+                    },
+                    initComplete: function (settings, json) {
+                    },
+                    rowCallback: (row, data, displayNum, displayIndex, dataIndex) => {
+                        $('td:eq(1)', row).html(displayIndex + 1);
+                        return row;
+                    },
+                    columns: [
+                        //{
+                        //    //For Row Number
+                        //    "data": "Id",
+                        //    render: function (data, type, row, meta) {
+                        //        return meta.settings.oAjaxData.start + meta.row + 1;
+                        //    }
+                        //},
+                        //{
+                        //    "data": "PersonFirstName",
+                        //    render: function (data, type) {
+                        //        //debugger;
+                        //        //if (type === 'display') {
+                        //        //    let link = 'http://datatables.net';
+
+                        //        //    if (data[0] < 'H') {
+                        //        //        link = 'http://cloudtables.com';
+                        //        //    } else if (data[0] < 'S') {
+                        //        //        link = 'http://editor.datatables.net';
+                        //        //    }
+
+                        //        //    return '<a href="' + link + '">' + data + '</a>';
+                        //        //}
+
+                        //        return data;
+                        //    },
+                        //},
+                        { "data": 'id' },
+                        { "data": null },
+                        { "data": "amount" },
+                        { "data": "requester" },
+                        { "data": "leasingName" },
+                        { "data": "guarantorIsRequired" },
+                        { "data": "shamsiCreateDate" },
+                        { "data": "shamsiLastActionDate" },
+                        { "data": null },
+                        { "data": "operator" },
+                        { "data": null },
+                    ],
+                    language: {
+                        url: '/new-layout/datatables.net/fa.json'
+                    }
+                });
+
+            const getFacilityRequestData = (data) => {
+                const postData = {
+                    Page: Math.floor(data.start / data.length) + 1,
+                    PageSize: data.length,
+                    SortDirection: null,
+                    SortOrder: null,
+                    FilterList: []
+                };
+
+                fillFilter(postData);
+                return new Promise(function (resolve, reject) {
+                    console.log('Loading data');
+
+                    $.ajax({
+                        type: 'post',
+                        datatype: "json",
+                        data: JSON.stringify(postData),
+                        contentType: "application/json; charset=utf-8",
+                        url: '@ajaxUrl',
+                        success: function (result) {
+                            if (result != undefined && result.isSuccess == true) {
+                                resolve({
+                                    data: result.data.data,
+                                    recordsTotal: result.data.totalRowCount,
+                                    recordsFiltered: result.data.totalRowCount
+                                });
+                            }
+                        },
+                        error: function (error) {
+                            debugger;
+                            const exception = getExceptionMessageFromError(error);
+                            if (exception != null)
+                                showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                            else
+                                showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                        },
+                        complete: function () {
+
+                        },
+                    });
+                });
+            }
+
+            $('#requestList tbody').on('click', 'a#requestHistory', function (e) {
+                e.preventDefault();
+                let data = responsiveDatatable.row(this).data();
+                if (data == undefined)
+                    data = responsiveDatatable.row($(this).parents('tr')).data();
+                loadRequestFacilitySteps(data.id);
+                $('#requestFacilityStepsHistoryModal').modal();
+            });
+
+            $('#requestList tbody').on('click', 'a#cancelRequest', function (e) {
+                e.preventDefault();
+                let data = responsiveDatatable.row(this).data();
+                if (data == undefined)
+                    data = responsiveDatatable.row($(this).parents('tr')).data();
+
+                Swal.fire({
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    title: 'هشدار',
+                    //text: message,
+                    html: 'آیا برای لغو درخواست مطمئن هستید؟<br/>در صورت انصراف درخواست بسته خواهد شد و تمام هزینه های پرداختی توسط شما قابل عودت نمی باشد!',
+                    icon: icons.warning,
+                    confirmButtonText: 'بله،مطمئنم',
+                    confirmButtonClass: 'btn btn-danger',
+                    cancelButtonText: "خیر،مطمئن نیستم",
+                    cancelButtonClass: "btn btn-warning",
+                    showCancelButton: true,
+                    closeOnConfirm: false,
+                    closeOnCancel: false,
+                }).then((result) => {
+                    if (result.value) {
+                        showWaiting('requestGridDiv', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                        $.ajax({
+                            type: 'post',
+                            //data: JSON.stringify(postData),
+                            datatype: "json",
+                            contentType: "application/json; charset=utf-8",
+                            url: `/api/v1/RequestFacility/CancelByZarinLendAdmin/${data.id}`,
+                            success: function (result) {
+                                hideWaiting('requestGridDiv');
+                                if (result !== undefined && result !== null && result.isSuccess === true) {
+                                    responsiveDatatable.page(0);
+                                    responsiveDatatable.ajax.reload(null, false);
+                                    showMessage('پیغام', 'عملیات با موفقیت انجام شد!', icons.info, '@ResourceFile.Close');
+                                }
+                                else {
+                                    showMessage('خطا', result.message, icons.error, '@ResourceFile.Close');
+                                }
+                            },
+                            error: function (error) {
+                                debugger;
+                                hideWaiting('requestGridDiv');
+                                if (error.responseJSON != undefined && error.responseJSON.message != undefined && error.responseJSON.message != '') {
+                                    const exception = JSON.parse(error.responseJSON.message).Exception;
+                                    showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                                }
+                                else {
+                                    showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                                }
+                            },
+                            complete: function () {
+
+                            },
+                        });
+                    }
+                });
+            });
+
+            $('#requestList tbody').on('change', 'input[type="checkbox"].select-row', function (e) {
+                if ($(e.target).is(":checked")) {
+                    if (jQuery.inArray(parseInt($(e.target).attr("value")), requestFacilityIdArray) === -1)
+                        requestFacilityIdArray.push(parseInt($(e.target).attr("value")));
+                    if ($("input[type='checkbox'].select-row").length == $("input[type='checkbox'].select-row:checked").length)
+                        $('#checkAll').prop('checked', true);
+                } else {
+                    requestFacilityIdArray.splice(parseInt(jQuery.inArray($(e.target).attr("value")), requestFacilityIdArray), 1);
+                    $('#checkAll').prop('checked', false);
+                }
+            });
+
+            $('#requestList').on('page.dt', function () {
+                debugger;
+                var info = responsiveDatatable.page.info();
+                //$('#pageInfo').html('Showing page: ' + info.page + ' of ' + info.pages);
+                console.log('Showing page: ' + info.page + ' of ' + info.pages);
+            });
+        }
+
+        //============
+        $('#checkAll').change((e) => {
+            const checkAllState = $(e.target).prop('checked');
+            $('input[type="checkbox"].select-row').prop('checked', checkAllState);
+
+            $("input[type='checkbox'].select-row").each(function () {
+                var $this = $(this);
+
+                if ($this.is(":checked")) {
+                    if (jQuery.inArray($this.attr("value"), requestFacilityIdArray) === -1)
+                        requestFacilityIdArray.push($this.attr("value"));
+                } else {
+                    requestFacilityIdArray.splice(jQuery.inArray($this.attr("value"), requestFacilityIdArray), 1);
+                }
+            });
+            debugger;
+        });
+
+        $('#btnSearch').click((e) => {
+            e.preventDefault();
+            responsiveDatatable.page(0);
+            responsiveDatatable.ajax.reload(null, false);
+        });
+
+        $('#btnExportToExcel').click((e) => {
+            e.preventDefault();
+            // if (!$('#filterForm').valid())
+            //     return;
+
+            showWaiting('requestGridDiv', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');;
+
+            const postData = {
+                Page: -1,
+                PageSize: -1,
+                SortDirection: null,
+                SortOrder: null,
+                FilterList: []
+            };
+
+            fillFilter(postData);
+            debugger;
+
+            $.ajax({
+                type: 'post',
+                data: JSON.stringify(postData),
+                datatype: "json",
+                contentType: "application/json; charset=utf-8",
+                url: '@ajaxExportUrl',
+                success: function (result) {
+                    hideWaiting('requestGridDiv');;
+                    if (result !== undefined && result !== null && result.data != null && result.isSuccess === true) {
+                        debugger;
+                        const downloadJsonLink = document.createElement("a");
+                        downloadJsonLink.href = `data:application/vnd.ms-excel;base64,${result.data}`;
+                        downloadJsonLink.download = "SearchRequestFacility.xlsx";
+                        downloadJsonLink.click();
+                    }
+                },
+                error: function (error) {
+                    hideWaiting('requestGridDiv');;
+                    const exception = getExceptionMessageFromError(error);
+                    if (exception != null)
+                        showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                    else
+                        showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                }
+            });
+        });
+
+        const fillFilter = (postData) => {
+            if ($('#FName').val() != undefined && $('#FName').val() != null && $('#FName').val() != '')
+                postData.FilterList.push({
+                    PropertyName: 'FName',
+                    Operator: @((int)Operator.Contain),
+                    PropertyValue: $('#FName').val()
+                });
+
+            if ($('#LName').val() != undefined && $('#LName').val() != null && $('#LName').val() != '')
+                postData.FilterList.push({
+                    PropertyName: 'LName',
+                    Operator: @((int)Operator.Contain),
+                    PropertyValue: $('#LName').val()
+                });
+
+            if ($('#StartDate').val() != undefined && $('#StartDate').val() != null && $('#StartDate').val() != '')
+                postData.FilterList.push({
+                    PropertyName: 'StartDate',
+                    Operator: @((int)Operator.GreaterThanOrEqual),
+                    PropertyValue: $('#StartDate').val()
+                });
+
+            if ($('#EndDate').val() != undefined && $('#EndDate').val() != null && $('#EndDate').val() != '')
+                postData.FilterList.push({
+                    PropertyName: 'EndDate',
+                    Operator: @((int)Operator.LesserThanOrEqual),
+                    PropertyValue: $('#EndDate').val()
+                });
+
+            if ($('#NationalCode').val() != undefined && $('#NationalCode').val() != null && $('#NationalCode').val() != '')
+                postData.FilterList.push({
+                    PropertyName: 'NationalCode',
+                    Operator: @((int)Operator.Equal),
+                    PropertyValue: $('#NationalCode').val()
+                });
+
+            if ($('#WaitingStepId').val() != undefined && $('#WaitingStepId').val() != null && $('#WaitingStepId').val() != '')
+                postData.FilterList.push({
+                    PropertyName: 'WaitingStepId',
+                    Operator: @((int)Operator.Equal),
+                    PropertyValue: parseInt($('#WaitingStepId').val())
+                });
+
+            if ($('#StartAmountThousandSeparator').val() != undefined && $('#StartAmountThousandSeparator').val() != null && $('#StartAmountThousandSeparator').val() != '')
+                postData.FilterList.push({
+                    PropertyName: 'StartAmount',
+                    Operator: @((int)Operator.GreaterThanOrEqual),
+                    PropertyValue: parseInt($('#StartAmountThousandSeparator').val().replaceAll(',', ''))
+                });
+
+            if ($('#EndAmountThousandSeparator').val() != undefined && $('#EndAmountThousandSeparator').val() != null && $('#EndAmountThousandSeparator').val() != '')
+                postData.FilterList.push({
+                    PropertyName: 'EndAmount',
+                    Operator: @((int)Operator.LesserThanOrEqual),
+                    PropertyValue: parseInt($('#EndAmountThousandSeparator').val().replaceAll(',', ''))
+                });
+
+            let facilityStatusValue = $('input[type="radio"][name="facilityStatus"]:checked').val();
+            postData.FilterList.push({
+                PropertyName: 'FacilityStatus',
+                Operator: @((int)Operator.Equal),
+                PropertyValue: parseInt(facilityStatusValue)
+            });
+
+            if (requestFacilityIdArray != undefined && requestFacilityIdArray.length > 0) {
+                postData.FilterList.push({
+                    PropertyName: 'CheckedRequestFacilityIds',
+                    Operator: @((int)Operator.Contain),
+                    PropertyValue: requestFacilityIdArray
+                });
+            }
+
+            if ('@User.IsInRole(RoleEnum.BankLeasing.ToString())' == 'True') {
+                postData.FilterList.push({
+                    PropertyName: 'OperatorId',
+                    Operator: @((int)Operator.Equal),
+                    PropertyValue: '@User.Identity.GetUserId()'
+                });
+            }
+        }
+    </script>
+}

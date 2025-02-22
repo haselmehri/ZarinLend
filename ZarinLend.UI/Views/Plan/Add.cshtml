@@ -1,0 +1,366 @@
+﻿@model PlanModel
+@{
+    ViewData["Title"] = ViewBag.Title;
+    Layout = "~/Views/Shared/_NewLayout.cshtml";
+}
+@section styles
+    {
+
+    <style type="text/css">
+        .table thead th, .table th {
+            color: blueviolet;
+            text-align: center;
+        }
+
+        .table td, .table th {
+            font-size: 13px;
+        }
+
+        .dt-error-message {
+            font-size: 13px;
+            color: red;
+            text-wrap: nowrap;
+            text-align: right
+        }
+    </style>
+}
+<div id="contentDiv" class="p-2 bg-white rounded-lg">
+    <div class="font-medium-3 secondary darken-4 text-bold-800 d-flex align-items-center">
+        <i class="bx bx-align-right zl-text-secondary mr-25"></i>
+        <span>@ViewBag.Title</span>
+    </div>
+    <form id="frmPlan" autocomplete="off" class="pt-2">
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <input asp-for="Name" class="form-control bg-transparent" placeholder="نام طرح" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-sm-6">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <input type="text" class="form-control bg-transparent number-thousand-separator" asp-for="AmountWaranty" placeholder="مبلغ چک/ضمانت" style="text-align:center;direction:ltr" />
+                    <span asp-validation-for="AmountWaranty" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <input type="text" class="form-control bg-transparent number-thousand-separator" asp-for="FacilityAmount" placeholder="مبلغ تسهیلات" style="text-align:center;direction:ltr" />
+                    <span asp-validation-for="FacilityAmount" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <select name="OrganizationId" asp-for="OrganizationId" class="form-control bg-transparent "
+                            asp-items="Model.Organizations">
+                        <option value="" >شرکت/سازمان را پیدا کنید</option>
+                    </select>
+                    <span asp-validation-for="OrganizationId" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <select name="FacilityTypeId" asp-for="FacilityTypeId" asp-items="Model.FacilityTypes" class="form-control bg-transparent ">
+                        <option value="" >نوع وام را انتخاب کنید</option>
+                    </select>
+                    <span asp-validation-for="FacilityTypeId" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="form-group">
+                    <textarea asp-for="Description" class="form-control bg-transparent" placeholder="توضیحات" style=" direction:rtl"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <input type="file" name="membersFileUpload" placeholder="باگذاری فایل اکسل اعضای طرح" id="membersFileUpload" class="form-control"
+                       accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+            </div>
+            <div class="col-md-6">
+                <button id="btnVerifyMembersExcelFile" type="button" class="btn btn-primary">
+                    <span>استخراج اطلاعات از فایل اکسل</span>
+                </button>
+            </div>
+        </div>
+        <div id="planMembersDiv" class="mt-2">
+            <table id="planMemberList" class="display" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th >کد ملی</th>
+                        <th >نام<br />نام خانوادگی</th>
+                        <th >شماره شناسنامه</th>
+                        <th >تاریخ تولد</th>
+                        <th >جنسیت</th>
+                        <th >شماره موبایل</th>
+                        <th >استان-شهر محل تولد<br />استان-شهر محل سکونت<br />استان-شهر محل صدور</th>
+                        <th >مبلغ درخواستی</th>
+                        <th >وضعیت</th>
+                        <th >لیست خطاها</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+        <div class="row">
+            <div class="col-12 text-right">
+                <a class="btn btn-outline-secondary" href='@Url.Action("List","Plan")'>
+                    <span>بازگشت</span>
+                </a>
+                <button id="btnSave" type="button" class="btn btn-zl-primary">
+                    <span>ثبت اطلاعات</span>
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+<input type="hidden" id="hdnSortOrder" value="CreateDate" />
+<input type="hidden" id="hdnSortDirection" value="DESC" />
+@section scripts{
+    @*<partia name="_ValidationScriptsPartial" />*@
+    @{
+
+        await Html.RenderPartialAsync("~/Views/Shared/_ValidationScriptsPartial.cshtml");
+    }
+    <script>
+        let planMembersDatatable;
+        let planMembers = [];
+        $(document).ready(function () {
+            loadPlanMembers();
+            $('#btnVerifyMembersExcelFile').click(function (e) {
+                e.preventDefault();
+                const membersFileUpload = $("#membersFileUpload")[0];
+                if (membersFileUpload.files.length == 0) {
+                    showMessage('@ResourceFile.InfoTitle', 'لطفا فایل اکسل اعضای طرح را انتخاب کنید!', icons.warning, '@ResourceFile.Close');
+                    return;
+                }
+                showWaiting('contentDiv', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                let data = new FormData();
+                data.append('membersExcelFile', membersFileUpload.files[0]);
+                $.ajax({
+                    type: 'post',
+                    data: data,
+                    processData: false,
+                    contentType: false,
+                    url: '/api/v1/Plan/VerifyPlanMembesExcel',
+                    success: function (result) {
+                        hideWaiting('contentDiv');
+                        if (result !== undefined && result !== null && result.data != null && result.isSuccess === true) {
+                            planMembers = result.data;
+                            planMembersDatatable.page(0);
+                            planMembersDatatable.ajax.reload(null, false);
+                            showMessage('@ResourceFile.InfoTitle', 'اطلاعات فایل اکسل خوانده شد!', icons.info, '@ResourceFile.Close');
+                        }
+                    },
+                    error: function (error) {
+                        hideWaiting('contentDiv');;
+                        const exception = getExceptionMessageFromError(error);
+                        if (exception != null)
+                            showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                        else
+                            showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                    }
+                });
+            });
+
+            $('#btnSave').click(function (e) {
+                e.preventDefault();
+                const membersFileUpload = $("#membersFileUpload")[0];
+                if (membersFileUpload.files.length == 0) {
+                    showMessage('@ResourceFile.InfoTitle', 'لطفا فایل اکسل اعضای طرح را انتخاب کنید!', icons.warning, '@ResourceFile.Close');
+                    return;
+                }
+
+                if (planMembers.length == 0) {
+                    showMessage('@ResourceFile.InfoTitle', 'ابتدا فایل اکسل اعضاء را انتخاب کنید،سپس روی دکمه <b>استخراج اطلاعات از فایل اکسل</b> کلیک کنید!', icons.warning, '@ResourceFile.Close');
+                    return;
+                }
+                const formIsValid = $('#frmPlan').valid();
+                if (formIsValid) {
+                    showWaiting('contentDiv', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                    let data = new FormData();
+                    data.append('membersExcelFile', membersFileUpload.files[0]);
+                    data.append('Name', $('#Name').val());
+                    data.append('AmountWaranty', $('#AmountWaranty').val().replaceAll(',', ''));
+                    data.append('FacilityAmount', $('#FacilityAmount').val().replaceAll(',', ''));
+                    data.append('OrganizationId', $('#OrganizationId').val());
+                    data.append('FacilityTypeId', $('#FacilityTypeId').val());
+                    data.append('Description', $('#Description').val());
+                    for (let i = 0; i < planMembers.length; i++) {
+                        data.append('Members', planMembers[i]);
+                    }
+                    data.append('JsonMembers', JSON.stringify(planMembers));
+
+                    $.ajax({
+                        type: 'post',
+                        data: data,
+                        processData: false,
+                        contentType: false,
+                        //datatype: "json",
+                        //contentType: "application/json; charset=utf-8",
+                        url: '/api/v1/Plan/Add',
+                        success: function (result) {
+                            hideWaiting('contentDiv');
+                            debugger;
+                            if (result != null && result.isSuccess != undefined && result.isSuccess === true) {
+                                planMembers = [];
+                                //renderPlanMembersGrid(1, PAGE_SIZE);
+                                //renderNavigation(parentGridElementId, planMembers.length, 1, Math.ceil(planMembers.length / PAGE_SIZE));
+                                //resetGridStyle(parentGridElementId, 'hdnSortOrder', 'hdnSortDirection');
+                                showMessage('@ResourceFile.InfoTitle', 'اطلاعات فایل اکسل خوانده شد!', icons.info, '@ResourceFile.Close', () => {
+                                    window.location.replace('@Url.Action("List","Plan")');
+                                });
+                            }
+                        },
+                        error: function (error) {
+                            hideWaiting('contentDiv');;
+                            const exception = getExceptionMessageFromError(error);
+                            if (exception != null)
+                                showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                            else
+                                showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                        }
+                    });
+                }
+            });
+        });
+
+        const loadPlanMembers = () => {
+            planMembersDatatable = $('#planMemberList')
+                .on('preXhr.dt', function (e, settings, data, a, b) {
+                    //trigger before ajax call
+                    //debugger;
+                    //alert('preXhr');
+                    //showWaiting('planMemberList', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                })
+                .on('xhr.dt', function (e, settings, json, xhr) {
+                    //trigger after ajax call
+                    //debugger;
+                    //alert('xhr');
+                })
+                .DataTable({
+                    order: [],
+                    processing: true,
+                    serverSide: true,
+                    responsive: true,
+                    rowReorder: false,
+                    select: true,
+                    searching: false,
+                    paging: false,
+                    ordering: false,
+                    searching: false,
+                    filtering: false,
+                    info: true,
+                    //lengthMenu: [
+                    //    [10, 25, 50, -1],
+                    //    [10, 25, 50, 'همه']
+                    //],
+                    pageLength: -1,
+                    columnDefs: [
+                        //{ "visible": false, "targets": 0 },
+                        //and in this case the < a href="//legacy.datatables.net/ref#bStateSave" > bStateSave</a> works regularly ....but then I would like to have responsive columns indicating responsive: {
+                        {
+                            details: false,
+                            breakpoints: [
+                                { name: 'desktop', width: Infinity },
+                                { name: 'tablet-l', width: 1200 },
+                                { name: 'tablet-p', width: 992 },
+                                { name: 'mobile-l', width: 576 },
+                                { name: 'mobile-p', width: 320 }
+                            ]
+                        },
+                        {
+                            targets: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+                            className: 'dt-center',
+                        },
+                        {
+                            targets: 2,
+                            render: function (data, type, row, meta) {
+                                return `<span style='display:inline-block'>${data.fName}<br/>${data.lName}</span>`;
+                            }
+                        },
+                        {
+                            targets: 5,
+                            render: function (data, type, row, meta) {
+                                return (data == 1 ? 'مرد' : 'زن')
+                            }
+                        },
+                        {
+                            targets: 7,
+                            render: function (data, type, row, meta) {
+                                return `<span style='display:inline-block'>${data.provinceOfBirthName}-${data.cityOfBirthName}<br/>${data.provinceName}-${data.cityName}<br/>${data.provinceOfIssueName}-${data.cityOfIssueName}</span>`;
+                            }
+                        },
+                        {
+                            targets: 8,
+                            render: function (data, type, row, meta) {
+                                return (data != null ? splitNumber(data) : '')
+                            }
+                        },
+                        {
+                            targets: 9,
+                            render: function (data, type, row, meta) {
+                                return (data ? "<i class='fa fa-times-circle' style='color:red;'></i>" : "<i class='fa fa-check-circle' style='color:green;'></i>")
+                            }
+                        },
+                        {
+                            targets: 10,
+                            className: "dt-error-message"
+                        }],
+                    rowCallback: function (row, data) {
+                        //$('td:eq(8)', row).css('text-align', 'right');
+                        //$('td', row).eq(1).css('color', 'red');
+                    },
+                    ajax: (data, callback, setting) => {
+                        getPlanMembers(data).then(function (_data) {
+                            callback(_data);
+                        });
+                    },
+                    drawCallback: function (settings) {
+                        //hideWaiting('planMemberList');
+                    },
+                    initComplete: function (settings, json) {
+                    },
+                    rowCallback: (row, data, displayNum, displayIndex, dataIndex) => {
+                        $('td:eq(0)', row).html(displayIndex + 1);
+                        return row;
+                    },
+                    columns: [
+                        { "data": null },
+                        { "data": "nationalCode" },
+                        { "data": null},
+                        { "data": "ssid" },
+                        { "data": "shamsiBirthDate" },
+                        { "data": "gender" },
+                        { "data": "mobile" },
+                        { "data": null },
+                        { "data": "facilityAmount" },
+                        { "data": "hasError" },
+                        { "data": "errorMessage" }
+                    ],
+                    language: {
+                        url: '/new-layout/datatables.net/fa.json'
+                    }
+                });
+
+            const getPlanMembers = (data) => {
+                return new Promise(function (resolve, reject) {
+                    resolve({
+                        data: planMembers,
+                        recordsTotal: planMembers.length,
+                        recordsFiltered: planMembers.length
+                    });
+                });
+            }
+        }
+    </script>
+    }

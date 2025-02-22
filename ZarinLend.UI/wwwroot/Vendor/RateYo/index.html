@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>RateYo - Scratchpad</title>
+    <meta charset="utf-8"></meta>
+    <link rel="stylesheet" href="./jquery.rateyo.min.css" />
+    <link rel="stylesheet" href="font-awesome/css/font-awesome.min.css" />
+
+</head>
+<body>
+
+    <div>
+        <!--<div id="rateYo1" style="margin: 10px auto"></div>-->
+        <div class="counter" style="float: left;
+                            font-weight: bold;
+                            margin-left: 10px;
+                            margin-top: 7px;"></div>
+        <div style="clear: both"></div>
+   
+
+    <div class="rateyo-readonly-widg"></div><span id="starclean"><i class="fa fa-remove"></i></span>
+</div>
+
+    <!--<div class="rateyo"></div>
+    <div class="rateyo"></div>
+    <div class="rateyo"></div>
+    <div class="rateyo"></div>
+    <div class="rateyo"
+         data-rateyo-rating="50%"
+         data-rateyo-rtl="true"
+         data-rateyo-spacing="10px"
+         data-rateyo-rated-fill="#FF0000"
+         data-rateyo-num-stars="10"></div>-->
+
+    <script type="text/javascript" src="./jquery.min.js"></script>
+
+    <script type="text/javascript" src="./jquery.rateyo.js"></script>
+
+    <script>
+
+        let rating = 0;
+
+        function changeStarLabel(){
+
+            if (rating > 0)
+            {
+                $(".counter").text(" تعداد ستاره برابر با "+rating+ " باشد ");
+            }
+            else
+            {
+                $(".counter").text("انتخاب نشده است");
+
+            } 
+        }
+
+        $(function () {
+
+            $(".rateyo-readonly-widg").on("rateyo.init", function () { changeStarLabel(0) });
+             
+            $(".rateyo-readonly-widg").rateYo({
+                rating: rating,
+                numStars: 10,
+                fullStar: true,
+                precision: 2,
+                minValue: 0,
+                maxValue: 10,
+                multiColor: {
+                    startColor: "#ff9800",
+                    endColor  : "#ff0000"   
+                },
+            }).on("rateyo.change", function (e, data) {
+                rating = data.rating;
+                changeStarLabel(); 
+            }); 
+
+            $("#starclean").on("click",function(){
+                  var $rateYo = $(".rateyo-readonly-widg");
+                    rating = 0;
+                   $rateYo.rateYo("rating", rating);
+                changeStarLabel(); 
+            }); 
+        });
+    </script>
+</body>
+</html>

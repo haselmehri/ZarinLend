@@ -1,0 +1,612 @@
+﻿@model RequestFacilityInfoModel
+@{
+    ViewData["Title"] = ViewBag.Title;
+}
+@section styles
+    {
+    <style type="text/css">
+    </style>
+}
+
+@await Component.InvokeAsync("WorkFlowStepWizard", new { workFlow = WorkFlowEnum.RequestFacility, requestFacilityId = Model.Id })
+<form id="frmVerifyBuyer" method="post">
+    <div class="card">
+        <div class="card-header" localize-content>@ViewBag.Title</div>
+        <div class="card-body">
+            @{
+                await Html.RenderPartialAsync("_Detail.cshtml", Model);
+            }
+            @if (Model.WaitingForZarinLend)
+            {
+                if (Model.CurrentStepForm == WorkFlowFormEnum.VerifyZarrinLend)
+                {
+                    <fieldset>
+                        <legend>انتخاب نهاد مالی/بررسی درخواست</legend>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="requestStatusRadio" id="inlineRadio1" value="@((int)StatusEnum.Approved)">
+                                        <label class="form-check-label" for="inlineRadio1">تایید درخواست</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="requestStatusRadio" id="inlineRadio2" value="@((int)StatusEnum.ReturnToCorrection)">
+                                        <label class="form-check-label" for="inlineRadio2">برگشت جهت اصلاح/ویرایش</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="requestStatusRadio" id="inlineRadio3" value="@((int)StatusEnum.Rejected)">
+                                        <label class="form-check-label" for="inlineRadio3">رد درخواست</label>
+                                    </div>
+                                    @if (!Model.RequestFacilityDetail.GuarantorIsRequired)
+                                    {
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="requestStatusRadio" id="inlineRadio4" value="100">
+                                            <label class="form-check-label" for="inlineRadio3">پرونده نیاز به ضامن دارد!تغییر وضعیت پرونده به حالت در انتظار معرفی ضامن</label>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="requestStatusRadio" id="inlineRadio4" value="101">
+                                            <label class="form-check-label" for="inlineRadio3">پرونده نیاز به ضامن ندارد!</label>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" id="selectLeasing" style="display:none">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="control-label" asp-for="LeasingId"></label>
+                                    <select name="LeasingId" asp-for="LeasingId" class="custom-select form-control"
+                                            asp-items="Model.Leasings">
+                                        <option value="" localize-content>SelectLeasing</option>
+                                    </select>
+                                    <span asp-validation-for="LeasingId" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div class="form-group form-group-ex">
+                                                <label class="control-label">توضیحات مدیر</label>
+                                                <textarea id="description_admin" class="form-control"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                }
+                else if (Model.CurrentStepForm == WorkFlowFormEnum.VerifyCheckByZarinLend)
+                {
+                    <fieldset>
+                        <legend>بررسی تصویر چک توسط زرین لند</legend>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="requestStatusRadio" id="inlineRadio1" value="@((int)StatusEnum.Approved)">
+                                        <label class="form-check-label" for="inlineRadio1">تایید درخواست(چک)</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="requestStatusRadio" id="inlineRadio2" value="@((int)StatusEnum.ReturnToCorrection)">
+                                        <label class="form-check-label" for="inlineRadio2">برگشت جهت اصلاح تصویر چک و اطلاعات چک ضمانت</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="requestStatusRadio" id="inlineRadio3" value="@((int)StatusEnum.Rejected)">
+                                        <label class="form-check-label" for="inlineRadio3">رد درخواست(چک)</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div class="form-group form-group-ex">
+                                                <label class="control-label">توضیحات مدیر</label>
+                                                <textarea id="description_admin" class="form-control"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                }
+                else if (Model.CurrentStepForm == WorkFlowFormEnum.InsuranceIssuance)
+                {
+                    <fieldset>
+                        <legend>صدور بیمه و اطلاع رسانی به مشتری</legend>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="control-label" asp-for="InsuranceIssuanceModel.InsuranceNumber"></label>
+                                    <input asp-for="InsuranceIssuanceModel.InsuranceNumber" class="form-control" style="text-align:center;direction:ltr" />
+                                    <span asp-validation-for="InsuranceIssuanceModel.InsuranceNumber" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="control-label">فایل پیوست</label>
+                                    <input type="file" name="file" id="file" class="form-control" accept="image/*;capture=camera">
+                                </div>
+                            </div>
+                            <div class="col-md-8"></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label class="control-label" asp-for="InsuranceIssuanceModel.Description"></label>
+                                    <textarea asp-for="InsuranceIssuanceModel.Description" class="form-control" style=" direction:rtl"></textarea>
+                                    <span asp-validation-for="InsuranceIssuanceModel.Description" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                }
+                else if (Model.CurrentStepForm == WorkFlowFormEnum.CardIssuance)
+                {
+                    <fieldset>
+                        <legend>صدور بن کارت</legend>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="control-label" asp-for="CardIssuanceModel.CardNumber"></label>
+                                    <input asp-for="CardIssuanceModel.CardNumber" class="form-control" style="text-align:center;direction:ltr" />
+                                    <span asp-validation-for="CardIssuanceModel.CardNumber" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="control-label" asp-for="CardIssuanceModel.AccountNumber"></label>
+                                    <input asp-for="CardIssuanceModel.AccountNumber" class="form-control" style="text-align:center;direction:ltr" />
+                                    <span asp-validation-for="CardIssuanceModel.AccountNumber" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                }
+                else if (Model.CurrentStepForm == WorkFlowFormEnum.CardRecharge)
+                {
+                    <fieldset>
+                        <legend>شارژ بن کارت</legend>
+                        @await Component.InvokeAsync("CardRecharge",new { model = new RequestFacilityCardRechargeModel()
+                {
+                AccountNumber =   Model.CardIssuanceModel.AccountNumber,
+                CardNumber = Model.CardIssuanceModel.CardNumber,
+                Amount = Model.RequestFacilityDetail.Amount,
+                RequesterFullName = $"{Model.UserIdentityInfo.FName} {Model.UserIdentityInfo.LName}",
+                RequestFacilityId = Model.Id,
+                }
+                })
+                        <div class="row">
+                            <div class="col-md-12">
+                                <fieldset>
+                                    <div class="checkbox checkbox-success checkbox-glow checkbox-sm">
+                                        <input type="checkbox" name="cardRechargeCheckBox" id="cardRechargeCheckBox" />
+                                        <label class="font-small-3 success darken-4 text-bold-400 line-height-23" for="cardRechargeCheckBox">آیا برای شارژ بن کارت مطمئن هستید؟</label>
+                                    </div>
+                                </fieldset>
+                            </div>
+                        </div>
+                    </fieldset>
+                }
+            }
+        </div>
+        <div class="card-footer" style="text-align:left">
+            @if (Model.WaitingForZarinLend)
+            {
+                if (Model.CurrentStepForm == WorkFlowFormEnum.InsuranceIssuance || Model.CurrentStepForm == WorkFlowFormEnum.CardIssuance)
+                {
+                    <button id="btnSave" class="btn btn-outline-success">
+                        @_loc["Save"]&nbsp;<i class="fal fa-save"></i>
+                    </button>
+                }
+                else if (Model.CurrentStepForm == WorkFlowFormEnum.CardRecharge)
+                {
+                    <button id="btnCardRecharge" class="btn btn-outline-success">
+                        شارژ بن کارت&nbsp;<i class="fal fa-save"></i>
+                    </button>
+                }
+                else
+                {
+                    <button id="btnChangeStatus" class="btn btn-outline-success">
+                        تغییر وضعیت درخواست&nbsp;<i class="fal fa-edit"></i>
+                    </button>
+                }
+            }
+            @* @if (Model.RequestFacilityDetail.LeasingNationalId.HasValue)
+            {
+            <button id="btnSendEmail" class="btn btn-outline-primary">
+            ارسال ایمیل به نهاد مالی&nbsp;<i class="fal fa-send"></i>
+            </button>
+            }*@
+            <a class="btn btn-outline-secondary" asp-controller="RequestFacility" asp-action="SearchRequest">
+                بازگشت به لیست درخواست تسهیلات&nbsp;<i class="fal fa-list"></i>
+            </a>
+        </div>
+    </div>
+</form>
+@section scripts{
+    @{
+        await Html.RenderPartialAsync("~/Views/Shared/_ValidationScriptsPartial.cshtml");
+    }
+    <script src="~/js/jquery.mask.min.js"></script>
+    @if (Model.RequestFacilityDetail.LeasingNationalId.HasValue)
+    {
+        <script>
+            $('#btnSendEmail').click(function (e) {
+                e.preventDefault();
+                showWaiting('frmVerifyBuyer', '@_loc["PleaseWait"]', '@_loc["Loading"]');
+                debugger;
+                $.ajax({
+                    type: 'post',
+                    //dataType: 'json',
+                    contentType: "application/json; charset=utf-8",
+                    url: '/api/v1/RequestFacility/SendRequestFacilityDetailToLeasingEmail/@Model.Id',
+                    //data: data,// JSON.stringify(model),
+                    success: function (result) {
+                        hideWaiting('frmVerifyBuyer');
+                        debugger;
+                        if (result.isSuccess) {
+                            showMessage('@_loc["InfoTitle"]', 'ارسال ایمیل با موفقیت انجام شد!', icons.success, '@_loc["Close"]');
+                        }
+                    },
+                    error: function (error) {
+                        hideWaiting('frmVerifyBuyer');
+                        const exception = getExceptionMessageFromError(error);
+                        if (exception != null)
+                            showMessage('@_loc["ErrorTitle"]', exception, icons.error, '@_loc["Close"]');
+                        else
+                            showMessage('@_loc["ErrorTitle"]', '@_loc["UnhandledError"]', icons.error, '@_loc["Close"]');
+                    }
+                });
+
+            });
+        </script>
+    }
+    @if (Model.WaitingForZarinLend)
+    {
+        if (Model.CurrentStepForm == WorkFlowFormEnum.VerifyZarrinLend)
+        {
+            <script>
+                $(document).ready(function () {
+
+                });
+
+                $('input[name=requestStatusRadio]').change(() => {
+                    debugger;
+                    if ($('input[name=requestStatusRadio]:checked').val() == '@((short)StatusEnum.Approved)')
+                        $('#selectLeasing').show();
+                    else
+                        $('#selectLeasing').hide();
+                });
+
+                $('#btnChangeStatus').click(function (e) {
+                    e.preventDefault();
+                    debugger;
+                    const formIsValid = $('#frmVerifyBuyer').valid();
+                    const requestStatus = $('input[name=requestStatusRadio]:checked').val();
+                    if (requestStatus == undefined) {
+                        showMessage('@_loc["InfoTitle"]', 'لطفا وضعیت درخواست را مشخص کنید!', icons.warning, '@_loc["Close"]');
+                        return;
+                    }
+
+                    let leasingId = null;
+                    if (requestStatus == '@((short)StatusEnum.Approved)')
+                        leasingId = $('#LeasingId').val();
+
+                    if (formIsValid) {
+                        showWaiting('frmVerifyBuyer', '@_loc["PleaseWait"]', '@_loc["Loading"]');
+                        if (requestStatus != 100 && requestStatus != 101)//request required to register 'Guarantor'
+                        {
+                            const postData = {
+                                RequestFacilityId: '@Model.Id',
+                                Status: requestStatus,
+                                LeasingId: leasingId,
+                                StatusDescription: $('#description_admin').val()
+                            };
+
+                            $.ajax({
+                                type: 'post',
+                                data: JSON.stringify(postData),
+                                datatype: "json",
+                                contentType: "application/json; charset=utf-8",
+                                url: '/api/v1/RequestFacility/VerifyByZarinLend',
+                                success: function (result) {
+                                    hideWaiting('frmVerifyBuyer');
+                                    debugger;
+                                    if (result.isSuccess) {
+                                        showMessage('@_loc["InfoTitle"]', '@_loc["MessageSuccess"]', icons.success, '@_loc["Close"]');
+                                        setTimeout(function () {
+                                            window.location.replace('@Url.Action("SearchRequest", "requestfacility")');
+                                        }, 2500);
+                                    }
+                                },
+                                error: function (error) {
+                                    hideWaiting('frmVerifyBuyer');
+                                    const exception = getExceptionMessageFromError(error);
+                                    if (exception != null)
+                                        showMessage('@_loc["ErrorTitle"]', exception, icons.error, '@_loc["Close"]');
+                                    else
+                                        showMessage('@_loc["ErrorTitle"]', '@_loc["UnhandledError"]', icons.error, '@_loc["Close"]');
+                                }
+                            });
+                        }
+                        else {
+                            const postData = {
+                                RequestFacilityId: '@Model.Id',
+                                GuarantorIsRequired : requestStatus == 100,
+                                StatusDescription: $('#description_admin').val()
+                            };
+
+                            $.ajax({
+                                type: 'post',
+                                data: JSON.stringify(postData),
+                                datatype: "json",
+                                contentType: "application/json; charset=utf-8",
+                                url: '/api/v1/RequestFacility/SetGuarantorIsRequired',
+                                success: function (result) {
+                                    hideWaiting('frmVerifyBuyer');
+                                    debugger;
+                                    if (result.isSuccess) {
+                                        showMessage('@_loc["InfoTitle"]', '@_loc["MessageSuccess"]', icons.success, '@_loc["Close"]');
+                                        setTimeout(function () {
+                                            window.location.replace('@Url.Action("SearchRequest", "requestfacility")');
+                                        }, 2500);
+                                    }
+                                },
+                                error: function (error) {
+                                    hideWaiting('frmVerifyBuyer');
+                                    const exception = getExceptionMessageFromError(error);
+                                    if (exception != null)
+                                        showMessage('@_loc["ErrorTitle"]', exception, icons.error, '@_loc["Close"]');
+                                    else
+                                        showMessage('@_loc["ErrorTitle"]', '@_loc["UnhandledError"]', icons.error, '@_loc["Close"]');
+                                }
+                            });
+                        }
+                    }
+                    else {
+                        scrollToFirstError();
+                    }
+                });
+            </script>
+        }
+        else if (Model.CurrentStepForm == WorkFlowFormEnum.CardRecharge)
+        {
+            <script>
+                $(document).ready(function () {
+
+                });
+
+                $('#btnCardRecharge').click(function (e) {
+                    e.preventDefault();
+                    debugger;
+                    const formIsValid = $('#frmVerifyBuyer').valid();
+
+                    if (!$('#cardRechargeCheckBox').prop('checked')) {
+                        showMessage('@_loc["InfoTitle"]', 'لطفا گزینه <b>آیا برای شارژ بن کارت مطمئن هستید؟</b> را انتخاب نمایید!', icons.warning, '@_loc["Close"]');
+                        return;
+                    }
+                    if (formIsValid) {
+                        showWaiting('frmVerifyBuyer', '@_loc["PleaseWait"]', '@_loc["Loading"]');
+
+                        $.ajax({
+                            type: 'post',
+                            //dataType: 'json',
+                            //contentType: "application/json; charset=utf-8",
+                            processData: false,
+                            contentType: false,
+                            url: '/api/v1/RequestFacility/CardRecharge/@Model.Id',
+                            //data: data,// JSON.stringify(model),
+                            success: function (result) {
+                                hideWaiting('frmVerifyBuyer');
+                                debugger;
+                                if (result.isSuccess) {
+                                    showMessage('@_loc["InfoTitle"]', '@_loc["MessageSuccess"]', icons.success, '@_loc["Close"]',
+                                        () => { window.location.replace('@Url.Action("LeasingRequests","RequestFacility")'); });
+                                }
+                            },
+                            error: function (error) {
+                                hideWaiting('frmVerifyBuyer');
+                                const exception = getExceptionMessageFromError(error);
+                                if (exception != null)
+                                    showMessage('@_loc["ErrorTitle"]', exception, icons.error, '@_loc["Close"]');
+                                else
+                                    showMessage('@_loc["ErrorTitle"]', '@_loc["UnhandledError"]', icons.error, '@_loc["Close"]');
+                            }
+                        });
+                    }
+                    else {
+                        scrollToFirstError();
+                    }
+                });
+            </script>
+        }
+        else if (Model.CurrentStepForm == WorkFlowFormEnum.InsuranceIssuance)
+        {
+            <script>
+                $(document).ready(function () {
+
+                });
+
+                $('#btnSave').click(function (e) {
+                    e.preventDefault();
+                    debugger;
+                    const formIsValid = $('#frmVerifyBuyer').valid();
+                    const file = $("#file")[0];
+                    //if (file.files.length == 0) {
+                    //    showMessage('@_loc["InfoTitle"]', 'لطفا تصویر چک را بارگذاری کنید', icons.warning, '@_loc["Close"]');
+                    //    return;
+                    //}
+
+                    if (formIsValid) {
+                        showWaiting('frmVerifyBuyer', '@_loc["PleaseWait"]', '@_loc["Loading"]');
+                        let data = new FormData();
+                        if (file.files.length > 0) {
+                            data.append('file', file.files[0]);
+                        }
+
+                        data.append('Description', $('#InsuranceIssuanceModel_Description').val());
+                        data.append('InsuranceNumber', $('#InsuranceIssuanceModel_InsuranceNumber').val());
+                        data.append('RequestFacilityId', @Model.Id);
+
+                        $.ajax({
+                            type: 'post',
+                            //dataType: 'json',
+                            //contentType: "application/json; charset=utf-8",
+                            processData: false,
+                            contentType: false,
+                            url: '/api/v1/RequestFacilityInsuranceIssuance/InsuranceIssuance',
+                            data: data,// JSON.stringify(model),
+                            success: function (result) {
+                                hideWaiting('frmVerifyBuyer');
+                                debugger;
+                                if (result.isSuccess) {
+                                    showMessage('@_loc["InfoTitle"]', '@_loc["MessageSuccess"]', icons.success, '@_loc["Close"]');
+                                    setTimeout(function () {
+                                        window.location.replace('@Url.Action("SearchRequest","RequestFacility")');
+                                    }, 2500);
+                                }
+                            },
+                            error: function (error) {
+                                hideWaiting('frmVerifyBuyer');
+                                const exception = getExceptionMessageFromError(error);
+                                if (exception != null)
+                                    showMessage('@_loc["ErrorTitle"]', exception, icons.error, '@_loc["Close"]');
+                                else
+                                    showMessage('@_loc["ErrorTitle"]', '@_loc["UnhandledError"]', icons.error, '@_loc["Close"]');
+                            }
+                        });
+                    }
+                    else {
+                        scrollToFirstError();
+                    }
+                });
+            </script>
+        }
+        else if (Model.CurrentStepForm == WorkFlowFormEnum.CardIssuance)
+        {
+            <script>
+                $(document).ready(function () {
+                    $('#CardIssuanceModel_CardNumber').mask('6362-1499-9999-9999', { placeholder: "6362-14__-____-____" });
+                });
+
+                $('#btnSave').click(function (e) {
+                    e.preventDefault();                    
+                    debugger;
+                    const formIsValid = $('#frmVerifyBuyer').valid();
+
+                    if (formIsValid) {
+                        showWaiting('frmVerifyBuyer', '@_loc["PleaseWait"]', '@_loc["Loading"]');
+                        let data = new FormData();
+
+                        data.append('AccountNumber', $('#CardIssuanceModel_AccountNumber').val());
+                        data.append('CardNumber', $('#CardIssuanceModel_CardNumber').val());
+                        data.append('RequestFacilityId', @Model.Id);
+
+                        $.ajax({
+                            type: 'post',
+                            //dataType: 'json',
+                            //contentType: "application/json; charset=utf-8",
+                            processData: false,
+                            contentType: false,
+                            url: '/api/v1/RequestFacilityCardIssuance/CardIssuance',
+                            data: data,// JSON.stringify(model),
+                            success: function (result) {
+                                hideWaiting('frmVerifyBuyer');
+                                debugger;
+                                if (result.isSuccess) {
+                                    showMessage('@_loc["InfoTitle"]', '@_loc["MessageSuccess"]', icons.success, '@_loc["Close"]');
+                                    setTimeout(function () {
+                                        window.location.replace('@Url.Action("SearchRequest","RequestFacility")');
+                                    }, 2500);
+                                }
+                            },
+                            error: function (error) {
+                                hideWaiting('frmVerifyBuyer');
+                                const exception = getExceptionMessageFromError(error);
+                                if (exception != null)
+                                    showMessage('@_loc["ErrorTitle"]', exception, icons.error, '@_loc["Close"]');
+                                else
+                                    showMessage('@_loc["ErrorTitle"]', '@_loc["UnhandledError"]', icons.error, '@_loc["Close"]');
+                            }
+                        });
+                    }
+                    else {
+                        scrollToFirstError();
+                    }
+                });
+            </script>
+        }
+        else if (Model.CurrentStepForm == WorkFlowFormEnum.VerifyCheckByZarinLend)
+        {
+            <script>
+                $(document).ready(function () {
+
+                });
+
+                $('#btnChangeStatus').click(function (e) {
+                    e.preventDefault();
+                    debugger;
+                    const formIsValid = $('#frmVerifyBuyer').valid();
+                    const requestStatus = $('input[name=requestStatusRadio]:checked').val();
+                    if (requestStatus == undefined) {
+                        showMessage('@_loc["InfoTitle"]', 'لطفا وضعیت درخواست را مشخص کنید!', icons.warning, '@_loc["Close"]');
+                        return;
+                    }
+
+                    if (formIsValid) {
+                        showWaiting('frmVerifyBuyer', '@_loc["PleaseWait"]', '@_loc["Loading"]');
+                        const postData = {
+                            RequestFacilityId: '@Model.Id',
+                            Status: requestStatus,
+                            StatusDescription: $('#description_admin').val()
+                        };
+
+                        $.ajax({
+                            type: 'post',
+                            data: JSON.stringify(postData),
+                            datatype: "json",
+                            contentType: "application/json; charset=utf-8",
+                            url: '/api/v1/RequestFacility/VerifyCheckByZarinLend',
+                            success: function (result) {
+                                hideWaiting('frmVerifyBuyer');
+                                debugger;
+                                if (result.isSuccess) {
+                                    showMessage('@_loc["InfoTitle"]', '@_loc["MessageSuccess"]', icons.success, '@_loc["Close"]');
+                                    setTimeout(function () {
+                                        window.location.replace('@Url.Action("SearchRequest", "requestfacility")');
+                                    }, 2500);
+                                }
+                            },
+                            error: function (error) {
+                                hideWaiting('frmVerifyBuyer');
+                                const exception = getExceptionMessageFromError(error);
+                                if (exception != null)
+                                    showMessage('@_loc["ErrorTitle"]', exception, icons.error, '@_loc["Close"]');
+                                else
+                                    showMessage('@_loc["ErrorTitle"]', '@_loc["UnhandledError"]', icons.error, '@_loc["Close"]');
+                            }
+                        });
+                    }
+                    else {
+                        scrollToFirstError();
+                    }
+                });
+            </script>
+        }
+    }
+}

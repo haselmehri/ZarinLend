@@ -1,0 +1,416 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon32x32.png">
+    <link rel="icon" type="image/png" sizes="180x180" href="/images/favicon180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/images/favicon192x192.png">
+
+    <link rel="manifest" href="/manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
+    <meta name="theme-color" content="#6748fe">
+
+    <title>@ViewData["Title"] - @ResourceFile.SiteTitle</title>
+
+    <link rel="stylesheet" href="~/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/bootstrap-rtl.min.css" />
+    <link rel="stylesheet" href="~/css/fonts.css" />
+    <link rel="stylesheet" href="~/font-awesome/css/font-awesome.css" />
+    <link rel="stylesheet" href="~/font-awesome/css/font-awesome-animation.min.css" />
+    <link href="~/css/material.css" rel="stylesheet" />
+    <link href="~/css/all.min.css" rel="stylesheet" />
+    <link href="~/css/spinners.css" rel="stylesheet" />
+    <link href="~/css/animate.css" rel="stylesheet" />
+    @*<link rel="stylesheet" href="~/css/site-rtl.css" asp-append-version="true" />*@
+    <link rel="stylesheet" href="~/css/site-rtl.css" asp-append-version="true" />
+    <link href="~/css/colors/purple.css" rel="stylesheet" />
+    <link href="~/Vendor/select2-4.0.13/css/select2.css" rel="stylesheet" />
+    <link href="~/Vendor/c3-master/c3.min.css" rel="stylesheet" />
+    <link href="~/Vendor/sweetalert2/sweetalert2.min.css" type="text/css" />
+    <link href="~/Vendor/jquery-ui-1.12.1.Autocomplete/jquery-ui.min.css" rel="stylesheet" />
+    <style>
+
+        body {
+            font-family: VazirFd;
+            direction: rtl;
+            text-align: right;
+        }
+
+    </style>
+
+    @await RenderSectionAsync("styles", required: false)
+</head>
+<body class="fix-header fix-sidebar card-no-border">
+    <!-- ============================================================== -->
+    <!-- Preloader - style you can find in spinners.css -->
+    <!-- ============================================================== -->
+    <div class="preloader">
+        <svg class="circular" viewBox="25 25 50 50">
+            <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10" />
+        </svg>
+    </div>
+    <!-- ============================================================== -->
+    <!-- Main wrapper - style you can find in pages.scss -->
+    <!-- ============================================================== -->
+    <div id="main-wrapper">
+        <!-- ============================================================== -->
+        <!-- Topbar header - style you can find in pages.scss -->
+        <!-- ============================================================== -->
+        <header class="topbar" style="z-index: 150">
+            <nav class="navbar top-navbar navbar-expand-md navbar-light">
+                <!-- ============================================================== -->
+                <!-- Logo -->
+                <!-- ============================================================== -->
+                <div class="navbar-header">
+                    <a class="navbar-brand" href='@Url.Action("index","Home")'>
+                        <!-- Logo icon --><b>
+                            <!--You can put here icon as well // <i class="wi wi-sunset"></i> //-->
+                            <!-- Dark Logo icon -->
+                            @*<img src="~/images/ZarrinLendLogo.png" style="width:32px;height:32px" alt="homepage" class="dark-logo" />*@
+                            <img src="~/images/ZarrinLendLogo.png" alt="homepage" class="dark-logo" />
+                            <!-- Light Logo icon -->
+                            @*<img src="~/images/ZarrinLendLogo.png" style="width:32px;height:32px" alt="homepage" class="light-logo" />*@
+                            <img src="~/images/ZarrinLendLogo.png" alt="homepage" class="light-logo" />
+                        </b>
+                        <!--End Logo icon -->
+                        <!-- Logo text -->
+                        @*<span>
+                        <img src="~/images/logo-light-text.png" alt="homepage" class="dark-logo" />
+                        <img src="~/images/logo-light-text.png" alt="homepage" class="light-logo" />
+                        </span>*@
+                        <span class="light-logo logoText" >
+                            SiteTitle
+                        </span>
+                    </a>
+                </div>
+                <!-- ============================================================== -->
+                <!-- End Logo -->
+                <!-- ============================================================== -->
+                <div class="navbar-collapse">
+                    <!-- ============================================================== -->
+                    <!-- toggle and nav items -->
+                    <!-- ============================================================== -->
+                    <ul class="navbar-nav mr-auto mt-md-0">
+                        <!-- This is  -->
+                        <li class="nav-item"> <a class="nav-link nav-toggler hidden-md-up text-muted waves-effect waves-dark" href="javascript:void(0)"><i class="fal fa-bars"></i></a> </li>
+                        <li class="nav-item"> <a class="nav-link sidebartoggler hidden-sm-down text-muted waves-effect waves-dark" href="javascript:void(0)"><i class="fal fa-bars"></i></a> </li>
+                        @*@if (User.Identity.IsAuthenticated && (User.IsInRole(RoleEnum.Buyer.ToString()) || User.IsInRole(RoleEnum.Seller.ToString())))
+                        {
+                        @await Component.InvokeAsync("Balance");
+                        }*@
+                        @*<li class="nav-item li-language">
+                        <language-nav flags-squared="true" flags="true"
+                        cookie-handler-url='@Url.Action("SetCultureCookie","Home", new { area="", cltr="{0}", returnUrl=Context.Request.Path })'></language-nav>
+                        </li>*@
+                    </ul>
+                    <!-- ============================================================== -->
+                    <!-- User profile and search -->
+                    <!-- ============================================================== -->
+                    <ul class="navbar-nav mr-2 my-lg-0">
+                        <li>
+
+                        </li>
+                    </ul>
+                    <ul class="navbar-nav my-lg-0">
+                        <!-- ============================================================== -->
+                        <!-- Campaign -->
+                        <!-- ============================================================== -->
+                        <!-- ============================================================== -->
+                        <!-- End Campaign -->
+                        <!-- ============================================================== -->
+                        <!-- ============================================================== -->
+                        <!-- Profile -->
+                        <!-- ============================================================== -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-muted waves-effect waves-dark" href="" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fal fa-user-circle"></i></a>
+                            <div class="dropdown-menu dropdown-menu-right scale-up">
+                                <ul class="dropdown-user">
+                                    <li>
+                                        <div class="dw-user-box">
+                                            <div class="u-img"><img src="~/images/person.png" alt="user"></div>
+                                            <div class="u-text">
+                                                <h4>
+                                                    @{
+                                                        if (User.Identity.IsAuthenticated)
+                                                        {
+                                                            @User.Identity.GetUserName()
+                                                        }
+                                                    }
+                                                </h4>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li role="separator" class="divider"></li>
+                                    @{
+                                        if (User.Identity.IsAuthenticated)
+                                        {
+                                            var userType = string.Empty;
+                                            if (User.IsInRole(RoleEnum.Admin.ToString()) || User.IsInRole(RoleEnum.SuperAdmin.ToString()))
+                                                userType = "کاربرادمین(مدیر)";
+                                            else if (User.IsInRole(RoleEnum.AdminBankLeasing.ToString()))
+                                                userType = "مدیر بانک";
+                                            else if (User.IsInRole(RoleEnum.BankLeasing.ToString()))
+                                                userType = "کارشناس بانک";
+                                            else if (User.IsInRole(RoleEnum.Seller.ToString()))
+                                                userType = "کاربر فروشگاه";
+                                            else if (User.IsInRole(RoleEnum.Buyer.ToString()))
+                                                userType = "کاربر خریدار";
+
+                                            if (!string.IsNullOrEmpty(userType))
+                                            {
+                                                <li>
+                                                    <a href='' class="dropdown-item"><i class="fal fa-user"></i>&nbsp;@userType</a>
+                                                </li>
+                                            }
+                                        }
+                                    }
+                                    <li>
+                                        <a href='@Url.Action("Logout","Account")' class="dropdown-item"><i class="fal fa-power-off" style="color:red;font-weight:normal"></i>&nbsp;@ResourceFile.SignOut</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                        <!-- ============================================================== -->
+                        <!-- Language -->
+                        <!-- ============================================================== -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-muted waves-effect waves-dark" href="" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="flag-icon flag-icon-us"></i></a>
+                            <div class="dropdown-menu dropdown-menu-right scale-up"> <a class="dropdown-item" href="#"><i class="flag-icon flag-icon-in"></i> India</a> <a class="dropdown-item" href="#"><i class="flag-icon flag-icon-fr"></i> French</a> <a class="dropdown-item" href="#"><i class="flag-icon flag-icon-cn"></i> China</a> <a class="dropdown-item" href="#"><i class="flag-icon flag-icon-de"></i> Dutch</a> </div>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </header>
+
+        <!-- ============================================================== -->
+        <!-- End Topbar header -->
+        <!-- ============================================================== -->
+        <!-- ============================================================== -->
+        <!-- Left Sidebar - style you can find in sidebar.scss  -->
+        <!-- ============================================================== -->
+        <aside class="left-sidebar">
+            <!-- Sidebar scroll-->
+            <div class="scroll-sidebar">
+                <!-- User profile -->
+                <div class="user-profile" style="background: url(/images/user-info.jpg) no-repeat;">
+                    <!-- User profile image -->
+                    <div class="profile-img"> <img src="~/images/person.png" class="img-circle" alt="user" /> </div>
+                    <!-- User profile text-->
+                    @{
+                        if (User.Identity.IsAuthenticated)
+                        {
+                            if (!string.IsNullOrEmpty(User.Identity.GetOrganizationName()) &&
+                            (User.IsInRole(RoleEnum.BankLeasing.ToString()) || User.IsInRole(RoleEnum.AdminBankLeasing.ToString()) || User.IsInRole(RoleEnum.Seller.ToString())))
+                            {
+                                <div class="profile-text">
+                                    <a class="dropdown-toggle u-dropdown" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="true" style="cursor:pointer">
+                                        @User.Identity.GetFullName()
+                                    </a>
+                                    <div class="dropdown-menu animated flipInY">
+                                        <a href='#' class="dropdown-item"><i class="fal fa-person-booth"></i>&nbsp;@User.Identity.GetOrganizationName()</a>
+                                        @*<a href='' class="dropdown-item"><i class="fal fa-user"></i> یادآوری ها</a>
+                            <a href="#" class="dropdown-item"><i class="fal fa-envelope"></i> پیام ها</a>*@
+                                        <div class="dropdown-divider"></div>
+                                        @*<a href="~/doc/.pdf" class="dropdown-item"><i class="fal fa-question-circle"></i> راهنما</a>*@
+                                        <a href='@Url.Action("Logout","Account")' class="dropdown-item"><i class="fal fa-power-off" style="color:red; font-weight:normal"></i>&nbsp;@ResourceFile.SignOut</a>
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="profile-text">
+                                    <a class="dropdown-toggle u-dropdown" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="true" style="cursor:pointer">
+                                        @User.Identity.GetFullName()
+                                    </a>
+                                    <div class="dropdown-menu animated flipInY">
+                                        <div class="dropdown-divider"></div>
+                                        @*<a href="~/doc/.pdf" class="dropdown-item"><i class="fal fa-question-circle"></i> راهنما</a>*@
+                                        <a href='@Url.Action("Logout","Account")' class="dropdown-item"><i class="fal fa-power-off" style="color:red; font-weight:normal"></i>&nbsp;@ResourceFile.SignOut</a>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    }
+                </div>
+                <!-- End User profile text-->
+                <!-- Sidebar navigation-->
+                <nav class="sidebar-nav">
+                    <ul id="sidebarnav">
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            if (User.IsInRole(Core.Entities.RoleEnum.SuperAdmin.ToString()))
+                            {
+                                <li>
+                                    <a class="has-arrow waves-effect waves-dark" href="#" aria-expanded="false"><i class="fad fa-money"></i><span class="hide-menu" >RequestFacility</span></a>
+                                    <ul aria-expanded="true" class="collapse">
+                                        <li><a href='@Url.Action("SearchRequest", "RequestFacility")' >RequestFacilityList</a></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <a class="has-arrow waves-effect waves-dark" href="#" aria-expanded="false"><i class="fad fa-user-alt"></i><span class="hide-menu" >Users</span></a>
+                                    <ul aria-expanded="false" class="collapse">
+                                        <li><a href='@Url.Action("List", "User")' >UserList</a></li>
+                                        <li><a href='@Url.Action("List", "Organization")' >لیست سازمان ها</a></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <a class="has-arrow waves-effect waves-dark" href="#" aria-expanded="false"><i class="fad fa-setting"></i><span class="hide-menu" >سایر</span></a>
+                                    <ul aria-expanded="false" class="collapse">
+                                        <li><a href='@Url.Action("Update", "Home")' >تنطیمات کلی</a></li>
+                                    </ul>
+                                </li>
+                            }
+                            else if (User.IsInRole(Core.Entities.RoleEnum.Admin.ToString()))
+                            {
+                                <li>
+                                    <a class="has-arrow waves-effect waves-dark" href="#" aria-expanded="false"><i class="fad fa-money"></i><span class="hide-menu" >RequestFacility</span></a>
+                                    <ul aria-expanded="true" class="collapse">
+                                        <li><a href='@Url.Action("SearchRequest", "RequestFacility")' >RequestFacilityList</a></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <a class="has-arrow waves-effect waves-dark" href="#" aria-expanded="false"><i class="fad fa-user-alt"></i><span class="hide-menu" >RequestFacility</span></a>
+                                    <ul aria-expanded="true" class="collapse">
+                                        <li><a href='@Url.Action("List", "User")' >UserList</a></li>
+                                        <li><a href='@Url.Action("List", "Organization")' >لیست سازمان ها</a></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <a class="has-arrow waves-effect waves-dark" href="#" aria-expanded="false"><i class="fad fa-setting"></i><span class="hide-menu" >سایر</span></a>
+                                    <ul aria-expanded="false" class="collapse">
+                                        <li><a href='@Url.Action("Update", "Home")' >تنطیمات کلی</a></li>
+                                    </ul>
+                                </li>
+                            }
+                            else if (User.IsInRole(Core.Entities.RoleEnum.AdminBankLeasing.ToString()) || User.IsInRole(Core.Entities.RoleEnum.BankLeasing.ToString()))
+                            {
+                                <li>
+                                    <a class="has-arrow waves-effect waves-dark" href="#" aria-expanded="false"><i class="fad fa-money"></i><span class="hide-menu" >RequestFacility</span></a>
+                                    <ul aria-expanded="true" class="collapse">
+                                        <li><a href='@Url.Action("LeasingRequests", "RequestFacility")' >RequestFacilityList</a></li>
+                                    </ul>
+                                </li>
+                            }
+                            else if (User.IsInRole(Core.Entities.RoleEnum.Buyer.ToString()))
+                            {
+                                <li>
+                                    <a class="has-arrow waves-effect waves-dark" href="#" aria-expanded="false"><i class="fad fa-money"></i><span class="hide-menu" >RequestFacility</span></a>
+                                    <ul aria-expanded="true" class="collapse">
+                                        <li><a href='@Url.Action("List", "RequestFacility")' >RequestFacilityList</a></li>
+                                        <li><a href='@Url.Action("Add", "RequestFacility")' >RequestFacilityAdd</a></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <a class="has-arrow waves-effect waves-dark" href="#" aria-expanded="false"><i class="fad fa-user-alt"></i><span class="hide-menu" >IdentityDocuments</span></a>
+                                    <ul aria-expanded="true" class="collapse">
+                                        <li><a href='@Url.Action("Edit", "User")' >EditIdentityInformation</a></li>
+                                        <li><a href='@Url.Action("UploadIdentityDocuments", "User")' >UploadIdentityDocuments</a></li>
+                                    </ul>
+                                </li>
+
+                            }
+                            else if (User.IsInRole(Core.Entities.RoleEnum.Seller.ToString()))
+                            {
+                                <li>
+                                    <a class="has-arrow waves-effect waves-dark" href="#" aria-expanded="false"><i class="fad fa-user-alt"></i><span class="hide-menu" >خریداران</span></a>
+                                    <ul aria-expanded="true" class="collapse">
+                                        <li><a href='@Url.Action("SearchUser", "User")' >جستجوی خریدار(مشتری)</a></li>
+                                    </ul>
+                                </li>
+
+                            }
+                        }
+                    </ul>
+                </nav>
+                <!-- End Sidebar navigation -->
+            </div>
+            <!-- End Sidebar scroll-->
+            <!-- Bottom points-->
+            <div class="sidebar-footer">
+                <!-- item--><a href="" class="link" data-toggle="tooltip" title="Settings"><i class="ti-settings"></i></a>
+                <!-- item--><a href="" class="link" data-toggle="tooltip" title="Email"><i class="mdi mdi-gmail"></i></a>
+                <!-- item--><a href="" class="link" data-toggle="tooltip" title="Logout"><i class="mdi mdi-power"></i></a>
+            </div>
+            <!-- End Bottom points-->
+        </aside>
+
+        <!-- ============================================================== -->
+        <!-- End Left Sidebar - style you can find in sidebar.scss  -->
+        <!-- ============================================================== -->
+        <!-- ============================================================== -->
+        <!-- Page wrapper  -->
+        <!-- ============================================================== -->
+        <div class="page-wrapper">
+            <!-- ============================================================== -->
+            <!-- Container fluid  -->
+            <!-- ============================================================== -->
+            <div class="container-fluid content-row">
+                <!-- ============================================================== -->
+                <!-- Bread crumb and right sidebar toggle -->
+                <!-- ============================================================== -->
+                <div class="row page-titles">
+                    @*PAGE TITLE*@
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        @RenderBody()
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================== -->
+            <!-- End Container fluid  -->
+            <!-- ============================================================== -->
+            <!-- ============================================================== -->
+            <!-- footer -->
+            <!-- ============================================================== -->
+
+            <footer class="footer">
+                <img src="/images/ZarrinLendLogo.png" class="footer-logo row" />
+            </footer>
+            <!-- ============================================================== -->
+            <!-- End footer -->
+            <!-- ============================================================== -->
+        </div>
+    </div>
+
+    <script src="~/js/jquery.min.js"></script>
+    <script src="~/js/jquery.unobtrusive-ajax.min.js"></script>
+    <script src="~/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/wordifyfa.js"></script>
+    <script src="~/vendor/wordify/wordifyfa.js"></script>
+    <script src="~/js/jquery.slimscroll.js"></script>
+    <script src="~/js/waves.js"></script>
+    <script src="~/js/sidebarmenu.js"></script>
+    <script src="~/js/sticky-kit.min.js"></script>
+    <script src="~/js/jquery.sparkline.min.js"></script>
+    <script src="~/js/custom.js" asp-append-version="true"></script>
+    <script src="~/js/json2.js"></script>
+    @*<script src="~/Vendor/bootstrap-jalali-datepicker-1.0/bootstrap-datepicker.js"></script>*@
+    <script src="~/Vendor/select2-4.0.13/js/select2.full.js"></script>
+    <script src="~/Vendor/html5sortable-0.9.16/js/html5sortable.min.js"></script>
+    <script src="~/Vendor/List.js/list.min.js"></script>
+    <script src="~/Vendor/underscore-1.9.2/underscore-min.js"></script>
+    <script src="~/Vendor/jquery-ui-1.12.1.Autocomplete/jquery-ui.min.js"></script>
+    <script src="~/Vendor/d3/d3.min.js"></script>
+    <script src="~/Vendor/c3-master/c3.min.js"></script>
+    <script src="~/Vendor/sweetalert2/sweetalert2.all.min.js" type="text/javascript"></script>
+    <script src="/js/jquery.blockUI.min.js"></script>
+    <script src="/js/moment.js"></script>
+    <script asp-append-version="true">
+        $(function() {
+            $.ajaxSetup({
+                beforeSend: function(xhr) {
+                    if ('@($"{CookieManager.Get(Context, CookieManager.CookieKeys.JwtToken)}")' != '') {
+                        xhr.setRequestHeader("Authorization", 'Bearer @($"{CookieManager.Get(Context, CookieManager.CookieKeys.JwtToken)}")');
+                    }
+                }
+            });
+        });
+    </script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("scripts", required: false)
+</body>
+</html>

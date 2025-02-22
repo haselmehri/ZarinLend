@@ -1,0 +1,174 @@
+﻿@model Services.Model.WalletChargeRequestModel
+@{
+    ViewData["Title"] = _loc["WalletChargeRegister"];
+}
+@section styles
+{
+    <style type="text/css">
+        textarea {
+            height: 120px !important;
+        }
+
+        .table-custom th,
+        .table-custom td {
+            text-align: center !important;
+            vertical-align: middle !important;
+        }
+
+        .button-columns {
+            padding-top: 7px !important;
+            width: 100px;
+            text-align: center;
+        }
+
+        [type="checkbox"]:not(:checked), [type="checkbox"]:checked,
+        [type="radio"]:not(:checked), [type="radio"]:checked {
+            position: unset !important;
+            right: unset !important;
+            opacity: 1 !important;
+        }
+
+        fieldset {
+            padding: 15px;
+            border: solid 1px #840fb5 !important;
+            border-radius: 5px !important;
+            margin-bottom: 20px !important;
+        }
+
+        legend {
+            display: block;
+            width: unset !important;
+            max-width: 100%;
+            padding: 5px;
+            margin: .5rem;
+            font-size: 1rem;
+            line-height: inherit;
+            color: #533fd0 !important;
+            white-space: normal;
+            border: 1px solid;
+            border-radius: 3px;
+        }
+    </style>
+}
+<form id="frmWalletChargeRequest" method="post" enctype="multipart/form-data">
+    <div class="card">
+        <div class="card-header" localize-content>WalletChargeRegister</div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="Amount" class="control-label"></label>
+                        <input asp-for="AmountThousandSeparator" class="form-control number-thousand-separator" />
+                        <span asp-validation-for="AmountThousandSeparator" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="control-label" localize-content>Attachments</label>
+                        <input type="file" name="PostedFiles" id="PostedFiles" class="form-control-file" multiple>
+                        @*<span asp-validation-for="PostedFiles" class="text-danger"></span>*@
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label asp-for="Description" class="control-label" localize-content>Description</label>
+                        <textarea asp-for="Description" class="form-control"></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer" style="text-align:left">
+            <button id="btnSaveWalletChargeRequest" class="btn btn-outline-success">
+                @_loc["RegisterRequest"]&nbsp;<i class="fal fa-send"></i>
+            </button>
+            <a class="btn btn-outline-secondary" href='@Url.Action("WalletChargeList","AgentRequest")'>
+                @_loc["Cancel"]&nbsp;<i class="fal fa-close"></i>
+            </a>
+        </div>
+    </div>
+</form>
+@section scripts{
+    @{
+        await Html.RenderPartialAsync("~/Views/Shared/_ValidationScriptsPartial.cshtml");
+    }
+    <script>
+        $(document).ready(() => {
+            $('#Amount').val('');
+        });
+        $('#btnSaveWalletChargeRequest').click(function (e) {
+            e.preventDefault();
+            debugger;
+            const fileUpload = $("#PostedFiles")[0];
+            const formIsValid = $('#frmWalletChargeRequest').valid();
+            if (fileUpload == undefined || fileUpload.files.length == 0) {
+                showMessage('@_loc["ErrorTitle"]', '@_loc["PleaseSelectAttachment"]', icons.error,'@_loc["Close"]');
+                return;
+            }
+            const amount = parseInt(replaceAllComma($('#AmountThousandSeparator').val()));
+            if (amount <= 0) {
+                showMessage('@_loc["ErrorTitle"]', '@_loc["ChargeMustBeGreaterThanZero"]', icons.error, '@_loc["Close"]');
+                return;
+            }
+            if (formIsValid && fileUpload.files.length > 0) {
+                showWaiting('frmWalletChargeRequest', '@_loc["PleaseWait"]', '@_loc["Loading"]');
+                //const postdata = $('#frmWalletChargeRequest').serialize();
+                //const model = {
+                //    Description: $("#Description").val(),
+                //    Amount: $("#Amount").val(),
+                //    PostedFiles : fileUpload.files[0]
+                //};
+                let data = new FormData();
+                $.map(fileUpload.files, (item) => {
+                    data.append('WalletChargeFiles', item);
+                });
+                data.append('Description',  $("#Description").val());
+                data.append('Amount', amount);
+                data.append('AmountThousandSeparator', $('#AmountThousandSeparator').val());
+
+                $.ajax({
+                    type: 'post',
+                    //dataType: 'json',
+                    //contentType: "application/json; charset=utf-8",
+                    //enctype: 'multipart/form-data',
+                    contentType: false,
+                    processData: false,
+                    url: '/api/v1/AgentRequest/AddWalletCharge',
+                    //data: JSON.stringify(model),
+                    data: data,
+                    success: function (result) {
+                        if (result.isSuccess) {
+                            hideWaiting('frmAddRequestCardCharge');
+                            showMessage('@_loc["InfoTitle"]', '@_loc["MessageSuccess"]', icons.success, '@_loc["Close"]');
+                            setTimeout(function () {
+                                window.location.replace('@Url.Action("WalletChargeList","AgentRequest")');
+                            }, 1500);
+                        }
+                        else if (!result.isSuccess) {
+                            showMessage('@_loc["ErrorTitle"]', result.message, icons.error, '@_loc["Close"]');
+                        }
+                    },
+                    error: function (error) {
+                        hideWaiting('frmAddRequestCardCharge');
+                        if (error.responseJSON != undefined && error.responseJSON.Message != undefined && error.responseJSON.Message != '') {
+                            if (IsJsonString(error.responseJSON.Message)) {
+                                const exception = JSON.parse(error.responseJSON.Message).Exception;
+                                showMessage('@_loc["ErrorTitle"]', exception, icons.error, '@_loc["Close"]');
+                            }
+                            else
+                                showMessage('@_loc["ErrorTitle"]', error.responseJSON.Message, icons.error, '@_loc["Close"]');
+                        }
+                        else {
+                            showMessage('@_loc["ErrorTitle"]', '@_loc["UnhandledError"]', icons.error, '@_loc["Close"]');
+                        }
+                    }
+                });
+            }
+            else {
+                scrollToFirstError();
+            }
+        });
+    </script>
+}

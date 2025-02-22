@@ -1,0 +1,67 @@
+﻿@model RequestFacilityStepWizardModel
+
+@if (Model != null)
+{
+    <div class="mt-2 py-2 px-1 rounded-lg bg-white">
+        <div class="text-bold-900 secondary darken-4 font-medium-3">
+            مراحل درخواست تسهیلات
+        </div>
+        <div class="mt-2">
+            @{
+                var lastStepInRejectedOrNotResponsed = false;
+                var manualSteps = Model.WorkFlowSteps.Where(p => p.StepIsManual).ToList();
+                for (var i = 0; i < manualSteps.Count; i++)
+                {
+                    if (Model.CompletedWorkFlowStepModels != null && !lastStepInRejectedOrNotResponsed)
+                    {
+                        var stepClassName = "bx bx-circle mr-1 light";
+
+                        var lastStepCompleted = Model.CompletedWorkFlowStepModels.Where(p => p.WorkFlowStepId.Equals(manualSteps[i].Id))
+                        .OrderByDescending(p => p.CreateDate)
+                        .FirstOrDefault();
+                        if (lastStepCompleted != null)
+                        {
+                            if (!lastStepCompleted.StatusId.HasValue)
+                            {
+                                lastStepInRejectedOrNotResponsed = true;
+                                stepClassName = "bx bxs-time-five mr-1 zl-text-secondary-light";//not response
+                            }
+                            else if (lastStepCompleted.StatusId == (short)StatusEnum.Approved)
+                                stepClassName = "bx bxs-check-circle zl-text-primary mr-1";//approved
+                            else if (lastStepCompleted.StatusId == (short)StatusEnum.Rejected)
+                            {
+                                lastStepInRejectedOrNotResponsed = true;
+                                stepClassName = "bx bxs-check-circle zl-text-primary mr-1";//rejected
+                            }
+                        }
+
+                        <div class="d-flex align-items-center mt-2">
+                            <i class="@stepClassName"></i>
+                            <div class="zl-border-primary w-100 py-2 px-1 rounded d-flex flex-column">
+                                <div class="text-bold-500 font-small-3 secondary darken-4">
+                                    @manualSteps[i].Name
+                                </div>
+                                <span class="text-bold-400 text-muted font-small-75">@(lastStepCompleted != null ? (!string.IsNullOrEmpty(lastStepCompleted.ShamsiUpdateDate) ? lastStepCompleted.ShamsiUpdateDate : lastStepCompleted.ShamsiCreateDate) : string.Empty)</span>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                         <div class="d-flex align-items-center mt-2">
+                            <i class="bx bx-circle mr-1 light"></i>
+                            <div class="zl-border-primary w-100 py-2 px-1 rounded d-flex flex-column">
+                                <div class="text-bold-500 font-small-3 secondary darken-4">
+                                    @manualSteps[i].Name
+                                </div>
+                                <span class="text-bold-400 text-muted font-small-75"></span>
+                            </div>
+                        </div>
+                    }
+                }
+            }
+        </div>
+    </div>
+    <script on-content-loaded="true">
+
+    </script>
+}

@@ -1,0 +1,610 @@
+﻿@model RequestFacilityModel
+@{
+    ViewData["Title"] = "درخواست تسهیلات";
+    Layout = "~/Views/Shared/_NewLayout.cshtml";
+}
+@section styles
+{
+    <link rel="stylesheet" type="text/css" href="~/new-layout/css/nouislider.min.css" />
+    <link rel="stylesheet" type="text/css" href="~/new-layout/css/noui-slider-custom.css" />
+    <style type="text/css">
+        .alert-ex {
+            margin-bottom: 1rem !important;
+        }
+    </style>
+}
+@if (!Model.UserHasOpenRequest)
+{
+    @await Component.InvokeAsync("WorkFlowStepWizardHorizental", new { workFlow = WorkFlowEnum.RequestFacility, requestId = (int?)null })
+}
+@if (Model.IranCreditScoringResultRules != null && Model.IranCreditScoringResultRules.Any(p => p.MaximumAmount > 0))
+{
+    var message = "<li>باتوجه به نتیجه اعتبارسنجی، شما میتوانید مطابق با یکی از شرایط زیر درخواست تسهیلات دهید :<ul>";
+    foreach (var rule in Model.IranCreditScoringResultRules.Where(p => p.MaximumAmount > 0).OrderByDescending(p => p.MaximumAmount))
+    {
+        if (rule.GuarantorIsRequired)
+            message += $"<li>حداکثر مبلغ تسهیلات درخواستی شما میتواند <b>{rule.MaximumAmount!.Value.ToString("N0")}</b> ريال باشد.همچنین درخواست شما نیاز به معرفی ضامن دارد!</li>";
+        else
+            message += $"<li>حداکثر مبلغ تسهیلات درخواستی شما میتواند <b>{rule.MaximumAmount!.Value.ToString("N0")}</b> ريال باشد.درخواست شما نیاز به معرفی ضامن ندارد!</li>";
+    }
+    message += "</ul></li>";
+
+    <form id="frmAddRequestFacility">
+        <div class="p-2 bg-white rounded-lg">
+            @if (Model.UserHasOpenRequest)
+            {
+                <div class="alert alert-ex zl-bg-alert-danger border-danger border-accent-4 alert-dismissible my-2"
+                     role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="بستن">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                    <div class="d-flex">
+                        <i class="bx bx-error-circle font-large-1"></i>
+                        <span class="text-bold-400 font-small-3" style="text-align:justify">
+                            <ul>
+                                <li>
+                                    کاربر گرامی شما در حال حاضر درخواست فعالی دارید که در لیست درخواست ها میتوانید اقدام به تکمیل آن نمایید
+                                </li>
+                                <li>
+                                    شما نمیتوانید بیش از یک درخواست تسهیلات(وام) فعال بصورت همزمان داشته باشید برای ثبت درخواست جدید یا باید منتظر مشخص شدن وضعیت نهایی درخواست(<b>تایید نهایی/رد درخواست</b>) باشید یا نسبت به <b>لغو درخواست</b> اقدام نمایید
+                                </li>
+                            </ul>
+                        </span>
+                    </div>
+                </div>
+            }
+            @if (Model.SumAmountApprovedFacilitiesNotPaid > 0)
+            {
+                <div class="alert alert-ex zl-bg-alert-danger border-danger border-accent-4 alert-dismissible my-2"
+                     role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="بستن">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                    <div class="d-flex">
+                        <i class="bx bx-error-circle font-large-1"></i>
+                        <span class="text-bold-400 font-small-3" style="text-align:justify">
+                            <ul>
+                                <li>
+                                    کاربر گرامی مجموع وام های دریافتی و تسویه نشده شما تا این لحظه <b>@Model.SumAmountApprovedFacilitiesNotPaid.ToString("N0")</b> ريال می باشد،شما در مجموع می توانید مبلغ <b>@((500000000).ToString("N0"))</b> ريال تسهیلات فعال تسویه نشده داشته باشید
+                                </li>
+                            </ul>
+                        </span>
+                    </div>
+                </div>
+            }
+            @if (Model.RegisterFromZarinpal)
+            {
+                <div class="alert alert-ex zl-bg-alert-info border-info border-accent-4 alert-dismissible my-2"
+                     role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="بستن">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                    <div class="d-flex">
+                        <i class="bx bx-error-circle font-large-1"></i>
+                        <span class="text-bold-400 font-small-3" style="text-align:justify">
+                            <ul>
+                                <li>
+                                    کاربر محترم اطلاعات اولیه دریافت و ثبت نام اولیه شما انجام شد
+                                </li>
+                                <li>
+                                    در این مرحله میتوانید با استفاده از ماشین حساب فوق، مبلغ و بازه پرداختی جهت ثبت درخواست تسهیلات را مشخص کنید
+                                </li>
+                                <li>
+                                    نام کاربری شما همان کد ملی شماست.<br />همچنین بصورت پیش فرض کلمه عبور شما همان کد ملی شماست،لطفا در اسرع وقت اقدام به تغییر کلمه عبور ثابت خود نمایید
+                                </li>
+                            </ul>
+                        </span>
+                    </div>
+                </div>
+            }
+            <div class="alert alert-ex zl-bg-alert-warning border-primary alert-dismissible" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="بستن">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <div class="d-flex">
+                    <i class="bx bx-error-circle font-large-1"></i>
+                    <span class="text-bold-400 font-small-3" style="text-align:justify">
+                        <ul>
+                            @Html.Raw(message)
+                        </ul>
+                    </span>
+                </div>
+            </div>
+            @* <div class="row">
+        <div class="col-11 col-sm-12 col-md-11 col-lg-9 col-xl-8 mx-auto">
+        <div class="bg-white rounded-lg border mt-2 p-2">
+        <div class="d-flex align-items-center justify-content-between">
+        <span class="text-bold-700">امتیاز :</span>
+        <div class="d-flex align-items-center">
+        <label class="text-bold-700">@Model.IranCreditScoringResult.Score</label>
+        </div>
+        </div>
+        <div class="d-flex align-items-center justify-content-between">
+        <span class="text-bold-700">رتبه :</span>
+        <div class="d-flex align-items-center">
+        <label class="text-bold-700">@Model.IranCreditScoringResult.Risk</label>
+        </div>
+        </div>
+        <div class="d-flex align-items-center justify-content-between">
+        <span class="text-bold-700">توضیحات :</span>
+        <div class="d-flex align-items-center">
+        <label class="text-bold-700">@Model.IranCreditScoringResult.Description</label>
+        </div>
+        </div>
+        </div>
+        </div>
+        </div> *@
+            <div class="row">
+                <div class="col-11 col-sm-12 col-md-11 col-lg-9 col-xl-8 mx-auto">
+                    @await Component.InvokeAsync("UserIranCreditScoringHistory", new { userId = new Guid(User.Identity!.GetUserId()), showFileLinks = false })
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="d-flex align-items-center justify-content-around">
+                        <fieldset>
+                            <div class="radio radio-primary radio-glow radio-sm">
+                                <input type="radio" name="userOption" id="inlineRadio1" value="1" checked="checked" />
+                                <label class="font-small-3 primary darken-4 text-bold-400 line-height-23" for="inlineRadio1">عضویت در باشگاه مشتریان</label>
+                            </div>
+                        </fieldset>
+                        <fieldset style="display:none">
+                            <div class="radio radio-primary radio-glow radio-sm">
+                                <input type="radio" name="userOption" id="inlineRadio2" value="2"  />
+                                <label class="font-small-3 primary darken-4 text-bold-400 line-height-23" for="inlineRadio2">خرید از فروشگاه های طرف قرارداد</label>
+                            </div>
+                        </fieldset>
+                    </div>
+                </div>
+                <div class="col-6"></div>
+            </div>
+            <div id="requestFacilityStep1">
+                <div class="row">
+                    <div class="col-11 col-sm-12 col-md-11 col-lg-9 col-xl-8 mx-auto">
+                        <div class="text-center text-bold-700 font-medium-4 secondary darken-4 mt-3">
+                            با استفاده از ماشین حساب زیر جزییات وام درخواستی خود را مشخص کنید
+                        </div>
+                        <div class="bg-white rounded-lg border mt-2 py-1 px-2">
+                            <div class="d-flex justify-content-between align-items-center mt-25">
+                                <div class="text-dark text-bold-700">مبلغ درخواستی وام</div>
+                                <div class="d-flex align-items-center">
+                                    <span id="requestValue" class="font-medium-6 dark text-bold-800">300,000,000</span>
+                                    <span class="font-small-75 text-bold-500 ml-75 dark">ریال</span>
+                                </div>
+                            </div>
+                            <div>
+                                <div id="slider" class="mt-3"></div>
+                                <div class="d-flex align-items-center justify-content-between mb-3 mt-25">
+                                    <span id="max_amount_span" class="font-small-3 text-muted">500,000,000</span>
+                                    <span class="font-small-3 text-muted">100,000,000</span>                                    
+                                </div>
+                            </div>
+                            <div class="">
+                                <div class="text-dark text-bold-700">مدت بازپرداخت</div>
+                                <div class="d-flex align-items-center justify-content-around mt-2 refund-section">
+                                    @foreach (var item in Model.PaymentPeriods)
+                                    {
+                                        if (item.Text == "12")
+                                        {
+                                            <a data-value='@item.Text' data-facility-type-id="@item.Value" class="cursor-pointer rounded-lg font-medium-1 active dark border p-1">@item.Text ماهه</a>
+                                        }
+                                        else
+                                        {
+                                            <a data-value='@item.Text' data-facility-type-id="@item.Value" class="cursor-pointer rounded-lg font-medium-1 dark border p-1">@item.Text ماهه</a>
+                                        }
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-11 col-sm-12 col-md-11 col-lg-9 col-xl-8 mx-auto">
+                        <div class="bg-white rounded-lg border mt-2 p-2">
+                            <div class="d-flex align-items-center justify-content-between dark">
+                                <span class="text-bold-700">مبلغ هر قسط :</span>
+                                <div class="d-flex align-items-center">
+                                    <label id="AmountInstallment" class="text-bold-700">0</label>
+                                    <label class="font-small-1 ml-75 text-bold-500">ريال</label>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center justify-content-between dark my-2">
+                                <span class="text-bold-700">جمع کل اقساط :</span>
+                                <div class="d-flex align-items-center">
+                                    <label id="TotalInstallment" class="text-bold-700">0</label>
+                                    <label class="font-small-1 ml-75 text-bold-500">ريال</label>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center justify-content-between dark">
+                                <span class="text-bold-700">مبلغ سفته ضمانت :</span>
+                                <div class="d-flex align-items-center">
+                                    <label id="ChequeAmountWarranty" class="text-bold-700">0</label>
+                                    <label class="font-small-1 ml-75 text-bold-500">ريال</label>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center justify-content-between dark my-2">
+                                <span class="text-bold-700">هزینه عضویت در باشگاه مشتریان :</span>
+                                <div class="d-flex align-items-center">
+                                    <label id="Fee" class="text-bold-700">0</label>
+                                    <label class="font-small-1 ml-75 text-bold-500">ريال</label>
+                                </div>
+                            </div>
+                            <hr />
+                            <div class="d-flex align-items-center justify-content-between dark mt-2">
+                                <span class="text-bold-700">جمع کل پرداختی :</span>
+                                <div class="d-flex align-items-center">
+                                    <label id="TotalPayment" class="text-bold-700">0</label>
+                                    <label class="font-small-1 ml-75 text-bold-500">ريال</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-11 col-sm-12 col-md-11 col-lg-9 col-xl-8 mx-auto">
+                        <div class="mt-1">
+                            <fieldset>
+                                <div class="checkbox checkbox-primary">
+                                    <input type="checkbox" id="chkConfirmStep1" />
+                                    <label for="chkConfirmStep1">توان پرداخت اقساط این تسهیلات را دارم!</label>
+                                </div>
+                            </fieldset>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-11 col-sm-12 col-md-11 col-lg-9 col-xl-8 mx-auto">
+                        <div class="my-3 d-flex align-items-center justify-content-between">
+                            <a href='@Url.Action("Index","Home")' class="btn-block dark btn btn-outline-secondary">بازگشت</a>
+                            @if (!Model.UserHasOpenRequest)
+                            {
+                                <button id="btnGoToNextStep" style="margin-top:0px;margin-right:5px" class="btn-block btn white btn-zl-primary">تایید</button>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    @section scripts {
+    <script src="~/new-layout/js/nouislider.min.js"></script>
+    @*<partia name="_ValidationScriptsPartial" />*@
+    @{
+            await Html.RenderPartialAsync("~/Views/Shared/_ValidationScriptsPartial.cshtml");
+        }
+        <script>
+            const rulesBaseVerifyResult = @Html.Raw(Model.IranCreditScoringResultRulesJson);
+            let max_amount = 0;
+            rulesBaseVerifyResult.map((element, index) => {
+                max_amount = Math.max(max_amount, element.maximumAmount);
+            });
+            if (max_amount == 0)
+                max_amount = 500000000;
+
+            $('#max_amount_span').html(splitNumber(max_amount));
+            const slider = document.getElementById("slider");
+            noUiSlider.create(slider, {
+                start: 40,
+                direction: "ltr",
+                tooltips: true,
+                step: 50000000,
+                behaviour: "tap",
+                connect: "upper",
+                range: {
+                    min: 300000000,
+                    max: max_amount,
+                },
+                format: {
+                    from: Number,
+                    to: function (value) {
+                        return (splitNumber(parseInt(value)) + " ريال");
+                    }
+                }
+            });
+
+            const getSliderValue = () => {
+                return parseInt(slider.noUiSlider.get().replaceAll(',', '').replaceAll(' ريال', ''));
+            }
+            const requestValue = $('#requestValue');
+
+            const INTEREST_RATE = @Model.FacilityInterest;
+            const INSTALLMENT_COUNT_IN_YEAR = @InstallmentCalculator.INSTALLMENT_COUNT_IN_YEAR;
+            const OPERATING_COST_PERCENTAGE = '@Model.ZP_Id' != undefined && '@Model.ZP_Id' != '' ? @Model.LendTechFacilityForZarinpalClientFee + @Model.FinancialInstitutionFacilityFee : @Model.LendTechFacilityFee + @Model.FinancialInstitutionFacilityFee;
+            const CHEQUE_AMOUNT_WARRANTY_PERCENTAGE = @Model.WarantyPercentage;
+            const calculateAmountInstallment = (amountRequest, paymentPeriodBaseMonth) => {
+                if (amountRequest == undefined || amountRequest == 0 || paymentPeriodBaseMonth == undefined || paymentPeriodBaseMonth == 0)
+                    return 0;
+
+                const result =
+                    amountRequest * INTEREST_RATE / (INSTALLMENT_COUNT_IN_YEAR * 100.0) * Math.pow(1 + (INTEREST_RATE / (INSTALLMENT_COUNT_IN_YEAR * 100.0)), paymentPeriodBaseMonth) /
+                    (Math.pow(1 + (INTEREST_RATE / (INSTALLMENT_COUNT_IN_YEAR * 100.0)), paymentPeriodBaseMonth) - 1);
+
+                return result;
+            }
+
+            const roundUp = (number, digits) => {
+                const baseDigit = Math.pow(10, digits);
+                return Math.ceil(number / baseDigit) * baseDigit;
+            }
+
+            const calculatePrePaymentOrFee = (amountRequest, paymentPeriodBaseMonth, totalInstallment) => {
+                if (amountRequest == undefined ||
+                    amountRequest == 0 ||
+                    paymentPeriodBaseMonth == undefined ||
+                    paymentPeriodBaseMonth == 0 ||
+                    totalInstallment == undefined ||
+                    totalInstallment == 0)
+                    return 0;
+
+                let feePercentage;
+                //switch (Number.parseInt(paymentPeriodBaseMonth)) {
+                //    case 6:
+                //        feePercentage = 5.5;
+                //        break;
+                //    case 12:
+                //        feePercentage = 8;
+                //        break;
+                //    case 18:
+                //        feePercentage = 10.5;
+                //        break;
+                //    case 24:
+                //        feePercentage = 12.6;
+                //        break;
+                //}
+                //if (feePercentage == undefined)
+                //    return 0;
+
+                //const result = (amountRequest * feePercentage / 100.0) + (amountRequest * feePercentage / 100.0 * 9 / 100.0) +
+                //    ((totalInstallment - amountRequest) * 9 / 100.0);
+
+                const result = amountRequest * OPERATING_COST_PERCENTAGE / 100.0;
+
+                return result;
+            }
+
+            $(document).ready(function () {
+                calculateFacilityObjects();
+            });
+
+            const calculateFacilityObjects = () => {
+                const paymentPeriodBaseMonth = $(".refund-section a.active").data('value');
+                const amountInstallment = calculateAmountInstallment(getSliderValue(), paymentPeriodBaseMonth);
+                const totalInstallment = paymentPeriodBaseMonth * amountInstallment;
+                const prePaymentOrFee = $('input[type="radio"][name="userOption"]:checked').val() == 1 ? calculatePrePaymentOrFee(getSliderValue(), paymentPeriodBaseMonth, totalInstallment) : 0;
+                $('#AmountInstallment').text(splitNumber(Math.round(amountInstallment)));
+                $('#TotalInstallment').text(splitNumber(Math.round(totalInstallment)));
+                $('#ChequeAmountWarranty').text(splitNumber(roundUp(Math.round(totalInstallment * CHEQUE_AMOUNT_WARRANTY_PERCENTAGE / 100.0), 6)));
+                $('#Fee').text(splitNumber(Math.round(prePaymentOrFee)));
+                $('#TotalPayment').text(splitNumber(Math.round(totalInstallment + prePaymentOrFee)));
+            }
+
+            $('input[type="radio"][name="userOption"]').change((e) => {
+                calculateFacilityObjects();
+            });
+
+            slider.noUiSlider.on('update', (values, handle) => {
+                requestValue.html(splitNumber(getSliderValue()));
+                calculateFacilityObjects();
+            });
+
+            $(".refund-section a").on("click", function (params) {
+                const element = $(params.target);
+                element.parent().children().removeClass("active");
+                element.addClass("active");
+                calculateFacilityObjects();
+            });
+
+            $('input[type="checkbox"][name="usagePlace"][value="10000"]').change((e) => {
+                if ($(e.target).prop('checked')) {
+                    $('#div_UsagePlaceDescription').show();
+                }
+                else {
+                    $('#div_UsagePlaceDescription').hide();
+                }
+            });
+
+            $('#btnGoToNextStep').click(function (e) {
+                e.preventDefault();
+                const formIsValid = $('#frmAddRequestFacility').valid();
+                if (formIsValid) {
+                    if (!$("#chkConfirmStep1").is(':checked')) {
+                        showMessage('خطا', "لطفا گزینه <b style='color:blueviolet'>توان پرداخت اقساط این تسهیلات را دارم!</b> را تایید نمایید!", icons.warning, '@ResourceFile.Close');
+                        return;
+                    }
+
+                    const maximunRequestAmount = 500000000 - @Model.SumAmountApprovedFacilitiesNotPaid;
+                    if (getSliderValue() > maximunRequestAmount) {
+                        showMessage('اخطار', `کاربر گرامی شما حداکثر میتوانید <b style='color:blueviolet'>${splitNumber(maximunRequestAmount)} ريال</b> درخواست وام دهید!`, icons.warning, '@ResourceFile.Close');
+                        return;
+                    }
+
+                    if ($('input[type="radio"][name="userOption"]:checked').val() == undefined) {
+                        showMessage('خطا', "لطفا یکی از گزینه های <b>عضویت در باشگاه مشتریان</b> یا <b>خرید از فروشگاه های طرف قرارداد</b> را انتخاب کنید!", icons.warning, '@ResourceFile.Close');
+                        return;
+                    }
+                    //$('#requestFacilityStep1').hide();
+                    //$('#requestFacilityStep2').show();
+
+                    if (formIsValid) {
+                        //const usagePlaceIds = [];
+                        //selectedUsagePlace.map((index, element) => {
+                        //    usagePlaceIds.push(element.value);
+                        //});
+
+                        //if (usagePlaceIds.includes('10000') && $("#UsagePlaceDescription").val().trim() == '') {
+                        //    showMessage('خطا', "در صورتی که در قسمت <b>محل مصرف کالا</b> گزینه <b>سایر</b> را انتخاب کنید،باید مقدار فیلد <b>محل مصرف تسهیلات-سایر</b> را نیز وارد کنید!", icons.warning, '@ResourceFile.Close');
+                        //    return;
+                        //}
+                        showWaiting('frmAddRequestFacility', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                        let data = new FormData();
+                        data.append('ActiveGlobalSettingId', @Model.ActiveGlobalSettingId);
+                        data.append('AmountRequest', getSliderValue());
+                        data.append('FacilityTypeId', $(".refund-section a.active").data('facility-type-id'));
+                        data.append('UserOption', $('input[type="radio"][name="userOption"]:checked').val());
+                        //data.append('UsagePlaceDescription', $("#UsagePlaceDescription").val());
+                        ////data.append('UsagePlaceIds',usagePlaceIds);
+                        //selectedUsagePlace.map((index, element) => {
+                        //    data.append('UsagePlaceIds', element.value);
+                        //});
+                        debugger;
+                        $.ajax({
+                            type: 'post',
+                            //dataType: 'json',
+                            //contentType: "application/json; charset=utf-8",
+                            processData: false,
+                            contentType: false,
+                            url: '/api/v1/RequestFacility/Add',
+                            data: data,// JSON.stringify(model),
+                            success: function (result) {
+                                hideWaiting('frmAddRequestFacility');
+                                if (result.isSuccess) {
+                                    showMessage('@ResourceFile.InfoTitle', 'کاربر گرامی درخواست شما ثبت شد.<br/>در مرحله بعد باید اقدام به تکمیل <b>اطلاعات هویتی،محل سکونت و اطلاعات حساب<b/> خود نمایید!', icons.success, '@ResourceFile.Close', () => {
+                                        window.location.replace('@Url.Action("Edit", "User")');
+                                    });
+                                } 
+                                else {
+                                    showMessage('@ResourceFile.ErrorTitle', result.message, icons.error, '@ResourceFile.Close');
+                                }
+                            },
+                            error: function (error) {
+                                hideWaiting('frmAddRequestFacility');
+                                const exception = getExceptionMessageFromError(error);
+                                if (exception != null)
+                                    showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                                else
+                                    showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                            }
+                        });
+                    }
+                    else {
+                        scrollToFirstError();
+                    }
+                }
+            });
+
+            $('#btnBackToStep').click(function (e) {
+                e.preventDefault();
+                $('#requestFacilityStep1').show();
+                $('#requestFacilityStep2').hide();
+            });
+
+            $('#btnSave').click(function (e) {
+                e.preventDefault();
+                const selectedUsagePlace = $('input[name=usagePlace]:checked');
+                if (selectedUsagePlace == undefined || selectedUsagePlace.length == 0) {
+                    showMessage('خطا', "حداقل باید یک مورد <b>محل مصرف کالا</b> را انتخاب کنید!", icons.warning, '@ResourceFile.Close');
+                    return;
+                }
+                console.log(selectedUsagePlace);
+
+                const formIsValid = $('#frmAddRequestFacility').valid();
+
+                if (formIsValid) {
+                    const usagePlaceIds = [];
+                    selectedUsagePlace.map((index, element) => {
+                        usagePlaceIds.push(element.value);
+                    });
+
+                    if (usagePlaceIds.includes('10000') && $("#UsagePlaceDescription").val().trim() == '') {
+                        showMessage('خطا', "در صورتی که در قسمت <b>محل مصرف کالا</b> گزینه <b>سایر</b> را انتخاب کنید،باید مقدار فیلد <b>محل مصرف تسهیلات-سایر</b> را نیز وارد کنید!", icons.warning, '@ResourceFile.Close');
+                        return;
+                    }
+                    showWaiting('frmAddRequestFacility', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                    let data = new FormData();
+                    data.append('AmountRequest', getSliderValue());
+                    data.append('FacilityTypeId', $(".refund-section a.active").data('facility-type-id'));
+                    data.append('UsagePlaceDescription', $("#UsagePlaceDescription").val());
+                    //data.append('UsagePlaceIds',usagePlaceIds);
+                    selectedUsagePlace.map((index, element) => {
+                        data.append('UsagePlaceIds', element.value);
+                    });
+
+                    $.ajax({
+                        type: 'post',
+                        //dataType: 'json',
+                        //contentType: "application/json; charset=utf-8",
+                        processData: false,
+                        contentType: false,
+                        url: '/api/v1/RequestFacility/Add',
+                        data: data,// JSON.stringify(model),
+                        success: function (result) {
+                            hideWaiting('frmAddRequestFacility');
+                            if (result.isSuccess) {
+                                showMessage('@ResourceFile.InfoTitle', 'کاربر گرامی،درخواست شما ثبت شد.<br/>در مرحله بعد باید اقدام به تکمیل اطلاعات هویتی،محل سکونت و اطلاعات حساب حود نمایید!', icons.success, '@ResourceFile.Close', () => {
+                                    window.location.replace('@Url.Action("Edit", "User")');
+                                });
+                            }
+                        },
+                        error: function (error) {
+                            hideWaiting('frmAddRequestFacility');
+                            const exception = getExceptionMessageFromError(error);
+                            if (exception != null)
+                                showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                            else
+                                showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                        }
+                    });
+                }
+                else {
+                    scrollToFirstError();
+                }
+            });
+        </script>
+    }
+}
+else
+{
+    <div class="p-2 bg-white rounded-lg">
+        <div class="alert zl-bg-alert-danger border-danger alert-dismissible" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="بستن">
+                <span aria-hidden="true">×</span>
+            </button>
+            <div class="d-flex">
+                <i class="bx bx-error-circle font-large-1"></i>
+                <span class="text-bold-400 font-small-3" style="text-align:justify">
+                    <ul>
+                        <li>
+                            با توجه به رتبه اعتباری شما امکان ثبت درخواست تسهیلات وجود ندارد!
+                        </li>
+                    </ul>
+                </span>
+            </div>
+        </div>
+        @* <div class="row">
+    <div class="col-11 col-sm-12 col-md-11 col-lg-9 col-xl-8 mx-auto">
+    <div class="bg-white rounded-lg border mt-2 p-2">
+    <div class="d-flex align-items-center justify-content-between">
+    <span class="text-bold-700">امتیاز :</span>
+    <div class="d-flex align-items-center">
+    <label class="text-bold-700">@Model.IranCreditScoringResult.Score</label>
+    </div>
+    </div>
+    <div class="d-flex align-items-center justify-content-between">
+    <span class="text-bold-700">رتبه :</span>
+    <div class="d-flex align-items-center">
+    <label class="text-bold-700">@Model.IranCreditScoringResult.Risk</label>
+    </div>
+    </div>
+    <div class="d-flex align-items-center justify-content-between">
+    <span class="text-bold-700">توضیحات :</span>
+    <div class="d-flex align-items-center">
+    <label class="text-bold-700">@Model.IranCreditScoringResult.Description</label>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div> *@
+        <div class="row">
+            <div class="col-11 col-sm-12 col-md-11 col-lg-9 col-xl-8 mx-auto">
+                @await Component.InvokeAsync("UserIranCreditScoringHistory", new { userId = new Guid(User.Identity.GetUserId()), showFileLinks = false })
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-11 col-sm-12 col-md-11 col-lg-9 col-xl-8 mx-auto">
+                <div class="my-3 d-flex align-items-center justify-content-between">
+                    <a href='@Url.Action("Index","Home")' class="btn-block dark btn btn-outline-secondary">بازگشت</a>
+                </div>
+            </div>
+        </div>
+    </div>
+}

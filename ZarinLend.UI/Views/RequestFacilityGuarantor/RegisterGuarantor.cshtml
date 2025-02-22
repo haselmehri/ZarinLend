@@ -1,0 +1,284 @@
+﻿@model RequestFacilityGuarantorAddModel
+@{
+    ViewData["Title"] = ViewBag.Title;
+    Layout = "~/Views/Shared/_NewLayout.cshtml";
+}
+@section styles
+{
+    <style type="text/css">
+    </style>
+}
+
+@await Component.InvokeAsync("WorkFlowStepWizardHorizental", new { workFlow = WorkFlowEnum.RegisterGuarantor, requestId = (int?)null })
+
+@if (Model.IranCreditScoringResultRules != null && Model.IranCreditScoringResultRules.Any(p => ViewBag.UserRisk.Contains(p.Risk)))
+{
+    <form id="frmRequestFacilityGuarantor">
+        <div class="p-2 bg-white rounded-lg">
+            @*@if (Model.UserHasOpenRequest)
+        {*@
+            <div class="alert zl-bg-alert-danger border-danger border-accent-4 alert-dismissible my-2"
+            role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="بستن">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <div class="d-flex">
+                    <i class="bx bx-error-circle font-large-1"></i>
+                    <span class="text-bold-400 font-small-3" style="text-align:justify">
+                        <ul>
+                            <li>
+                                توضیحاتتتتتتتتتتتتتتتتتتتتتتتتتتتتتتتتتتتتتتتتتتتتتتتتتتتتتتتتتتتت
+                            </li>
+                            <li>
+                                توضیحاتتتتتتتتتتتتتتتتتتتتتتتتتتتتتتتتتتتتتتتتتتتتتتتتتتتتتتتتتتتت
+                            </li>
+                        </ul>
+                    </span>
+                </div>
+            </div>
+            @*        }*@
+            <div>
+                <div class="row">
+                    <div class="col-md-4 col-sm-12">
+                        <div class="form-group">
+                            <input type="text" class="form-control bg-transparent" asp-for="NationalCode" placeholder="کد ملی" style="text-align:center;direction:ltr;letter-spacing:1px" />
+                            <span asp-validation-for="NationalCode" class="text-danger"></span>
+                            <input type="hidden" id="hdnNationalCode" value="" />
+                        </div>
+                    </div>
+                    <div class="col-md-8 col-sm-12">
+                        <div class="form-group">
+                            <button id="btnSearch" style="margin-top:0px;margin-right:5px" class="btn btn-info">مشاهده اطلاعات</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div id="userIdentityInfo" style="display:none" class="col-12 mt-2">
+                        <div class="text-bold-900 secondary darken-4 font-medium-3">
+                            اطلاعات هویتی
+                        </div>
+                        <div class="border rounded mt-2">
+                            <div class="d-flex flex-column flex-sm-row">
+                                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                                    <span class="font-small-2 text-bold-500">نام</span>
+                                    <span id="fname" class="dark mt-50 text-bold-400"></span>
+                                </div>
+                                <div class="border-left border-top"></div>
+                                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                                    <span class="font-small-2 text-bold-500">نام خانوادگی</span>
+                                    <span id="lname" class="dark mt-50 text-bold-400"></span>
+                                </div>
+                                <div class="border-left border-top"></div>
+                                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                                    <span class="font-small-2 text-bold-500">نام پدر</span>
+                                    <span id="fatherName" class="dark mt-50 text-bold-400"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div id="requestFacilityDetail" style="display:none" class="col-12 mt-2">
+                        <div class="text-bold-900 secondary darken-4 font-medium-3">
+                            جزئیات درخواست تسهیلات
+                        </div>
+                        <div class="border rounded mt-2">
+                            <div class="d-flex flex-column flex-sm-row">
+                                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                                    <span class="font-small-2 text-bold-500">مبلغ تسهیلات</span>
+                                    <span id="amount" class="dark mt-50 text-bold-400"></span>
+                                </div>
+                                <div class="border-left border-top"></div>
+                                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                                    <span class="font-small-2 text-bold-500">مبلغ چک ضمانت</span>
+                                    <span id="chequeAmountWarranty" class="dark mt-50 text-bold-400" style='font-weight:bold;color:red !important'></span>
+                                </div>
+                            </div>
+                            <hr class="m-0 p-0" />
+                            <div class="d-flex flex-column flex-sm-row">
+                                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                                    <span class="font-small-2 text-bold-500">تعداد اقساط</span>
+                                    <span id="monthCountTitle" class="dark mt-50 text-bold-400"></span>
+                                </div>
+                                <div class="border-left border-top"></div>
+                                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                                    <span class="font-small-2 text-bold-500">مبلغ هر قسط</span>
+                                    <span id="amountInstallment" class="dark mt-50 text-bold-400"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="mt-1">
+                            <fieldset>
+                                <div class="checkbox checkbox-primary">
+                                    <input type="checkbox" id="chkConfirm" />
+                                    <label for="chkConfirm">تایید می نمایم در صورتی تسهیلات گیرنده اقساط خود را پرداخت نکرد،چک ضمانت من ....!</label>
+                                </div>
+                            </fieldset>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-sm-12" style="text-align:left">
+                        <a href='@Url.Action("list","requestfacilityguarantor")' style="width:80px" class="btn btn-outline-secondary">بازگشت</a>
+                        <button id="btnSave" style="margin-top: 0px; margin-right: 5px; width: 80px" class="btn btn-success" disabled>تایید</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </form>
+}
+else
+{
+    <div class="p-2 bg-white rounded-lg">
+        <div class="alert zl-bg-alert-danger border-danger alert-dismissible" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="بستن">
+                <span aria-hidden="true">×</span>
+            </button>
+            <div class="d-flex">
+                <i class="bx bx-error-circle font-large-1"></i>
+                <span class="text-bold-400 font-small-3" style="text-align:justify">
+                    <ul>
+                        <li>
+                            با توجه به رتبه اعتباری شما نمی توانید ضامن شخصی شوید!
+                            @if (Model.IranCreditScoringResultRules != null && Model.IranCreditScoringResultRules.Any())
+                            {
+                                <br />
+                                Html.Raw($"فقط کسانی که رتبه اعتباری {string.Join(" و ", Model.IranCreditScoringResultRules.Select(p => p.Risk))} میتوانند ضامن شوند!");
+                            }
+                        </li>
+                    </ul>
+                </span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-11 col-sm-12 col-md-11 col-lg-9 col-xl-8 mx-auto">
+                @await Component.InvokeAsync("UserIranCreditScoringHistory", new { userId = new Guid(User.Identity.GetUserId()), showFileLinks = false })
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-11 col-sm-12 col-md-11 col-lg-9 col-xl-8 mx-auto">
+                <div class="my-3 d-flex align-items-center justify-content-between">
+                    <a href='@Url.Action("Index","Home")' class="btn-block dark btn btn-outline-secondary">بازگشت</a>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+@section scripts {
+    @*<partia name="_ValidationScriptsPartial" />*@
+    @{
+        await Html.RenderPartialAsync("~/Views/Shared/_ValidationScriptsPartial.cshtml");
+    }
+    <script>
+
+        $(document).ready(function () {
+
+        });
+
+        let requestFacilityId = null;
+        $('#btnSearch').click(function (e) {
+            e.preventDefault();
+            const formIsValid = $('#frmRequestFacilityGuarantor').valid();
+
+            if (formIsValid) {
+                showWaiting('frmRequestFacilityGuarantor', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                //const model = { nationalCodde: $('#NationalCode').val() }
+
+                $.ajax({
+                    type: 'post',
+                    dataType: 'json',
+                    contentType: "application/json; charset=utf-8",
+                    url: `/api/v1/RequestFacility/FindOpenFacilityRequest/${$('#NationalCode').val()}`,
+                    data: null,// JSON.stringify(model),
+                    success: function (result) {
+                        debugger;
+                        hideWaiting('frmRequestFacilityGuarantor');
+                        if (result.isSuccess && result.data != null) {
+                            $('#requestFacilityDetail').show();
+                            $('#amount').html(`${splitNumber(result.data.amount)} ريال`);
+                            $('#chequeAmountWarranty').html(`${splitNumber(result.data.chequeAmountWarranty)} ريال`);
+                            $('#monthCountTitle').html(`${splitNumber(result.data.monthCountTitle)} قسط`);
+                            $('#amountInstallment').html(`${splitNumber(result.data.amountInstallment)} ريال`);
+
+                            $('#userIdentityInfo').show();
+                            $('#fname').html(result.data.fName);
+                            $('#lname').html(result.data.lName);
+                            $('#fatherName').html(result.data.fatherName);
+                            requestFacilityId = result.data.id;
+                            $('#btnSave').prop('disabled', false);
+                            //$('#btnSave').show();
+                        }
+                        else {
+                            $('#btnSave').prop('disabled', true);
+                            //$('#btnSave').hide();
+                            requestFacilityId = null;
+                            showMessage('@ResourceFile.InfoTitle', 'با کد ملی وارد شده اطلاعاتی یافت نشد،یا درخواست تسهیلات فعالی که نیاز به ثبت ضامن داشته باشد یافت نشده است!', icons.warning, '@ResourceFile.Close');
+                        }
+                    },
+                    error: function (error) {
+                        hideWaiting('frmRequestFacilityGuarantor');
+                        $('#btnSave').prop('disabled', true);
+                        requestFacilityId = null;
+                        const exception = getExceptionMessageFromError(error);
+                        if (exception != null)
+                            showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                        else
+                            showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                    }
+                });
+            }
+        });
+
+
+        $('#btnSave').click(function (e) {
+            e.preventDefault();
+            if (requestFacilityId == null) {
+                showMessage('خطا', "ابتدا کد ملی فردی که میخواهید ضامن آن شوید را وارد کنید و سپس روی دکمه جستجو کلیک کنید!", icons.warning, '@ResourceFile.Close');
+                return;
+            }
+            if (!$("#chkConfirm").is(':checked')) {
+                showMessage('خطا', "لطفا گزینه <b style='color:blueviolet'>تایید!</b> را انتخاب نمایید!", icons.warning, '@ResourceFile.Close');
+                return;
+            }
+
+            const formIsValid = $('#frmRequestFacilityGuarantor').valid();
+
+            if (formIsValid) {
+                showWaiting('frmRequestFacilityGuarantor', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+
+                $.ajax({
+                    type: 'post',
+                    dataType: 'json',
+                    contentType: "application/json; charset=utf-8",
+                    url: `/api/v1/RequestFacilityGuarantor/RegisterGuarantor/${requestFacilityId}`,
+                    //data: JSON.stringify(model),
+                    success: function (result) {
+                        debugger;
+                        hideWaiting('frmRequestFacilityGuarantor');
+                        if (result.isSuccess) {
+                            showMessage('@ResourceFile.InfoTitle', 'کاربر گرامی،درخواست شما ثبت شد.<br/>در مرحله بعد باید اقدام به تکمیل اطلاعات هویتی،محل سکونت خود را  تکمیل نمایید!', icons.success, '@ResourceFile.Close', () => {
+                                window.location.replace('@Url.Action("EditGuarantorInfo", "User")');
+                            });
+                        }
+                    },
+                    error: function (error) {
+                        hideWaiting('frmRequestFacilityGuarantor');
+                        const exception = getExceptionMessageFromError(error);
+                        if (exception != null)
+                            showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                        else
+                            showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                    }
+                });
+            }
+            else {
+                scrollToFirstError();
+            }
+        });
+    </script>
+}

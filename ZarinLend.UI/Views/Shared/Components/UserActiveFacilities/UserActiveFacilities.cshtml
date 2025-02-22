@@ -1,0 +1,132 @@
+﻿@model SamatFacilityHeaderModel
+
+<style type="text/css">
+</style>
+<div class="card-body">
+    @if (Model != null)
+    {
+        <div class="row">
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label class="control-label" asp-for="ShamsiCreatedDate">آخرین بروزرسانی</label>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label disabled class="control-label control-label-value">@Model.ShamsiCreatedDate</label>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label class="control-label" asp-for="CreatorName">دریافت کننده اطلاعات</label>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label disabled class="control-label control-label-value">@Model.CreatorName</label>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label class="control-label" asp-for="FacilityTotalAmount">نام و نام خانوادگی</label>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label disabled class="control-label control-label-value">@Model.Name</label>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label class="control-label" asp-for="FacilityTotalAmount">مبلغ کل تسهیلات</label>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label disabled class="control-label control-label-value">@Model.FacilityTotalAmount.ToString("N0") ريال</label>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label class="control-label" asp-for="FacilityDebtTotalAmount">مبلغ کل بدهی تسهیلات</label>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label disabled class="control-label control-label-value">@Model.FacilityDebtTotalAmount.ToString("N0") ريال</label>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label class="control-label" asp-for="FacilityDeferredTotalAmount">مبلغ کل بدهی معوق</label>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label disabled class="control-label control-label-value">@Model.FacilityDeferredTotalAmount.ToString("N0") ريال</label>
+                </div>
+            </div>
+        </div>
+        <div class="paging-div"></div>
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover table-custom">
+                <thead>
+                    <tr class="table-secondary">
+                        <th scope="col">#</th>
+                        <th scope="col" data-sortorder="date" >اصل مبلغ تسهیلات(ريال)</th>
+                        <th scope="col" data-sortorder="date" >سود مبلغ تسهیلات(ريال)</th>
+                        <th scope="col" data-sortorder="date" >مبلغ باقیمانده از تسهیلات(ريال)</th>
+                        <th scope="col" data-sortorder="date" >مجموع بدهی معوق از تسهیلات(ريال)</th>
+                        <th scope="col" data-sortorder="Tedad" >بانک-شعبه تسهیلات</th>
+                        <th scope="col" data-sortorder="Tedad" >تاریخ شروع</th>
+                        <th scope="col" data-sortorder="Tedad" >تاریخ پایان</th>
+                    </tr>
+                </thead>
+                <tbody id="requestGridRows">
+                    @if (Model.FacilityList != null && Model.FacilityList.Any())
+                    {
+                        for (int i = 0; i < Model.FacilityList.Count; i++)
+                        {
+                            <tr class='@(i % 2 == 0 ? "table-info" : "table-light")'>
+                                <td>@(i + 1)</td>
+                                <td>@Model.FacilityList[i].FacilityAmountOrginal.ToString("N0")</td>
+                                <td>@Model.FacilityList[i].FacilityBenefitAmount.ToString("N0")</td>
+                                <td>@Model.FacilityList[i].FacilityDebtorTotalAmount.ToString("N0")</td>
+                                <td>@Model.FacilityList[i].FacilityDeferredAmount.ToString("N0")</td>
+                                <td>@Model.FacilityList[i].BranchDescription</td>
+                                <td>@($"{Model.FacilityList[i].FacilitySetDate.Substring(0, 4)}/{Model.FacilityList[i].FacilitySetDate.Substring(4, 2)}/{Model.FacilityList[i].FacilitySetDate.Substring(6)}")</td>
+                                <td>@($"{Model.FacilityList[i].FacilityEndDate.Substring(0, 4)}/{Model.FacilityList[i].FacilityEndDate.Substring(4, 2)}/{Model.FacilityList[i].FacilityEndDate.Substring(6)}")</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" >
+                                هیچ تسهیلات یا تعهدی یافت نشد
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    @*<tr class="table-primary" style="font-weight:bold">
+                            <td scope="row"></td>
+                            <td></td>
+                            <td></td>
+                            <td>جمع کل</td>
+                            <td id="Mablagh_Sum"></td>
+                            <td id="DaftariEghtesadi_Sum"></td>
+                        </tr>*@
+                </tfoot>
+            </table>
+        </div>
+        <div class="paging-div"></div>
+    }
+</div>
+<script on-content-loaded="true">
+
+</script>

@@ -1,0 +1,422 @@
+﻿@{
+    ViewData["Title"] = "لیست درخواست ها";
+    Layout = "~/Views/Shared/_NewLayout.cshtml";
+    int WaitingToSignPromissoryByUserStepId = 100017;
+    int WaitingToSignContractByUserStepId = 100019;
+}
+@section styles{
+    <style type="text/css">
+        .nav.nav-pills ~ .tab-content {
+            padding: 0px !important;
+        }
+    </style>
+}
+<div id="requestGridDiv" class="p-2 bg-white rounded-lg">
+    <div class="font-medium-3 secondary darken-4 text-bold-800 d-flex align-items-center">
+        <i class="bx bx-align-right zl-text-secondary mr-25"></i>
+        <span>درخواست های من</span>
+    </div>
+    <div class="row my-0 my-md-1">
+        <div class="col-md-12">
+            <div class="form-group">
+                <a class="btn btn-outline-primary" asp-controller="RequestFacility" asp-action="Add">
+                    ثبت  درخواست تسهیلات(اعتبار)&nbsp;<i class="fal fa-save"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div id='myTab' class="shadow-none zl-req-list-container">
+        <ul class="nav nav-pills nav-justified border-bottom">
+            <li class="nav-item mb-0">
+                <a class="nav-link bg-transparent pb-1 active" id="active-facilityList-justified" data-toggle="pill" href="#facilityList" aria-expanded="true">
+                    درخواست های جاری
+                </a>
+            </li>
+            <li class="nav-item mb-0">
+                <a class="nav-link bg-transparent pb-1" id="done-facilityList-justified" data-toggle="pill" href="#facilityList" aria-expanded="false">
+                    درخواست های پایان یافته
+                </a>
+            </li>
+            <li class="nav-item mb-0">
+                <a class="nav-link bg-transparent pb-1" id="reject-facilityList-justified" data-toggle="pill" href="#facilityList" aria-expanded="false">
+                    درخواست های رد شده
+                </a>
+            </li>
+            <li class="nav-item mb-0">
+                <a class="nav-link bg-transparent pb-1" id="all-facilityList-justified" data-toggle="pill" href="#facilityList" aria-expanded="false">
+                    همه درخواست ها
+                </a>
+            </li>
+        </ul>
+        <div class="tab-content shadow-none">
+            <div role="tabpanel" class="tab-pane active" id="facilityList" aria-labelledby="active-facilityList-justified" aria-expanded="true">
+                <div id="activeFacilityDiv" class="mt-2">
+                    <table id="requestList" class="display" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th >اعتبار درخواستی(ريال)</th>
+                                <th >بازه پرداخت</th>
+                                <th >نام نهاد مالی</th>
+                                <th >تاریخ درخواست</th>
+                                <th >تاریخ آخرین اقدام</th>
+                                <th >وضعیت</th>
+                                <th >اقدام</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script>
+        let responsiveDatatable;
+        let facilityStatusValue = 4;
+        $(document).ready(function() {
+            $('div').removeClass('zl-active');
+            $('#myRequests').addClass('zl-active');
+
+            const triggerTabList = [].slice.call(document.querySelectorAll('#myTab a'));
+            triggerTabList.forEach(function(triggerEl) {
+                var tabTrigger = new bootstrap.Tab(triggerEl)
+
+                triggerEl.addEventListener('click', function(event) {
+                    debugger;
+                    event.preventDefault();
+                    const target = $(event.target).attr('id');
+                    switch (target) {
+                        case "active-facilityList-justified":
+                            debugger;
+                            facilityStatusValue = @((int)FacilityStatus.OpenRequest);
+                            responsiveDatatable.page(0);
+                            responsiveDatatable.ajax.reload(null, false);
+                            break;
+                        case "done-facilityList-justified":
+                            debugger;
+                            facilityStatusValue = @((int)FacilityStatus.ApprovedRequest);
+                            responsiveDatatable.page(0);
+                            responsiveDatatable.ajax.reload(null, false);
+                            break;
+                        case "reject-facilityList-justified":
+                            debugger;
+                            facilityStatusValue = @((int)FacilityStatus.RejectCancelRequest);
+                            responsiveDatatable.page(0);
+                            responsiveDatatable.ajax.reload(null, false);
+                            break;
+                        case "all-facilityList-justified":
+                            debugger;
+                            facilityStatusValue = -1;
+                            responsiveDatatable.page(0);
+                            responsiveDatatable.ajax.reload(null, false);
+                            break;
+                    }
+                });
+            });
+
+            loadBuyerRequest();
+
+        });
+
+        const loadBuyerRequest = () => {
+            responsiveDatatable = $('#requestList')
+                .on('preXhr.dt', function (e, settings, data, a, b) {
+                    //trigger before ajax call
+                    //debugger;
+                    //alert('preXhr');
+                    showWaiting('requestList', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                })
+                .on('xhr.dt', function (e, settings, json, xhr) {
+                    //trigger after ajax call
+                    //debugger;
+                    //alert('xhr');
+                })
+                .DataTable({
+                    order: [],
+                    processing: true,
+                    serverSide: true,
+                    responsive: true,
+                    rowReorder: false,
+                    select: true,
+                    searching: false,
+                    paging: true,
+                    ordering: false,
+                    searching: false,
+                    filtering: false,
+                    info: true,
+                    lengthMenu: [
+                        [3, 10, 25, 50],
+                        [3, 10, 25, 50]
+                    ],
+                    pageLength: 3,
+                    columnDefs: [
+                        //{ "visible": false, "targets": 0 },
+                        //and in this case the < a href="//legacy.datatables.net/ref#bStateSave" > bStateSave</a> works regularly ....but then I would like to have responsive columns indicating responsive: {
+                        {
+                            details: false,
+                            breakpoints: [
+                                { name: 'desktop', width: Infinity },
+                                { name: 'tablet-l', width: 1200 },
+                                { name: 'tablet-p', width: 992 },
+                                { name: 'mobile-l', width: 576 },
+                                { name: 'mobile-p', width: 320 }
+                            ]
+                        },
+                        {
+                            targets: [0, 1, 2, 3, 4, 5, 6, 7],
+                            className: 'dt-center',
+                        },
+                        {
+                            targets: 1,
+                            render: function(data, type, row, meta) {
+                                return splitNumber(data);
+                            }
+                        },
+                        {
+                            targets: 6,
+                            render: function(data, type, row, meta) {
+                                let waitingStep = '';
+                                if (data.cancelByUser) {
+                                    const cancelByUserDescription = "<span style='color:red'>انصراف توسط کاربر</span>";
+                                    if ('@((short)StatusEnum.Approved)' == data.statusId)
+                                        waitingStep = `${data.lastStatusDescription}(${cancelByUserDescription})`;
+                                    else if ('@((short)StatusEnum.Rejected)' == data.statusId)
+                                        waitingStep = `${data.lastStatusDescription}(${cancelByUserDescription})`;
+                                    else
+                                        waitingStep = `${data.lastStatusDescription}(${cancelByUserDescription})`;
+                                }
+                                else {
+                                    if ('@((short)StatusEnum.Approved)' == data.statusId)
+                                        waitingStep += data.lastStatusDescription;
+                                    else if ('@((short)StatusEnum.Rejected)' == data.statusId)
+                                        waitingStep = data.lastStatusDescription;
+                                    else {
+                                        waitingStep = data.guarantorIsRequired && data.awaitingIntroductionGuarantor ? `${data.lastStatusDescription}(<span class='text-danger'>در انتظار معرفی ضامن</span>)` : data.lastStatusDescription;
+                                    }
+                                }
+                                return `<div class="badge badge-pill zl-badge-upload-document"><div class="d-flex align-items-center"><i class="bx bxs-circle font-size-xxsmall mr-25"></i>${waitingStep}</div></div>`;
+                            }
+                        },
+                        {
+                            targets: 7,
+                            responsivePriority: 3,
+                            data: { aa: 'bb' },
+                            render: function(data, type, row, meta) {
+                                let cancelButtonHtml = '';
+                                let buttonsHtml = `<a class="dropdown-item change-status" href='@Url.Action("Detail","RequestFacility")/${data.id}'><i class="bx bx-detail font-medium-5 secondary darken-4 mr-75"></i>جزئیات</a>`;
+
+                                if (!data.cancelByUser) {
+                                    if ('@((short)StatusEnum.Approved)' != data.statusId && '@((short)StatusEnum.Rejected)' != data.statusId)
+                                        cancelButtonHtml = `<a id='cancelRequest' href='JavaScript:Void(0);' data-id='${data.id}' style='color:red' class='dropdown-item cancel-request'><i class="bx bx-folder-minus font-medium-5 danger darken-1 mr-75"></i>لغو درخواست</a>`;
+
+                                    if (data.formUrl != null)
+                                        buttonsHtml = `<a href='${data.formUrl}' class='dropdown-item change-status'><i class="bx bx-news font-medium-5 secondary darken-4 mr-75"></i>اقدام</a>` + buttonsHtml;
+
+                                    if (data.requestFacilityWorkFlowStepList.some(p => p.workFlowStepId == @WaitingToSignContractByUserStepId && p.statusId == null))
+                                        buttonsHtml = `<a href='@Url.Action("SendSignContractNotification","SignContract")/${data.id}' class='dropdown-item change-status'><i class="bx bx-news font-medium-5 secondary darken-4 mr-75"></i>ارسال مجدد درخواست امضاء</a>` + buttonsHtml;
+                                }
+                                buttonsHtml = buttonsHtml + `<a id='requestHistory' class="dropdown-item request-history" data-request-facility-id='${data.id}' href='javascript:void(0)'><i class="bx bx-detail font-medium-5 secondary darken-4 mr-75"></i>تاریخچه مراحل تسهیلات</a>`;
+
+                                return `<div class="btn-group dropright"><a href="#" class="dark" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="bx bx-dots-horizontal"></i></a><div class="dropdown-menu">${buttonsHtml}${cancelButtonHtml}</div></div>`;
+                            }
+                        }],
+                    rowCallback: function(row, data) {
+                        $('td:eq(0)', row).css('text-align', 'center');
+                    },
+                    //ajax: {
+                    //    url: `/api/v1/RequestFacilityInstallment/SelectInstallment2/${$('#drpApprovalFacility').val()}`,
+                    //    type: 'POST',
+                    //    dataSrc: function(data) {
+                    //        data.recordsTotal = data.data.length;
+                    //        data.recordsFiltered = data.data.length;
+                    //        return data.data;
+                    //    },
+                    //    datatype: "json",
+                    //    //contentType: "application/json",
+                    //    contentType: "application/json; charset=utf-8",
+                    //    data: function(input) {
+                    //        debugger;
+                    //        //if ($('#FacilityTypeId').val() != '')
+                    //        //    input.FacilityTypeId = $('#FacilityTypeId').val();
+
+                    //        return JSON.stringify(input);
+                    //    },
+                    //},
+                    ajax: (data, callback, setting) => {
+                        getFacilityRequestData(data).then(function(_data) {
+                            callback(_data);
+                        });
+                    },
+                    drawCallback: function (settings) {
+                        //alert('drawCallback');
+                        hideWaiting('requestList');
+                    },
+                    initComplete: function (settings, json) {
+                        //alert('initComplete');
+                    },
+                    rowCallback: (row, data, displayNum, displayIndex, dataIndex) => {
+                        $('td:eq(0)', row).html(displayIndex + 1);
+                        return row;
+                    },
+                    columns: [
+                        //{
+                        //    //For Row Number
+                        //    "data": "Id",
+                        //    render: function (data, type, row, meta) {
+                        //        return meta.settings.oAjaxData.start + meta.row + 1;
+                        //    }
+                        //},
+                        //{
+                        //    "data": "PersonFirstName",
+                        //    render: function (data, type) {
+                        //        //debugger;
+                        //        //if (type === 'display') {
+                        //        //    let link = 'http://datatables.net';
+
+                        //        //    if (data[0] < 'H') {
+                        //        //        link = 'http://cloudtables.com';
+                        //        //    } else if (data[0] < 'S') {
+                        //        //        link = 'http://editor.datatables.net';
+                        //        //    }
+
+                        //        //    return '<a href="' + link + '">' + data + '</a>';
+                        //        //}
+
+                        //        return data;
+                        //    },
+                        //},
+                        { "data": null },
+                        { "data": "amount" },
+                        { "data": "monthCountTitle" },
+                        { "data": "leasingName" },
+                        { "data": "shamsiCreateDate" },
+                        { "data": "shamsiLastActionDate" },
+                        { "data": null },
+                        { "data": null }
+                    ],
+                    language: {
+                        url: '/new-layout/datatables.net/fa.json'
+                    }
+                });
+
+            const getFacilityRequestData = (data) => {
+                const postData = {
+                    Page: Math.floor(data.start / data.length) + 1,
+                    PageSize: data.length,
+                    SortDirection: null,
+                    SortOrder: null,
+                    FilterList: []
+                };
+
+                postData.FilterList.push({
+                    PropertyName: 'FacilityStatus',
+                    Operator: @((int)Services.Dto.Operator.Equal),
+                    PropertyValue: parseInt(facilityStatusValue)
+                });
+                return new Promise(function(resolve, reject) {
+                    console.log('Loading data');
+
+                    $.ajax({
+                        type: 'post',
+                        datatype: "json",
+                        data: JSON.stringify(postData),
+                        contentType: "application/json; charset=utf-8",
+                        url: `/api/v1/RequestFacility/GetBuyerRequests`,
+                        success: function(result) {
+                            if (result != undefined && result.isSuccess == true) {
+                                resolve({
+                                    data: result.data.data,
+                                    recordsTotal: result.data.totalRowCount,
+                                    recordsFiltered: result.data.totalRowCount
+                                });
+                            }
+                        },
+                        error: function(error) {
+                            debugger;
+                            const exception = getExceptionMessageFromError(error);
+                            if (exception != null)
+                                showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                            else
+                                showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                        },
+                        complete: function() {
+
+                        },
+                    });
+                });
+            }
+
+            $('#requestList tbody').on('click', 'a#requestHistory', function(e) {
+                e.preventDefault();
+                let data = responsiveDatatable.row(this).data();
+                if (data == undefined)
+                    data = responsiveDatatable.row($(this).parents('tr')).data();
+                loadRequestFacilitySteps(data.id);
+                $('#requestFacilityStepsHistoryModal').modal();
+            });
+
+            $('#requestList tbody').on('click', 'a#cancelRequest', function(e) {
+                debugger;
+                e.preventDefault();
+                let data = responsiveDatatable.row(this).data();
+                if (data == undefined)
+                    data = responsiveDatatable.row($(this).parents('tr')).data();
+
+                Swal.fire({
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    title: 'هشدار',
+                    //text: message,
+                    html: 'آیا برای لغو درخواست مطمئن هستید؟<br/>در صورت انصراف درخواست بسته خواهد شد و تمام هزینه های پرداختی توسط شما قابل عودت نمی باشد!',
+                    icon: icons.warning,
+                    confirmButtonText: 'بله،مطمئنم',
+                    confirmButtonClass: 'btn btn-danger',
+                    cancelButtonText: "خیر،مطمئن نیستم",
+                    cancelButtonClass: "btn btn-warning",
+                    showCancelButton: true,
+                    closeOnConfirm: false,
+                    closeOnCancel: false,
+                }).then((result) => {
+                    if (result.value) {
+                        debugger;
+                        showWaiting('requestGridDiv', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                        $.ajax({
+                            type: 'post',
+                            //data: JSON.stringify(postData),
+                            datatype: "json",
+                            contentType: "application/json; charset=utf-8",
+                            url: `/api/v1/RequestFacility/CancelByUser/${data.id}`,
+                            success: function(result) {
+                                hideWaiting('requestGridDiv');
+                                if (result !== undefined && result !== null && result.isSuccess === true) {
+                                    responsiveDatatable.page(0);
+                                    responsiveDatatable.ajax.reload(null, false);
+                                    showMessage('پیغام', 'عملیات با موفقیت انجام شد!', icons.info, '@ResourceFile.Close');
+                                }
+                                else {
+                                    showMessage('خطا', result.message, icons.error, '@ResourceFile.Close');
+                                }
+                            },
+                            error: function(error) {
+                                debugger;
+                                hideWaiting('requestGridDiv');
+                                if (error.responseJSON != undefined && error.responseJSON.message != undefined && error.responseJSON.message != '') {
+                                    const exception = JSON.parse(error.responseJSON.message).Exception;
+                                    showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                                }
+                                else {
+                                    showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                                }
+                            },
+                            complete: function() {
+
+                            },
+                        });
+                    }
+                });
+            });
+        }
+    </script>
+}

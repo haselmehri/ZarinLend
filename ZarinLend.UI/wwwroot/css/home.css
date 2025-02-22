@@ -1,0 +1,64 @@
+﻿.login-box {
+    display: flex;
+    height: 100vh;
+    align-items: center;
+    margin-top: -110px;
+    justify-content: center;
+}
+
+.cover {
+    height: 100vh;
+    background-image: url("../images/background.png");
+    -ms-background-repeat: no-repeat;
+    background-repeat: no-repeat;
+    -ms-background-size: cover;
+    background-size: cover;
+}
+
+.bg-transparent {
+    background-color: transparent !important;
+}
+
+.btn-contaner {
+    text-align: left;
+}
+
+.footer {
+    background-color: transparent;
+    border: none;
+    direction: ltr;
+    text-align: left;
+    color: black;
+}
+
+.top-nav {
+    margin-right: 220px;
+    z-index: 150;
+}
+
+.z-important {
+    z-index: 1000
+}
+
+.logo {
+    font-family: Lalezar;
+    font-size: 30px;
+    font-weight: normal;
+}
+
+@media (max-width: 989.98px) {
+    .top-nav {
+        margin-right: 0;
+        z-index: 150;
+    }
+}
+
+@media (max-height: 500px) {
+    .login-box {
+        display: flex;
+        height: auto;
+        align-items: center;
+        margin-top: 0;
+        justify-content: center;
+    }
+}

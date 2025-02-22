@@ -1,0 +1,192 @@
+﻿@model OrganizationModel
+@{
+    ViewData["Title"] = Model.IsEditMode ? "ویرایش سازمان/فروشگاه/نهاد مالی" : "ثبت سازمان/فروشگاه/نهاد مالی جدید";
+}
+@section styles
+    {
+    <style type="text/css">
+        textarea {
+            height: 80px !important;
+        }
+
+        @@media (min-width:768px) {
+            .username-info {
+                margin-top: 40px;
+            }
+        }
+    </style>
+}
+
+    <form id="frmAddEditOrganization" method="post">
+        <div class="card">
+            <div class="card-header" >@(Model.IsEditMode ? "ویرایش سازمان/فروشگاه/نهاد مالی" : "ثبت سازمان/فروشگاه/نهاد مالی جدید")</div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="control-label" asp-for="Name"></label>
+                        <input asp-for="Name" class="form-control" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="control-label" asp-for="OrganizationTypeId"></label>
+                        <select name="OrganizationTypeId" asp-for="OrganizationTypeId" class="custom-select form-control"
+                                asp-items="Model.OrganizationTypes">
+                            <option value="" >نوع سازمان را انتخاب کنید</option>
+                        </select>
+                        <span asp-validation-for="OrganizationTypeId" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="control-label" asp-for="NationalId"></label>
+                        <input asp-for="NationalId" class="form-control" />
+                        <span asp-validation-for="NationalId" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="control-label" asp-for="Tel"></label>
+                        <input asp-for="Tel" class="form-control" style="text-align:center; direction:ltr" />
+                        <span asp-validation-for="Tel" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="form-group">
+                        <label class="control-label" asp-for="SiteUrl"></label>
+                        <input asp-for="SiteUrl" class="form-control" style="text-align:center; direction:ltr" />
+                        <span asp-validation-for="SiteUrl" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label class="control-label" asp-for="IsActive"></label>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" value="true" name="IsActive" @(Model.IsActive ? "checked='checked'" : "") id="IsActive">
+                            <label class="form-check-label" for="IsActive">فعال</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" value="false" name="IsActive" @(!Model.IsActive ? "checked='checked'" : "") id="IsDisable">
+                            <label class="form-check-label" for="IsDisable">غیر فعال</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label class="control-label" asp-for="Address"></label>
+                        <textarea asp-for="Address" class="form-control" style=" direction:rtl"></textarea>
+                        <span asp-validation-for="Address" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer" style="text-align:left">
+            <button id="btnSave" class="btn btn-outline-success">
+                @ResourceFile.Save&nbsp;<i class="fal fa-save"></i>
+            </button>
+            <a class="btn btn-outline-primary" asp-controller="Organization" asp-action="List">
+                بازگشت&nbsp;<i class="fal fa-list"></i>
+            </a>
+        </div>
+    </div>
+</form>
+@section scripts{
+    @{
+        await Html.RenderPartialAsync("~/Views/Shared/_ValidationScriptsPartial.cshtml");
+    }
+    @*<partia name="_ValidationScriptsPartial" />*@
+    <script>
+
+        $(document).ready(function () {
+
+        });
+
+        $('#btnSave').click(function (e) {
+            e.preventDefault();
+            debugger;
+            const formIsValid = $('#frmAddEditOrganization').valid();
+            const isActive = $('input[name=IsActive]:checked').val();
+            if (isActive == undefined) {
+                showMessage('@ResourceFile.InfoTitle', 'لطفا وضعیت(فعال/غیر فعال) را مشخص کنید!', icons.warning, '@ResourceFile.Close');
+                return;
+            }
+
+            if (formIsValid) {
+                showWaiting('frmAddEditOrganization', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                //const postdata = $('#frmAddEditOrganization').serialize();
+                //const model = {
+                //    FName: $("#FName").val(),
+                //    LName: $("#LName").val(),
+                //};
+                let data = new FormData();
+        @if (Model.IsEditMode)
+        {
+            <text>
+                        data.append('Id', '@ViewContext.RouteData.Values["Id"]');
+                    const apiUrl = '/api/v1/Organization/Edit';
+            </text>
+        }
+        else
+        {
+            <text>
+                        const apiUrl = '/api/v1/Organization/Add';
+            </text>
+        }
+
+                    data.append('Name', $("#Name").val());
+                data.append('NationalId', $("#NationalId").val());
+                data.append('Address', $("#Address").val());
+                data.append('SiteUrl', $("#SiteUrl").val());
+                data.append('Tel', $("#Tel").val());
+                data.append('IsActive', isActive);
+                data.append('OrganizationTypeId', $("#OrganizationTypeId").val());
+                data.append('OrganizationId', $("#OrganizationId").val());
+
+                $.ajax({
+                    type: 'post',
+                    //dataType: 'json',
+                    //contentType: "application/json; charset=utf-8",
+                    processData: false,
+                    contentType: false,
+                    url: apiUrl,
+                    data: data,// JSON.stringify(model),
+                    success: function (result) {
+                        hideWaiting('frmAddEditOrganization');
+                        debugger;
+                        if (result.isSuccess) {
+                            showMessage('@ResourceFile.InfoTitle', '@ResourceFile.MessageSuccess', icons.success, '@ResourceFile.Close');
+                            setTimeout(function () {
+                                window.location.replace('@Url.Action("List","Organization")');
+                            }, 2500);
+                        }
+                    },
+                    error: function (error) {
+                        hideWaiting('frmAddEditOrganization');
+                        if (error.responseJSON != undefined && error.responseJSON.message != undefined && error.responseJSON.message != '') {
+                            if (IsJsonString(error.responseJSON.message)) {
+                                const exception = JSON.parse(error.responseJSON.message).Exception;
+                                showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                            }
+                            else
+                                showMessage('@ResourceFile.ErrorTitle', error.responseJSON.message, icons.error, '@ResourceFile.Close');
+                        }
+                        else {
+                            showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                        }
+                    }
+                });
+            }
+            else {
+                scrollToFirstError();
+            }
+        });
+    </script>
+}

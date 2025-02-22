@@ -1,0 +1,336 @@
+﻿@model UserQuickRegisterModel
+@{
+    ViewData["Title"] = ViewBag.Title;
+    Layout = "~/Views/Shared/_NewLayoutWithoutRightMenu.cshtml";
+}
+@section styles
+{
+    <link href="~/persianDatePicker/css/persianDatepicker-lightorang.css" rel="stylesheet" />
+    <style type="text/css">
+        .bx {
+            margin-right: 1.3rem !important;
+        }
+
+        .form-control:disabled, .form-control[readonly] {
+            opacity: 0.5 !important;
+            background-color: #9692921a !important;
+            border: 1px solid #DFE3E7 !important;
+        }
+    </style>
+}
+<div id="contentDiv" class="p-2 bg-white rounded-lg">
+    <div class="col-12 col-md-10 col-lg-8 col-xl-7 mx-auto">
+        <form id="frmRegister" method="post" autocomplete="off">
+            <div class="row my-0">
+                <div class="col-12">
+                    <div class="alert zl-bg-alert-warning border-warning border-accent-4 alert-dismissible" style="padding-bottom:0px !important;margin-bottom:auto.6rem !important" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="بستن">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                        <div class="d-flex">
+                            <i class="bx bx-error-circle font-large-1" style="margin:0 !important"></i>
+                            <span class="text-muted text-bold-400 font-small-3">
+                                <ul>
+                                    <li>
+                                        کد ملی و تاریخ تولد خود را وارد کنید و روی دکمه <span style="font-weight:bold">تایید و ثبت نام</span> کلیک کنید
+                                    </li>
+                                    <li>
+                                        بصورت پیش فرض <span style="font-weight:bold">کد ملی</span> شما بعنوان <span style="font-weight:bold">نام کاربری</span> در نظر گرفته میشود
+                                    </li>
+                                    <li>
+                                        لطفا کلمه عبوری انتخاب کنید که قابل حدس زدن نباشد
+                                    </li>
+                                    <li>
+                                        در مواقعی که به هر دلیلی شما نتوانستید با شماره موبایل و رمز یکبار مصرف وارد پنل کاربری خود شوید میتوانید با استفاده از نام کاربری(کد ملی) و رمز ثابتی که در قسمت پایین مشخص میکنید وارد پنل کاربری خود شوید
+                                    </li>
+                                </ul>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @*<div class="row mb-1">
+            <div class="col-md-12">
+            <div class="d-flex align-items-center justify-content-around">
+            <fieldset>
+            <div class="radio radio-success radio-glow radio-sm">
+            <input type="radio" name="getCivilRegistryDataRadio" id="radioGetCivilRegistry" value="1" checked="checked" />
+            <label class="font-small-3 success darken-4 text-bold-400 line-height-23" for="radioGetCivilRegistry">دریافت اطلاعات هویتی از ثبت احوال</label>
+            </div>
+            </fieldset>
+            <fieldset>
+            <div class="radio radio-warning radio-glow radio-sm">
+            <input type="radio" name="getCivilRegistryDataRadio" id="radioInputDataManually" value="2" />
+            <label class="font-small-3 warning darken-4 text-bold-400 line-height-23" for="radioInputDataManually">وارد کردن اطلاعات هویتی بصورت دستی</label>
+            </div>
+            </fieldset>
+            </div>
+            </div>
+            </div>*@
+            <input type="hidden" id="IsDead" />
+            <input asp-for="Mobile" type="hidden" />
+            <div class="row">
+                <div class="col-sm-3"></div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <input type="text" class="form-control bg-transparent" asp-for="NationalCode" placeholder="کد ملی" style="text-align:center;direction:ltr;letter-spacing:2px" />
+                        <span asp-validation-for="NationalCode" class="text-danger"></span>
+                        <input type="hidden" id="hdnNationalCode" value="" />
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-3"></div>
+                <div class="col-sm-6">
+                    <fieldset class="form-group position-relative has-icon-left">
+                        <input class="form-control bg-transparent shamsi-datepicker" autocomplete="off" asp-for="ShamsiBirthDate" maxlength="10" placeholder="تاریخ تولد"
+                               style="text-align:center;direction:ltr;opacity: 1 !important;background-color: #fff !important;border: 1px solid #DFE3E7 !important;"
+                               type="text" value="" data-fromdate="" readonly="readonly" data-jdate="@ViewBag.PersianBirthDate" data-gdate="@ViewBag.BirthDate" />
+                        <div class="form-control-position">
+                            <i class="bx bx-calendar"></i>
+                        </div>
+                        <span asp-validation-for="ShamsiBirthDate" class="text-danger"></span>
+                    </fieldset>
+                    <input asp-for="BirthDate" type="hidden" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-3"></div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <input type="password" class="form-control bg-transparent" asp-for="Password" placeholder="کلمه عبور" />
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-3"></div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <input type="password" class="form-control bg-transparent" asp-for="ConfirmPassword" placeholder="تکرار کلمه عبور" />
+                        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            @* <div class="row" id="btnGetCivilRegistryDataRow">
+            <div class="col-md-12" style="text-align:left">
+            <button id="btnGetCivilRegistryData" class="btn btn-zl-primary ml-1">دریافت اطلاعات هویتی</button>
+            </div>
+            </div> *@
+            @* <hr class="mt-1 p-0" id="hr_search" /> *@
+           
+            <div class="row my-0" style="display:none">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <input type="text" class="form-control bg-transparent" asp-for="UserName" style="text-align:center;direction:ltr;letter-spacing:5px" placeholder="نام کاربری" disabled />
+                    </div>
+                </div>
+            </div>
+            <div class="row my-0">
+                <div class="col-12">
+                    <fieldset>
+                        <div class="checkbox checkbox-primary">
+                            <input type="checkbox" id="chkConfirm" />
+                            <label for="chkConfirm">صحت اطلاعات وارد شده را تایید می نمایم!</label>
+                        </div>
+                    </fieldset>
+                </div>
+            </div>
+            <div class="row my-0">
+                <div class="col-12" style="text-align:left">
+                    <button type="button" id="btnSave" class="btn btn-outline-success" >تایید و ثبت نام</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+@section scripts {
+    @{
+        await Html.RenderPartialAsync("~/Views/Shared/_ValidationScriptsPartial.cshtml");
+    }
+    <script src="~/persianDatePicker/js/persianDatepicker.min.js"></script>
+    @*<script src="~/new-layout/js/wizard-form.js"></script>*@
+    <script>
+        $(document).ready(function () {
+            $('#NationalCode').mask('9999999999', { placeholder: "کد ملی" });
+
+            //$('#ShamsiBirthDate').mask('9999/99/99', { placeholder: "____/__/__" });
+            $('#BirthDate').val('@ViewBag.BirthDate');
+            $('#ShamsiBirthDate').val('@ViewBag.PersianBirthDate');
+            $("#ShamsiBirthDate").persianDatepicker({
+                startDate: '1300/01/01',
+                endDate: new persianDate().now().addYear(-18).toString("YYYY/MM/DD"),
+                months: ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"],
+                dowTitle: ["شنبه", "یکشنبه", "دوشنبه", "سه شنبه", "چهارشنبه", "پنج شنبه", "جمعه"],
+                shortDowTitle: ["ش", "ی", "د", "س", "چ", "پ", "ج"],
+                theme: 'lightorang',
+                showGregorianDate: !1,
+                persianNumbers: !0,
+                formatDate: "YYYY/0M/0D",
+                selectedBefore: 1,
+                selectedDate: null,
+                //selectedDate: '@ViewBag.PersianBirthDate',
+                prevArrow: '\u25c4',
+                nextArrow: '\u25ba',
+                alwaysShow: !1,
+                selectableYears: null,
+                selectableMonths: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                cellWidth: 35, // by px
+                cellHeight: 30, // by px
+                fontSize: 14, // by px
+                isRTL: !1,
+                calendarPosition: {
+                    x: 0,
+                    y: 0,
+                },
+                onSelect: function () {
+                    //alert($("#ShamsiBirthDate").attr("data-gdate"));
+                    if (moment().diff($("#ShamsiBirthDate").attr("data-gdate"), 'years') < 18) {
+                        showMessage("اخطار", "کاربر گرامی حداقل سن برای درخواست تسهیلات 18 سال می باشد!", icons.warning, 'متوجه شدم');
+                    }
+                    $('#BirthDate').val($("#ShamsiBirthDate").attr("data-gdate"));
+                },
+                onShow: function () { },
+                onHide: function () { },
+                onRender: function () {
+                    $('#ShamsiBirthDate').val('');
+                }
+            });
+
+            if ('@Model.LoginFromZarinpal' == 'True') {
+                $('#btnGetCivilRegistryDataRow').hide();
+                $('#hr_search').hide();
+                $('#@nameof(UserAddModel.FName)').prop('disabled', false);
+                $('#@nameof(UserAddModel.LName)').prop('disabled', false);
+                $('#@nameof(UserAddModel.FatherName)').prop('disabled', false);
+                $('#@nameof(UserAddModel.SSID)').prop('disabled', false);
+                $('#@nameof(UserAddModel.Gender)').prop('disabled', false);
+            }
+        });
+
+        $('#btnSave').click((e) => {
+            e.preventDefault();
+            if (!$('#frmRegister').valid()) return;
+
+            if ($('#NationalCode').val() != '' && $('#ShamsiBirthDate').val() != '' && $('#BirthDate').val() != '' &&
+                $("#ShamsiBirthDate").attr("data-gdate") != '' && $("#ShamsiBirthDate").attr("data-gdate") != undefined) {
+                if (!$("#chkConfirm").is(':checked')) {
+                    showMessage('خطا', "لطفا گزینه <b style='color:blueviolet'>صحت اطلاعات وارد شده را تایید می نمایم!</b> را انتخاب کنید!", icons.warning, '@ResourceFile.Close');
+                    return;
+                }
+
+                if (moment().diff($("#ShamsiBirthDate").attr("data-gdate"), 'years') < 18) {
+                    showMessage("اخطار", "کاربر گرامی حداقل سن برای درخواست تسهیلات 18 سال می باشد!", icons.warning, 'متوجه شدم');
+                    return;
+                }
+                const model = { NationalCode: $('#NationalCode').val(), ShamsiBirthDate: $('#ShamsiBirthDate').val() };
+                
+            }
+            else {
+                showMessage("اخطار", 'کد ملی و تاریخ تولد خود را بصورت صحیح وارد کنید!', icons.warning, '@ResourceFile.Close');
+            }
+
+            let data = new FormData();
+            data.append('Mobile', $("#Mobile").val());
+            data.append('NationalCode', $("#NationalCode").val());
+            data.append('UserName', $("#NationalCode").val());
+            data.append('Password', $("#Password").val());
+            data.append('ConfirmPassword', $("#Password").val());
+            data.append('BirthDate', $("#BirthDate").val());
+            data.append('ShamsiBirthDate', $("#ShamsiBirthDate").attr("data-gdate"));
+            data.append('IdentificationSerial', $("#IdentificationSerial").val());
+            data.append('IdentificationSeri', $("#IdentificationSeri").val());
+            data.append('PlaceOfBirth', $("#PlaceOfBirth").val());
+
+            $.ajax({
+                type: 'post',
+                //dataType: 'json',
+                //contentType: "application/json; charset=utf-8",
+                processData: false,
+                contentType: false,
+                url: '/api/v1/User/QuickRegister',
+                data: data,// JSON.stringify(model),
+                success: function (result) {
+                    hideWaiting('contentDiv');
+                    debugger;
+                    if (result.isSuccess) {
+                        showMessage('@ResourceFile.InfoTitle', '@ResourceFile.MessageSuccess', icons.success, '@ResourceFile.Close', () => { window.location.replace('@Url.Action("Add", "RequestFacility")'); });
+                    }
+                },
+                error: function (error) {
+                    hideWaiting('contentDiv');
+                    const exception = getExceptionMessageFromError(error);
+                    if (exception != null)
+                        showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                    else
+                        showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                }
+            });
+        });
+
+        $('#NationalCode').change((e) => {
+            $('#UserName').val($('#NationalCode').val());
+        });
+
+        $('#btnGetCivilRegistryData').click(function (e) {
+            e.preventDefault();
+            debugger;
+            if ($('#NationalCode').val() != '' && $('#ShamsiBirthDate').val() != '' && $('#BirthDate').val() != '' &&
+                $("#ShamsiBirthDate").attr("data-gdate") != '' && $("#ShamsiBirthDate").attr("data-gdate") != undefined) {
+                const model = { NationalCode: $('#NationalCode').val(), ShamsiBirthDate: $('#ShamsiBirthDate').val() };
+                showWaiting('contentDiv', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                $.ajax({
+                    type: 'post',
+                    data: JSON.stringify(model),
+                    datatype: "json",
+                    contentType: "application/json; charset=utf-8",
+                    url: '/api/v1/NeginHub/GetCivilRegistryData',
+                    success: function (result) {
+                        hideWaiting('contentDiv');
+                        debugger;
+                        if (result.isSuccess) {
+                            $('#@nameof(UserAddModel.FName)').val(result.data.firstName);
+                            $('#@nameof(UserAddModel.LName)').val(result.data.lastName);
+                            $('#@nameof(UserAddModel.FatherName)').val(result.data.fatherName);
+                            $('#@nameof(UserAddModel.SSID)').val((result.data.identityId != undefined && result.data.identityId != '0')
+                                ? result.data.identityId
+                                : result.data.nationalCode);
+                            $('#@nameof(UserAddModel.Gender)').val(result.data.gender == "Male" ? "1" : "2");
+                            $('#IsDead').val(result.data.isDead);
+                            if (result.data.isDead) {
+                                showMessage('اخطار', 'امکان  ثبت درخواست برای شخص مورد نظر وجود ندارد<br/>با توجه به اطلاعات دریافتی از ثبت احوال شخص مورد نظر در قید حیات نمی باشد', icons.warning, '@ResourceFile.Close');
+                            }
+                        }
+                        else {
+                            $('#@nameof(UserAddModel.FName)').val('');
+                            $('#@nameof(UserAddModel.LName)').val('');
+                            $('#@nameof(UserAddModel.FatherName)').val('');
+                            $('#@nameof(UserAddModel.SSID)').val('');
+                            $('#@nameof(UserAddModel.Gender)').val('');
+                            $('#IsDead').val('');
+                            // $('#hdnNationalCode').val('');
+                            // $('#hdnShamsiBirthDate').val('');
+                            // $('#hdnFName').val('');
+                            // $('#hdnLName').val('');
+                            // $('#hdnFatherName').val('');
+                            // $('#hdnSSID').val('');
+                            // $('#hdnGender').val('');
+                            showMessage('اخطار', 'اطلاعاتی هویتی یافت نشد<br/>در صورتی کد ملی و تاریخ تولد را بدرستی وارد کرده اید و همچنان در دریافت اطلاعات با مشکل مواجه میشوید،اطلاعات هویتی خود را بصورت دستی وارد کنید', icons.warning, '@ResourceFile.Close');
+                        }
+                    },
+                    error: function (error) {
+                        hideWaiting('contentDiv');
+                        const exception = getExceptionMessageFromError(error);
+                        if (exception != null)
+                            showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                        else
+                            showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                    }
+                });
+            }
+            else {
+                showMessage("اخطار", 'کد ملی و تاریخ تولد خود را بصورت دقیق وارد کنید!', icons.warning, '@ResourceFile.Close');
+            }
+        });
+    </script>
+}

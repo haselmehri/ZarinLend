@@ -1,0 +1,1693 @@
+{
+  "reportTypes": [
+    "Base",
+    "Standard",
+    "Advance",
+    "Score"
+  ],
+  "score": {
+    "personInformation": {
+      "name": "يدالله",
+      "nationalCode": "0075661993",
+      "address": "ابوذر پل6 خ ده حقي نصر4 پ11",
+      "contacts": [
+        {
+          "title": "تلفن ثابت",
+          "value": " 021033246307 "
+        },
+        {
+          "title": "تلفن ثابت",
+          "value": " - "
+        },
+        {
+          "title": "تلفن ثابت",
+          "value": " - "
+        },
+        {
+          "title": "تلفن همراه",
+          "value": " 09371693421 "
+        },
+        {
+          "title": "تلفن ثابت",
+          "value": " 33039988 "
+        }
+      ],
+      "hasBlockedContract": false,
+      "dateOfBirth": "1364/02/22",
+      "family": "حاصل مهرى",
+      "fatherName": "محمد رضا",
+      "maritalStatus": "متاهل",
+      "placeOfBirth": "تهران",
+      "sex": "مرد",
+      "companyType": null,
+      "registrationNumber": null,
+      "percent": 0
+    },
+    "scoreCodes": [
+      {
+        "code": "CTP2",
+        "description": "زیاد بودن نسبت مبلغ وثیقه به مبلغ کل وام(اصل و فرع) در 2 ماه گذشته‬‬"
+      },
+      {
+        "code": "BTP1",
+        "description": "خیلی زیاد بودن نسبت بدهی سررسید نشده به مبلغ کل قرارداد(اصل و فرع) در حداقل یک قرارداد در 3 ماه گذشته‬‬"
+      },
+      {
+        "code": "REC2",
+        "description": "‫‏8 ماه یا کمتر از تاریخ شروع آخرین قرارداد گذشته است"
+      },
+      {
+        "code": "HAD3",
+        "description": "مبلغ بدهی سررسیدشده پرداخت نشده بیش از 10 میلیون ریال بیش از 5 ماه آخر می باشد"
+      }
+    ],
+    "score": 645,
+    "description": " ریسک خیلی کم",
+    "risk": "A3",
+    "inquiryCreatedDate": "1402/04/06 13:56:41",
+    "perviouScoreDate": null,
+    "perviouScore": false
+  },
+  "report": {
+    "personInformation": {
+      "name": "يدالله",
+      "nationalCode": "0075661993",
+      "address": "ابوذر پل6 خ ده حقي نصر4 پ11",
+      "contacts": [
+        {
+          "title": "تلفن ثابت",
+          "value": " 021033246307 "
+        },
+        {
+          "title": "تلفن ثابت",
+          "value": " - "
+        },
+        {
+          "title": "تلفن ثابت",
+          "value": " - "
+        },
+        {
+          "title": "تلفن همراه",
+          "value": " 09371693421 "
+        },
+        {
+          "title": "تلفن ثابت",
+          "value": " 33039988 "
+        }
+      ],
+      "hasBlockedContract": false,
+      "dateOfBirth": "1364/02/22",
+      "family": "حاصل مهرى",
+      "fatherName": "محمد رضا",
+      "maritalStatus": "متاهل",
+      "placeOfBirth": "تهران",
+      "sex": "مرد",
+      "companyType": null,
+      "registrationNumber": null
+    },
+    "inquiryStats": [
+      {
+        "organizationType": "بانک مرکزی",
+        "organizationTypeCode": "0102533",
+        "lastMonthInquiryCount": 0,
+        "lastYearInquiryCount": 0,
+        "personNegativeStatusCount": 0,
+        "contractNegativeStatusCount": 0
+      },
+      {
+        "organizationType": "بانک ها و موسسات اعتباری",
+        "organizationTypeCode": "010333",
+        "lastMonthInquiryCount": 0,
+        "lastYearInquiryCount": 1,
+        "personNegativeStatusCount": 0,
+        "contractNegativeStatusCount": 0
+      },
+      {
+        "organizationType": "تلکام/سازمان هاي خدماتی",
+        "organizationTypeCode": "0108933",
+        "lastMonthInquiryCount": 0,
+        "lastYearInquiryCount": 0,
+        "personNegativeStatusCount": 0,
+        "contractNegativeStatusCount": 0
+      },
+      {
+        "organizationType": "سازمان های خرده فروشی",
+        "organizationTypeCode": "0106633",
+        "lastMonthInquiryCount": 0,
+        "lastYearInquiryCount": 0,
+        "personNegativeStatusCount": 0,
+        "contractNegativeStatusCount": 0
+      },
+      {
+        "organizationType": "سازمان های عمومی/دولتی",
+        "organizationTypeCode": "01010233",
+        "lastMonthInquiryCount": 0,
+        "lastYearInquiryCount": 0,
+        "personNegativeStatusCount": 0,
+        "contractNegativeStatusCount": 0
+      },
+      {
+        "organizationType": "سازمان های قضايی",
+        "organizationTypeCode": "01012233",
+        "lastMonthInquiryCount": 0,
+        "lastYearInquiryCount": 0,
+        "personNegativeStatusCount": 0,
+        "contractNegativeStatusCount": 0
+      },
+      {
+        "organizationType": "مصرف کنندگان",
+        "organizationTypeCode": "01010033",
+        "lastMonthInquiryCount": 0,
+        "lastYearInquiryCount": 0,
+        "personNegativeStatusCount": 0,
+        "contractNegativeStatusCount": 0
+      },
+      {
+        "organizationType": "موسسات اعتباري غير متشکل",
+        "organizationTypeCode": "0103033",
+        "lastMonthInquiryCount": 0,
+        "lastYearInquiryCount": 0,
+        "personNegativeStatusCount": 0,
+        "contractNegativeStatusCount": 0
+      },
+      {
+        "organizationType": "موسسات صادر کننده کارت اعتباری",
+        "organizationTypeCode": "0104433",
+        "lastMonthInquiryCount": 0,
+        "lastYearInquiryCount": 0,
+        "personNegativeStatusCount": 0,
+        "contractNegativeStatusCount": 0
+      }
+    ],
+    "personRoles": [
+      {
+        "title": "متقاضی اصلی",
+        "numberOfContracts": 3,
+        "code": "0101333"
+      },
+      {
+        "title": "ضامن",
+        "numberOfContracts": 4,
+        "code": "0109433"
+      }
+    ],
+    "summaryInformationRelatedToContracts": [
+      {
+        "organizationName": "بانک صادرات",
+        "organizationNameCode": "020971",
+        "currency": "ریال",
+        "currencyCode": "0102933",
+        "inProgressContractsCount": 0,
+        "terminatedContractsCount": 2,
+        "outstandingAmount": 0.0,
+        "overdueAmount": 0.0,
+        "typeOfFinancing": "تسهیلات",
+        "typeOfFinancingCode": "01010533",
+        "roleType": 0,
+        "totalAmount": 0.0,
+        "organizationId": 0
+      },
+      {
+        "organizationName": "بانک قرض الحسنه رسالت",
+        "organizationNameCode": "0207371",
+        "currency": "ریال",
+        "currencyCode": "0102933",
+        "inProgressContractsCount": 0,
+        "terminatedContractsCount": 2,
+        "outstandingAmount": 0.0,
+        "overdueAmount": 0.0,
+        "typeOfFinancing": "تسهیلات",
+        "typeOfFinancingCode": "01010533",
+        "roleType": 0,
+        "totalAmount": 0.0,
+        "organizationId": 0
+      },
+      {
+        "organizationName": "پست بانک",
+        "organizationNameCode": "0201671",
+        "currency": "ریال",
+        "currencyCode": "0102933",
+        "inProgressContractsCount": 0,
+        "terminatedContractsCount": 1,
+        "outstandingAmount": 0.0,
+        "overdueAmount": 0.0,
+        "typeOfFinancing": "تسهیلات",
+        "typeOfFinancingCode": "010233",
+        "roleType": 0,
+        "totalAmount": 0.0,
+        "organizationId": 0
+      },
+      {
+        "organizationName": "بانک صادرات",
+        "organizationNameCode": "020971",
+        "currency": "ریال",
+        "currencyCode": "0102933",
+        "inProgressContractsCount": 1,
+        "terminatedContractsCount": 0,
+        "outstandingAmount": 1855607611.0,
+        "overdueAmount": 0.0,
+        "typeOfFinancing": "تسهیلات",
+        "typeOfFinancingCode": "010233",
+        "roleType": 0,
+        "totalAmount": 0.0,
+        "organizationId": 0
+      },
+      {
+        "organizationName": "بانک آینده",
+        "organizationNameCode": "0202871",
+        "currency": "ریال",
+        "currencyCode": "0102933",
+        "inProgressContractsCount": 2,
+        "terminatedContractsCount": 0,
+        "outstandingAmount": 599112662.0,
+        "overdueAmount": 0.0,
+        "typeOfFinancing": "تسهیلات",
+        "typeOfFinancingCode": "010233",
+        "roleType": 0,
+        "totalAmount": 0.0,
+        "organizationId": 0
+      }
+    ],
+    "summaryInformationRelatedToContractsSum": [
+      {
+        "currency": "ریال",
+        "currencyCode": "0102933",
+        "outstandingAmount": 2454720273.0,
+        "overdueAmount": 0.0,
+        "inProgressContractsCount": 3,
+        "terminatedContractsCount": 5,
+        "totalAmount": 0.0
+      }
+    ],
+    "directContracts": [
+      {
+        "contractId": 0,
+        "organizationName": "بانک صادرات",
+        "organizationNameCode": "010933",
+        "organizationType": "بانک ها و موسسات اعتباری",
+        "organizationTypeCode": "010333",
+        "contractNumber": "028579001000640265252",
+        "contractCurrency": "ریال",
+        "contractCurrencyCode": "0102933",
+        "installmentsCurrency": "ریال",
+        "installmentsCurrencyCode": "0102933",
+        "customerRoleTilte": "متقاضی اصلی",
+        "customerRole": 13,
+        "customerRoleCode": "0101333",
+        "expectedEndDate": "1405/05/18",
+        "instalmentAmount": 33333333.0,
+        "paymentMethod": "پرداخت مستقیم (نقدی)",
+        "paymentMethodCode": "0102733",
+        "negativeContractStatus": "فاقد وضعیت منفی",
+        "negativeContractStatusCode": "0104033",
+        "outstandingAmount": 1855607611.0,
+        "overdueAmount": 0.0,
+        "paymentPeriodicity": "ماهانه",
+        "paymentPeriodicityCode": "0105633",
+        "phaseOfOperationTitle": "درجریان",
+        "phaseOfOperation": 69,
+        "phaseOfOperationCode": "0106933",
+        "purposeOfTheCredit": "سرمایه در گردش",
+        "purposeOfTheCreditCode": "010133",
+        "accountingDate": "1402/02/31",
+        "startDate": "1400/05/18",
+        "totalAmount": 2000000000.0,
+        "typeOfFinancingTitle": "سایر",
+        "typeOfFinancing": 2,
+        "typeOfFinancingCode": "010233",
+        "typeofInstallments": "اقساط ثابت",
+        "typeofInstallmentsCode": "0105733",
+        "realEndDate": null,
+        "totalNumberOfInstallments": 60,
+        "totalNumberOfOverdue": 0,
+        "totalNumberOfOutstanding": 60,
+        "guarantees": [
+          {
+            "value": 2900000000.0,
+            "type": "دارائی واقعی (غیر منقول ملکی)",
+            "typeCode": "0105333",
+            "currency": "ریال",
+            "currencyCode": "0102933"
+          }
+        ],
+        "relatedPersons": [],
+        "repayments": [
+          {
+            "date": "1402/3",
+            "overdueAmount": null,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1402/2",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": 0,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1402/1",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": 0,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/12",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": 0,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/11",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": 0,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/10",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": 0,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/9",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": 0,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/8",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": 0,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/7",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": 0,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/6",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": 0,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/5",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": 0,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/4",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": 0,
+            "negativeContractStatus": 0
+          }
+        ],
+        "contractStartDateIsTransactionType": false
+      },
+      {
+        "contractId": 0,
+        "organizationName": "بانک آینده",
+        "organizationNameCode": "0102833",
+        "organizationType": "بانک ها و موسسات اعتباری",
+        "organizationTypeCode": "010333",
+        "contractNumber": "6100098512005",
+        "contractCurrency": "ریال",
+        "contractCurrencyCode": "0102933",
+        "installmentsCurrency": "ریال",
+        "installmentsCurrencyCode": "0102933",
+        "customerRoleTilte": "متقاضی اصلی",
+        "customerRole": 13,
+        "customerRoleCode": "0101333",
+        "expectedEndDate": "1404/08/05",
+        "instalmentAmount": 13889000.0,
+        "paymentMethod": "پرداخت مستقیم (نقدی)",
+        "paymentMethodCode": "0102733",
+        "negativeContractStatus": "فاقد وضعیت منفی",
+        "negativeContractStatusCode": "0104033",
+        "outstandingAmount": 416666000.0,
+        "overdueAmount": 0.0,
+        "paymentPeriodicity": "ماهانه",
+        "paymentPeriodicityCode": "0105633",
+        "phaseOfOperationTitle": "درجریان",
+        "phaseOfOperation": 69,
+        "phaseOfOperationCode": "0106933",
+        "purposeOfTheCredit": "سایر",
+        "purposeOfTheCreditCode": "0107933",
+        "accountingDate": "1402/02/31",
+        "startDate": "1401/08/05",
+        "totalAmount": 500000000.0,
+        "typeOfFinancingTitle": "سایر",
+        "typeOfFinancing": 2,
+        "typeOfFinancingCode": "010233",
+        "typeofInstallments": "اقساط ثابت",
+        "typeofInstallmentsCode": "0105733",
+        "realEndDate": null,
+        "totalNumberOfInstallments": null,
+        "totalNumberOfOverdue": 0,
+        "totalNumberOfOutstanding": 0,
+        "guarantees": [
+          {
+            "value": 640000000.0,
+            "type": "برات و سفته",
+            "typeCode": "01016633",
+            "currency": "ریال",
+            "currencyCode": "0102933"
+          }
+        ],
+        "relatedPersons": [
+          {
+            "customerRole": "ضامن",
+            "customerRoleCode": "0109433",
+            "nationalCode": "3520909987"
+          }
+        ],
+        "repayments": [
+          {
+            "date": "1402/3",
+            "overdueAmount": null,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1402/2",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": 0,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1402/1",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": 0,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/12",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": 0,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/11",
+            "overdueAmount": null,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/10",
+            "overdueAmount": null,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/9",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": 0,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/8",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": 0,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/7",
+            "overdueAmount": null,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/6",
+            "overdueAmount": null,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/5",
+            "overdueAmount": null,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/4",
+            "overdueAmount": null,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          }
+        ],
+        "contractStartDateIsTransactionType": false
+      },
+      {
+        "contractId": 0,
+        "organizationName": "بانک آینده",
+        "organizationNameCode": "0102833",
+        "organizationType": "بانک ها و موسسات اعتباری",
+        "organizationTypeCode": "010333",
+        "contractNumber": "6800218463004",
+        "contractCurrency": "ریال",
+        "contractCurrencyCode": "0102933",
+        "installmentsCurrency": "ریال",
+        "installmentsCurrencyCode": "0102933",
+        "customerRoleTilte": "متقاضی اصلی",
+        "customerRole": 13,
+        "customerRoleCode": "0101333",
+        "expectedEndDate": "1404/08/05",
+        "instalmentAmount": 6084000.0,
+        "paymentMethod": "پرداخت مستقیم (نقدی)",
+        "paymentMethodCode": "0102733",
+        "negativeContractStatus": "فاقد وضعیت منفی",
+        "negativeContractStatusCode": "0104033",
+        "outstandingAmount": 182446662.0,
+        "overdueAmount": 0.0,
+        "paymentPeriodicity": "ماهانه",
+        "paymentPeriodicityCode": "0105633",
+        "phaseOfOperationTitle": "درجریان",
+        "phaseOfOperation": 69,
+        "phaseOfOperationCode": "0106933",
+        "purposeOfTheCredit": "خرید لوازم مصرفی",
+        "purposeOfTheCreditCode": "01010633",
+        "accountingDate": "1402/02/31",
+        "startDate": "1401/08/05",
+        "totalAmount": 219039246.0,
+        "typeOfFinancingTitle": "سایر",
+        "typeOfFinancing": 2,
+        "typeOfFinancingCode": "010233",
+        "typeofInstallments": "اقساط ثابت",
+        "typeofInstallmentsCode": "0105733",
+        "realEndDate": null,
+        "totalNumberOfInstallments": null,
+        "totalNumberOfOverdue": 0,
+        "totalNumberOfOutstanding": 0,
+        "guarantees": [
+          {
+            "value": 300000000.0,
+            "type": "برات و سفته",
+            "typeCode": "01016633",
+            "currency": "ریال",
+            "currencyCode": "0102933"
+          }
+        ],
+        "relatedPersons": [
+          {
+            "customerRole": "ضامن",
+            "customerRoleCode": "0109433",
+            "nationalCode": "3520909987"
+          }
+        ],
+        "repayments": [
+          {
+            "date": "1402/3",
+            "overdueAmount": null,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1402/2",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": 0,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1402/1",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": 0,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/12",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": 0,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/11",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": 0,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/10",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": 0,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/9",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": 0,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/8",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": 0,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/7",
+            "overdueAmount": null,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/6",
+            "overdueAmount": null,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/5",
+            "overdueAmount": null,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/4",
+            "overdueAmount": null,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          }
+        ],
+        "contractStartDateIsTransactionType": false
+      },
+      {
+        "contractId": 0,
+        "organizationName": "بانک صادرات",
+        "organizationNameCode": "010933",
+        "organizationType": "بانک ها و موسسات اعتباری",
+        "organizationTypeCode": "010333",
+        "contractNumber": "02526252696014614938",
+        "contractCurrency": "ریال",
+        "contractCurrencyCode": "0102933",
+        "installmentsCurrency": "ریال",
+        "installmentsCurrencyCode": "0102933",
+        "customerRoleTilte": "متقاضی اصلی",
+        "customerRole": 13,
+        "customerRoleCode": "0101333",
+        "expectedEndDate": "1400/09/07",
+        "instalmentAmount": 2083333.0,
+        "paymentMethod": "پرداخت مستقیم (نقدی)",
+        "paymentMethodCode": "0102733",
+        "negativeContractStatus": "فاقد وضعیت منفی",
+        "negativeContractStatusCode": "0104033",
+        "outstandingAmount": 0.0,
+        "overdueAmount": 0.0,
+        "paymentPeriodicity": "ماهانه",
+        "paymentPeriodicityCode": "0105633",
+        "phaseOfOperationTitle": "خاتمه یافته عادی طبق قرارداد",
+        "phaseOfOperation": 112,
+        "phaseOfOperationCode": "01011233",
+        "purposeOfTheCredit": "ایجاد",
+        "purposeOfTheCreditCode": "0102033",
+        "accountingDate": "1400/10/30",
+        "startDate": "1396/09/07",
+        "totalAmount": 100000000.0,
+        "typeOfFinancingTitle": "قرض الحسنه",
+        "typeOfFinancing": 105,
+        "typeOfFinancingCode": "01010533",
+        "typeofInstallments": "اقساط ثابت",
+        "typeofInstallmentsCode": "0105733",
+        "realEndDate": "1400/10/30",
+        "totalNumberOfInstallments": 48,
+        "totalNumberOfOverdue": 0,
+        "totalNumberOfOutstanding": 0,
+        "guarantees": [
+          {
+            "value": 110000960.0,
+            "type": "سایر",
+            "typeCode": null,
+            "currency": "ریال",
+            "currencyCode": null
+          }
+        ],
+        "relatedPersons": [],
+        "repayments": [],
+        "contractStartDateIsTransactionType": false
+      },
+      {
+        "contractId": 0,
+        "organizationName": "بانک صادرات",
+        "organizationNameCode": "010933",
+        "organizationType": "بانک ها و موسسات اعتباری",
+        "organizationTypeCode": "010333",
+        "contractNumber": "0252696014614938",
+        "contractCurrency": "ریال",
+        "contractCurrencyCode": "0102933",
+        "installmentsCurrency": "ریال",
+        "installmentsCurrencyCode": "0102933",
+        "customerRoleTilte": "متقاضی اصلی",
+        "customerRole": 13,
+        "customerRoleCode": "0101333",
+        "expectedEndDate": "1400/09/07",
+        "instalmentAmount": 2083333.0,
+        "paymentMethod": "پرداخت مستقیم (نقدی)",
+        "paymentMethodCode": "0102733",
+        "negativeContractStatus": "فاقد وضعیت منفی",
+        "negativeContractStatusCode": "0104033",
+        "outstandingAmount": 0.0,
+        "overdueAmount": 0.0,
+        "paymentPeriodicity": "ماهانه",
+        "paymentPeriodicityCode": "0105633",
+        "phaseOfOperationTitle": "خاتمه یافته عادی طبق قرارداد",
+        "phaseOfOperation": 112,
+        "phaseOfOperationCode": "01011233",
+        "purposeOfTheCredit": "ایجاد",
+        "purposeOfTheCreditCode": "0102033",
+        "accountingDate": "1398/05/30",
+        "startDate": "1396/09/07",
+        "totalAmount": 100000000.0,
+        "typeOfFinancingTitle": "قرض الحسنه",
+        "typeOfFinancing": 105,
+        "typeOfFinancingCode": "01010533",
+        "typeofInstallments": "اقساط ثابت",
+        "typeofInstallmentsCode": "0105733",
+        "realEndDate": "1398/04/31",
+        "totalNumberOfInstallments": 48,
+        "totalNumberOfOverdue": 0,
+        "totalNumberOfOutstanding": null,
+        "guarantees": [
+          {
+            "value": 110000960.0,
+            "type": "سایر",
+            "typeCode": null,
+            "currency": "ریال",
+            "currencyCode": null
+          }
+        ],
+        "relatedPersons": [
+          {
+            "customerRole": "ضامن",
+            "customerRoleCode": "0109433",
+            "nationalCode": "2722236729"
+          }
+        ],
+        "repayments": [],
+        "contractStartDateIsTransactionType": false
+      },
+      {
+        "contractId": 0,
+        "organizationName": "بانک قرض الحسنه رسالت",
+        "organizationNameCode": "0107333",
+        "organizationType": "بانک ها و موسسات اعتباری",
+        "organizationTypeCode": "010333",
+        "contractNumber": "10-110-3229966-1",
+        "contractCurrency": "ریال",
+        "contractCurrencyCode": "0102933",
+        "installmentsCurrency": "ریال",
+        "installmentsCurrencyCode": "0102933",
+        "customerRoleTilte": "متقاضی اصلی",
+        "customerRole": 13,
+        "customerRoleCode": "0101333",
+        "expectedEndDate": "1398/12/25",
+        "instalmentAmount": 15000000.0,
+        "paymentMethod": "پرداخت مستقیم (نقدی)",
+        "paymentMethodCode": "0102733",
+        "negativeContractStatus": "فاقد وضعیت منفی",
+        "negativeContractStatusCode": "0104033",
+        "outstandingAmount": 0.0,
+        "overdueAmount": 0.0,
+        "paymentPeriodicity": "ماهانه",
+        "paymentPeriodicityCode": "0105633",
+        "phaseOfOperationTitle": "خاتمه یافته عادی طبق قرارداد",
+        "phaseOfOperation": 112,
+        "phaseOfOperationCode": "01011233",
+        "purposeOfTheCredit": "سایر",
+        "purposeOfTheCreditCode": "0107933",
+        "accountingDate": "1399/06/31",
+        "startDate": "1397/02/25",
+        "totalAmount": 300000000.0,
+        "typeOfFinancingTitle": "قرض الحسنه",
+        "typeOfFinancing": 105,
+        "typeOfFinancingCode": "01010533",
+        "typeofInstallments": "اقساط ثابت",
+        "typeofInstallmentsCode": "0105733",
+        "realEndDate": "1399/01/05",
+        "totalNumberOfInstallments": 22,
+        "totalNumberOfOverdue": 0,
+        "totalNumberOfOutstanding": null,
+        "guarantees": [],
+        "relatedPersons": [],
+        "repayments": [],
+        "contractStartDateIsTransactionType": false
+      },
+      {
+        "contractId": 0,
+        "organizationName": "بانک قرض الحسنه رسالت",
+        "organizationNameCode": "0107333",
+        "organizationType": "بانک ها و موسسات اعتباری",
+        "organizationTypeCode": "010333",
+        "contractNumber": "10-110-3229966-2",
+        "contractCurrency": "ریال",
+        "contractCurrencyCode": "0102933",
+        "installmentsCurrency": "ریال",
+        "installmentsCurrencyCode": "0102933",
+        "customerRoleTilte": "متقاضی اصلی",
+        "customerRole": 13,
+        "customerRoleCode": "0101333",
+        "expectedEndDate": "1400/10/21",
+        "instalmentAmount": 31250000.0,
+        "paymentMethod": "پرداخت مستقیم (نقدی)",
+        "paymentMethodCode": "0102733",
+        "negativeContractStatus": "فاقد وضعیت منفی",
+        "negativeContractStatusCode": "0104033",
+        "outstandingAmount": 0.0,
+        "overdueAmount": 0.0,
+        "paymentPeriodicity": "ماهانه",
+        "paymentPeriodicityCode": "0105633",
+        "phaseOfOperationTitle": "خاتمه یافته عادی طبق قرارداد",
+        "phaseOfOperation": 112,
+        "phaseOfOperationCode": "01011233",
+        "purposeOfTheCredit": "سایر",
+        "purposeOfTheCreditCode": "0107933",
+        "accountingDate": "1400/12/01",
+        "startDate": "1399/04/21",
+        "totalAmount": 500000000.0,
+        "typeOfFinancingTitle": "قرض الحسنه",
+        "typeOfFinancing": 105,
+        "typeOfFinancingCode": "01010533",
+        "typeofInstallments": "اقساط ثابت",
+        "typeofInstallmentsCode": "0105733",
+        "realEndDate": "1400/10/27",
+        "totalNumberOfInstallments": 18,
+        "totalNumberOfOverdue": 0,
+        "totalNumberOfOutstanding": null,
+        "guarantees": [],
+        "relatedPersons": [],
+        "repayments": [],
+        "contractStartDateIsTransactionType": false
+      },
+      {
+        "contractId": 0,
+        "organizationName": "پست بانک",
+        "organizationNameCode": "0101633",
+        "organizationType": "بانک ها و موسسات اعتباری",
+        "organizationTypeCode": "010333",
+        "contractNumber": "111_420_79457586_1",
+        "contractCurrency": "ریال",
+        "contractCurrencyCode": "0102933",
+        "installmentsCurrency": "ریال",
+        "installmentsCurrencyCode": "0102933",
+        "customerRoleTilte": "متقاضی اصلی",
+        "customerRole": 13,
+        "customerRoleCode": "0101333",
+        "expectedEndDate": "1397/04/18",
+        "instalmentAmount": 176107920.0,
+        "paymentMethod": "پرداخت مستقیم (نقدی)",
+        "paymentMethodCode": "0102733",
+        "negativeContractStatus": "فاقد وضعیت منفی",
+        "negativeContractStatusCode": "0104033",
+        "outstandingAmount": 0.0,
+        "overdueAmount": 0.0,
+        "paymentPeriodicity": "ماهانه",
+        "paymentPeriodicityCode": "0105633",
+        "phaseOfOperationTitle": "خاتمه یافته عادی طبق قرارداد",
+        "phaseOfOperation": 112,
+        "phaseOfOperationCode": "01011233",
+        "purposeOfTheCredit": "سایر",
+        "purposeOfTheCreditCode": "0107933",
+        "accountingDate": "1401/04/01",
+        "startDate": "1392/04/18",
+        "totalAmount": 176107920.0,
+        "typeOfFinancingTitle": "سایر",
+        "typeOfFinancing": 2,
+        "typeOfFinancingCode": "010233",
+        "typeofInstallments": "اقساط ثابت",
+        "typeofInstallmentsCode": "0105733",
+        "realEndDate": "1397/04/18",
+        "totalNumberOfInstallments": 60,
+        "totalNumberOfOverdue": 0,
+        "totalNumberOfOutstanding": 0,
+        "guarantees": [
+          {
+            "value": 230000000.0,
+            "type": "سایر",
+            "typeCode": null,
+            "currency": "ریال",
+            "currencyCode": null
+          }
+        ],
+        "relatedPersons": [],
+        "repayments": [],
+        "contractStartDateIsTransactionType": false
+      }
+    ],
+    "indirectContracts": [
+      {
+        "contractId": 0,
+        "organizationName": "بانک قرض الحسنه رسالت",
+        "organizationNameCode": "0107333",
+        "organizationType": "بانک ها و موسسات اعتباری",
+        "organizationTypeCode": "010333",
+        "contractNumber": "10-110-4185127-1",
+        "contractCurrency": "ریال",
+        "contractCurrencyCode": "0102933",
+        "installmentsCurrency": "ریال",
+        "installmentsCurrencyCode": "0102933",
+        "customerRoleTilte": "ضامن",
+        "customerRole": 94,
+        "customerRoleCode": "0109433",
+        "expectedEndDate": "1402/09/11",
+        "instalmentAmount": 30000000.0,
+        "paymentMethod": "پرداخت مستقیم (نقدی)",
+        "paymentMethodCode": "0102733",
+        "negativeContractStatus": "فاقد وضعیت منفی",
+        "negativeContractStatusCode": "0104033",
+        "outstandingAmount": 210045454.0,
+        "overdueAmount": 0.0,
+        "paymentPeriodicity": "ماهانه",
+        "paymentPeriodicityCode": "0105633",
+        "phaseOfOperationTitle": "درجریان",
+        "phaseOfOperation": 69,
+        "phaseOfOperationCode": "0106933",
+        "purposeOfTheCredit": "سایر",
+        "purposeOfTheCreditCode": "0107933",
+        "accountingDate": "1402/02/31",
+        "startDate": "1400/11/11",
+        "totalAmount": 600000000.0,
+        "typeOfFinancingTitle": "قرض الحسنه",
+        "typeOfFinancing": 105,
+        "typeOfFinancingCode": "01010533",
+        "typeofInstallments": "اقساط ثابت",
+        "typeofInstallmentsCode": "0105733",
+        "realEndDate": null,
+        "totalNumberOfInstallments": 22,
+        "totalNumberOfOverdue": 0,
+        "totalNumberOfOutstanding": null,
+        "guarantees": [],
+        "relatedPersons": [
+          {
+            "customerRole": "متقاضی اصلی",
+            "customerRoleCode": "0101333",
+            "nationalCode": "0072013532"
+          }
+        ],
+        "repayments": [
+          {
+            "date": "1402/3",
+            "overdueAmount": null,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1402/2",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1402/1",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/12",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/11",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/10",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/9",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/8",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/7",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/6",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/5",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/4",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          }
+        ],
+        "contractStartDateIsTransactionType": false
+      },
+      {
+        "contractId": 0,
+        "organizationName": "بانک قرض الحسنه رسالت",
+        "organizationNameCode": "0107333",
+        "organizationType": "بانک ها و موسسات اعتباری",
+        "organizationTypeCode": "010333",
+        "contractNumber": "10-110-3237004-6",
+        "contractCurrency": "ریال",
+        "contractCurrencyCode": "0102933",
+        "installmentsCurrency": "ریال",
+        "installmentsCurrencyCode": "0102933",
+        "customerRoleTilte": "ضامن",
+        "customerRole": 94,
+        "customerRoleCode": "0109433",
+        "expectedEndDate": "1402/03/09",
+        "instalmentAmount": 31818000.0,
+        "paymentMethod": "پرداخت مستقیم (نقدی)",
+        "paymentMethodCode": "0102733",
+        "negativeContractStatus": "فاقد وضعیت منفی",
+        "negativeContractStatusCode": "0104033",
+        "outstandingAmount": 31820000.0,
+        "overdueAmount": 0.0,
+        "paymentPeriodicity": "ماهانه",
+        "paymentPeriodicityCode": "0105633",
+        "phaseOfOperationTitle": "درجریان",
+        "phaseOfOperation": 69,
+        "phaseOfOperationCode": "0106933",
+        "purposeOfTheCredit": "سایر",
+        "purposeOfTheCreditCode": "0107933",
+        "accountingDate": "1402/02/31",
+        "startDate": "1401/03/09",
+        "totalAmount": 350000000.0,
+        "typeOfFinancingTitle": "قرض الحسنه",
+        "typeOfFinancing": 105,
+        "typeOfFinancingCode": "01010533",
+        "typeofInstallments": "اقساط ثابت",
+        "typeofInstallmentsCode": "0105733",
+        "realEndDate": null,
+        "totalNumberOfInstallments": 12,
+        "totalNumberOfOverdue": 0,
+        "totalNumberOfOutstanding": null,
+        "guarantees": [],
+        "relatedPersons": [
+          {
+            "customerRole": "متقاضی اصلی",
+            "customerRoleCode": "0101333",
+            "nationalCode": "0067252796"
+          },
+          {
+            "customerRole": "ضامن",
+            "customerRoleCode": "0109433",
+            "nationalCode": "2720859788"
+          }
+        ],
+        "repayments": [
+          {
+            "date": "1402/3",
+            "overdueAmount": null,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1402/2",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1402/1",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/12",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/11",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/10",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/9",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/8",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/7",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/6",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/5",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/4",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          }
+        ],
+        "contractStartDateIsTransactionType": false
+      },
+      {
+        "contractId": 0,
+        "organizationName": "بانک آینده",
+        "organizationNameCode": "0102833",
+        "organizationType": "بانک ها و موسسات اعتباری",
+        "organizationTypeCode": "010333",
+        "contractNumber": "6100097462006",
+        "contractCurrency": "ریال",
+        "contractCurrencyCode": "0102933",
+        "installmentsCurrency": "ریال",
+        "installmentsCurrencyCode": "0102933",
+        "customerRoleTilte": "ضامن",
+        "customerRole": 94,
+        "customerRoleCode": "0109433",
+        "expectedEndDate": "1404/08/01",
+        "instalmentAmount": 13889000.0,
+        "paymentMethod": "پرداخت مستقیم (نقدی)",
+        "paymentMethodCode": "0102733",
+        "negativeContractStatus": "فاقد وضعیت منفی",
+        "negativeContractStatusCode": "0104033",
+        "outstandingAmount": 416666000.0,
+        "overdueAmount": 0.0,
+        "paymentPeriodicity": "ماهانه",
+        "paymentPeriodicityCode": "0105633",
+        "phaseOfOperationTitle": "درجریان",
+        "phaseOfOperation": 69,
+        "phaseOfOperationCode": "0106933",
+        "purposeOfTheCredit": "توسعه",
+        "purposeOfTheCreditCode": "0104133",
+        "accountingDate": "1402/02/31",
+        "startDate": "1401/08/01",
+        "totalAmount": 500000000.0,
+        "typeOfFinancingTitle": "سایر",
+        "typeOfFinancing": 2,
+        "typeOfFinancingCode": "010233",
+        "typeofInstallments": "اقساط ثابت",
+        "typeofInstallmentsCode": "0105733",
+        "realEndDate": null,
+        "totalNumberOfInstallments": null,
+        "totalNumberOfOverdue": 0,
+        "totalNumberOfOutstanding": 0,
+        "guarantees": [
+          {
+            "value": 640000000.0,
+            "type": "برات و سفته",
+            "typeCode": "01016633",
+            "currency": "ریال",
+            "currencyCode": "0102933"
+          }
+        ],
+        "relatedPersons": [
+          {
+            "customerRole": "متقاضی اصلی",
+            "customerRoleCode": "0101333",
+            "nationalCode": "3932717627"
+          }
+        ],
+        "repayments": [
+          {
+            "date": "1402/3",
+            "overdueAmount": null,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1402/2",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": 0,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1402/1",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": 0,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/12",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": 0,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/11",
+            "overdueAmount": null,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/10",
+            "overdueAmount": null,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/9",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": 0,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/8",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": 0,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/7",
+            "overdueAmount": null,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/6",
+            "overdueAmount": null,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/5",
+            "overdueAmount": null,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/4",
+            "overdueAmount": null,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          }
+        ],
+        "contractStartDateIsTransactionType": false
+      },
+      {
+        "contractId": 0,
+        "organizationName": "بانک آینده",
+        "organizationNameCode": "0102833",
+        "organizationType": "بانک ها و موسسات اعتباری",
+        "organizationTypeCode": "010333",
+        "contractNumber": "6800216458002",
+        "contractCurrency": "ریال",
+        "contractCurrencyCode": "0102933",
+        "installmentsCurrency": "ریال",
+        "installmentsCurrencyCode": "0102933",
+        "customerRoleTilte": "ضامن",
+        "customerRole": 94,
+        "customerRoleCode": "0109433",
+        "expectedEndDate": "1404/08/02",
+        "instalmentAmount": 6084000.0,
+        "paymentMethod": "پرداخت مستقیم (نقدی)",
+        "paymentMethodCode": "0102733",
+        "negativeContractStatus": "فاقد وضعیت منفی",
+        "negativeContractStatusCode": "0104033",
+        "outstandingAmount": 182535246.0,
+        "overdueAmount": 0.0,
+        "paymentPeriodicity": "ماهانه",
+        "paymentPeriodicityCode": "0105633",
+        "phaseOfOperationTitle": "درجریان",
+        "phaseOfOperation": 69,
+        "phaseOfOperationCode": "0106933",
+        "purposeOfTheCredit": "ایجاد",
+        "purposeOfTheCreditCode": "0102033",
+        "accountingDate": "1402/02/31",
+        "startDate": "1401/08/02",
+        "totalAmount": 219039246.0,
+        "typeOfFinancingTitle": "سایر",
+        "typeOfFinancing": 2,
+        "typeOfFinancingCode": "010233",
+        "typeofInstallments": "اقساط ثابت",
+        "typeofInstallmentsCode": "0105733",
+        "realEndDate": null,
+        "totalNumberOfInstallments": null,
+        "totalNumberOfOverdue": 0,
+        "totalNumberOfOutstanding": 0,
+        "guarantees": [
+          {
+            "value": 300000000.0,
+            "type": "برات و سفته",
+            "typeCode": "01016633",
+            "currency": "ریال",
+            "currencyCode": "0102933"
+          }
+        ],
+        "relatedPersons": [
+          {
+            "customerRole": "متقاضی اصلی",
+            "customerRoleCode": "0101333",
+            "nationalCode": "3932717627"
+          }
+        ],
+        "repayments": [
+          {
+            "date": "1402/3",
+            "overdueAmount": null,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1402/2",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": 0,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1402/1",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": 0,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/12",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": 0,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/11",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": 0,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/10",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": 0,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/9",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": 0,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/8",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": 0,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/7",
+            "overdueAmount": null,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/6",
+            "overdueAmount": null,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/5",
+            "overdueAmount": null,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/4",
+            "overdueAmount": null,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          }
+        ],
+        "contractStartDateIsTransactionType": false
+      },
+      {
+        "contractId": 0,
+        "organizationName": "بانک قرض الحسنه رسالت",
+        "organizationNameCode": "0107333",
+        "organizationType": "بانک ها و موسسات اعتباری",
+        "organizationTypeCode": "010333",
+        "contractNumber": "10-110-3237004-5",
+        "contractCurrency": "ریال",
+        "contractCurrencyCode": "0102933",
+        "installmentsCurrency": "ریال",
+        "installmentsCurrencyCode": "0102933",
+        "customerRoleTilte": "ضامن",
+        "customerRole": 94,
+        "customerRoleCode": "0109433",
+        "expectedEndDate": "1401/10/25",
+        "instalmentAmount": 26666000.0,
+        "paymentMethod": "پرداخت مستقیم (نقدی)",
+        "paymentMethodCode": "0102733",
+        "negativeContractStatus": "فاقد وضعیت منفی",
+        "negativeContractStatusCode": "0104033",
+        "outstandingAmount": 0.0,
+        "overdueAmount": 0.0,
+        "paymentPeriodicity": "ماهانه",
+        "paymentPeriodicityCode": "0105633",
+        "phaseOfOperationTitle": "خاتمه یافته عادی طبق قرارداد",
+        "phaseOfOperation": 112,
+        "phaseOfOperationCode": "01011233",
+        "purposeOfTheCredit": "سایر",
+        "purposeOfTheCreditCode": "0107933",
+        "accountingDate": "1401/11/20",
+        "startDate": "1400/08/25",
+        "totalAmount": 320000000.0,
+        "typeOfFinancingTitle": "قرض الحسنه",
+        "typeOfFinancing": 105,
+        "typeOfFinancingCode": "01010533",
+        "typeofInstallments": "اقساط ثابت",
+        "typeofInstallmentsCode": "0105733",
+        "realEndDate": "1401/10/25",
+        "totalNumberOfInstallments": 14,
+        "totalNumberOfOverdue": 0,
+        "totalNumberOfOutstanding": null,
+        "guarantees": [],
+        "relatedPersons": [
+          {
+            "customerRole": "متقاضی اصلی",
+            "customerRoleCode": "0101333",
+            "nationalCode": "0067252796"
+          },
+          {
+            "customerRole": "ضامن",
+            "customerRoleCode": "0109433",
+            "nationalCode": "2720859788"
+          }
+        ],
+        "repayments": [
+          {
+            "date": "1402/3",
+            "overdueAmount": null,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1402/2",
+            "overdueAmount": null,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1402/1",
+            "overdueAmount": null,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/12",
+            "overdueAmount": null,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/11",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/10",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/9",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/8",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/7",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/6",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/5",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          },
+          {
+            "date": "1401/4",
+            "overdueAmount": 0.0,
+            "totalNumberOfOverdue": null,
+            "negativeContractStatus": 0
+          }
+        ],
+        "contractStartDateIsTransactionType": false
+      },
+      {
+        "contractId": 0,
+        "organizationName": "لیزینگ رایان سایپا",
+        "organizationNameCode": "0103633",
+        "organizationType": "بانک ها و موسسات اعتباری",
+        "organizationTypeCode": "010333",
+        "contractNumber": "9612816740",
+        "contractCurrency": "ریال",
+        "contractCurrencyCode": "0102933",
+        "installmentsCurrency": "ریال",
+        "installmentsCurrencyCode": "0102933",
+        "customerRoleTilte": "ضامن",
+        "customerRole": 94,
+        "customerRoleCode": "0109433",
+        "expectedEndDate": "1398/12/15",
+        "instalmentAmount": 61242000.0,
+        "paymentMethod": "حساب جاری",
+        "paymentMethodCode": "01011133",
+        "negativeContractStatus": "فاقد وضعیت منفی",
+        "negativeContractStatusCode": "0104033",
+        "outstandingAmount": 0.0,
+        "overdueAmount": 0.0,
+        "paymentPeriodicity": "شش ماهه",
+        "paymentPeriodicityCode": "0107233",
+        "phaseOfOperationTitle": "خاتمه یافته عادی طبق قرارداد",
+        "phaseOfOperation": 112,
+        "phaseOfOperationCode": "01011233",
+        "purposeOfTheCredit": "خرید لوازم مصرفی",
+        "purposeOfTheCreditCode": "01010633",
+        "accountingDate": "1399/07/01",
+        "startDate": "1396/12/23",
+        "totalAmount": 244968027.0,
+        "typeOfFinancingTitle": "اجاره به شرط تملیک",
+        "typeOfFinancing": 14,
+        "typeOfFinancingCode": "0101433",
+        "typeofInstallments": "اقساط ثابت",
+        "typeofInstallmentsCode": "0105733",
+        "realEndDate": "1399/03/19",
+        "totalNumberOfInstallments": 4,
+        "totalNumberOfOverdue": 0,
+        "totalNumberOfOutstanding": 0,
+        "guarantees": [],
+        "relatedPersons": [
+          {
+            "customerRole": "متقاضی اصلی",
+            "customerRoleCode": "0101333",
+            "nationalCode": "0075661772"
+          }
+        ],
+        "repayments": [],
+        "contractStartDateIsTransactionType": false
+      }
+    ],
+    "contractNegativeStatus": [],
+    "personNegativeStatus": [
+      {
+        "organizationName": "بانک صادرات",
+        "organizationNameCode": "010933",
+        "organizationType": "بانک ها و موسسات اعتباری",
+        "organizationTypeCode": "010333",
+        "date": "1402/02/31",
+        "state": "فاقد وضعیت منفی",
+        "stateCode": "01015633"
+      },
+      {
+        "organizationName": "پست بانک",
+        "organizationNameCode": "0101633",
+        "organizationType": "بانک ها و موسسات اعتباری",
+        "organizationTypeCode": "010333",
+        "date": "1401/04/01",
+        "state": "فاقد وضعیت منفی",
+        "stateCode": "01015633"
+      },
+      {
+        "organizationName": "بانک آینده",
+        "organizationNameCode": "0102833",
+        "organizationType": "بانک ها و موسسات اعتباری",
+        "organizationTypeCode": "010333",
+        "date": "1402/02/31",
+        "state": "فاقد وضعیت منفی",
+        "stateCode": "01015633"
+      },
+      {
+        "organizationName": "لیزینگ رایان سایپا",
+        "organizationNameCode": "0103633",
+        "organizationType": "بانک ها و موسسات اعتباری",
+        "organizationTypeCode": "010333",
+        "date": "1399/07/01",
+        "state": "فاقد وضعیت منفی",
+        "stateCode": "01015633"
+      },
+      {
+        "organizationName": "بانک قرض الحسنه رسالت",
+        "organizationNameCode": "0107333",
+        "organizationType": "بانک ها و موسسات اعتباری",
+        "organizationTypeCode": "010333",
+        "date": "1402/02/31",
+        "state": "فاقد وضعیت منفی",
+        "stateCode": "01015633"
+      }
+    ],
+    "inquiryCreatedDate": "1402/04/06 13:56:41",
+    "reportUniqueId": "8000 8010 6000 0131 9202"
+  }
+}

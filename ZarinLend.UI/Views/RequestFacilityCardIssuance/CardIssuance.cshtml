@@ -1,0 +1,110 @@
+﻿@model RequestFacilityCardIssuanceModel
+@{
+    ViewData["Title"] = "صدور بیمه و اطلاع رسانی به مشتری";
+}
+@section styles
+    {
+    <style type="text/css">
+        .cheque-data {
+            color: blueviolet;
+        }
+    </style>
+}
+    @await Component.InvokeAsync("WorkFlowStepWizard", new { workFlowId = 1, requestFacilityId = Model.RequestFacilityId })
+    <form id="frmCardIssuance" method="post">
+        <div class="card">
+            <div class="card-header" >صدور بن کارت</div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="control-label" asp-for="CardNumber"></label>
+                            <input asp-for="CardNumber" class="form-control card-number-css" style="text-align:center;direction:ltr" />
+                            <span asp-validation-for="CardNumber" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="control-label" asp-for="AccountNumber"></label>
+                            <input asp-for="AccountNumber" class="form-control" style="text-align:center;direction:ltr" />
+                            <span asp-validation-for="AccountNumber" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer" style="text-align:left">
+                <button id="btnSave" class="btn btn-outline-success">
+                    @ResourceFile.Save&nbsp;<i class="fal fa-upload"></i>
+                </button>
+            <a class="btn btn-outline-secondary" asp-controller="RequestFacility" asp-action="SearchRequest">
+                    بازگشت به لیست درخواست تسهیلات&nbsp;<i class="fal fa-list"></i>
+                </a>
+            </div>
+        </div>
+    </form>
+    @section scripts{
+    @*<partia name="_ValidationScriptsPartial" />*@
+    @{
+        await Html.RenderPartialAsync("~/Views/Shared/_ValidationScriptsPartial.cshtml");
+    }
+    <script>
+        var isEditMode = false; //@@Model.IsEditMode.ToString().ToLower();
+        $(document).ready(function () {
+
+        });
+
+        $('#btnSave').click(function (e) {
+            e.preventDefault();
+            debugger;
+            const formIsValid = $('#frmCardIssuance').valid();
+
+            if (formIsValid) {
+                showWaiting('frmCardIssuance', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                let data = new FormData();
+
+                data.append('AccountNumber', $('#AccountNumber').val());
+                data.append('CardNumber', $('#CardNumber').val());
+                data.append('RequestFacilityId', @Model.RequestFacilityId);
+
+                $.ajax({
+                    type: 'post',
+                    //dataType: 'json',
+                    //contentType: "application/json; charset=utf-8",
+                    processData: false,
+                    contentType: false,
+                    url: '/api/v1/RequestFacilityCardIssuance/InsuranceIssuance',
+                    data: data,// JSON.stringify(model),
+                    success: function (result) {
+                        hideWaiting('frmCardIssuance');
+                        debugger;
+                        if (result.isSuccess) {
+                            showMessage('@ResourceFile.InfoTitle', '@ResourceFile.MessageSuccess', icons.success, '@ResourceFile.Close');
+                            setTimeout(function () {
+                                window.location.replace('@Url.Action("SearchRequest","RequestFacility")');
+                            }, 2500);
+                        }
+                    },
+                    error: function (error) {
+                        hideWaiting('frmCardIssuance');
+                        if (error.responseJSON != undefined && error.responseJSON.message != undefined && error.responseJSON.message != '') {
+                            if (IsJsonString(error.responseJSON.message)) {
+                                const exception = JSON.parse(error.responseJSON.message).Exception;
+                                showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                            }
+                            else
+                                showMessage('@ResourceFile.ErrorTitle', error.responseJSON.message, icons.error, '@ResourceFile.Close');
+                        }
+                        else {
+                            showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                        }
+                    }
+                });
+            }
+            else {
+                scrollToFirstError();
+            }
+        });
+    </script>
+}

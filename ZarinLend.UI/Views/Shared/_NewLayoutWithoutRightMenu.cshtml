@@ -1,0 +1,80 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon32x32.svg">
+
+    <link rel="manifest" href="/manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
+    <meta name="theme-color" content="#6748fe">
+
+    <title>@ViewData["Title"] - @ResourceFile.SiteTitle</title>
+    <meta name="theme-color" content="#5A8DEE" />
+    <partial name="_StylesPartial" />
+
+    @await RenderSectionAsync("styles", required: false)
+    <partial name="_ImberScript" />
+</head>
+<body class="container-fluid container-fluid-zero-padding">
+    <div class="">
+        <nav class="px-50 px-md-2 navbar fixed-top navbar-expand-lg navbar-light bg-white zl-app-content">
+            <div class="d-flex flex-row justify-content-between w-100">
+                <div class="d-flex">
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <a class="navbar-brand mr-auto mr-lg-1" href='@Url.Action("index","Home")'>
+                        <img class="ml-1 ml-lg-0 logo-image" src="~/new-layout/images/ZarinLend-Logo.svg?v=1" alt="زرین‌لند" />
+                    </a>
+                    <ul class="navbar-nav flex-row d-none d-lg-flex">
+                        <li class="nav-item">
+                            <a class="nav-link dark text-bold-500" href="#">راهنمای گرفتن تسهیلات</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link dark text-bold-500" href="#">سوالات متداول</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="ml-auto d-block d-lg-none">
+                    <ul class="navbar-nav d-flex flex-row">
+                        <li class="nav-item mr-1">
+                            <a class="nav-link" href="#"><i class="bx bx-bell font-medium-5"></i></a>
+                        </li>
+                        <li class="nav-item mr-1">
+                            <a class="nav-link" href="#"><i class="bx bx-user font-medium-5" style="color:green"></i></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Action("Logout","Account")"><i class="bx bx-log-out font-medium-5" style="color:red"></i></a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            @await RenderSectionAsync("responsiveMenu", required: false)
+        </nav>
+    </div>
+
+    <div class="zl-app-content py-5">
+        <div class="my-2 px-1 px-md-3 px-lg-0">
+            @RenderBody()
+        </div>
+    </div>
+    <partial name="_ScriptsPartial" />
+    <script asp-append-version="true">
+        $(function() {
+            $.ajaxSetup({
+                beforeSend: function(xhr) {
+                    if ('@($"{CookieManager.Get(Context, CookieManager.CookieKeys.JwtToken)}")' != '') {
+                        xhr.setRequestHeader("Authorization", 'Bearer @($"{CookieManager.Get(Context, CookieManager.CookieKeys.JwtToken)}")');
+                    }
+                }
+            });
+        });
+    </script>
+    @{
+        await Html.RenderPartialAsync("~/Views/RequestFacility/_RequestFacilityWorkFlowStepsHistory.cshtml", -1);
+    }
+    @await RenderSectionAsync("scripts", required: false)
+</body>
+</html>

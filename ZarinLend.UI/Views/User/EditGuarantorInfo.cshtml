@@ -1,0 +1,880 @@
+﻿@model UserEditModel
+@{
+    ViewData["Title"] = ResourceFile.RegisterSellerBuyer;
+    Layout = "~/Views/Shared/_NewLayout.cshtml";
+    var editByZarinLend = false;
+    var updateUserInfo = "/api/v1/User/UpdateUserInfo";
+    var updateUserLocation = "/api/v1/User/UpdateUserLocation";
+    if (User.IsInRole(RoleEnum.SuperAdmin.ToString()) ||
+        User.IsInRole(RoleEnum.Admin.ToString()) ||
+        User.IsInRole(RoleEnum.ZarinLendExpert.ToString()))
+    {
+        editByZarinLend = true;
+        var userId = ViewContext.RouteData.Values["userId"];
+        updateUserInfo = $"{updateUserInfo}/{userId}";
+        updateUserLocation = $"{updateUserLocation}/{userId}";
+    }
+}
+@section styles
+    {
+    <link href="~/persianDatePicker/css/persianDatepicker-lightorang.css" rel="stylesheet" />
+    <style type="text/css">
+        textarea {
+            height: 120px !important;
+        }
+    </style>
+}
+@if (Model.RequestFacilityGuarantorId.HasValue && !editByZarinLend)
+{
+    @await Component.InvokeAsync("WorkFlowStepWizardHorizental", new {workFlow =  WorkFlowEnum.RegisterGuarantor, requestId =  Model.RequestFacilityGuarantorId })
+}
+<div class="p-2 bg-white rounded-lg" id="mainContentDiv">
+    <div class="row font-medium-3 secondary darken-4 text-bold-800 d-flex align-items-center">
+        <div class="col-12 col-md-6 col-sm-12 mb-2">
+            <i class="bx bx-align-right zl-text-secondary mr-25"></i>
+            <span>اطلاعات کاربری</span>
+        </div>
+        <div class="col-12 col-md-6 col-sm-12 mb-2">
+            @if (Model.RequestFacilityGuarantorId.HasValue && !editByZarinLend)
+            {
+                <div class="d-flex align-items-center justify-content-end">
+                    <button id="btnGoToNextStep" class="btn btn-zl-primary ml-1">
+                        تغییری ندارم،به مرحله بعد برو
+                    </button>
+                </div>
+            }
+        </div>
+    </div>
+    <div class="mt-2 p-2 edit-user-bg rounded-lg">
+        <div class="d-flex justify-content-between">
+            <div class="text-bold-900 secondary darken-4 font-medium-3">
+                اطلاعات فردی
+            </div>
+            <a href="#" data-toggle="modal" data-target="#editUserInfoModal" class="d-flex align-items-center">
+                <i class="bx bx-edit-alt zl-text-secondary font-medium-5 mr-25"></i>
+                <span class="font-small-3 zl-text-secondary">ویرایش</span>
+            </a>
+        </div>
+        <div class="border rounded mt-2">
+            <div class="d-flex flex-column flex-sm-row">
+                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                    <span class="font-small-2 text-bold-500">نام</span>
+                    <span id="fnameValue" class="dark mt-50 text-bold-400">@Model.FName</span>
+                </div>
+                <div class="border-left border-top"></div>
+                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                    <span class="font-small-2 text-bold-500">نام خانوادگی</span>
+                    <span id="lnameValue" class="dark mt-50 text-bold-400">@Model.LName</span>
+                </div>
+            </div>
+            <hr class="m-0 p-0" />
+            <div class="d-flex flex-column flex-sm-row">
+                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                    <span class="font-small-2 text-bold-500">نام پدر</span>
+                    <span id="fatherNameValue" class="dark mt-50 text-bold-400">@Model.FatherName</span>
+                </div>
+                <div class="border-left border-top"></div>
+                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                    <span class="font-small-2 text-bold-500">کد ملی</span>
+                    <span id="nationalCodeValue" class="dark mt-50 text-bold-400">@Model.NationalCode</span>
+                </div>
+            </div>
+            <hr class="m-0 p-0" />
+            <div class="d-flex flex-column flex-sm-row">
+                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                    <span class="font-small-2 text-bold-500">شماره شناسنامه</span>
+                    <span id="ssidValue" class="dark mt-50 text-bold-400">@Model.SSID</span>
+                </div>
+                <div class="border-left border-top"></div>
+                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                   @*  <span class="font-small-2 text-bold-500">سریال شناسنامه</span>
+                    <span id="birthCertificateSerialValue" class="dark mt-50 text-bold-400">@Model.BirthCertificateSerial</span> *@
+                    <span class="font-small-2 text-bold-500">تاریخ تولد</span>
+                    <span id="birthDateValue" class="dark mt-50 text-bold-400">@ViewBag.PersianBirthDate</span>
+                </div>
+            </div>
+            <hr class="m-0 p-0" />
+            <div class="d-flex flex-column flex-sm-row">
+                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                    <span class="font-small-2 text-bold-500">جنسیت</span>
+                    <span id="genderValue" class="dark mt-50 text-bold-400">@(Model.Gender == GenderEnum.Female ? "زن" : "مرد")</span>
+                </div>
+                <div class="border-left border-top"></div>
+                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                    @* <span class="font-small-2 text-bold-500">تاریخ تولد</span>
+                    <span id="birthDateValue" class="dark mt-50 text-bold-400">@ViewBag.PersianBirthDate</span> *@
+                </div>
+            </div>
+@*             <hr class="m-0 p-0" />
+            <div class="d-flex flex-column flex-sm-row">
+                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                    <span class="font-small-2 text-bold-500">استان محل تولد</span>
+                    <span id="provinceOfBirthValue" class="dark mt-50 text-bold-400">@(Model.BirthProvinces.Any(p => p.Selected) ? Model.BirthProvinces.First(p => p.Selected).Text : "-")</span>
+                </div>
+                <div class="border-left border-top"></div>
+                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                    <span class="font-small-2 text-bold-500">شهر محل تولد</span>
+                    <span id="cityOfBirthValue" class="dark mt-50 text-bold-400">@(Model.BirthProvinces.Any(p => p.Selected) ? Model.BirthCities.First(p => p.Selected).Text : "-")</span>
+                </div>
+            </div> *@
+@*             <hr class="m-0 p-0" />
+            <div class="d-flex flex-column flex-sm-row">
+                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                    <span class="font-small-2 text-bold-500">استان محل صدور شناسنامه</span>
+                    <span id="provinceOfIssueValue" class="dark mt-50 text-bold-400">@(Model.IssueProvinces.Any(p => p.Selected) ? Model.IssueProvinces.First(p => p.Selected).Text : "-")</span>
+                </div>
+                <div class="border-left border-top"></div>
+                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                    <span class="font-small-2 text-bold-500">شهر محل صدور شناسنامه</span>
+                    <span id="cityOfIssueValue" class="dark mt-50 text-bold-400">@(Model.IssueProvinces.Any(p => p.Selected) ? Model.IssueCities.First(p => p.Selected).Text : "-")</span>
+                </div>
+            </div> *@
+@*             <hr class="m-0 p-0" />
+            <div class="d-flex flex-column flex-sm-row">
+                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                    <span class="font-small-2 text-bold-500">شماره ثنا</span>
+                    <span id="sanaValue" class="dark mt-50 text-bold-400">@Model.SanaNumber</span>
+                </div>
+                <div class="border-left border-top"></div>
+                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                </div>
+            </div> *@
+        </div>
+    </div>
+    <div class="mt-2 p-2 edit-user-bg rounded-lg">
+        <div class="d-flex justify-content-between">
+            <div class="text-bold-900 secondary darken-4 font-medium-3">
+                اطلاعات شغلی
+            </div>
+            <a href="#" data-toggle="modal" data-target="#editUserJobModal" class="d-flex align-items-center">
+                <i class="bx bx-edit-alt zl-text-secondary font-medium-5 mr-25"></i>
+                <span class="font-small-3 zl-text-secondary">ویرایش</span>
+            </a>
+        </div>
+        <div class="border rounded mt-2">
+            <div class="d-flex flex-column flex-sm-row">
+                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                    <span class="font-small-2 text-bold-500">شغل</span>
+                    <span class="dark mt-50 text-bold-400">کارمند</span>
+                </div>
+                <div class="border-left border-top"></div>
+                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                    <span class="font-small-2 text-bold-500">میزان درآمد</span>
+                    <span class="dark mt-50 text-bold-400">پنج تا ده میلیون تومان</span>
+                </div>
+                <div class="border-left border-top"></div>
+                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                    <span class="font-small-2 text-bold-500">تلفن محل کار</span>
+                    <span class="dark mt-50 text-bold-400">021-25325356</span>
+                </div>
+            </div>
+            <hr class="m-0 p-0" />
+            <div class="d-flex flex-column flex-sm-row">
+                <div class="d-flex flex-column justify-content-start py-2 px-1">
+                    <span class="font-small-2 text-bold-500">آدرس محل کار</span>
+                    <span class="dark mt-50 text-bold-400">یوسف آباد کوچه بیستم پلاک 61 واحد 4</span>
+                </div>
+                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50"></div>
+            </div>
+        </div>
+    </div>
+    <div class="mt-2 p-2 edit-user-bg rounded-lg">
+        <div class="d-flex justify-content-between">
+            <div class="text-bold-900 secondary darken-4 font-medium-3">
+                اطلاعات تماس و محل اقامت
+            </div>
+            <a href="#" data-toggle="modal" data-target="#editUserLocationModal" class="d-flex align-items-center">
+                <i class="bx bx-edit-alt zl-text-secondary font-medium-5 mr-25"></i>
+                <span class="font-small-3 zl-text-secondary">ویرایش</span>
+            </a>
+        </div>
+        <div class="border rounded mt-2">
+            <div class="d-flex flex-column flex-sm-row">
+                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                    <span class="font-small-2 text-bold-500">شماره موبایل</span>
+                    <span id="mobileValue" class="dark mt-50 text-bold-400">@Model.Mobile</span>
+                </div>
+                <div class="border-left border-top"></div>
+                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                    <span class="font-small-2 text-bold-500">شماره تلفن</span>
+                    <span id="phoneNumberValue" class="dark mt-50 text-bold-400">@Model.PhoneNumber</span>
+                </div>
+            </div>
+            <hr class="m-0 p-0" />
+            <div class="d-flex flex-column flex-sm-row">
+                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                    <span class="font-small-2 text-bold-500">استان محل اقامت</span>
+                    <span id="provinceValue" class="dark mt-50 text-bold-400">@(Model.Provinces.Any(p => p.Selected) ? Model.Provinces.First(p => p.Selected).Text : "-")</span>
+                </div>
+                <div class="border-left border-top"></div>
+                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                    <span class="font-small-2 text-bold-500">شهر محل اقامت</span>
+                    <span id="cityValue" class="dark mt-50 text-bold-400">@(Model.Cities.Any(p => p.Selected) ? Model.Cities.First(p => p.Selected).Text : "-")</span>
+                </div>
+            </div>
+            <hr class="m-0 p-0" />
+            <div class="d-flex flex-column flex-sm-row">
+                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                    <span class="font-small-2 text-bold-500">کد پستی</span>
+                    <span id="postalCodeValue" class="dark mt-50 text-bold-400">@Model.PostalCode</span>
+                </div>
+                <div class="border-left border-top"></div>
+                <div class="d-flex flex-column justify-content-start py-2 px-1 w-50">
+                    <span class="font-small-2 text-bold-500">ایمیل</span>
+                    <span id="emailValue" class="dark mt-50 text-bold-400">@Model.Email</span>
+                </div>
+            </div>
+            <hr class="m-0 p-0" />
+            <div class="d-flex flex-column flex-sm-row">
+                <div class="d-flex flex-column justify-content-start py-2 px-1">
+                    <span class="font-small-2 text-bold-500">آدرس محل سکونت</span>
+                    <span id="addressValue" class="dark mt-50 text-bold-400">@Model.Address</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Start : Modal -->
+<form id="frmEditUserInfo" autocomplete="off">
+    <div class="modal fade" id="editUserInfoModal" tabindex="-1" role="dialog" aria-labelledby="editUserInfoModalTitle" data-backdrop="static" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg"
+             role="document">
+            <div class="modal-content rounded-lg">
+                <div class="modal-header">
+                    <h5 class="modal-title secondary darken-4" id="editUserInfoModalTitle">
+                        ویرایش اطلاعات فردی
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="بستن">
+                        <i class="bx bx-x"></i>
+                    </button>
+                </div>
+                <div class="modal-body" id="userInfoContent">
+                    <fieldset>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <input asp-for="FName" class="form-control bg-transparent" placeholder="نام" />
+                                    <span asp-validation-for="FName" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <input type="text" class="form-control bg-transparent" asp-for="LName" placeholder="نام خانوادگی" />
+                                    <span asp-validation-for="LName" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <input type="text" class="form-control bg-transparent" asp-for="FatherName" placeholder="نام پدر" />
+                                    <span asp-validation-for="FatherName" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <input type="text" class="form-control bg-transparent" asp-for="NationalCode" disabled placeholder="کد ملی" style="text-align:center;direction:ltr;letter-spacing:5px" />
+                                    <span asp-validation-for="NationalCode" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <input type="text" class="form-control bg-transparent" asp-for="SSID" placeholder="شماره شناسنامه" />
+                                    <span asp-validation-for="SSID" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <@* input type="text" class="form-control bg-transparent" asp-for="BirthCertificateSerial" placeholder="سریال شناسنامه" style="text-align:center;direction:ltr" />
+                                    <span asp-validation-for="BirthCertificateSerial" class="text-danger"></span> *@
+                                              <fieldset class="form-group position-relative has-icon-left">
+                                    <input class="form-control bg-transparent shamsi-datepicker" readonly id="txtBirthDate" maxlength="10" placeholder="تاریخ تولد" style="text-align:center;direction:ltr" name="txtBirthDate"
+                                           type="text" value="" data-fromdate=""  data-jdate="@ViewBag.PersianBirthDate" data-gdate="@ViewBag.BirthDate"  />
+                                    <div class="form-control-position">
+                                        <i class="bx bx-calendar"></i>
+                                    </div>
+                                </fieldset>
+                                <input asp-for="BirthDate" type="hidden" />
+                                </div>
+                            </div>
+                        </div>
+@*                         <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <select name="ProvinceOfIssueId" asp-for="ProvinceOfIssueId" class="form-control bg-transparent "
+                                            asp-items="Model.IssueProvinces">
+                                        <option value="" >SelectProvinceOfIssue</option>
+                                    </select>
+                                    <span asp-validation-for="ProvinceOfIssueId" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <select name="CityOfIssueId" asp-for="CityOfIssueId" asp-items="Model.IssueCities" class="form-control bg-transparent ">
+                                        <option value="" >@ResourceFile.SelectCityOfIssue</option>
+                                    </select>
+                                    <span asp-validation-for="CityOfIssueId" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div> *@
+@*                         <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <select name="ProvinceOfBirthId" asp-for="ProvinceOfBirthId" class="form-control bg-transparent "
+                                            asp-items="Model.BirthProvinces">
+                                        <option value="" >@ResourceFile.SelectProvinceOfBirth</option>
+                                    </select>
+                                    <span asp-validation-for="ProvinceOfBirthId" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <select name="CityOfBirthId" asp-for="CityOfBirthId" asp-items="Model.BirthCities" class="form-control bg-transparent ">
+                                        <option value="" >@ResourceFile.SelectCityOfBirth</option>
+                                    </select>
+                                    <span asp-validation-for="CityOfBirthId" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div> *@
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <select name="Gender" asp-for="Gender" class="form-control bg-transparent ">
+                                        <option value="" selected="selected" >SelectGender</option>
+                                        <option value="1" >@ResourceFile.Male</option>
+                                        <option value="2" >@ResourceFile.Female</option>
+                                    </select>
+                                    <span asp-validation-for="Gender" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                @*<fieldset class="form-group position-relative has-icon-left">
+                                <input type="text" class="form-control shamsi-datepicker bg-transparent" placeholder="تاریخ تولد" />
+                                <div class="form-control-position">
+                                <i class="bx bx-calendar"></i>
+                                </div>
+                                </fieldset>*@
+                      @*           <fieldset class="form-group position-relative has-icon-left">
+                                    <input class="form-control bg-transparent shamsi-datepicker" readonly id="txtBirthDate" maxlength="10" placeholder="تاریخ تولد" style="text-align:center;direction:ltr" name="txtBirthDate"
+                                           type="text" value="" data-fromdate=""  data-jdate="@ViewBag.PersianBirthDate" data-gdate="@ViewBag.BirthDate"  />
+                                    <div class="form-control-position">
+                                        <i class="bx bx-calendar"></i>
+                                    </div>
+                                </fieldset>
+                                <input asp-for="BirthDate" type="hidden" /> *@
+                            </div>
+                        </div>
+@*                         <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <input type="text" class="form-control bg-transparent" asp-for="SanaNumber" placeholder="شماره ثنا" />
+                                    <span asp-validation-for="SanaNumber" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                               
+                            </div>
+                        </div> *@
+                    </fieldset>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">
+                        <span>انصراف</span>
+                    </button>
+                    <button type="button" id="btnSaveUserInfo" class="btn btn-zl-primary">
+                        <span>ثبت تغییرات</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<div class="modal fade" id="editUserJobModal" tabindex="-1" role="dialog" aria-labelledby="editUserJobModalTitle" data-backdrop="static" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg" role="document">
+        <div class="modal-content rounded-lg">
+            <div class="modal-header">
+                <h5 class="modal-title secondary darken-4" id="editUserJobModalTitle">
+                    ویرایش اطلاعات شغلی
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="بستن">
+                    <i class="bx bx-x"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="userJobBody">
+                <fieldset>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <select name="job" class="form-control bg-transparent ">
+                                    <option>شغل (اختیاری)</option>
+                                    <option value="1">کارمند دولتی</option>
+                                    <option value="2">دانشجو</option>
+                                    <option value="3">شغل آزاد</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <select name="income" class="form-control bg-transparent ">
+                                    <option>میزان درآمد (اختیاری)</option>
+                                    <option value="1">کمتر از یک میلیون تومان</option>
+                                    <option value="2">ده تا پانزده میلیون تومان</option>
+                                    <option value="3">بیشتر از بیست میلیون تومان</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <input type="text" class="form-control bg-transparent" id="emailAddress1" placeholder="تلفن محل کار (اختیاری)" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <input type="text" class="form-control bg-transparent" id="emailAddress1" placeholder="آدرس محل کار" />
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">
+                    <span>انصراف</span>
+                </button>
+                <button type="button" id="btnSaveUserJob" class="btn btn-zl-primary">
+                    <span>ثبت تغییرات</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<form id="frmEditUserLocation" autocomplete="off">
+    <div class="modal fade" id="editUserLocationModal" tabindex="-1" role="dialog" data-backdrop="static" aria-labelledby="editUserLocationModalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg"
+             role="document">
+            <div class="modal-content rounded-lg">
+                <div class="modal-header">
+                    <h5 class="modal-title secondary darken-4" id="editUserLocationModalTitle">
+                        ویرایش اطلاعات تماس و محل اقامت
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="بستن">
+                        <i class="bx bx-x"></i>
+                    </button>
+                </div>
+                <div class="modal-body" id='userLocationBody'>
+                    <fieldset>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <input asp-for="Mobile" class="form-control bg-transparent" style="text-align:center; direction:ltr;letter-spacing:5px" placeholder="شماره موبایل" />
+                                    <span asp-validation-for="Mobile" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <input asp-for="PhoneNumber" class="form-control bg-transparent" style="text-align:center; direction:ltr" placeholder="شماره تلفن" />
+                                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <select name="ProvinceId" asp-for="ProvinceId" class="form-control bg-transparent " asp-items="Model.Provinces">
+                                        <option value="" >@ResourceFile.SelectProvince</option>
+                                    </select>
+                                    <span asp-validation-for="ProvinceId" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <select name="CityId" asp-for="CityId" asp-items="Model.Cities" class="form-control bg-transparent ">
+                                        <option value="" >SelectCity</option>
+                                    </select>
+                                    <span asp-validation-for="CityId" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <input class="form-control bg-transparent" asp-for="PostalCode" style="text-align:center; direction:ltr" placeholder="کد پستی" />
+                                    <span asp-validation-for="PostalCode" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <input asp-for="Email" class="form-control bg-transparent" style="text-align:center; direction:ltr" placeholder="ایمیل" />
+                                    <span asp-validation-for="Email" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <textarea asp-for="Address" class="form-control bg-transparent" placeholder="آدرس محل سکونت" style=" direction:rtl"></textarea>
+                                    <span asp-validation-for="Address" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">
+                        <span>انصراف</span>
+                    </button>
+                    <button type="button" id="btnSaveUserLocation" class="btn btn-zl-primary">
+                        <span>ثبت تغییرات</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section scripts{
+    @*<partia name="_ValidationScriptsPartial" />*@
+    @{
+        <script src="~/persianDatePicker/js/persianDatepicker.min.js"></script>
+        await Html.RenderPartialAsync("~/Views/Shared/_ValidationScriptsPartial.cshtml");
+    }
+    <script>
+        $(document).ready(function() {
+            $('div').removeClass('zl-active');
+            $('#myProfile').addClass('zl-active');
+            //$('#NationalCode').mask('9999999999', { placeholder: "__________" });
+            $('#Mobile').mask('09999999999', { placeholder: "09_________" });
+            //$('#txtBirthDate').mask('9999/99/99', { placeholder: "____/__/__" });
+            $('#BirthDate').val('@ViewBag.BirthDate');
+            $('#txtBirthDate').val('@ViewBag.PersianBirthDate');
+            $("#txtBirthDate").persianDatepicker(
+                {
+                    //startDate: '1300/01/01',
+                    initialValue:true,
+                    endDate: new persianDate().now().addYear(-18).toString("YYYY/MM/DD"),
+                    months: ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"],
+                    dowTitle: ["شنبه", "یکشنبه", "دوشنبه", "سه شنبه", "چهارشنبه", "پنج شنبه", "جمعه"],
+                    shortDowTitle: ["ش", "ی", "د", "س", "چ", "پ", "ج"],
+                    theme: 'lightorang',
+                    showGregorianDate: !1,
+                    persianNumbers: !0,
+                    formatDate: "YYYY/0M/0D",
+                    selectedBefore: !1,
+                    selectedDate: '@ViewBag.PersianBirthDate',
+                    prevArrow: '\u25c4',
+                    nextArrow: '\u25ba',
+                    alwaysShow: !1,
+                    selectableYears: null,
+                    selectableMonths: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                    cellWidth: 35, // by px
+                    cellHeight: 30, // by px
+                    fontSize: 14, // by px
+                    isRTL: !1,
+                    responsive: true,
+                    calendarPosition: {
+                        x: 50,
+                        y: -300,
+                    },
+                    onSelect: function() {
+                        //alert($("#txtBirthDate").attr("data-gdate"));
+                        if (moment().diff($("#txtBirthDate").attr("data-gdate"), 'years') < 18) {
+                            showMessage("اخطار", "کاربر گرامی حداقل سن برای درخواست تسهیلات 18 سال می باشد!", icons.warning, 'متوجه شدم');
+                        }
+                        $('#BirthDate').val($("#txtBirthDate").attr("data-gdate"));
+                    },
+                    onShow: function() { },
+                    onHide: function() { },
+                    onRender: function() { }
+                });
+        });
+
+        $('#ProvinceOfBirthId').change(e => {
+            const provinceId = $(e.target).val();
+
+            if (provinceId != undefined && provinceId != '') {
+                showWaiting('userInfoContent', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                $.ajax({
+                    type: 'get',
+                    //dataType: 'json',
+                    contentType: "application/json; charset=utf-8",
+                    //processData: false,
+                    //contentType: false,
+                    url: `/api/v1/Location/SelectCityByProvince/${provinceId}`,
+                    success: function(result) {
+                        hideWaiting('userInfoContent');
+                        debugger;
+                        if (result.isSuccess && result.data != undefined && result.data.length > 0) {
+                            $('#CityOfBirthId').empty().append('<option value="">@ResourceFile.SelectCityOfBirth</option>');
+                            result.data.map(city => {
+                                $('#CityOfBirthId').append(`<option value="${city.value}">${city.text}</option>`);
+                            });
+                        }
+                        else {
+                            $('#CityOfBirthId').empty().append('<option value="">@ResourceFile.SelectCityOfBirth</option>');
+                        }
+                    },
+                    error: function(error) {
+                        hideWaiting('userInfoContent');
+                        const exception = getExceptionMessageFromError(error);
+                        if (exception != null)
+                            showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                        else
+                            showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                    }
+                });
+            }
+            else {
+                $('#CityOfBirthId').empty().append('<option value="">@ResourceFile.SelectCityOfBirth</option>');
+            }
+        });
+
+        $('#ProvinceOfIssueId').change(e => {
+            const provinceId = $(e.target).val();
+
+            if (provinceId != undefined && provinceId != '') {
+                showWaiting('userInfoContent', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                $.ajax({
+                    type: 'get',
+                    //dataType: 'json',
+                    contentType: "application/json; charset=utf-8",
+                    //processData: false,
+                    //contentType: false,
+                    url: `/api/v1/Location/SelectCityByProvince/${provinceId}`,
+                    success: function(result) {
+                        hideWaiting('userInfoContent');
+                        debugger;
+                        if (result.isSuccess && result.data != undefined && result.data.length > 0) {
+                            $('#CityOfIssueId').empty().append('<option value="">@ResourceFile.SelectCityOfIssue</option>');
+                            result.data.map(city => {
+                                $('#CityOfIssueId').append(`<option value="${city.value}">${city.text}</option>`);
+                            });
+                        }
+                        else {
+                            $('#CityOfIssueId').empty().append('<option value="">@ResourceFile.SelectCityOfIssue</option>');
+                        }
+                    },
+                    error: function(error) {
+                        hideWaiting('userInfoContent');
+                        const exception = getExceptionMessageFromError(error);
+                        if (exception != null)
+                            showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                        else
+                            showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                    }
+                });
+            }
+            else {
+                $('#CityOfIssueId').empty().append('<option value="">@ResourceFile.SelectCity</option>');
+            }
+        });
+
+        $('#ProvinceId').change(e => {
+            const provinceId = $(e.target).val();
+
+            if (provinceId != undefined && provinceId != '') {
+                showWaiting('userLocationBody', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                $.ajax({
+                    type: 'get',
+                    //dataType: 'json',
+                    contentType: "application/json; charset=utf-8",
+                    //processData: false,
+                    //contentType: false,
+                    url: `/api/v1/Location/SelectCityByProvince/${provinceId}`,
+                    success: function(result) {
+                        hideWaiting('userLocationBody');
+                        debugger;
+                        if (result.isSuccess && result.data != undefined && result.data.length > 0) {
+                            $('#CityId').empty().append('<option value="">@ResourceFile.SelectCity</option>');
+                            result.data.map(city => {
+                                $('#CityId').append(`<option value="${city.value}">${city.text}</option>`);
+                            });
+                        }
+                        else {
+                            $('#CityId').empty().append('<option value="">@ResourceFile.SelectCity</option>');
+                        }
+                    },
+                    error: function(error) {
+                        hideWaiting('userLocationBody');
+                        const exception = getExceptionMessageFromError(error);
+                        if (exception != null)
+                            showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                        else
+                            showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                    }
+                });
+            }
+            else {
+                $('#CityId').empty().append('<option value="">@ResourceFile.SelectCity</option>');
+            }
+        });
+
+        @if (Model.RequestFacilityGuarantorId.HasValue && !editByZarinLend)
+        {
+            <text>
+                $('#btnGoToNextStep').click(function(e) {
+                    e.preventDefault();
+                    showWaiting('mainContentDiv', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                    $.ajax({
+                        type: 'post',
+                        //dataType: 'json',
+                        //contentType: "application/json; charset=utf-8",
+                        processData: false,
+                        contentType: false,
+                        url: '/api/v1/User/GoToNextStepFromProfileToUploadDocumentsInGuarantor/@Model.RequestFacilityGuarantorId.Value',
+                        //data: data,// JSON.stringify(model),
+                        success: function(result) {
+                            hideWaiting('mainContentDiv');
+                            debugger;
+                            if (result.isSuccess) {
+                                window.location.replace('@Url.Action("UploadIdentityDocumentsGuarantor","User")');
+                            }
+                        },
+                        error: function(error) {
+                            debugger;
+                            hideWaiting('mainContentDiv');
+                            const exception = getExceptionMessageFromError(error);
+                            if (exception != null)
+                                showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                            else
+                                showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                        }
+                    });
+                });
+            </text>
+        }
+
+        $('#btnSaveUserInfo').click(function(e) {
+                e.preventDefault();
+                debugger;
+                if (moment().diff($("#BirthDate").val(), 'years') < 18) {
+                    showMessage("اخطار", "کاربر گرامی حداقل سن برای درخواست تسهیلات 18 سال می باشد!", icons.warning, 'متوجه شدم');
+                    return;
+                }
+                if ($('#frmEditUserInfo').valid()) {
+                    showWaiting('userInfoContent', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+
+                    let data = new FormData();
+                    data.append('FName', $("#FName").val());
+                    data.append('LName', $("#LName").val());
+                    data.append('NationalCode', $("#NationalCode").val());
+                    data.append('UserName', $("#NationalCode").val());
+                    data.append('FatherName', $("#FatherName").val());
+                    data.append('BirthDate', $("#BirthDate").val());
+                    data.append('SSID', $("#SSID").val());
+                    // data.append('SanaNumber', $("#SanaNumber").val());
+                    // data.append('BirthCertificateSerial', $("#BirthCertificateSerial").val());
+                    // data.append('ProvinceOfBirthId', $("#ProvinceOfBirthId").val());
+                    // data.append('CityOfBirthId', $("#CityOfBirthId").val());
+                    // data.append('ProvinceOfIssueId', $("#ProvinceOfIssueId").val());
+                    // data.append('CityOfIssueId', $("#CityOfIssueId").val());
+                    data.append('Gender', $("#Gender").val());
+
+                    $.ajax({
+                        type: 'post',
+                        //dataType: 'json',
+                        //contentType: "application/json; charset=utf-8",
+                        processData: false,
+                        contentType: false,
+                        url: '@updateUserInfo',
+                        data: data,// JSON.stringify(model),
+                        success: function(result) {
+                            hideWaiting('userInfoContent');
+                            debugger;
+                            if (result.isSuccess) {
+                                $('#fnameValue').html($("#FName").val());
+                                $('#lnameValue').html($("#LName").val());
+                                $('#fatherNameValue').html($("#FatherName").val());
+                                //$('#nationalCodeValue').html($("#NationalCode").val());
+                                $('#birthDateValue').html($("#txtBirthDate").val());
+                                $('#ssidValue').html($("#SSID").val());
+                                // $('#sanaValue').html($("#SanaNumber").val());
+                                // $('#birthCertificateSerialValue').html($("#BirthCertificateSerial").val());
+                                // $('#provinceOfBirthValue').html($("#ProvinceOfBirthId option:selected").text());
+                                // $('#cityOfBirthValue').html($("#CityOfBirthId option:selected").text());
+                                // $('#provinceOfIssueValue').html($("#ProvinceOfIssueId option:selected").text());
+                                // $('#cityOfIssueValue').html($("#CityOfIssueId option:selected").text());
+                                $('#genderValue').html($("#Gender option:selected").text());
+
+                                showMessage('@ResourceFile.InfoTitle', '@ResourceFile.MessageSuccess', icons.success, '@ResourceFile.Close');
+                                $('#editUserInfoModal').modal('hide');
+                            }
+                        },
+                        error: function(error) {
+                            hideWaiting('userInfoContent');
+                            const exception = getExceptionMessageFromError(error);
+                            if (exception != null)
+                                showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                            else
+                                showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                        }
+                    });
+                }
+                else {
+                    scrollToFirstError();
+                }
+            });
+
+        $('#btnSaveUserLocation').click(function(e) {
+            e.preventDefault();
+            debugger;
+
+            if ($('#frmEditUserLocation').valid()) {
+                showWaiting('userLocationBody', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+
+                let data = new FormData();
+                data.append('Mobile', $("#Mobile").val());
+                data.append('Email', $("#Email").val());
+                data.append('Address', $("#Address").val());
+                data.append('PhoneNumber', $("#PhoneNumber").val());
+                data.append('ProvinceId', $("#ProvinceId").val());
+                data.append('CityId', $("#CityId").val());
+                data.append('PostalCode', $("#PostalCode").val());
+
+                $.ajax({
+                    type: 'post',
+                    //dataType: 'json',
+                    //contentType: "application/json; charset=utf-8",
+                    processData: false,
+                    contentType: false,
+                    url: '@updateUserLocation',
+                    data: data,// JSON.stringify(model),
+                    success: function(result) {
+                        hideWaiting('userLocationBody');
+                        debugger;
+                        if (result.isSuccess) {
+                            $('#mobileValue').html($("#Mobile").val());
+                            $('#emailValue').html($("#Email").val());
+                            $('#addressValue').html($("#Address").val());
+                            $('#postalCodeValue').html($("#PostalCode").val());
+                            $('#phoneNumberValue').html($("#PhoneNumber").val());
+                            $('#provinceValue').html($("#ProvinceId option:selected").text());
+                            $('#cityValue').html($("#CityId option:selected").text());
+
+                            showMessage('@ResourceFile.InfoTitle', '@ResourceFile.MessageSuccess', icons.success, '@ResourceFile.Close');
+                            $('#editUserLocationModal').modal('hide');
+                        }
+                    },
+                    error: function(error) {
+                        hideWaiting('userLocationBody');
+                        const exception = getExceptionMessageFromError(error);
+                        if (exception != null)
+                            showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                        else
+                            showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                    }
+                });
+            }
+            else {
+                scrollToFirstError();
+            }
+        });
+        
+    </script>
+}

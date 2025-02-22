@@ -1,0 +1,249 @@
+﻿@model List<SelectListItem>
+@{
+    ViewData["Title"] = "لیست درخواست ها";
+    Layout = "~/Views/Shared/_NewLayout.cshtml";
+}
+@section styles{
+    <style type="text/css">
+        .zl-app-content {
+            padding-right: 1rem !important;
+            padding-left: 1rem !important;
+        }
+    </style>
+}
+    <div id="requestGridDiv" class="p-2 bg-white rounded-lg">
+        <div class="font-medium-3 secondary darken-4 text-bold-800 d-flex align-items-center">
+            <i class="bx bx-align-right zl-text-secondary mr-25"></i>
+            <span>اقساط من</span>
+        </div>
+        <div class=" p-2 rounded-lg">
+            <div class="row my-0 my-md-1">
+                <div class=" col-md-6 col-sm-12">
+                    <div class="form-group">
+                        <select id="drpApprovalFacility" class="form-control bg-transparent" asp-items="Model">
+                            <option value="" localize-content>تسهیلات دریافتی</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="paging-div"></div>
+            <div class="table-responsive table-sm">
+                <table class="table zero-configuration">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col" data-sortorder="date" localize-content>مبلغ قسط</th>
+                            <th scope="col" data-sortorder="Tedad" localize-content>تاریخ سررسید</th>
+                            <th scope="col" data-sortorder="Tedad" localize-content>تعداد روزهای دیرکرد</th>
+                            <th scope="col" data-sortorder="Tedad" localize-content>مبلغ دیرکرد</th>
+                            <th scope="col" data-sortorder="Tedad" localize-content>مبلغ کل(قسط + دیرکرد)</th>
+                            <th scope="col" data-sortorder="Tedad" localize-content>تاریخ پرداخت</th>
+                            <th scope="col" data-sortorder="Tedad" localize-content>وضعیت</th>
+                            <th scope="col" data-sortorder="Tedad" localize-content>عملیات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="requestGridRows">
+                        <tr>
+                            <td colspan="9" localize-content>
+                                NoRows
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="paging-div"></div>
+        </div>
+    </div>
+    <input type="hidden" id="hdnSortOrder" value="CreateDate" />
+    <input type="hidden" id="hdnSortDirection" value="DESC" />
+
+    <div class="modal fade text-left" id="installmentPaymentModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel18" style="display: none;" data-backdrop="static" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-md" role="document">
+            <div class="modal-content rounded-xl modal-md">
+                <div class="modal-header">
+                    <h4 class="modal-title dark" id="myModalLabel18">
+                        پرداخت قسط
+                    </h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="بستن">
+                        <i class="bx bx-x"></i>
+                    </button>
+                </div>
+                <form id="frmPayment" method="post" action="">
+                    <div class="modal-body line-height-2">
+                        <div class="border rounded">
+                            <div class="d-flex align-items-center p-1">
+                                <span class="font-small-3 w-50 text-bold-500">مبلغ قسط(ريال)</span><span class="dark w-50 text-bold-400" id="amount"></span>
+                            </div>
+                            <hr class="my-0" />
+                            <div class="d-flex align-items-center p-1">
+                                <span class="font-small-3 w-50 text-bold-500">تعداد روزهای دیرکرد</span><span class="dark w-50 text-bold-400" id="penaltyDays"></span>
+                            </div>
+                            <hr class="my-0" />
+                            <div class="d-flex align-items-center p-1">
+                                <span class="font-small-2 w-50 text-bold-500">مبلغ دیرکرد(ريال)</span><span class="dark w-50 text-bold-400" id="penaltyAmount"></span>
+                            </div>
+                            <hr class="my-0" />
+                            <div class="d-flex align-items-center p-1">
+                                <span class="font-small-3 w-50 text-bold-500">جمع کل(مبلغ قسط + مبلغ دیرکرد)</span><span class="dark w-50 text-bold-400" id="totalAmount"></span>
+                            </div>
+                            <hr class="my-0" />
+                            <div class="d-flex align-items-center p-1">
+                                <span class="font-small-3 w-50 text-bold-500">مبلغ پرداختی(ريال)</span><span class="w-50 text-bold-900" style="color: #108885;font-size:1.1rem" id="amountForPay"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <div class="text-right">
+                            <a href="#" class="btn btn-outline-secondary" data-dismiss="modal">
+                                <span>انصراف</span>
+                            </a>
+                            <button id="btnPayment" type="submit" class="btn btn-zl-primary white">
+                                <span>اتصال به درگاه و پرداخت</span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    @section scripts{
+    <script>
+        let dataTableResponsive;
+        $(document).ready(function() {
+            $('div').removeClass('zl-active');
+            $('#myInstallment').addClass('zl-active');
+
+            dataTableResponsive = $(".zero-configuration").DataTable({
+                ordering: false,
+                responsive: false,
+                searching: false,
+                paging: false,
+                lengthChange: false,
+                info: false
+            });
+        });
+
+        $('#drpApprovalFacility').change((e) => {
+            if ($(e.target).val() == '') {
+                let rows = '<tr><td colspan="6">@_loc["NoRows"]</td></tr>';
+                rows += '</tr>';
+                $('#requestGridRows').html(rows);
+            }
+            else
+                loadInstallmentData($(e.target).val());
+        });
+
+        const loadInstallmentData = (requestFacilityId) => {
+            debugger;
+            showWaiting('requestGridDiv', '@_loc["PleaseWait"]', '@_loc["Loading"]');
+
+            $.ajax({
+                type: 'post',
+                //datatype: "json",
+                data: JSON.stringify('{}'),
+                contentType: "application/json; charset=utf-8",
+                url: `/api/v1/RequestFacilityInstallment/SelectInstallment/${requestFacilityId}`,
+                success: function(result) {
+                    hideWaiting('requestGridDiv');
+                    debugger;
+                    if (result !== undefined && result !== null && result.isSuccess === true) {
+                        renderRequestGrid(result.data);
+                        //renderNavigation('requestGridDiv', result.data.totalRowCount, result.data.currentPage, result.data.totalPages);
+                        //resetGridStyle('requestGridDiv', 'hdnSortOrder', 'hdnSortDirection');
+                    }
+                },
+                error: function(error) {
+                    debugger;
+                    hideWaiting('requestGridDiv');
+                    const exception = getExceptionMessageFromError(error);
+                    if (exception != null)
+                        showMessage('@_loc["ErrorTitle"]', exception, icons.error, '@_loc["Close"]');
+                    else
+                        showMessage('@_loc["ErrorTitle"]', '@_loc["UnhandledError"]', icons.error, '@_loc["Close"]');
+                },
+                complete: function() {
+
+                },
+            });
+        }
+
+        const renderRequestGrid = (data) => {
+            let rows = '<tr><td colspan="9">@_loc["NoRows"]</td></tr>';
+            if (data.length > 0) {
+                rows = '';
+                for (var i = 0; i < data.length; i++) {
+                    //rows += '<tr class="' + (i % 2 == 0 ? 'table-info' : 'table-light') + '">';
+                    rows += '<tr>';
+                    rows += "<td style=''>" + (i + 1) + "</td>";
+                    rows += "<td style='direction:ltr'>" + splitNumber(data[i].amount) + "</td>";
+                    rows += "<td style='direction:ltr'>" + data[i].shamsiDueDate + "</td>";
+                    rows += "<td style='direction:ltr'>" + data[i].penaltyDays + "</td>";
+                    rows += "<td style='direction:ltr'>" + splitNumber(data[i].penaltyAmount) + "</td>";
+                    rows += "<td class='date-cell'>" + splitNumber(data[i].realPayAmount) + "</td>";
+                    rows += "<td class='date-cell'>" + (data[i].shamsiRealPayDate != null ? data[i].shamsiRealPayDate : '') + "</td>";
+                    rows += `<td><div class="badge badge-pill ${data[i].paid ? "badge-light-info" : "zl-badge-upload-document"}">
+                                                                                    <div class="d-flex align-items-center">
+                                                                                        <i class="bx bxs-circle font-size-xxsmall mr-25"></i>
+                                                                                        ${data[i].paid ? "پرداخت شده" : "پرداخت نشده"}
+                                                                                    </div>
+                                                                                 </div>
+                                                                             </td>`;
+                    if (data[i].paid)
+                        rows += `<td style='text-align:center' class='date-cell'>
+                                                        <button class="btn btn-outline-secondary" disabled style='width:100px'>پرداخت</button>
+                                                    </td>`;
+                    else
+                        rows += `<td style='text-align:center' class='date-cell'>
+                                                        <button data-installment-id=${data[i].id} data-amount='${data[i].amount}' data-penalty-days='${data[i].penaltyDays}' data-penalty-amount='${data[i].penaltyAmount}' data-total-amount='${data[i].realPayAmount}' class="btn btn-outline-success pay-installment" style='width:100px'>پرداخت</button>
+                                                    </td>`;
+                }
+
+                rows += '</tr>';
+            }
+            $('#requestGridRows').html(rows);
+
+            $('.pay-installment').off('click');
+            $('.pay-installment').click((e) => {
+                debugger;
+                e.preventDefault();
+                $.ajax({
+                    type: 'post',
+                    //datatype: "json",
+                    data: JSON.stringify('{}'),
+                    contentType: "application/json; charset=utf-8",
+                    url: `/api/v1/RequestFacilityInstallment/CheckExistUnpaidInstallmentBeforeThis/${$(e.target).data('installment-id')}`,
+                    success: function(result) {
+                        hideWaiting('requestGridDiv');
+                        debugger;
+                        if (result != undefined && result.isSuccess == true) {
+                            if (result.data == null) {
+                                $('#amount').html(splitNumber($(e.target).data('amount')));
+                                $('#penaltyDays').html($(e.target).data('penalty-days'));
+                                $('#penaltyAmount').html(splitNumber($(e.target).data('penalty-amount')));
+                                $('#totalAmount').html(splitNumber($(e.target).data('total-amount')));
+                                $('#amountForPay').html(splitNumber($(e.target).data('total-amount')));
+                                $('#frmPayment').prop('action', `@Url.Action("PostInternetPaymentForInstallment", "Payment")/${$(e.target).data('installment-id')}`);
+                                $('#installmentPaymentModal').modal();
+                            }
+                            else {
+                                showMessage('@_loc["InfoTitle"]', 'کاربر گرامی شما قسط تسویه نشده قبل از این قسط دارید<br/>لطفا قبل از پرداخت این مرحله از اقساط تسهیلات،اقدام به پرداخت اقساط ماه(های) گذشته نمایید!', icons.warning, '@_loc["Close"]');
+                            }
+                        }
+                    },
+                    error: function(error) {
+                        debugger;
+                        hideWaiting('requestGridDiv');
+                        const exception = getExceptionMessageFromError(error);
+                        if (exception != null)
+                            showMessage('@_loc["ErrorTitle"]', exception, icons.error, '@_loc["Close"]');
+                        else
+                            showMessage('@_loc["ErrorTitle"]', '@_loc["UnhandledError"]', icons.error, '@_loc["Close"]');
+                    },
+                    complete: function() {
+
+                    },
+                });
+            });
+        }
+    </script>
+}

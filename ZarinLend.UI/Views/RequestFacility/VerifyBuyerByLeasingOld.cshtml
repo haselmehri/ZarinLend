@@ -1,0 +1,1091 @@
+﻿@model RequestFacilityInfoModel
+@{
+    ViewData["Title"] = ViewBag.Title;
+    var ajaxUrl = string.Empty;
+}
+@section styles
+    {
+        @if (Model.CurrentStepForm == WorkFlowFormEnum.DepositFacilityAmount)
+        {
+            <link href="~/persianDatePicker/css/persianDatepicker-lightorang.css" rel="stylesheet" />
+        }
+    <style type="text/css">
+    </style>
+}
+    @await Component.InvokeAsync("WorkFlowStepWizard", new { workFlowId = 1, requestFacilityId = Model.Id})
+    <form id="frmVerifyBuyer" method="post">
+        <div class="card">
+            <div class="card-header" localize-content>بررسی اولیه درخواست توسط نهاد مالی</div>
+            <div class="card-body">
+                @{
+                await Html.RenderPartialAsync("_Detail.cshtml", Model);
+            }
+            @if (Model.WaitingForLeasing)
+            {
+                var legendTitle = string.Empty;
+                var returnToCorrectionTitle = string.Empty;
+                if (Model.CurrentStepForm == WorkFlowFormEnum.VerifyLeasing)
+                {
+                    legendTitle = "بررسی درخواست توسط نهاد مالی/استعلام 8 گانه";
+                    returnToCorrectionTitle = "برگشت جهت اصلاح/ویرایش";
+                    ajaxUrl = "/api/v1/RequestFacility/VerifyByLeasing";
+                }
+                else if (Model.CurrentStepForm == WorkFlowFormEnum.BankLeasingInquiry)
+                {
+                    legendTitle = ViewBag.Title;
+                    returnToCorrectionTitle = "برگشت جهت اصلاح/ویرایش";
+                    ajaxUrl = "/api/v1/RequestFacility/VerifyAndAllocationByLeasing";
+                }
+                else if (Model.CurrentStepForm == WorkFlowFormEnum.DepositFacilityAmount)
+                {
+                    legendTitle = ViewBag.Title;
+                    //returnToCorrectionTitle = "برگشت جهت اصلاح/ویرایش";
+                    ajaxUrl = "/api/v1/RequestFacility/DepositFacilityAmount";
+                }
+                else if (Model.CurrentStepForm == WorkFlowFormEnum.AdminBankLeasingSignature)
+                {
+                    legendTitle = ViewBag.Title;
+                    returnToCorrectionTitle = "برگشت جهت اصلاح/ویرایش";
+                    ajaxUrl = "/api/v1/RequestFacility/AdminBankLeasingSignature";
+                }
+                else if (Model.CurrentStepForm == WorkFlowFormEnum.VerifyCheckByLeasing)
+                {
+                    legendTitle = "بررسی تصویر چک توسط نهاد مالی و تایید ثبت در سامانه صیاد";
+                    returnToCorrectionTitle = "برگشت جهت اصلاح تصویر چک و اطلاعات چک ضمانت";
+                    ajaxUrl = "/api/v1/RequestFacility/VerifyCheckByLeasing";
+                }
+                <fieldset style="margin-top:15px">
+                    <legend>@legendTitle</legend>
+                    @if (Model.CurrentStepForm == WorkFlowFormEnum.VerifyLeasing)
+                    {
+                        <fieldset>
+                            <legend>بارگذاری فایل اکسل نتیجه استعلام 8 گانه</legend>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <input type="file" name="OctetExcelResultFile" id="OctetExcelResultFile" class="form-control" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <button id="btnUploadOctetExcelResult" tabindex="5" class="btn btn-outline-primary" localize-content>
+                                            @_loc["UploadOctetExcelResult"]&nbsp;<i class="fal fa-file-excel-o"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <label class="control-label">استعلام ثبت احوال</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input verifyRadio" type="radio" name="@nameof(ApplicantValidationResultModel.CivilRegistryInquiry)" id="inlineRadio1" value="true">
+                                            <label class="form-check-label" for="inlineRadio1">تایید</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input verifyRadio" type="radio" name="@nameof(ApplicantValidationResultModel.CivilRegistryInquiry)" id="inlineRadio2" value="false">
+                                            <label class="form-check-label" for="inlineRadio2">رد</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input verifyRadio" type="radio" name="@nameof(ApplicantValidationResultModel.CivilRegistryInquiry)" id="inlineRadio3" value="null">
+                                            <label class="form-check-label" for="inlineRadio3">نامشخص</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <label class="control-label">استعلام چک برگشتی</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input verifyRadio" type="radio" name="@nameof(ApplicantValidationResultModel.ReturnedCheckInquiry)" id="inlineRadio4" value="true">
+                                            <label class="form-check-label" for="inlineRadio4">تایید</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input verifyRadio" type="radio" name="@nameof(ApplicantValidationResultModel.ReturnedCheckInquiry)" id="inlineRadio5" value="false">
+                                            <label class="form-check-label" for="inlineRadio5">رد</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input verifyRadio" type="radio" name="@nameof(ApplicantValidationResultModel.ReturnedCheckInquiry)" id="inlineRadio6" value="null">
+                                            <label class="form-check-label" for="inlineRadio6">نامشخص</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <label class="control-label">استعلام تسهیلات و تعهدات</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input verifyRadio" type="radio" name="@nameof(ApplicantValidationResultModel.FacilityInquiry)" id="inlineRadio7" value="true">
+                                            <label class="form-check-label" for="inlineRadio7">تایید</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input verifyRadio" type="radio" name="@nameof(ApplicantValidationResultModel.FacilityInquiry)" id="inlineRadio8" value="false">
+                                            <label class="form-check-label" for="inlineRadio8">رد</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input verifyRadio" type="radio" name="@nameof(ApplicantValidationResultModel.FacilityInquiry)" id="inlineRadio9" value="null">
+                                            <label class="form-check-label" for="inlineRadio9">نامشخص</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <label class="control-label">استعلام کدپستی به آدرس</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group ">
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input verifyRadio" type="radio" name="@nameof(ApplicantValidationResultModel.PostalCodeInquiry)" id="inlineRadio10" value="true">
+                                            <label class="form-check-label" for="inlineRadio10">تایید</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input verifyRadio" type="radio" name="@nameof(ApplicantValidationResultModel.PostalCodeInquiry)" id="inlineRadio11" value="false">
+                                            <label class="form-check-label" for="inlineRadio11">رد</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input verifyRadio" type="radio" name="@nameof(ApplicantValidationResultModel.PostalCodeInquiry)" id="inlineRadio12" value="null">
+                                            <label class="form-check-label" for="inlineRadio12">نامشخص</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <label class="control-label">استعلام تحریم شورا امنیت</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input verifyRadio" type="radio" name="@nameof(ApplicantValidationResultModel.SecurityCouncilSanctionsInquiry)" id="inlineRadio13" value="true">
+                                            <label class="form-check-label" for="inlineRadio13">تایید</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input verifyRadio" type="radio" name="@nameof(ApplicantValidationResultModel.SecurityCouncilSanctionsInquiry)" id="inlineRadio14" value="false">
+                                            <label class="form-check-label" for="inlineRadio14">رد</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input verifyRadio" type="radio" name="@nameof(ApplicantValidationResultModel.SecurityCouncilSanctionsInquiry)" id="inlineRadio15" value="null">
+                                            <label class="form-check-label" for="inlineRadio15">نامشخص</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <label class="control-label">استعلام شاهکار</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group ">
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input verifyRadio" type="radio" name="@nameof(ApplicantValidationResultModel.ShahkarInquiry)" id="inlineRadio16" value="true">
+                                            <label class="form-check-label" for="inlineRadio16">تایید</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input verifyRadio" type="radio" name="@nameof(ApplicantValidationResultModel.ShahkarInquiry)" id="inlineRadio17" value="false">
+                                            <label class="form-check-label" for="inlineRadio17">رد</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input verifyRadio" type="radio" name="@nameof(ApplicantValidationResultModel.ShahkarInquiry)" id="inlineRadio18" value="null">
+                                            <label class="form-check-label" for="inlineRadio18">نامشخص</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <label class="control-label">استعلام نظام وظیفه</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input verifyRadio" type="radio" name="@nameof(ApplicantValidationResultModel.MilitaryInquiry)" id="inlineRadio19" value="true">
+                                            <label class="form-check-label" for="inlineRadio19">تایید</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input verifyRadio" type="radio" name="@nameof(ApplicantValidationResultModel.MilitaryInquiry)" id="inlineRadio20" value="false">
+                                            <label class="form-check-label" for="inlineRadio20">رد</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input verifyRadio" type="radio" name="@nameof(ApplicantValidationResultModel.MilitaryInquiry)" id="inlineRadio21" value="null">
+                                            <label class="form-check-label" for="inlineRadio21">نامشخص</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <label class="control-label">استعلام لیست سیاه</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input verifyRadio" type="radio" name="@nameof(ApplicantValidationResultModel.BlackListInquiry)" id="inlineRadio22" value="true">
+                                            <label class="form-check-label" for="inlineRadio22">تایید</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input verifyRadio" type="radio" name="@nameof(ApplicantValidationResultModel.BlackListInquiry)" id="inlineRadio23" value="false">
+                                            <label class="form-check-label" for="inlineRadio23">رد</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input verifyRadio" type="radio" name="@nameof(ApplicantValidationResultModel.BlackListInquiry)" id="inlineRadio24" value="null">
+                                            <label class="form-check-label" for="inlineRadio24">نامشخص</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </fieldset>
+                    }
+                    else if (Model.CurrentStepForm == WorkFlowFormEnum.BankLeasingInquiry)
+                    {
+                        <fieldset>
+                            <legend>استعلام سمات</legend>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="control-label">در صورت تمایل با کلیک روی دکمه فوق استعلام سمات را بروز رسانی کنید</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <button id="btnReInquiry" class="btn btn-outline-primary">
+                                            استعلام مجدد سمات&nbsp;<i class="fal fa-refresh"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </fieldset>
+                    }
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="requestStatusRadio" id="inlineRadio100" value="@((int)StatusEnum.Approved)">
+                                    <label class="form-check-label" for="inlineRadio100">تایید درخواست</label>
+                                </div>
+                                @if (Model.CurrentStepForm != WorkFlowFormEnum.AdminBankLeasingSignature && Model.CurrentStepForm != WorkFlowFormEnum.DepositFacilityAmount)
+                                {
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="requestStatusRadio" id="inlineRadio200" value="@((int)StatusEnum.ReturnToCorrection)">
+                                        <label class="form-check-label" for="inlineRadio200">@returnToCorrectionTitle</label>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    @if (Model.CurrentStepForm == WorkFlowFormEnum.VerifyLeasing)
+                    {
+                        <div class="row" id="facilityNumberRow" style="display:none">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="control-label" for="FacilityNumber">شماره تسهیلات</label>
+                                    <input class="form-control" style="text-align:center;direction:ltr" type="text" placeholder="68__________" data-val="true" data-val-length="شماره تسهیلات حداکثر میتواند عددی سیزده(13) رقمی باشد." data-val-length-max="13" data-val-required="شماره تسهیلات اجباری است!" id="FacilityNumber" maxlength="13" name="FacilityNumber" value="">
+                                    <span class="text-danger field-validation-valid" data-valmsg-for="FacilityNumber" data-valmsg-replace="true"></span>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else if (Model.CurrentStepForm == WorkFlowFormEnum.BankLeasingInquiry)
+                    {
+                        <div class="row" id="policeNumberRow" style="display:none">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="control-label" for="PoliceNumber">شماره انتظامی</label>
+                                    <input class="form-control" type="text" style="text-align:center;direction:ltr" data-val="true" data-val-length="شماره انتظامی حداکثر میتواند 10 حرف یا عدد باشد." data-val-length-max="10" data-val-required="شماره انتظامی اجباری است!" id="PoliceNumber" maxlength="10" name="PoliceNumber" value="">
+                                    <span class="text-danger field-validation-valid" data-valmsg-for="PoliceNumber" data-valmsg-replace="true"></span>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else if (Model.CurrentStepForm == WorkFlowFormEnum.AdminBankLeasingSignature)
+                    {
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <a class="btn btn-outline-info" target="_blank" href="~/UploadFiles/RequestFacilityContract/@Model.RequestFacilityDetail.SignedContractByUserFileName">
+                                        دانلود/مشاهده قرارداد تسهیلات(امضاء شده توسط مشتری)&nbsp;<i class="fal fa-file-pdf"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <a style="display:none" id="a_finalContractUrl" class="btn btn-outline-primary" target="_blank">
+                                        دانلود/مشاهده قرارداد تسهیلات(امضاء شده توسط مدیر بانک-نهایی)&nbsp;<i class="fal fa-file-pdf"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else if (Model.CurrentStepForm == WorkFlowFormEnum.DepositFacilityAmount)
+                    {
+                        @await Component.InvokeAsync("DepositToCard", new { model = @Model.DepositModel })
+                    }
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="form-group form-group-ex">
+                                            <label class="control-label">توضیحات نهاد مالی</label>
+                                            <textarea id="description_admin" class="form-control"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            }
+        </div>
+        <div class="card-footer" style="text-align:left">
+            @if (Model.CurrentStepForm == WorkFlowFormEnum.VerifyLeasing)
+            {
+                <button id="btnChangeStatusAndSaveVerifyResult" class="btn btn-outline-success">
+                    تغییر وضعیت درخواست و ثبت استعلام 8 گانه&nbsp;<i class="fal fa-edit"></i>
+                </button>
+            }
+            else if (Model.CurrentStepForm == WorkFlowFormEnum.BankLeasingInquiry)
+            {
+                <button id="btnReInquiryAndAllocation" class="btn btn-outline-success">
+                    تغییر وضعیت درخواست&nbsp;<i class="fal fa-edit"></i>
+                </button>
+            }
+            else if (Model.CurrentStepForm == WorkFlowFormEnum.DepositFacilityAmount)
+            {
+                <button id="btnDepositFacilityAmount" class="btn btn-outline-success">
+                    واریز تسهیلات به بن کارت&nbsp;<i class="fal fa-edit"></i>
+                </button>
+            }
+            else if (Model.CurrentStepForm == WorkFlowFormEnum.AdminBankLeasingSignature)
+            {
+                <button id="btnSignatureContract" class="btn btn-outline-success">
+                    امضاء قرارداد&nbsp;<i class="fal fa-edit"></i>
+                </button>
+            }
+            else if (Model.CurrentStepForm == WorkFlowFormEnum.VerifyCheckByLeasing)
+            {
+                <button id="btnEdit" class="btn btn-outline-success">
+                    تغییر وضعیت درخواست&nbsp;<i class="fal fa-edit"></i>
+                </button>
+            }
+            <a class="btn btn-outline-secondary" asp-controller="requestfacility" asp-action="LeasingRequests">
+                بازگشت به لیست درخواست تسهیلات&nbsp;<i class="fal fa-list"></i>
+            </a>
+        </div>
+    </div>
+</form>
+@section scripts{
+    @*<partia name="_ValidationScriptsPartial" />*@
+    @{
+        await Html.RenderPartialAsync("~/Views/Shared/_ValidationScriptsPartial.cshtml");
+    }
+    @if (Model.CurrentStepForm == WorkFlowFormEnum.AdminBankLeasingSignature)
+    {
+        <script src="~/js/Dastine/Dastine-Config.js"></script>
+        <script src="~/js/Dastine/Dastine.js"></script>
+    }
+    else if (Model.CurrentStepForm == WorkFlowFormEnum.VerifyLeasing)
+    {
+        <script src="~/js/jquery.mask.min.js"></script>
+    }
+    else if (Model.CurrentStepForm == WorkFlowFormEnum.DepositFacilityAmount)
+    {
+        <script src="~/persianDatePicker/js/persianDatepicker.min.js"></script>
+    }
+    <script>
+        $(document).ready(function () {
+              @if (Model.CurrentStepForm == WorkFlowFormEnum.VerifyLeasing)
+              {
+                  <text>
+                    $('#FacilityNumber').mask('6899999999999', {placeholder: "68___________"});
+                  </text>
+              }
+        });
+
+        $('#btnDownloadOctetExcel').click((e) => {
+            e.preventDefault();
+            debugger;
+            showWaiting('frmVerifyBuyer', '@_loc["PleaseWait"]', '@_loc["Loading"]');;
+
+            $.ajax({
+                type: 'post',
+                data: JSON.stringify('{}'),
+                datatype: "json",
+                contentType: "application/json; charset=utf-8",
+                url: '/api/v1/Person/DownloadVerifyOctectExcel/@Model.UserIdentityInfo.PersonId',
+                success: function (result) {
+                    hideWaiting('frmVerifyBuyer');;
+                    if (result !== undefined && result !== null && result.data != null && result.isSuccess === true) {
+                        debugger;
+                        const downloadJsonLink = document.createElement("a");
+                        //downloadJsonLink.href = `data:application/octet-stream;base64,${result.data}`;
+                        downloadJsonLink.href = `data:application/vnd.ms-excel;base64,${result.data}`;
+                        downloadJsonLink.download = "VerifyOctect.xlsx";
+                        downloadJsonLink.click();
+                    }
+                },
+                error: function (error) {
+                    hideWaiting('frmVerifyBuyer');;
+                    const exception = getExceptionMessageFromError(error);
+                    if (exception != null)
+                        showMessage('@_loc["ErrorTitle"]', exception, icons.error, '@_loc["Close"]');
+                    else
+                        showMessage('@_loc["ErrorTitle"]', '@_loc["UnhandledError"]', icons.error, '@_loc["Close"]');
+                },
+                complete: function () {
+
+                },
+            });
+        });
+
+        $('#btnUploadOctetExcelResult').click((e) => {
+            e.preventDefault();
+            debugger;
+
+            const OctetExcelResultFile = $("#OctetExcelResultFile")[0];
+            if (OctetExcelResultFile.files.length == 0) {
+                showMessage('@_loc["InfoTitle"]', 'لطفا فایل نتیجه اعتبارسنجی را جهت بارگذاری،انتخاب کنید', icons.warning, '@_loc["Close"]');
+                return;
+            }
+            showWaiting('frmVerifyBuyer', '@_loc["PleaseWait"]', '@_loc["Loading"]');
+            let data = new FormData();
+            data.append('verifyOctectResultFile', OctetExcelResultFile.files[0]);
+            $.ajax({
+                type: 'post',
+                data: data,
+                processData: false,
+                contentType: false,
+                //datatype: "json",
+                //contentType: "application/json; charset=utf-8",
+                url: '/api/v1/ApplicantValidationResult/UploadVerifyOctectResult/@Model.Id/@Model.LeasingId',
+                success: function (result) {
+                    hideWaiting('frmVerifyBuyer');;
+                    if (result !== undefined && result !== null && result.data != null && result.isSuccess === true) {
+                        debugger;
+                        $(`input[name=@nameof(ApplicantValidationResultModel.CivilRegistryInquiry)][value=${String(result.data['civilRegistryInquiry'])}]`).prop('checked', true);
+                        $(`input[name=@nameof(ApplicantValidationResultModel.ReturnedCheckInquiry)][value=${String(result.data['returnedCheckInquiry'])}]`).prop('checked', true);
+                        $(`input[name=@nameof(ApplicantValidationResultModel.FacilityInquiry)][value=${String(result.data['facilityInquiry'])}]`).prop('checked', true);
+                        $(`input[name=@nameof(ApplicantValidationResultModel.PostalCodeInquiry)][value=${String(result.data['postalCodeInquiry'])}]`).prop('checked', true);
+                        $(`input[name=@nameof(ApplicantValidationResultModel.SecurityCouncilSanctionsInquiry)][value=${String(result.data['securityCouncilSanctionsInquiry'])}]`).prop('checked', true);
+                        $(`input[name=@nameof(ApplicantValidationResultModel.ShahkarInquiry)][value=${String(result.data['shahkarInquiry'])}]`).prop('checked', true);
+                        $(`input[name=@nameof(ApplicantValidationResultModel.MilitaryInquiry)][value=${String(result.data['militaryInquiry'])}]`).prop('checked', true);
+                        $(`input[name=@nameof(ApplicantValidationResultModel.BlackListInquiry)][value=${String(result.data['blackListInquiry'])}]`).prop('checked', true);
+                    }
+                },
+                error: function (error) {
+                    hideWaiting('frmVerifyBuyer');;
+                    const exception = getExceptionMessageFromError(error);
+                    if (exception != null)
+                        showMessage('@_loc["ErrorTitle"]', exception, icons.error, '@_loc["Close"]');
+                    else
+                        showMessage('@_loc["ErrorTitle"]', '@_loc["UnhandledError"]', icons.error, '@_loc["Close"]');
+                },
+                complete: function () {
+
+                },
+            });
+        });
+
+        @if (Model.CurrentStepForm == WorkFlowFormEnum.VerifyLeasing)
+        {
+            <text>
+            $('input[name=requestStatusRadio]').change((e) => {
+                    debugger;
+                    if ($(e.target).val() == 2)
+                        $('#facilityNumberRow').show();
+                    else
+                        $('#facilityNumberRow').hide();
+                });
+
+                $('#btnChangeStatusAndSaveVerifyResult').click(function (e) {
+                    e.preventDefault();
+                    debugger;
+                    const formIsValid = $('#frmVerifyBuyer').valid();
+                    const requestStatus = $('input[name=requestStatusRadio]:checked').val();
+                    if (requestStatus == undefined) {
+                        showMessage('@_loc["InfoTitle"]', 'لطفا وضعیت درخواست را مشخص کنید!', icons.warning, '@_loc["Close"]');
+                        return;
+                    }
+
+                    const approveVerifyRadios = $('input[type=radio][value=true].verifyRadio:checked');
+                    if (requestStatus == 2 && approveVerifyRadios.length <=7) {
+                        showMessage('@_loc["InfoTitle"]', "کاربر گرامی در صورت <b>تایید</b> درخواست باید همه نتایج اعتبارسنجی 8 گانه را نیز <b>تایید</b> نمایید!", icons.warning, '@_loc["Close"]');
+                        return;
+                    }
+
+                    const unknownVerifyRadios = $('input[type=radio][value=null].verifyRadio:checked');
+                    if (unknownVerifyRadios.length > 0) {
+                        showMessage('@_loc["InfoTitle"]', "هیچ کدام از  نتیجه های استعلام اعتبارسنجی 8 گانه نمیتواند <b>نامشخص</b> باشد!", icons.warning, '@_loc["Close"]');
+                        return;
+                    }
+
+                    //const denyVerifyRadios = $('input[type=radio][value!=true].verifyRadio:checked');
+                    //if (requestStatus == 2 && denyVerifyRadios.length > 0) {
+                    //    showMessage('@_loc["InfoTitle"]', "کاربر گرامی در صورت <b>تایید</b> درخواست باید همه نتایج اعتبارسنجی 8 گانه را نیز <b>تایید</b> نمایید!", icons.warning, '@_loc["Close"]');
+                    //    return;
+                    //}
+
+                    if (requestStatus == 2 && $('#FacilityNumber').val() == '') {
+                        showMessage('@_loc["InfoTitle"]', 'لطفا شماره تسهیلات را وارد کنید!', icons.warning, '@_loc["Close"]');
+                        return;
+                    }
+
+                    if (formIsValid) {
+                        showWaiting('frmVerifyBuyer', '@_loc["PleaseWait"]', '@_loc["Loading"]');
+                        const postData = {
+                            RequestFacilityId: '@Model.Id',
+                            Status: requestStatus,
+                            FacilityNumber: requestStatus == 2 ? $('#FacilityNumber').val() : null,
+                            StatusDescription: $('#description_admin').val()
+                        };
+                        const verfyResultModel = {
+                            RequestFacilityId: '@Model.Id',
+                            CivilRegistryInquiry: $(`input[name=@nameof(ApplicantValidationResultModel.CivilRegistryInquiry)]`).prop('checked'),
+                            MilitaryInquiry: $(`input[name=@nameof(ApplicantValidationResultModel.MilitaryInquiry)]`).prop('checked'),
+                            ReturnedCheckInquiry: $(`input[name=@nameof(ApplicantValidationResultModel.ReturnedCheckInquiry)]`).prop('checked'),
+                            FacilityInquiry: $(`input[name=@nameof(ApplicantValidationResultModel.FacilityInquiry)]`).prop('checked'),
+                            BlackListInquiry: $(`input[name=@nameof(ApplicantValidationResultModel.BlackListInquiry)]`).prop('checked'),
+                            PostalCodeInquiry: $(`input[name=@nameof(ApplicantValidationResultModel.PostalCodeInquiry)]`).prop('checked'),
+                            SecurityCouncilSanctionsInquiry: $(`input[name=@nameof(ApplicantValidationResultModel.SecurityCouncilSanctionsInquiry)]`).prop('checked'),
+                            ShahkarInquiry: $(`input[name=@nameof(ApplicantValidationResultModel.ShahkarInquiry)]`).prop('checked'),
+                        }
+                        debugger;
+                        $.ajax({
+                            type: 'post',
+                            data: JSON.stringify({ RequestStatus: postData, ApplicantValidationResult: verfyResultModel }),
+                            datatype: "json",
+                            contentType: "application/json; charset=utf-8",
+                            url: '@ajaxUrl',
+                            success: function (result) {
+                                hideWaiting('frmVerifyBuyer');
+                                debugger;
+                                if (result.isSuccess) {
+                                    showMessage('@_loc["InfoTitle"]', '@_loc["MessageSuccess"]', icons.success, '@_loc["Close"]');
+                                    setTimeout(function () {
+                                        window.location.replace('@Url.Action("LeasingRequests","RequestFacility")');
+                                    }, 2500);
+                                }
+                            },
+                            error: function (error) {
+                                hideWaiting('frmVerifyBuyer');
+                                const exception = getExceptionMessageFromError(error);
+                                if (exception != null)
+                                    showMessage('@_loc["ErrorTitle"]', exception, icons.error, '@_loc["Close"]');
+                                else
+                                    showMessage('@_loc["ErrorTitle"]', '@_loc["UnhandledError"]', icons.error, '@_loc["Close"]');
+                            }
+                        });
+                    }
+                    else {
+                        scrollToFirstError();
+                    }
+                });
+            </text>
+        }
+        else if (Model.CurrentStepForm == WorkFlowFormEnum.DepositFacilityAmount)
+        {
+            <text>
+            $('#btnDepositFacilityAmount').click(function (e) {
+                e.preventDefault();
+                debugger;
+                const formIsValid = $('#frmVerifyBuyer').valid();
+                const file = $("#file")[0];
+                //if (file.files.length == 0) {
+                //    showMessage('@_loc["InfoTitle"]', 'لطفا تصویر چک را بارگذاری کنید', icons.warning, '@_loc["Close"]');
+                //    return;
+                //}
+                const requestStatus = $('input[name=requestStatusRadio]:checked').val();
+                if (requestStatus == undefined) {
+                    showMessage('@_loc["InfoTitle"]', 'لطفا وضعیت درخواست را مشخص کنید!', icons.warning, '@_loc["Close"]');
+                    return;
+                }
+                if (formIsValid) {
+                    showWaiting('frmVerifyBuyer', '@_loc["PleaseWait"]', '@_loc["Loading"]');
+                    let data = new FormData();
+                    if (file.files.length > 0) {
+                        data.append('file', file.files[0]);
+                    }
+
+                    data.append('DepositDocumentNumber', $('#DepositDocumentNumber').val());
+                    data.append('DepositDate', $('#DepositDate').val());
+                    data.append('RequestFacilityId', @Model.Id);
+                    data.append('StepDescription', $('#description_admin').val());
+
+                    $.ajax({
+                        type: 'post',
+                        //dataType: 'json',
+                        //contentType: "application/json; charset=utf-8",
+                        processData: false,
+                        contentType: false,
+                        url: '@ajaxUrl',
+                        data: data,// JSON.stringify(model),
+                        success: function (result) {
+                            hideWaiting('frmVerifyBuyer');
+                            debugger;
+                            if (result.isSuccess) {
+                                showMessage('@_loc["InfoTitle"]', '@_loc["MessageSuccess"]', icons.success, '@_loc["Close"]');
+                                setTimeout(function () {
+                                        window.location.replace('@Url.Action("LeasingRequests","RequestFacility")');
+                                }, 2500);
+                            }
+                        },
+                        error: function (error) {
+                            hideWaiting('frmVerifyBuyer');
+                            const exception = getExceptionMessageFromError(error);
+                            if (exception != null)
+                                showMessage('@_loc["ErrorTitle"]', exception, icons.error, '@_loc["Close"]');
+                            else
+                                showMessage('@_loc["ErrorTitle"]', '@_loc["UnhandledError"]', icons.error, '@_loc["Close"]');
+                        }
+                    });
+                }
+                else {
+                    scrollToFirstError();
+                }
+            });
+            </text>
+        }
+        else if (Model.CurrentStepForm == WorkFlowFormEnum.AdminBankLeasingSignature)
+        {
+            <text>
+            let selectedCertificateFromTokenByUIResult;
+            let selectedCertificate;
+            let digest;
+            let signature;
+            function SelectCertificateFromTokenByUI(callback) {
+                if (Dastine.isInstalled) {
+                    const issuer = '';// document.getElementById('txtSelectCertificateFromTokenByUIIssuer').value;
+                    const keyUsages = '';// document.getElementById('txtSelectCertificateFromTokenByUIKeyUsages').value;
+                    try {
+                        Dastine.SelectCertificateFromTokenByUI(issuer, keyUsages, function (event) {
+                            selectedCertificateFromTokenByUIResult = event.data.Result;
+                             if (selectedCertificateFromTokenByUIResult == 0)
+                                callback(true); 
+                             else
+                             {
+                                showMessage('@_loc["InfoTitle"]', 'خطایی نامشخص رخ داده است،لطفا نسبت به متصل بودن توکن سخت افزاری خود به سیستم کامپیوتر خود اطمینان حاصل کنید', icons.error, '@_loc["Close"]');
+                                 callback(false); 
+                             }
+                        });                       
+                    }
+                    catch (e) {
+                        //alert(e);
+                        showMessage('@_loc["InfoTitle"]',e, icons.error, '@_loc["Close"]');
+                        callback(false);
+                    }
+                } else {
+                    if (Dastine.errorMessage == 'DASTINE_NOT_INSTALLED')
+                    {
+                        //alert(Dastine.errorMessage + '\n Get it from:\n' + DastineConfig.hostDownloadLink);
+                        showMessage('@_loc["InfoTitle"]',Dastine.errorMessage + '\n Get it from:\n' + DastineConfig.hostDownloadLink, icons.error, '@_loc["Close"]');
+                    }
+                    else
+                    {
+                        //alert(Dastine.errorMessage);
+                        showMessage('@_loc["InfoTitle"]', Dastine.errorMessage, icons.error, '@_loc["Close"]');
+                    }
+
+                    callback(false);
+                }              
+            }
+
+            function ReadSelectedCertificate(callback) {
+                if (Dastine.isInstalled) {
+                    try {
+                        Dastine.GetSelectedCertificate(function (event) {
+                            selectedCertificate = event.data.Result;
+                            callback(true);
+                        });
+                    }
+                    catch (e) {
+                        //alert(e);
+                         showMessage('@_loc["InfoTitle"]',e, icons.error, '@_loc["Close"]');
+                        callback(false);
+                    }
+                } else {
+                    if (Dastine.errorMessage == 'DASTINE_NOT_INSTALLED')
+                    {
+                        //alert(Dastine.errorMessage + '\n Get it from:\n' + DastineConfig.hostDownloadLink);
+                         showMessage('@_loc["InfoTitle"]',Dastine.errorMessage + '\n Get it from:\n' + DastineConfig.hostDownloadLink, icons.error, '@_loc["Close"]');
+                    }
+                    else
+                    {
+                        //alert(Dastine.errorMessage);
+                        showMessage('@_loc["InfoTitle"]',Dastine.errorMessage, icons.error, '@_loc["Close"]');
+                    }
+
+                    callback(false);
+                }
+            }
+
+            function SignMessage(digest,callback) {
+                if (Dastine.isInstalled) {
+                    try {                        
+                        Dastine.Sign(digest, 'SHA1', function (event) {
+                            if (event.data.Result == '18' || event.data.Result == '14')
+                            {
+                                //alert('کلمه عبور وارد شده اشتباه می باشد!');
+                                 showMessage('@_loc["InfoTitle"]','کلمه عبور وارد شده اشتباه می باشد!', icons.error, '@_loc["Close"]');
+                                callback(false);
+                            }
+                            else
+                            {
+                                signature = event.data.Result;
+                                callback(true);
+                            }
+                        });
+                    }
+                    catch (e) {
+                        //alert(e);
+                         showMessage('@_loc["InfoTitle"]',e, icons.error, '@_loc["Close"]');
+                        callback(false);
+                    }
+                } else {
+                    if (Dastine.errorMessage == 'DASTINE_NOT_INSTALLED')
+                    {
+                        //alert(Dastine.errorMessage + '\n Get it from:\n' + DastineConfig.hostDownloadLink);
+                        showMessage('@_loc["InfoTitle"]',Dastine.errorMessage + '\n Get it from:\n' + DastineConfig.hostDownloadLink, icons.error, '@_loc["Close"]');
+                    }
+                    else
+                    {
+                        //alert(Dastine.errorMessage);
+                        showMessage('@_loc["InfoTitle"]',Dastine.errorMessage, icons.error, '@_loc["Close"]');
+                    }
+
+                    callback(false);
+                }
+            }
+
+            $('#btnSignatureContract').click(function (e) {
+                e.preventDefault();
+                debugger;
+                const formIsValid = $('#frmVerifyBuyer').valid();
+                if (!formIsValid) {
+                    scrollToFirstError();
+                    return;
+                }
+                const requestStatus = $('input[name=requestStatusRadio]:checked').val();
+                if (requestStatus == undefined) {
+                    showMessage('@_loc["InfoTitle"]', 'لطفا وضعیت درخواست را مشخص کنید!', icons.warning, '@_loc["Close"]');
+                    return;
+                }
+
+                SelectCertificateFromTokenByUI(function(selectCertificateResult)
+                {
+                    debugger;
+                    if (selectCertificateResult == true)
+                    {                       
+                        ReadSelectedCertificate(function (readCertificateResult)
+                        {
+                            debugger;
+                            if (readCertificateResult == true)
+                            {
+                                 data = {
+                                     RequestFacilityId: @Model.Id,
+                                     SelectedCertificate: selectedCertificate
+                                 };
+                                  $.ajax({
+                                    type: 'post',
+                                    data: JSON.stringify(data),
+                                    datatype: "json",
+                                    contentType: "application/json; charset=utf-8",
+                                    url: `/api/v1/dastine/PDFDigestForMultiSign`,
+                                    success: function (result) {
+                                        hideWaiting('frmVerifyBuyer');
+                                        debugger;
+                                        if (result.isSuccess) {
+                                            digest = result.data;
+                                            SignMessage(digest,function (signMessageResult)
+                                            {
+                                                debugger;
+                                                if (signMessageResult == true)
+                                                {
+                                                    //======================
+                                                    const postData = {
+                                                        RequestFacilityId: @Model.Id,
+                                                        SelectedCertificate: selectedCertificate,
+                                                        Digest: digest,
+                                                        Signature: signature
+                                                    };
+                                                    $.ajax({
+                                                        type: 'post',
+                                                        data: JSON.stringify(postData),
+                                                        datatype: "json",
+                                                        contentType: "application/json; charset=utf-8",
+                                                        url: `/api/v1/dastine/PutPDFSignatureForMultiSign`,
+                                                        success: function (result) {
+                                                            hideWaiting('frmVerifyBuyer');
+                                                            debugger;
+                                                            if (result.isSuccess) {
+                                                                $('#a_finalContractUrl').show();
+                                                                $('#btnSignatureContract').hide();
+                                                                $('#a_finalContractUrl').attr('href', `/UploadFiles/RequestFacilityContract/${result.data}`);
+                                                                showMessage('@_loc["InfoTitle"]', 'امضای قرارداد با موفقیت انجام شد', icons.success, '@_loc["Close"]');
+                                                            }
+                                                        },
+                                                        error: function (error) {
+                                                            hideWaiting('frmVerifyBuyer');
+                                                            const exception = getExceptionMessageFromError(error);
+                                                            if (exception != null)
+                                                                showMessage('@_loc["ErrorTitle"]', exception, icons.error, '@_loc["Close"]');
+                                                            else
+                                                                showMessage('@_loc["ErrorTitle"]', '@_loc["UnhandledError"]', icons.error, '@_loc["Close"]');
+                                                        }
+                                                    });
+                                                    //======================
+                                                }
+                                            });                                                                                           
+                                        }
+                                    },
+                                    error: function (error) {
+                                        hideWaiting('frmVerifyBuyer');
+                                        const exception = getExceptionMessageFromError(error);
+                                        if (exception != null)
+                                            showMessage('@_loc["ErrorTitle"]', exception, icons.error, '@_loc["Close"]');
+                                        else
+                                            showMessage('@_loc["ErrorTitle"]', '@_loc["UnhandledError"]', icons.error, '@_loc["Close"]');
+                                    }
+                                  });
+                            }
+                        });
+                    }
+                });                
+
+                return;
+                //if (formIsValid) {
+                //    showWaiting('frmVerifyBuyer', '@_loc["PleaseWait"]', '@_loc["Loading"]');
+                //    const postData = {
+                //        RequestFacilityId: '@Model.Id',
+                //        Status: requestStatus,
+                //        StatusDescription: $('#description_admin').val()
+                //    };
+
+                //    debugger;
+                //    $.ajax({
+                //        type: 'post',
+                //        data: JSON.stringify(postData),
+                //        datatype: "json",
+                //        contentType: "application/json; charset=utf-8",
+                //        url: '@ajaxUrl/',
+                //        success: function (result) {
+                //            hideWaiting('frmVerifyBuyer');
+                //            debugger;
+                //            if (result.isSuccess) {
+                //                showMessage('@_loc["InfoTitle"]', '@_loc["MessageSuccess"]', icons.success, '@_loc["Close"]');
+                //                setTimeout(function () {
+                //                    window.location.replace('@Url.Action("LeasingRequests","RequestFacility")');
+                //                }, 2500);
+                //            }
+                //        },
+                //        error: function (error) {
+                //            hideWaiting('frmVerifyBuyer');
+                //            if (error.responseJSON != undefined && error.responseJSON.message != undefined && error.responseJSON.message != '') {
+                //                if (IsJsonString(error.responseJSON.message)) {
+                //                    const exception = JSON.parse(error.responseJSON.message).Exception;
+                //                    showMessage('@_loc["ErrorTitle"]', exception, icons.error, '@_loc["Close"]');
+                //                }
+                //                else
+                //                    showMessage('@_loc["ErrorTitle"]', error.responseJSON.message, icons.error, '@_loc["Close"]');
+                //            }
+                //            else {
+                //                showMessage('@_loc["ErrorTitle"]', '@_loc["UnhandledError"]', icons.error, '@_loc["Close"]');
+                //            }
+                //        }
+                //    });
+                //}
+                //else {
+                //    scrollToFirstError();
+                //}
+            });
+            </text>
+        }
+        else if (Model.CurrentStepForm == WorkFlowFormEnum.BankLeasingInquiry)
+        {
+            <text>
+                $('input[name=requestStatusRadio]').change((e) => {
+                    debugger;
+                    if ($(e.target).val() == 2)
+                        $('#policeNumberRow').show();
+                    else
+                        $('#policeNumberRow').hide();
+                });
+
+            $('#btnReInquiry').click(function (e) {
+                e.preventDefault();
+
+                $.ajax({
+                    type: 'post',
+                    //data: JSON.stringify({ RequestStatus: postData, ApplicantValidationResult: verfyResultModel }),
+                    //datatype: "json",
+                    //contentType: "application/json; charset=utf-8",
+                    url: '/Samat/ReInquiryCheques/@Model.Id/@Model.RequestFacilityDetail.BuyerId',
+                    success: function (result) {
+                        hideWaiting('frmVerifyBuyer');
+                        debugger;
+                        $('#collapseUserBackCheques').html(result);
+                    },
+                    error: function (error) {
+                        hideWaiting('frmVerifyBuyer');
+                        const exception = getExceptionMessageFromError(error);
+                        if (exception != null)
+                            showMessage('@_loc["ErrorTitle"]', exception, icons.error, '@_loc["Close"]');
+                        else
+                            showMessage('@_loc["ErrorTitle"]', '@_loc["UnhandledError"]', icons.error, '@_loc["Close"]');
+                        }
+                });
+
+                $.ajax({
+                    type: 'post',
+                    //data: JSON.stringify({ RequestStatus: postData, ApplicantValidationResult: verfyResultModel }),
+                    //datatype: "json",
+                    //contentType: "application/json; charset=utf-8",
+                    url: '/Samat/ReInquiryActiveFacilities/@Model.Id/@Model.RequestFacilityDetail.BuyerId',
+                    success: function (result) {
+                        hideWaiting('frmVerifyBuyer');
+                        debugger;
+                        $('#collapseSamatFacilityResult').html(result);
+                        $('html, body').animate({
+                            scrollTop: $("#collapseSamatFacilityResult").offset().top - 130
+                        }, 2000);
+                        showMessage('@_loc["InfoTitle"]', 'اطلاعات تسهیلات و چک های برگشتی بروز شد!', icons.success, '@_loc["Close"]');
+                    },
+                    error: function (error) {
+                        hideWaiting('frmVerifyBuyer');
+                        const exception = getExceptionMessageFromError(error);
+                        if (exception != null)
+                            showMessage('@_loc["ErrorTitle"]', exception, icons.error, '@_loc["Close"]');
+                        else
+                            showMessage('@_loc["ErrorTitle"]', '@_loc["UnhandledError"]', icons.error, '@_loc["Close"]');
+                    }
+                });
+            });
+
+            $('#btnReInquiryAndAllocation').click(function (e) {
+                e.preventDefault();
+                debugger;
+                const formIsValid = $('#frmVerifyBuyer').valid();
+                const requestStatus = $('input[name=requestStatusRadio]:checked').val();
+                if (requestStatus == undefined) {
+                    showMessage('@_loc["InfoTitle"]', 'لطفا وضعیت درخواست را مشخص کنید!', icons.warning, '@_loc["Close"]');
+                    return;
+                }
+
+                if (requestStatus == 2 && $('#PoliceNumber').val() == '') {
+                    showMessage('@_loc["InfoTitle"]', 'لطفا شماره انتظامی را وارد کنید!', icons.warning, '@_loc["Close"]');
+                    return;
+                }
+
+                if (formIsValid) {
+                    showWaiting('frmVerifyBuyer', '@_loc["PleaseWait"]', '@_loc["Loading"]');
+                    const postData = {
+                        RequestFacilityId: '@Model.Id',
+                        Status: requestStatus,
+                        PoliceNumber: $('#PoliceNumber').val(),
+                        StatusDescription: $('#description_admin').val()
+                    };
+
+                    debugger;
+                    $.ajax({
+                        type: 'post',
+                        data: JSON.stringify(postData),
+                        datatype: "json",
+                        contentType: "application/json; charset=utf-8",
+                        url: '@ajaxUrl/',
+                        success: function (result) {
+                            hideWaiting('frmVerifyBuyer');
+                            debugger;
+                            if (result.isSuccess) {
+                                showMessage('@_loc["InfoTitle"]', '@_loc["MessageSuccess"]', icons.success, '@_loc["Close"]');
+                                setTimeout(function () {
+                                    window.location.replace('@Url.Action("LeasingRequests","RequestFacility")');
+                                }, 2500);
+                            }
+                        },
+                        error: function (error) {
+                            hideWaiting('frmVerifyBuyer');
+                            const exception = getExceptionMessageFromError(error);
+                            if (exception != null)
+                                showMessage('@_loc["ErrorTitle"]', exception, icons.error, '@_loc["Close"]');
+                            else
+                                showMessage('@_loc["ErrorTitle"]', '@_loc["UnhandledError"]', icons.error, '@_loc["Close"]');
+                        }
+                    });
+                }
+                else {
+                    scrollToFirstError();
+                }
+            });
+            </text>
+        }
+        else
+        {
+            <text>
+                $('#btnEdit').click(function (e) {
+                    e.preventDefault();
+                    debugger;
+                    const formIsValid = $('#frmVerifyBuyer').valid();
+                    const requestStatus = $('input[name=requestStatusRadio]:checked').val();
+                    if (requestStatus == undefined) {
+                        showMessage('@_loc["InfoTitle"]', 'لطفا وضعیت درخواست را مشخص کنید!', icons.warning, '@_loc["Close"]');
+                        return;
+                    }
+
+                    if (formIsValid) {
+                        showWaiting('frmVerifyBuyer', '@_loc["PleaseWait"]', '@_loc["Loading"]');
+                        const postData = {
+                            RequestFacilityId: '@Model.Id',
+                            Status: requestStatus,
+                            StatusDescription: $('#description_admin').val()
+                        };
+
+                        $.ajax({
+                            type: 'post',
+                            data: JSON.stringify(postData),
+                            datatype: "json",
+                            contentType: "application/json; charset=utf-8",
+                            url: '@ajaxUrl',
+                            success: function (result) {
+                                hideWaiting('frmVerifyBuyer');
+                                debugger;
+                                if (result.isSuccess) {
+                                    showMessage('@_loc["InfoTitle"]', '@_loc["MessageSuccess"]', icons.success, '@_loc["Close"]');
+                                    setTimeout(function () {
+                                        window.location.replace('@Url.Action("LeasingRequests","RequestFacility")');
+                                    }, 2500);
+                                }
+                            },
+                            error: function (error) {
+                                hideWaiting('frmVerifyBuyer');
+                                const exception = getExceptionMessageFromError(error);
+                                if (exception != null)
+                                    showMessage('@_loc["ErrorTitle"]', exception, icons.error, '@_loc["Close"]');
+                                else
+                                    showMessage('@_loc["ErrorTitle"]', '@_loc["UnhandledError"]', icons.error, '@_loc["Close"]');
+                            }
+                        });
+                    }
+                    else {
+                        scrollToFirstError();
+                    }
+                });
+            </text>
+        }
+
+    </script>
+}

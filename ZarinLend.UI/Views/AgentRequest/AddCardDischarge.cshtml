@@ -1,0 +1,224 @@
+﻿@model Services.Model.AgentRequestModel
+@{
+    ViewData["Title"] = "درخواست صدور کارت";
+}
+@section styles
+{
+    <style type="text/css">
+        textarea {
+            height: 120px !important;
+        }
+
+        .table-custom th,
+        .table-custom td {
+            text-align: center !important;
+            vertical-align: middle !important;
+        }
+
+        .button-columns {
+            padding-top: 7px !important;
+            width: 100px;
+            text-align: center;
+        }
+
+        [type="checkbox"]:not(:checked), [type="checkbox"]:checked,
+        [type="radio"]:not(:checked), [type="radio"]:checked {
+            position: unset !important;
+            right: unset !important;
+            opacity: 1 !important;
+        }
+
+        fieldset {
+            padding: 15px;
+            border: solid 1px #840fb5 !important;
+            border-radius: 5px !important;
+            margin-bottom: 20px !important;
+        }
+
+        legend {
+            display: block;
+            width: unset !important;
+            max-width: 100%;
+            padding: 5px;
+            margin: .5rem;
+            font-size: 1rem;
+            line-height: inherit;
+            color: #533fd0 !important;
+            white-space: normal;
+            border: 1px solid;
+            border-radius: 3px;
+        }
+    </style>
+}
+<form id="frmAgentRequest" method="post">
+    <div class="card">
+        <div class="card-header">ثبت درخواست صدور کارت</div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="control-label">نام</label>
+                        <input asp-for="FName" class="form-control" />
+                        <span asp-validation-for="FName" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="control-label">نام خانوادگی</label>
+                        <input asp-for="LName" class="form-control" />
+                        <span asp-validation-for="LName" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="control-label">شماره پاسپورت</label>
+                        <input asp-for="PassportId" class="form-control" />
+                        <span asp-validation-for="PassportId" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="control-label">شماره فراگیر</label>
+                        <input asp-for="PrivateNumber" class="form-control" />
+                        <span asp-validation-for="PrivateNumber" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="control-label">شماره موبایل</label>
+                        <input asp-for="Mobile" class="form-control" />
+                        <span asp-validation-for="Mobile" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="control-label">ایمیل</label>
+                        <input asp-for="Email" class="form-control" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="control-label">ملیت</label>
+                        <select name="CountryId" asp-for="CountryId" class="custom-select form-control"
+                                asp-items="Model.Countries">
+                            <option value="">ملیت را انتخاب کنید</option>
+                        </select>
+                        <span asp-validation-for="CountryId" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <fieldset>
+                <legend>
+                    انتخاب کارت
+                </legend>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="control-label">نوع کارت</label>
+                            <select name="CardTypeId" asp-for="CardTypeId" class="custom-select form-control"
+                                    asp-items="Model.CardTypes">
+                                <option value="">کارت را انتخاب کنید</option>
+                            </select>
+                            <span asp-validation-for="CardTypeId" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="control-label">مبلغ شارژ کارت</label>
+                            <input asp-for="Amount" class="form-control" />
+                            <span asp-validation-for="Amount" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <input type="hidden" asp-for="JsonListCardTypes" />
+                    <div class="col-md-6" id="cardTypeInfo">
+
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+        <div class="card-footer" style="text-align:left">
+            <button id="btnSaveRequest" class="btn btn-outline-success">
+                <i class="fal fa-send"></i>&nbsp;ثبت اطلاعات
+            </button>
+        </div>
+    </div>
+</form>
+@section scripts{
+    @*<partia name="_ValidationScriptsPartial" />*@
+    @{
+        await Html.RenderPartialAsync("~/Views/Shared/_ValidationScriptsPartial.cshtml");
+    }
+    <script>
+        const cardTypeListInfo = $('#JsonListCardTypes').val() !== '' ? JSON.parse($('#JsonListCardTypes').val()) : [];
+        $('#CardTypeId').change((e) => {
+            $('#cardTypeInfo').html('');
+            if ($(e.target).val() !== '') {
+                $.map(cardTypeListInfo, (item) => {
+                    debugger;
+                    if (item.CardTypeId == $(e.target).val()) {
+                        $('#cardTypeInfo').html(`کارمزد : <b>${splitNumber(item.Wage)}</b> ريال<br/>توضیحات : <b>${item.Description}</b>`);
+                    }
+                });
+            }
+        });
+
+        $('#btnSaveRequest').click(function (e) {
+            e.preventDefault();
+            debugger;
+            const formIsValid = $('#frmAgentRequest').valid();
+            if (formIsValid) {
+                //const postdata = $('#frmAgentRequest').serialize();
+                const model = {
+                    FName: $("#FName").val(),
+                    LName: $("#LName").val(),
+                    PassportId: $("#PassportId").val(),
+                    Money: $("#Money").val(),
+                    Mobile: $("#Mobile").val(),
+                    PrivateNumber: $("#PrivateNumber").val(),
+                    Email: $("#Email").val(),
+                    Amount: $("#Amount").val(),
+                    CountryId: $('#CountryId').val(),
+                    CardTypeId: $('#CardTypeId').val()
+                };
+                $.ajax({
+                    type: 'post',
+                    //dataType: 'json',
+                    contentType: "application/json; charset=utf-8",
+                    url: '/api/v1/AgentRequest/AddCardIssuance',
+                    data: JSON.stringify(model),
+                    success: function (result) {
+                        const jsonResult = JSON.stringify(result);
+                        debugger;
+                        if (result.isSuccess) {
+                            showMessage("پیام", 'ثبت اطلاعات با موفقیت انجام شد', icons.success, "بستن");
+                            setTimeout(function () {
+                                window.location.replace('@Url.Action("CardDischargeList","AgentRequest")');
+                            }, 1500);
+                        }
+                    },
+                    error: function (error) {
+                        const jsonResult = JSON.stringify(error.responseJSON);
+                        if (error.responseJSON.Message != undefined && error.responseJSON.Message != '') {
+                            debugger;
+                            alert(error.responseJSON.Message);
+                        }
+                        else {
+                            $('#hdnAjaxResponse').val('خطایی نامشخص رخ داده است!');
+                            alert('خطایی نامشخص رخ داده است!');
+                        }
+                    }
+                });
+            }
+            else {
+                scrollToFirstError();
+            }
+        });
+    </script>
+}

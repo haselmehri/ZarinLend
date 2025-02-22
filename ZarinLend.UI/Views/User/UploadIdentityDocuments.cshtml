@@ -1,0 +1,917 @@
+﻿@using static Common.Enums;
+@model UserIdentityDocumentModel
+@{
+    ViewData["Title"] = ResourceFile.UploadIdentityDocuments;
+    Layout = "~/Views/Shared/_NewLayout.cshtml";
+    var showPreview = false;
+}
+@section styles
+{
+    <link rel="stylesheet" type="text/css" href="~/new-layout/css/dropzone.min.css" />
+    <link rel="stylesheet" type="text/css" href="~/new-layout/css/dropzone.custom.css" />
+    <style type="text/css">
+        #frmBirthCertificatePage1,
+        #frmBirthCertificateDescription,
+        #frmBackNationalCard,
+        #frmFrontNationalCard,
+        #frmOccupationDocument,
+        #frmAddressDocument,
+        #frmAccountStatement {
+            text-align: center;
+        }
+
+        .dropzone.dz-started .dz-message {
+            top: 0px !important;
+        }
+
+        .dropzone .dz-preview, .dropzone-previews .dz-preview {
+            margin: 1px !important;
+        }
+
+        @@media (min-width:768px) and (max-width:814px) {
+            .dropzone .dz-preview .dz-details img, .dropzone-previews .dz-preview .dz-details img {
+                width: 85px !important;
+                height: 90px !important;
+            }
+
+            .dropzone .dz-preview .dz-details, .dropzone-previews .dz-preview .dz-details {
+                width: 85px !important;
+                height: 90px !important;
+            }
+        }
+
+        @@media (max-width:407px) {
+            .dropzone .dz-preview .dz-details img, .dropzone-previews .dz-preview .dz-details img {
+                width: 75px !important;
+                height: 75px !important;
+            }
+
+            .dropzone .dz-preview .dz-details, .dropzone-previews .dz-preview .dz-details {
+                width: 75px !important;
+                height: 75px !important;
+            }
+        }
+    </style>
+}
+@if (Model.RequestFacilityId.HasValue)
+{
+    @await Component.InvokeAsync("WorkFlowStepWizardHorizental", new { workFlow = WorkFlowEnum.RequestFacility, requestId = Model.RequestFacilityId })
+}
+<div class="p-2 bg-white rounded-lg" id="UserIdentityDocumentsDiv">
+    <div class="row font-medium-3 secondary darken-4 text-bold-800 d-flex align-items-center">
+        <div class="col-12 col-md-6 col-sm-12 mb-2">
+            <i class="bx bx-align-right zl-text-secondary mr-25"></i>
+            <span>بارگذاری مدارک هویتی</span>
+        </div>
+        <div class="col-12 col-md-6 col-sm-12 mb-2">
+            @if (Model.RequestFacilityId.HasValue)
+            {
+                <div class="d-flex align-items-center justify-content-end">
+                    <button id="btnGoToNextStep" class="btn btn-zl-primary ml-1">
+                        تغییری ندارم،به مرحله بعد برو
+                    </button>
+                </div>
+            }
+        </div>
+    </div>
+    <div class="alert zl-bg-alert-warning border-warning border-accent-4 alert-dismissible my-2"
+         role="alert">
+        <button type="button"
+                class="close"
+                data-dismiss="alert"
+                aria-label="بستن">
+            <span aria-hidden="true">×</span>
+        </button>
+        <div class="d-flex">
+            <i class="bx bx-error-circle font-large-1"></i>
+            <span class="text-muted text-bold-400 font-small-3">
+                <ul>
+                    <li>
+                        حجم فایل بارگذاری شده نباید بیشتر از 1 مگابایت باشد
+                    </li>
+                    <li>
+                        تمام مشخصات روی تصویر باید با اطلاعات هویتی که در هنگام
+                        ثبت نام وارد کرده اید،یکسان باشد
+                    </li>
+                    <li>مشخصات روی تصویر باید خوانا باشد</li>
+                </ul>
+            </span>
+        </div>
+    </div>
+@*     <div class="mt-2 p-2 edit-user-bg rounded-lg">
+        <div class="text-bold-900 secondary darken-4 font-medium-3">
+            شناسنامه
+        </div>
+        <div class="row mt-2">
+            <div class="col-md-6 mb-2">
+                <div class="d-flex flex-column align-items-start">
+                    <div class="text-bold-700 dark">
+                        تصویر صفحه اول شناسنامه
+                    </div>
+                    <div class="text-bold-400 mb-2 font-small-2">
+                        فرمت‌های مجاز: png و jpg و gif و bmp و jpeg
+                    </div>
+                    <div class="w-100">
+                        @{
+                            showPreview = Model != null && Model.BirthCertificatePage1 != null && Model.BirthCertificatePage1.DocumentType == DocumentType.BirthCertificatePage1;
+                            <form action="#" class="dropzone dropzone-area bg-white @(showPreview ? "dz-started" : string.Empty)" id="frmBirthCertificatePage1">
+                                <div class="dz-message font-medium-1">
+                                    انتخاب فایل ..
+                                </div>
+                                @if (showPreview)
+                                {
+                                    var filePath = $"{Model.BirthCertificatePage1.FilePath}?ver={Model.BirthCertificatePage1.Version}";
+                                    <div id="previewBirthCertificatePage1" class="dz-preview dz-image-preview">
+                                        <div class="dz-details">
+                                            <a target='_blank' href='@filePath'>
+                                                <img data-dz-thumbnail="" alt='@_loc["BirthCertificate"]' src="@filePath">
+                                            </a>
+                                        </div>
+                                        <a class="dz-remove" href="javascript:undefined;" onclick="deleteFile(@Model.BirthCertificatePage1.Id,this,'previewBirthCertificatePage1')" data-dz-remove="">حذف</a>
+                                    </div>
+                                }
+                            </form>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="d-flex flex-column align-items-start">
+                    <div class="text-bold-700 dark">
+                        تصویر توضیحات شناسنامه
+                    </div>
+                    <div class="text-bold-400 mb-2 font-small-2">
+                        فرمت‌های مجاز: png و jpg و gif و bmp و jpeg
+                    </div>
+                    <div class="w-100">
+                        @{
+                            showPreview = Model != null && Model.BirthCertificateDescription != null && Model.BirthCertificateDescription.DocumentType == DocumentType.BirthCertificateDescription;
+                            <form action="#" class="dropzone dropzone-area bg-white @(showPreview ? "dz-started" : string.Empty)" id="frmBirthCertificateDescription">
+                                <div class="dz-message font-medium-1">
+                                    انتخاب فایل ..
+                                </div>
+                                @if (showPreview)
+                                {
+                                    var filePath = $"{Model.BirthCertificateDescription.FilePath}?ver={Model.BirthCertificateDescription.Version}";
+                                    <div id="previewBirthCertificateDescription" class="dz-preview dz-image-preview">
+                                        <div class="dz-details">
+                                            <a target='_blank' href='@filePath'>
+                                                <img data-dz-thumbnail="" alt='@_loc["BirthCertificate"]' src="@filePath">
+                                            </a>
+                                        </div>
+                                        <a class="dz-remove" href="javascript:undefined;" onclick="deleteFile(@Model.BirthCertificateDescription.Id,this,'previewBirthCertificateDescription')" data-dz-remove="">حذف</a>
+                                    </div>
+                                }
+                            </form>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> *@
+    <div class="mt-2 p-2 edit-user-bg rounded-lg">
+        <div class="text-bold-900 secondary darken-4 font-medium-3">
+            کارت ملی
+        </div>
+        <div class="row mt-2">
+            @* <div class="col-12">
+            <div class="d-flex flex-column flex-md-row align-items-md-center">
+            <div class="text-bold-800 secondary darken-4">
+            وضعیت کارت ملی:
+            </div>
+            <div class="d-flex ml-md-2 mt-1 mt-md-0">
+            <fieldset>
+            <div class="radio radio-success">
+            <input type="radio" name="customRadio" id="colorRadio3" />
+            <label for="colorRadio3" class="font-small-3 text-bold-700">کارت ملی جدید</label>
+            </div>
+            </fieldset>
+            <fieldset>
+            <div class="radio radio-success ml-3">
+            <input type="radio" name="customRadio" id="colorRadio4" />
+            <label for="colorRadio4" class="font-small-3 text-bold-700">رسید تعویض کارت ملی</label>
+            </div>
+            </fieldset>
+            </div>
+            </div>
+            </div>*@
+            <div class="col-md-6 mb-2">
+                <div class="d-flex flex-column align-items-start">
+                    <div class="text-bold-700 dark">تصویر روی کارت ملی</div>
+                    <div class="text-bold-400 mb-2 font-small-2">
+                        فرمت‌های مجاز: png و jpg و gif و bmp و jpeg
+                    </div>
+                    <div class="w-100">
+                        @{
+                            showPreview = Model != null && Model.NationalCardFront != null && Model.NationalCardFront.DocumentType == DocumentType.NationalCardFront;
+                            <form action="#" class="dropzone dropzone-area bg-white @(showPreview ? "dz-started" : string.Empty)" id="frmFrontNationalCard">
+                                <div class="dz-message font-medium-1">
+                                    انتخاب فایل ..
+                                </div>
+                                @if (showPreview)
+                                {
+                                    var filePath = $"{Model.NationalCardFront.FilePath}?ver={Model.NationalCardFront.Version}";
+                                    <div id="previewFrontNationalCard" class="dz-preview dz-image-preview">
+                                        <div class="dz-details">
+                                            <a target='_blank' href='@filePath'>
+                                                <img data-dz-thumbnail="" alt='@ResourceFile.NationlCardUploadInfo' src="@filePath">
+                                            </a>
+                                        </div>
+                                        <a class="dz-remove" href="javascript:undefined;" onclick="deleteFile(@Model.NationalCardFront.Id,this,'previewFrontNationalCard')" data-dz-remove="">حذف</a>
+                                    </div>
+                                }
+                            </form>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="d-flex flex-column align-items-start">
+                    <div class="text-bold-700 dark">تصویر پشت کارت ملی</div>
+                    <div class="text-bold-400 mb-2 font-small-2">
+                        فرمت‌های مجاز: png و jpg و gif و bmp و jpeg
+                    </div>
+                    <div class="w-100">
+                        @{
+                            showPreview = Model != null && Model.NationalCardBack != null && Model.NationalCardBack.DocumentType == DocumentType.NationalCardBack;
+                            <form action="#" class="dropzone dropzone-area bg-white @(showPreview ? "dz-started" : string.Empty)" id="frmBackNationalCard">
+                                <div class="dz-message font-medium-1">
+                                    انتخاب فایل ..
+                                </div>
+                                @if (showPreview)
+                                {
+                                    var filePath = $"{Model.NationalCardBack.FilePath}?ver={Model.NationalCardBack.Version}";
+                                    <div id="previewBackNationalCard" class="dz-preview dz-image-preview">
+                                        <div class="dz-details">
+                                            <a target='_blank' href='@filePath'>
+                                                <img data-dz-thumbnail="" alt='@ResourceFile.NationlCardUploadInfo' src="@filePath">
+                                            </a>
+                                        </div>
+                                        <a class="dz-remove" href="javascript:undefined;" onclick="deleteFile(@Model.NationalCardBack.Id,this,'previewBackNationalCard')" data-dz-remove="">حذف</a>
+                                    </div>
+                                }
+                            </form>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+@*     <div class="mt-2 p-2 edit-user-bg rounded-lg">
+        <div class="row">
+            <div class="col-md-6 mb-2">
+                <div class="d-flex flex-column align-items-start">
+                    <div class="text-bold-700 dark">تصویر مدرک شغلی</div>
+                    <div class="text-bold-400 mb-2 font-small-2">
+                        فرمت‌های مجاز: png و jpg و gif و bmp و jpeg
+                    </div>
+                    <div class="w-100">
+                        @{
+                            showPreview = Model != null && Model.JobDocuments != null && Model.JobDocuments.Any();
+                            <form action="#" class="dropzone dropzone-area bg-white @(showPreview ? "dz-started" : string.Empty)" id="frmOccupationDocument">
+                                <div class="dz-message font-medium-1">
+                                    انتخاب فایل ..
+                                </div>
+                                @if (showPreview)
+                                {
+                                    foreach (var item in Model.JobDocuments)
+                                    {
+                                        var filePath = $"{item.FilePath}?ver={item.Version}";
+                                        <div id="previewOccupationDocument_@item.Id" class="dz-preview dz-image-preview job-preview">
+                                            <div class="dz-details">
+                                                <a target='_blank' href='@filePath'>
+                                                    <img data-dz-thumbnail="" alt='@_loc["JobDocumentUploadInfo"]' src="@filePath">
+                                                </a>
+                                            </div>
+                                            <a class="dz-remove" href="javascript:undefined;" onclick="deleteFile(@item.Id,this,'previewOccupationDocument_@item.Id','JobDocument')" data-dz-remove="">حذف</a>
+                                        </div>
+                                    }
+                                }
+                            </form>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="d-flex flex-column align-items-start">
+                    <div class="text-bold-700 dark">اجاره نامه یا سند مالکیت</div>
+                    <div class="text-bold-400 mb-2 font-small-2">
+                        فرمت‌های مجاز: png و jpg و gif و bmp و jpeg
+                    </div>
+                    <div class="w-100">
+                        @{
+                            showPreview = Model != null && Model.AddressDocuments != null && Model.AddressDocuments.Any();
+                            <form action="#" class="dropzone dropzone-area bg-white @(showPreview ? "dz-started" : string.Empty)" id="frmAddressDocument">
+                                <div class="dz-message font-medium-1">
+                                    انتخاب فایل ..
+                                </div>
+                                @if (showPreview)
+                                {
+                                    foreach (var item in Model.AddressDocuments)
+                                    {
+                                        var filePath = $"{item.FilePath}?ver={item.Version}";
+                                        <div id="previewAddressDocument_@item.Id" class="dz-preview dz-image-preview address-preview">
+                                            <div class="dz-details">
+                                                <a target='_blank' href='@filePath'>
+                                                    <img data-dz-thumbnail="" alt='@ResourceFile.AddressDocument' src="@filePath">
+                                                </a>
+                                            </div>
+                                            <a class="dz-remove" href="javascript:undefined;" onclick="deleteFile(@item.Id,this,'previewAddressDocument_@item.Id','AddressDocument')" data-dz-remove="">حذف</a>
+                                        </div>
+                                    }
+                                }
+                            </form>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> *@
+@*     <div class="mt-2 p-2 edit-user-bg rounded-lg">
+        <div class="row">
+            <div class="col-md-6 col-sm-12">
+                <select name="ProvinceOfBirthId" asp-for="BankId" class="form-control bg-transparent "
+                        asp-items="Model.Banks">
+                    <option value="" >بانک را انتخاب کنید</option>
+                </select>
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col-md-6 mb-2">
+                <div class="d-flex flex-column align-items-start">
+                    <div class="text-bold-700 dark">
+                        صورتحساب
+                    </div>
+                    <div class="text-bold-400 mb-2 font-small-2">
+                        فرمت‌های مجاز: pdf و xls و xlsx
+                    </div>
+                    <div class="w-100">
+                        @{
+                            var accountStatementPreview = Model != null && Model.AccountStatement != null && Model.AccountStatement.DocumentType == DocumentType.AccountStatement;
+                            <form action="#" class="dropzone dropzone-area bg-white @(accountStatementPreview ? "dz-started" : string.Empty)" id="frmAccountStatement">
+                                <div class="dz-message font-medium-1">
+                                    انتخاب فایل ..
+                                </div>
+                                @if (accountStatementPreview)
+                                {
+                                    var filePath = $"{Model.AccountStatement.FilePath}?ver={Model.AccountStatement.Version}";
+                                    var fileLogo = FileExtensions.GetFileType(Model.AccountStatement.FilePath) == Enums.FileType.Pdf ? "/images/icons/pdf2.png" : "/images/icons/excel.png";
+                                    <div id="previewAccountStatement" class="dz-preview dz-image-preview">
+                                        <div class="dz-details">
+                                            <a target='_blank' href='@filePath'>
+                                                <img data-dz-thumbnail="" alt='صورتحساب' src="@fileLogo">
+                                            </a>
+                                        </div>
+                                        <a class="dz-remove" href="javascript:undefined;" onclick="deleteFile(@Model.AccountStatement.Id,this,'previewAccountStatement')" data-dz-remove="">حذف</a>
+                                    </div>
+                                }
+                            </form>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+            </div>
+        </div>
+    </div> *@
+    <div class="mt-2 p-2 edit-user-bg rounded-lg">
+        <div class="row" style="text-align:left">
+            <div class="col-12 col-lg-12">
+                <a class="btn btn-outline-secondary" asp-route="home">
+                    @ResourceFile.Cancel&nbsp;<i class="fal fa-close"></i>
+                </a>
+                <button id="btnUploadIdentityDocument" class="btn btn-zl-primary">
+                    @ResourceFile.Save&nbsp;<i class="fal fa-upload"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script src="~/new-layout/js/dropzone.min.js"></script>
+    @*<partia name="_ValidationScriptsPartial" />*@
+    @{
+        await Html.RenderPartialAsync("~/Views/Shared/_ValidationScriptsPartial.cshtml");
+    }
+    <script>
+        let addressDocumentsArrays = '@Model.AddressDocumentsJson' != '' ? JSON.parse('@Html.Raw(Model.AddressDocumentsJson)') : [];
+        let jobDocumentsArrays = '@Model.JobDocumentsJson' != '' ? JSON.parse('@Html.Raw(Model.JobDocumentsJson)') : [];
+        let isEditMode = @Model.IsEditMode.ToString().ToLower();
+
+        const fileIsImage = (file) => {
+            return file.type == 'image/jpg' ||
+                file.type == 'image/jpeg' ||
+                file.type == 'image/png' ||
+                file.type == 'image/gif' ||
+                file.type == 'image/bmp';
+        }
+
+        const fileIsDocument = (file) => {
+            return file.type == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
+                file.type == 'application/pdf' ||
+                file.type == 'image/png';
+        }
+
+        if ('@Model.RequestFacilityId.HasValue' == 'True') {
+            $('#btnGoToNextStep').click(function (e) {
+                e.preventDefault();
+                showWaiting('mainContentDiv', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                $.ajax({
+                    type: 'post',
+                    //dataType: 'json',
+                    //contentType: "application/json; charset=utf-8",
+                    processData: false,
+                    contentType: false,
+                    url: '/api/v1/User/GoToNextStepFromUploadDocumentsToVerifyZarinLend/@Model.RequestFacilityId',
+                    //data: data,// JSON.stringify(model),
+                    success: function (result) {
+                        hideWaiting('mainContentDiv');
+                        debugger;
+                        if (result.isSuccess) {
+                            window.location.replace('@Url.Action("List", "RequestFacility", new { requestFacilityId = Model.RequestFacilityId })');
+                        }
+                    },
+                    error: function (error) {
+                        hideWaiting('mainContentDiv');
+                        const exception = getExceptionMessageFromError(error);
+                        if (exception != null)
+                            showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                        else
+                            showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                    }
+                });
+            });
+        }
+        const deleteFile = (documentId, sender, parentElementId, documentType) => {
+            debugger;
+            if ($(sender).parent().parent().find('.dz-preview').length == 1)
+                $(sender).parent().parent().removeClass('dz-started');
+            //$(sender).parent().remove();
+            $(`#${parentElementId}`).remove();
+            if (documentType == 'JobDocument') {
+                const item = jobDocumentsArrays.find(x => x.FileId == documentId);
+                if (item != undefined)
+                    item.Status = @((int)FileStatusEnum.Delete);
+            }
+            else if (documentType == 'AddressDocument') {
+                const item = addressDocumentsArrays.find(x => x.FileId == documentId);
+                if (item != undefined)
+                    item.Status = @((int)FileStatusEnum.Delete);
+            }
+        }
+
+        // let AccountStatement = null;
+        // Dropzone.options.frmAccountStatement = {
+        //     paramName: "file", // The name that will be used to transfer the file
+        //     maxFilesize: 1, // MB
+        //     addRemoveLinks: true,
+        //     dictRemoveFile: "حذف",
+        //     autoProcessQueue: false,
+        //     acceptedFiles: ".pdf,.xls,.xlsx",
+        //     maxFiles: 1,
+        //     accept: function (file, done) {
+        //         debugger;
+        //         //if ($('#previewBirthCertificatePage1').length > 0)
+        //         //    $('#previewBirthCertificatePage1').remove();
+        //         AccountStatement = file;
+        //         console.log(typeof (file));
+        //         done();
+        //     },
+        //     init: function () {
+        //         this.on("maxfilesexceeded", function (file) {
+        //             showMessage('@ResourceFile.InfoTitle', 'فقط میتوانید یک فایل بارگذاری کنید،در صورت نیاز به بارگذاری فایل جدید ابتدا فایل قبلی را حذف کنید!', icons.warning, '@ResourceFile.Close');
+        //             this.removeFile(file);
+        //         });
+        //         this.on("sending", function (file) {
+        //             debugger;
+        //         });
+        //         this.on("addedfile", file => {
+        //             debugger;
+        //             if (!fileIsDocument(file)) {
+        //                 this.removeFile(file);
+        //                 showMessage('@ResourceFile.InfoTitle', 'فقط فایل های با پسوند pdf,xls,xlsx میتوانید انتخاب کنید', icons.warning, '@ResourceFile.Close');
+        //                 $('#frmAccountStatement').addClass('dz-started');
+        //                 return;
+        //             }
+        //             if ($('#previewAccountStatement').length > 0) {
+        //                 this.removeFile(file);
+        //                 showMessage('@ResourceFile.InfoTitle', 'فقط میتوانید یک فایل بارگذاری کنید،در صورت نیاز به بارگذاری فایل جدید ابتدا فایل قبلی را حذف کنید!', icons.warning, '@ResourceFile.Close');
+        //                 $('#frmAccountStatement').addClass('dz-started');
+        //             }
+        //         });
+        //         this.on("removedfile", file => {
+        //             debugger;
+        //             AccountStatement = null;
+        //             $('#frmAccountStatement').addClass('dz-started');
+        //         });
+        //     }
+        // };
+
+        // let BirthCertificateFile_Page1 = null;
+        // Dropzone.options.frmBirthCertificatePage1 = {
+        //     paramName: "file", // The name that will be used to transfer the file
+        //     maxFilesize: 1, // MB
+        //     addRemoveLinks: true,
+        //     dictRemoveFile: "حذف",
+        //     autoProcessQueue: false,
+        //     acceptedFiles: ".png,.jpg,.gif,.bmp,.jpeg",
+        //     maxFiles: 1,
+        //     accept: function (file, done) {
+        //         debugger;
+        //         //if ($('#previewBirthCertificatePage1').length > 0)
+        //         //    $('#previewBirthCertificatePage1').remove();
+        //         BirthCertificateFile_Page1 = file;
+        //         console.log(typeof (file));
+        //         done();
+        //     },
+        //     init: function () {
+        //         this.on("maxfilesexceeded", function (file) {
+        //             showMessage('@ResourceFile.InfoTitle', 'فقط میتوانید یک فایل بارگذاری کنید،در صورت نیاز به بارگذاری فایل جدید ابتدا فایل قبلی را حذف کنید!', icons.warning, '@ResourceFile.Close');
+        //             this.removeFile(file);
+        //         });
+        //         this.on("sending", function (file) {
+        //             debugger;
+        //         });
+        //         this.on("addedfile", file => {
+        //             debugger;
+        //             if (!fileIsImage(file)) {
+        //                 this.removeFile(file);
+        //                 showMessage('@ResourceFile.InfoTitle', 'فقط فایل های با پسوند png,jpg,gif,bmp,jpeg میتوانید انتخاب کنید', icons.warning, '@ResourceFile.Close');
+        //                 $('#frmBirthCertificatePage1').addClass('dz-started');
+        //                 return;
+        //             }
+        //             if ($('#previewBirthCertificatePage1').length > 0) {
+        //                 this.removeFile(file);
+        //                 showMessage('@ResourceFile.InfoTitle', 'فقط میتوانید یک فایل بارگذاری کنید،در صورت نیاز به بارگذاری فایل جدید ابتدا فایل قبلی را حذف کنید!', icons.warning, '@ResourceFile.Close');
+        //                 $('#frmBirthCertificatePage1').addClass('dz-started');
+        //             }
+        //         });
+        //         this.on("removedfile", file => {
+        //             debugger;
+        //             BirthCertificateFile_Page1 = null;
+        //             $('#frmBirthCertificatePage1').addClass('dz-started');
+        //         });
+        //     }
+        // };
+
+        // let BirthCertificateDescription = null;
+        // Dropzone.options.frmBirthCertificateDescription = {
+        //     paramName: "file", // The name that will be used to transfer the file
+        //     maxFilesize: 1, // MB
+        //     addRemoveLinks: true,
+        //     dictRemoveFile: "حذف",
+        //     autoProcessQueue: false,
+        //     acceptedFiles: ".png,.jpg,.gif,.bmp,.jpeg",
+        //     maxFiles: 1,
+        //     accept: function (file, done) {
+        //         debugger;
+        //         //if ($('#previewBirthCertificateDescription').length > 0)
+        //         //    $('#previewBirthCertificateDescription').remove();
+        //         BirthCertificateDescription = file;
+        //         console.log(typeof (file));
+        //         done();
+        //     },
+        //     init: function () {
+        //         this.on("maxfilesexceeded", function (file) {
+        //             showMessage('@ResourceFile.InfoTitle', 'فقط میتوانید یک فایل بارگذاری کنید،در صورت نیاز به بارگذاری فایل جدید ابتدا فایل قبلی را حذف کنید!', icons.warning, '@ResourceFile.Close');
+        //             this.removeFile(file);
+        //         });
+        //         this.on("sending", function (file) {
+        //             debugger;
+        //         });
+        //         this.on("addedfile", file => {
+        //             debugger;
+        //             if (!fileIsImage(file)) {
+        //                 this.removeFile(file);
+        //                 showMessage('@ResourceFile.InfoTitle', 'فقط فایل های با پسوند png,jpg,gif,bmp,jpeg میتوانید انتخاب کنید', icons.warning, '@ResourceFile.Close');
+        //                 $('#frmBirthCertificateDescription').addClass('dz-started');
+        //                 return;
+        //             }
+        //             if ($('#previewBirthCertificateDescription').length > 0) {
+        //                 this.removeFile(file);
+        //                 showMessage('@ResourceFile.InfoTitle', 'فقط میتوانید یک فایل بارگذاری کنید،در صورت نیاز به بارگذاری فایل جدید ابتدا فایل قبلی را حذف کنید!', icons.warning, '@ResourceFile.Close');
+        //                 $('#frmBirthCertificateDescription').addClass('dz-started');
+        //             }
+        //         });
+        //         this.on("removedfile", file => {
+        //             debugger;
+        //             BirthCertificateDescription = null;
+        //             $('#frmBirthCertificateDescription').addClass('dz-started');
+        //         });
+        //     }
+        // };
+
+        let BackNationalCardFile = null;
+        Dropzone.options.frmBackNationalCard = {
+            paramName: "file", // The name that will be used to transfer the file
+            maxFilesize: 1, // MB
+            addRemoveLinks: true,
+            dictRemoveFile: "حذف",
+            autoProcessQueue: false,
+            acceptedFiles: ".png,.jpg,.gif,.bmp,.jpeg",
+            maxFiles: 1,
+            accept: function (file, done) {
+                debugger;
+                //if ($('#previewBackNationalCard').length > 0)
+                //    $('#previewBackNationalCard').remove();
+                BackNationalCardFile = file;
+                console.log(typeof (file));
+                done();
+            },
+            init: function () {
+                this.on("maxfilesexceeded", function (file) {
+                    showMessage('@ResourceFile.InfoTitle', 'فقط میتوانید یک فایل بارگذاری کنید،در صورت نیاز به بارگذاری فایل جدید ابتدا فایل قبلی را حذف کنید!', icons.warning, '@ResourceFile.Close');
+                    this.removeFile(file);
+                });
+                this.on("sending", function (file) {
+                    debugger;
+                });
+                this.on("addedfile", file => {
+                    debugger;
+                    if (!fileIsImage(file)) {
+                        this.removeFile(file);
+                        showMessage('@ResourceFile.InfoTitle', 'فقط فایل های با پسوند png,jpg,gif,bmp,jpeg میتوانید انتخاب کنید', icons.warning, '@ResourceFile.Close');
+                        $('#frmBackNationalCard').addClass('dz-started');
+                        return;
+                    }
+                    if ($('#previewBackNationalCard').length > 0) {
+                        this.removeFile(file);
+                        showMessage('@ResourceFile.InfoTitle', 'فقط میتوانید یک فایل بارگذاری کنید،در صورت نیاز به بارگذاری فایل جدید ابتدا فایل قبلی را حذف کنید!', icons.warning, '@ResourceFile.Close');
+                        $('#frmBackNationalCard').addClass('dz-started');
+                    }
+                });
+                this.on("removedfile", file => {
+                    debugger;
+                    BackNationalCardFile = null;
+                    $('#frmBackNationalCard').addClass('dz-started');
+                });
+            }
+        };
+
+        let FrontNationalCardFile = null;
+        Dropzone.options.frmFrontNationalCard = {
+            paramName: "file", // The name that will be used to transfer the file
+            maxFilesize: 1, // MB
+            addRemoveLinks: true,
+            dictRemoveFile: "حذف",
+            autoProcessQueue: false,
+            acceptedFiles: ".png,.jpg,.gif,.bmp,.jpeg",
+            maxFiles: 1,
+            accept: function (file, done) {
+                debugger;
+                //if ($('#previewFrontNationalCard').length > 0)
+                //    $('#previewFrontNationalCard').remove();
+                FrontNationalCardFile = file;
+                console.log(typeof (file));
+                done();
+            },
+            init: function () {
+                this.on("maxfilesexceeded", function (file) {
+                    showMessage('@ResourceFile.InfoTitle', 'فقط میتوانید یک فایل بارگذاری کنید،در صورت نیاز به بارگذاری فایل جدید ابتدا فایل قبلی را حذف کنید', icons.warning, '@ResourceFile.Close');
+                    this.removeFile(file);
+                });
+                this.on("sending", function (file) {
+                    debugger;
+                });
+                this.on("addedfile", file => {
+                    debugger;
+                    if (!fileIsImage(file)) {
+                        this.removeFile(file);
+                        showMessage('@ResourceFile.InfoTitle', 'فقط فایل های با پسوند png,jpg,gif,bmp,jpeg میتوانید انتخاب کنید', icons.warning, '@ResourceFile.Close');
+                        $('#frmFrontNationalCard').addClass('dz-started');
+                        return;
+                    }
+                    if ($('#previewFrontNationalCard').length > 0) {
+                        this.removeFile(file);
+                        showMessage('@ResourceFile.InfoTitle', 'فقط میتوانید یک فایل بارگذاری کنید،در صورت نیاز به بارگذاری فایل جدید ابتدا فایل قبلی را حذف کنید!', icons.warning, '@ResourceFile.Close');
+                        $('#frmFrontNationalCard').addClass('dz-started');
+                    }
+                });
+                this.on("removedfile", file => {
+                    debugger;
+                    FrontNationalCardFile = null;
+                    $('#frmFrontNationalCard').addClass('dz-started');
+                });
+            }
+        };
+
+        // Dropzone.options.frmOccupationDocument = {
+        //     paramName: "file", // The name that will be used to transfer the file
+        //     maxFilesize: 1, // MB
+        //     addRemoveLinks: true,
+        //     dictRemoveFile: "حذف",
+        //     autoProcessQueue: false,
+        //     acceptedFiles: ".png,.jpg,.gif,.bmp,.jpeg",
+        //     maxFiles: 2,
+        //     accept: function (file, done) {
+        //         debugger;
+        //         //if ($('#frmOccupationDocument').find('.dz-preview').length > 2 && $('#previewOccupationDocument').length > 0)
+        //         //    $('#previewOccupationDocument').remove();
+        //         if (jobDocumentsArrays.filter(p => p.Status != @((int)FileStatusEnum.Delete)).length < 2) {
+        //             const tickId = new Date().getTime();
+        //             $(file.previewElement).find('a.dz-remove').data('file-id', tickId);;
+        //             jobDocumentsArrays.push({
+        //                 FileId: tickId,
+        //                 Status: @((int)FileStatusEnum.Add),
+        //                 File: file
+        //             });
+        //         }
+        //         done();
+        //     },
+        //     init: function () {
+        //         this.on("maxfilesexceeded", function (file) {
+        //             showMessage('@ResourceFile.InfoTitle', 'حداکثر میتوانید دو فایل بارگذاری کنید!', icons.warning, '@ResourceFile.Close');
+        //             this.removeFile(file);
+        //         });
+        //         this.on("sending", function (file) {
+        //             debugger;
+        //         });
+        //         this.on("addedfile", file => {
+        //             debugger;
+        //             if (!fileIsImage(file)) {
+        //                 this.removeFile(file);
+        //                 showMessage('@ResourceFile.InfoTitle', 'فقط فایل های با پسوند png,jpg,gif,bmp,jpeg میتوانید انتخاب کنید', icons.warning, '@ResourceFile.Close');
+        //                 $('#frmOccupationDocument').addClass('dz-started');
+        //                 return;
+        //             }
+        //             if (jobDocumentsArrays.filter(p => p.Status != @((int)FileStatusEnum.Delete)).length >= 2) {
+        //                 this.removeFile(file);
+        //                 showMessage('@ResourceFile.InfoTitle', 'فقط میتوانید دو فایل بارگذاری کنید،در صورت نیاز به بارگذاری فایل جدید ابتدا فایل(های) قبلی را حذف کنید!', icons.warning, '@ResourceFile.Close');
+        //                 $('#frmOccupationDocument').addClass('dz-started');
+        //             }
+        //         });
+        //         this.on("removedfile", file => {
+        //             debugger;
+        //             const deleteElement = $(file.previewElement).find('a.dz-remove');
+        //             if (deleteElement != undefined && deleteElement.data('file-id') != undefined)
+        //                 jobDocumentsArrays.splice(jQuery.inArray(parseInt(deleteElement.data('file-id')), jobDocumentsArrays), 1);
+        //             if (jobDocumentsArrays.length > 0)
+        //                 $('#frmOccupationDocument').addClass('dz-started');
+        //         });
+        //     }
+        // };
+
+        // Dropzone.options.frmAddressDocument = {
+        //     paramName: "file", // The name that will be used to transfer the file
+        //     maxFilesize: 1, // MB
+        //     addRemoveLinks: true,
+        //     dictRemoveFile: "حذف",
+        //     autoProcessQueue: false,
+        //     acceptedFiles: ".png,.jpg,.gif,.bmp,.jpeg",
+        //     maxFiles: 2,
+        //     accept: function (file, done) {
+        //         debugger;
+        //         //if ($('#frmAddressDocument').find('.dz-preview').length > 2 && $('#previewAddressDocument').length > 0)
+        //         //    $('#previewAddressDocument').remove();
+        //         if (addressDocumentsArrays.filter(p => p.Status != @((int)FileStatusEnum.Delete)).length < 2) {
+        //             const tickId = new Date().getTime();
+        //             $(file.previewElement).find('a.dz-remove').data('file-id', tickId);;
+        //             addressDocumentsArrays.push({
+        //                 FileId: tickId,
+        //                 Status: @((int)FileStatusEnum.Add),
+        //                 File: file
+        //             });
+        //         }
+        //         done();
+        //     },
+        //     init: function () {
+        //         this.on("maxfilesexceeded", function (file) {
+        //             showMessage('@ResourceFile.InfoTitle', 'حداکثر میتوانید دو فایل بارگذاری کنید!', icons.warning, '@ResourceFile.Close');
+        //             this.removeFile(file);
+        //         });
+        //         this.on("sending", function (file) {
+        //             debugger;
+        //         });
+        //         this.on("addedfile", file => {
+        //             debugger;
+        //             if (!fileIsImage(file)) {
+        //                 this.removeFile(file);
+        //                 showMessage('@ResourceFile.InfoTitle', 'فقط فایل های با پسوند png,jpg,gif,bmp,jpeg میتوانید انتخاب کنید', icons.warning, '@ResourceFile.Close');
+        //                 $('#frmAddressDocument').addClass('dz-started');
+        //                 return;
+        //             }
+        //             if (addressDocumentsArrays.filter(p => p.Status != @((int)FileStatusEnum.Delete)).length >= 2) {
+        //                 this.removeFile(file);
+        //                 showMessage('@ResourceFile.InfoTitle', 'فقط میتوانید دو فایل بارگذاری کنید،در صورت نیاز به بارگذاری فایل جدید ابتدا فایل(های) قبلی را حذف کنید!', icons.warning, '@ResourceFile.Close');
+        //                 $('#frmAddressDocument').addClass('dz-started');
+        //             }
+        //         });
+        //         this.on("removedfile", file => {
+        //             debugger;
+        //             const deleteElement = $(file.previewElement).find('a.dz-remove');
+        //             if (deleteElement != undefined && deleteElement.data('file-id') != undefined)
+        //                 addressDocumentsArrays.splice(jQuery.inArray(parseInt(deleteElement.data('file-id')), addressDocumentsArrays), 1);
+        //             if (addressDocumentsArrays.length > 0)
+        //                 $('#frmAddressDocument').addClass('dz-started');
+        //         });
+        //     }
+        // };
+
+        $(document).ready(function () {
+            $('div').removeClass('zl-active');
+            $('#uploadDocumentsMenu').addClass('zl-active');
+        });
+
+        $('#btnUploadIdentityDocument').click(function (e) {
+            e.preventDefault();
+            debugger;
+
+            // if ($('#previewBirthCertificatePage1').length == 0 && BirthCertificateFile_Page1 == null) {
+            //     showMessage('@ResourceFile.InfoTitle', '@ResourceFile.RequiredMessageBirthCertificatePage1', icons.warning, '@ResourceFile.Close');
+            //     return;
+            // }
+
+            // if ($('#previewBirthCertificateDescription').length == 0 && BirthCertificateDescription == null) {
+            //     showMessage('@ResourceFile.InfoTitle', '@ResourceFile.RequiredMessageBirthCertificateDescription', icons.warning, '@ResourceFile.Close');
+            //     return;
+            // }
+
+            if ($('#previewFrontNationalCard').length == 0 && FrontNationalCardFile == null) {
+                showMessage('@ResourceFile.InfoTitle', '@ResourceFile.RequiredMessageNationalCardFront', icons.warning, '@ResourceFile.Close');
+                return;
+            }
+
+            if ($('#previewBackNationalCard').length == 0 && BackNationalCardFile == null) {
+                showMessage('@ResourceFile.InfoTitle', '@ResourceFile.RequiredMessageNationalCardBack', icons.warning, '@ResourceFile.Close');
+                return;
+            }
+
+            //if ($('#previewAccountStatement').length == 0 && AccountStatement == null) {
+            //    showMessage('@ResourceFile.InfoTitle', 'فایل صورتحساب خود را بارگذاری کنید', icons.warning, '@ResourceFile.Close');
+            //    return;
+            //}
+
+            // if (addressDocumentsArrays.filter(p => p.Status != @((int)FileStatusEnum.Delete)).length == 0) {
+            //     showMessage('@ResourceFile.InfoTitle', '@ResourceFile.RequiredMessageAddressDocument', icons.warning, '@ResourceFile.Close');
+            //     return;
+            // }
+
+            // if (jobDocumentsArrays.filter(p => p.Status != @((int)FileStatusEnum.Delete)).length == 0) {
+            //     showMessage('@ResourceFile.InfoTitle', '@ResourceFile.RequiredMessageJobDocument', icons.warning, '@ResourceFile.Close');
+            //     return;
+            // }
+            showWaiting('UserIdentityDocumentsDiv', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+            let data = new FormData();
+            //data.append('@DocumentType.BirthCertificatePage1', BirthCertificateFile_Page1);
+            //data.append('@DocumentType.BirthCertificateDescription', BirthCertificateDescription);
+            data.append('@DocumentType.NationalCardFront', FrontNationalCardFile);
+            data.append('@DocumentType.NationalCardBack', BackNationalCardFile);
+            //data.append('@DocumentType.AccountStatement', AccountStatement);
+            if ($('#BankId').val() != '')
+                data.append('bankId', $('#BankId').val());
+
+            // for (let i = 0; i < jobDocumentsArrays.length; i++) {
+            //     if (jobDocumentsArrays[i].Status == @((int)FileStatusEnum.Add))
+            //         data.append('@DocumentType.JobDocument', jobDocumentsArrays[i].File);
+            //     else if (jobDocumentsArrays[i].Status == @((int)FileStatusEnum.Delete))
+            //         data.append('DeleteFileIds', jobDocumentsArrays[i].FileId);
+            // }
+
+            // for (let i = 0; i < addressDocumentsArrays.length; i++) {
+            //     if (addressDocumentsArrays[i].Status == @((int)FileStatusEnum.Add))
+            //         data.append('@DocumentType.AddressDocument', addressDocumentsArrays[i].File);
+            //     else if (addressDocumentsArrays[i].Status == @((int)FileStatusEnum.Delete))
+            //         data.append('DeleteFileIds', addressDocumentsArrays[i].FileId);
+            // }
+
+            $.ajax({
+                type: 'post',
+                //dataType: 'json',
+                //contentType: "application/json; charset=utf-8",
+                processData: false,
+                contentType: false,
+                url: '/api/v1/User/UploadIdentityDocuments',
+                data: data,// JSON.stringify(model),
+                success: function (result) {
+                    hideWaiting('UserIdentityDocumentsDiv');
+                    debugger;
+                    if (result.isSuccess) {
+                        if ('@Model.RequestFacilityId.HasValue' == "True") {
+                            if (!result.data.requestFacilityRequiredGuarantor || result.data.hasGaurantorWithApprovedWorkFlow) {
+                                showMessage('@ResourceFile.InfoTitle', 'بارگذاری مدارک با موفقیت انجام شد.<br/>پرونده شما به کارشناسان ما ارسال شد، لطفا منتظر بمانید!', icons.success, '@ResourceFile.Close',
+                                    () => { window.location.replace('@Url.Action("List", "RequestFacility", new { requestFacilityId = Model.RequestFacilityId })'); });
+                            }
+                            else if (result.data.requestFacilityRequiredGuarantor && !result.data.hasGaurantorWithApprovedWorkFlow) {
+                                showMessage('@ResourceFile.InfoTitle', 'بارگذاری مدارک با موفقیت انجام شد.<br/>اما بدلیل اینکه درخواست تسهیلات شما نیاز به معرفی ضامن دارد تا زمانی که فرآیند معرفی،ثبت درخواست ضامن و تکمیل پرونده انجام نشود پرونده شما به کارشناسان ما ارسال نمیشود<br/>در صورتی تکمیل فرآیند ضامن تسهیلات شما بصورت اتوماتیک به کارشناسان ما ارسال خواهد شد!', icons.success, '@ResourceFile.Close',
+                                    () => { window.location.replace('@Url.Action("List", "RequestFacility", new { requestFacilityId = Model.RequestFacilityId })'); });
+                            }
+                        }
+                        else {
+                            showMessage('@ResourceFile.InfoTitle', 'بارگذاری مدارک با موفقیت انجام شد!', icons.success, '@ResourceFile.Close',
+                                () => { window.location.replace('/home'); });
+                        }
+                    }
+                },
+                error: function (error) {
+                    hideWaiting('UserIdentityDocumentsDiv');
+                    const exception = getExceptionMessageFromError(error);
+                    if (exception != null)
+                        showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                    else
+                        showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                }
+            });
+        });
+    </script>
+}

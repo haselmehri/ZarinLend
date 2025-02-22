@@ -1,0 +1,674 @@
+﻿@model RequestFacilityInstallmentFilterModel
+@{
+    ViewData["Title"] = "گزارش اقساط";
+    Layout = "~/Views/Shared/_NewLayout.cshtml";
+}
+@section styles{
+    <link href="~/persianDatePicker/css/persianDatepicker-lightorang.css" rel="stylesheet" />
+    <style type="text/css">
+        /*.zl-app-content {
+                                                    padding-right: 1rem !important;
+                                                    padding-left: 1rem !important;
+                                                    }*/
+        .ipg-img {
+            width: 70px;
+            height: 70px;
+            border-radius: 18px;
+            border: 1px solid #e6dbdb;
+            opacity: .35
+        }
+    </style>
+}
+<div id="requestGridDiv" class="p-2 bg-white rounded-lg">
+    <div class="font-medium-3 secondary darken-4 text-bold-800 d-flex align-items-center">
+        <i class="bx bx-align-right zl-text-secondary mr-25"></i>
+        <span>گزارش اقساط</span>
+    </div>
+    <div class=" pt-1 rounded-lg">
+        <form id="filterForm" method="post">
+            <div class="row my-0 my-md-1">
+                <div class=" col-md-6 col-sm-12">
+                    <div class="form-group">
+                        <fieldset class="form-group position-relative has-icon-left">
+                            <input class="form-control bg-transparent shamsi-datepicker" id="txtStartDueDate" name="txtStartDueDate" maxlength="10" placeholder="تاریخ سررسید از" style="text-align:center;direction:ltr" type="text" value="" data-fromdate="" />
+                            <div class="form-control-position">
+                                <i class="bx bx-calendar"></i>
+                            </div>
+                        </fieldset>
+                        <input asp-for="StartDueDate" type="hidden" />
+                        <span asp-validation-for="StartDueDate" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class=" col-md-6 col-sm-12">
+                    <div class="form-group">
+                        <fieldset class="form-group position-relative has-icon-left">
+                            <input class="form-control bg-transparent shamsi-datepicker" id="txtEndDueDate" name="txtEndDueDate" maxlength="10" placeholder="تاریخ سررسید تا" style="text-align:center;direction:ltr" type="text" value="" data-fromdate="" />
+                            <div class="form-control-position">
+                                <i class="bx bx-calendar"></i>
+                            </div>
+                        </fieldset>
+                        <input asp-for="EndDueDate" type="hidden" />
+                        <span asp-validation-for="EndDueDate" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row my-0 my-md-1">
+                <div class=" col-md-6 col-sm-12">
+                    <div class="form-group">
+                        <fieldset class="form-group position-relative has-icon-left">
+                            <input class="form-control bg-transparent shamsi-datepicker" id="txtStartRealPaymentDate" name="txtStartRealPaymentDate" maxlength="10" placeholder="تاریخ پرداخت از" style="text-align:center;direction:ltr" type="text" value="" data-fromdate="" />
+                            <div class="form-control-position">
+                                <i class="bx bx-calendar"></i>
+                            </div>
+                        </fieldset>
+                        <input asp-for="StartRealPaymentDate" type="hidden" />
+                        <span asp-validation-for="StartRealPaymentDate" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class=" col-md-6 col-sm-12">
+                    <div class="form-group">
+                        <fieldset class="form-group position-relative has-icon-left">
+                            <input class="form-control bg-transparent shamsi-datepicker" id="txtEndRealPaymentDate" name="txtEndRealPaymentDate" maxlength="10" placeholder="تاریخ پرداخت تا" style="text-align:center;direction:ltr" type="text" value="" data-fromdate="" />
+                            <div class="form-control-position">
+                                <i class="bx bx-calendar"></i>
+                            </div>
+                        </fieldset>
+                        <input asp-for="EndRealPaymentDate" type="hidden" />
+                        <span asp-validation-for="EndRealPaymentDate" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row my-0 my-md-1">
+                <div class=" col-md-6 col-sm-12">
+                    <div class="form-group">
+                        <input type="text" class="form-control bg-transparent" asp-for="NationalCode" placeholder="کد ملی" style="text-align:center;direction:ltr;letter-spacing:5px" />
+                        <span asp-validation-for="NationalCode" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row my-0 my-md-1">
+                <div class="col-lg-2 col-md-6 col-sm-12">
+                    <div class="radio radio-danger radio-glow radio-sm">
+                        <input type="radio" checked="checked" class="verifyRadio" name="paidStatus" id="inlineRadio1" value="@((long)PaidStatus.NotPayAndPenalty)" />
+                        <label class="font-small-3 danger darken-4 text-bold-400 line-height-23" for="inlineRadio1">پرداخت نشده و با جریمه</label>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6 col-sm-12">
+                    <div class="radio radio-warning radio-glow radio-sm">
+                        <input type="radio" class="verifyRadio" name="paidStatus" id="inlineRadio7" value="@((long)PaidStatus.PaidAndPenalty)" />
+                        <label class="font-small-3 warning darken-4 text-bold-400 line-height-23" for="inlineRadio7">پرداخت شده با جریمه</label>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 col-sm-12">
+                    <div class="radio radio-info radio-glow radio-sm">
+                        <input type="radio" class="verifyRadio" name="paidStatus" id="inlineRadio2" value="@((long)PaidStatus.NotPayAndNotPenalty)" />
+                        <label class="font-small-3 info darken-4 text-bold-400 line-height-23" for="inlineRadio2">پرداخت نشده و بدون جریمه</label>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 col-sm-12">
+                    <div class="radio radio-success radio-glow radio-sm">
+                        <input type="radio" class="verifyRadio" name="paidStatus" id="inlineRadio3" value="@((long)PaidStatus.PaidAndNotPenalty)" />
+                        <label class="font-small-3 success darken-4 text-bold-400 line-height-23" for="inlineRadio3">پرداخت شده بدون جریمه</label>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6 col-sm-12">
+                    <div class="radio radio-black radio-glow radio-sm">
+                        <input type="radio" name="paidStatus" id="inlineRadio4" value="@((long)PaidStatus.None)" />
+                        <label class="font-small-3 black darken-4 text-bold-400 line-height-23" for="inlineRadio4">همه</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row my-0 my-md-1">
+                <div class=" col-md-12" style="text-align:left">
+                    <button type="button" id="btnSearch" class="btn btn-zl-primary">
+                        جستجو&nbsp;<i class="fal fa-search"></i>
+                    </button>
+                    <button id="btnExportToExcel" tabindex="5" class="btn btn-outline-info">
+                        خروجی اکسل&nbsp;<i class="fal fa-file-excel-o"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+        <div>
+            <table id="installmentList" class="display" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th >مبلغ قسط</th>
+                        <th >تاریخ سررسید</th>
+                        <th >تعداد روزهای دیرکرد</th>
+                        <th >مبلغ دیرکرد</th>
+                        <th >مبلغ کل(قسط + دیرکرد)</th>
+                        <th >تاریخ پرداخت</th>
+                        <th >اعتبار درخواستی(ريال)<br />بازه پرداخت</th>
+                        <th >درخواست کننده<br />کد ملی/شناسه ملی</th>
+                        <th >وضعیت</th>
+                        <th >جزئیات تراکنش</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="modal fade text-left" id="transactionDetailModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel18" style="display: none;" data-backdrop="static" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-md" role="document">
+        <div class="modal-content rounded-xl modal-md">
+            <div class="modal-header">
+                <h4 class="modal-title dark" id="myModalLabel18">
+                    جزئیات ترکنش
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="بستن">
+                    <i class="bx bx-x"></i>
+                </button>
+            </div>
+            <div class="modal-body line-height-2">
+                <div class="border rounded">
+                    <div class="d-flex align-items-center p-1">
+                        <span class="font-small-3 w-50 text-bold-500">مبلغ تراکنش(ريال)</span><span id="amountSpan" class="dark w-50 text-bold-400"></span>
+                    </div>
+                    <hr class="my-0" />
+                    <div class="d-flex align-items-center p-1">
+                        <span class="font-small-3 w-50 text-bold-500">شناسه خرید</span><span id="resNumSpan" class="dark w-50 text-bold-400"></span>
+                    </div>
+                    <hr class="my-0" />
+                    <div class="d-flex align-items-center p-1">
+                        <span class="font-small-3 w-50 text-bold-500">شماره مرجع</span><span id="rrnSpan" class="dark w-50 text-bold-400"></span>
+                    </div>
+                    <hr class="my-0" />
+                    <div class="d-flex align-items-center p-1">
+                        <span class="font-small-3 w-50 text-bold-500">رسید دیجیتالی خرید</span><span style="word-wrap:break-word;word-break:break-word" id="refNumSpan" class="dark w-50 text-bold-400"></span>
+                    </div>
+                    <hr class="my-0" />
+                    <div class="d-flex align-items-center p-1">
+                        <span class="font-small-3 w-50 text-bold-500">شماره کارت</span><span id="cardPanSpan" style="direction:ltr" class="dark w-50 text-bold-400"></span>
+                    </div>
+                    <hr class="my-0" />
+                    <div class="d-flex align-items-center p-1">
+                        <span class="font-small-3 w-50 text-bold-500">تاریخ تراکنش</span><span id="dateSpan" class="dark w-50 text-bold-400"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    @{
+        await Html.RenderPartialAsync("~/Views/Shared/_ValidationScriptsPartial.cshtml");
+        <script src="~/persianDatePicker/js/persianDatepicker.min.js"></script>
+    }
+    <script>
+        let dataTableResponsive;
+        let startDueDate = null;
+        let endDueDate = null;
+        let startRealPaymentDate = null;
+        let endRealPaymentDate = null;
+        $(document).ready(function () {
+            $('div').removeClass('zl-active');
+            $('#searchInstallment').addClass('zl-active');
+            $('#NationalCode').mask('9999999999', {});
+
+            startDueDate = $("#txtStartDueDate").persianDatepicker(
+                {
+                    months: ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"],
+                    dowTitle: ["شنبه", "یکشنبه", "دوشنبه", "سه شنبه", "چهارشنبه", "پنج شنبه", "جمعه"],
+                    shortDowTitle: ["ش", "ی", "د", "س", "چ", "پ", "ج"],
+                    theme: 'lightorang',
+                    showGregorianDate: !1,
+                    persianNumbers: !0,
+                    formatDate: "YYYY/0M/0D",
+                    selectedBefore: !1,
+                    selectedDate: null,
+                    prevArrow: '\u25c4',
+                    nextArrow: '\u25ba',
+                    alwaysShow: !1,
+                    selectableYears: null,
+                    selectableMonths: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                    cellWidth: 50, // by px
+                    cellHeight: 40, // by px
+                    fontSize: 17, // by px
+                    isRTL: !1,
+                    calendarPosition: {
+                        x: 0,
+                        y: 0,
+                    },
+                    onSelect: function () {
+                        //alert($("#txtBirthDate").attr("data-gdate"));
+                        $('#StartDueDate').val($("#txtStartDueDate").attr("data-gdate"));
+                    },
+                    onShow: function () { },
+                    onHide: function () { },
+                    onRender: function () { }
+                });
+
+            endDueDate = $("#txtEndDueDate").persianDatepicker(
+                {
+                    months: ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"],
+                    dowTitle: ["شنبه", "یکشنبه", "دوشنبه", "سه شنبه", "چهارشنبه", "پنج شنبه", "جمعه"],
+                    shortDowTitle: ["ش", "ی", "د", "س", "چ", "پ", "ج"],
+                    theme: 'lightorang',
+                    showGregorianDate: !1,
+                    persianNumbers: !0,
+                    formatDate: "YYYY/0M/0D",
+                    selectedBefore: !1,
+                    selectedDate: null,
+                    prevArrow: '\u25c4',
+                    nextArrow: '\u25ba',
+                    alwaysShow: !1,
+                    selectableYears: null,
+                    selectableMonths: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                    cellWidth: 50, // by px
+                    cellHeight: 40, // by px
+                    fontSize: 17, // by px
+                    isRTL: !1,
+                    calendarPosition: {
+                        x: 0,
+                        y: 0,
+                    },
+                    onSelect: function () {
+                        $('#EndDueDate').val($("#txtEndDueDate").attr("data-gdate"));
+                    },
+                    onShow: function () { },
+                    onHide: function () { },
+                    onRender: function () { }
+                });
+
+            startRealPaymentDate = $("#txtStartRealPaymentDate").persianDatepicker(
+                {
+                    months: ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"],
+                    dowTitle: ["شنبه", "یکشنبه", "دوشنبه", "سه شنبه", "چهارشنبه", "پنج شنبه", "جمعه"],
+                    shortDowTitle: ["ش", "ی", "د", "س", "چ", "پ", "ج"],
+                    theme: 'lightorang',
+                    showGregorianDate: !1,
+                    persianNumbers: !0,
+                    formatDate: "YYYY/0M/0D",
+                    selectedBefore: !1,
+                    selectedDate: null,
+                    prevArrow: '\u25c4',
+                    nextArrow: '\u25ba',
+                    alwaysShow: !1,
+                    selectableYears: null,
+                    selectableMonths: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                    cellWidth: 50, // by px
+                    cellHeight: 40, // by px
+                    fontSize: 17, // by px
+                    isRTL: !1,
+                    calendarPosition: {
+                        x: 0,
+                        y: 0,
+                    },
+                    onSelect: function () {
+                        //alert($("#txtBirthDate").attr("data-gdate"));
+                        $('#StartDate').val($("#txtStartRealPaymentDate").attr("data-gdate"));
+                    },
+                    onShow: function () { },
+                    onHide: function () { },
+                    onRender: function () { }
+                });
+
+            endRealPaymentDate = $("#txtEndRealPaymentDate").persianDatepicker(
+                {
+                    months: ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"],
+                    dowTitle: ["شنبه", "یکشنبه", "دوشنبه", "سه شنبه", "چهارشنبه", "پنج شنبه", "جمعه"],
+                    shortDowTitle: ["ش", "ی", "د", "س", "چ", "پ", "ج"],
+                    theme: 'lightorang',
+                    showGregorianDate: !1,
+                    persianNumbers: !0,
+                    formatDate: "YYYY/0M/0D",
+                    selectedBefore: !1,
+                    selectedDate: null,
+                    prevArrow: '\u25c4',
+                    nextArrow: '\u25ba',
+                    alwaysShow: !1,
+                    selectableYears: null,
+                    selectableMonths: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                    cellWidth: 50, // by px
+                    cellHeight: 40, // by px
+                    fontSize: 17, // by px
+                    isRTL: !1,
+                    calendarPosition: {
+                        x: 0,
+                        y: 0,
+                    },
+                    onSelect: function () {
+                        $('#EndDate').val($("#txtEndDate").attr("data-gdate"));
+                    },
+                    onShow: function () { },
+                    onHide: function () { },
+                    onRender: function () { }
+                });
+
+            $('input.shamsi-datepicker').on('input', function (e) {
+                if ($(e.currentTarget).val() == '') {
+                    const pdb_Id = $(e.currentTarget).attr('pdp-id');
+                    if (pdb_Id != undefined && pdb_Id != '') {
+                        $(`div#${pdb_Id}>div.days>div>div.selday`).removeClass('selday');
+                        $(e.currentTarget).attr('data-jdate', '');
+                        $(e.currentTarget).attr('data-gdate', '');
+                    }
+                }
+            });
+
+            searchInstallment();
+        });
+
+        const searchInstallment = () => {
+            dataTableResponsive = $('#installmentList')
+                .on('preXhr.dt', function (e, settings, data, a, b) {
+                    //trigger before ajax call
+                    //debugger;
+                    //alert('preXhr');
+                    showWaiting('installmentList', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                })
+                .on('xhr.dt', function (e, settings, json, xhr) {
+                    //trigger after ajax call
+                    //debugger;
+                    //alert('xhr');
+                })
+                .DataTable({
+                    order: [],
+                    processing: true,
+                    serverSide: true,
+                    responsive: true,
+                    rowReorder: false,
+                    select: true,
+                    searching: false,
+                    paging: true,
+                    ordering: false,
+                    searching: false,
+                    filtering: false,
+                    info: true,
+                    lengthMenu: [
+                        [10, 25, 50],
+                        [10, 25, 50]
+                    ],
+                    pageLength: 10,
+                    columnDefs: [
+                        //{ "visible": false, "targets": 0 },
+                        //and in this case the < a href="//legacy.datatables.net/ref#bStateSave" > bStateSave</a> works regularly ....but then I would like to have responsive columns indicating responsive: {
+                        {
+                            details: false,
+                            breakpoints: [
+                                { name: 'desktop', width: Infinity },
+                                { name: 'tablet-l', width: 1200 },
+                                { name: 'tablet-p', width: 992 },
+                                { name: 'mobile-l', width: 576 },
+                                { name: 'mobile-p', width: 320 }
+                            ]
+                        },
+                        {
+                            targets: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                            className: 'dt-center',
+                        },
+                        {
+                            targets: 1,
+                            render: function (data, type, row, meta) {
+                                return splitNumber(data);
+                            }
+                        },
+                        {
+                            targets: 4,
+                            render: function (data, type, row, meta) {
+                                return splitNumber(data);
+                            }
+                        },
+                        {
+                            targets: 5,
+                            render: function (data, type, row, meta) {
+                                return splitNumber(data);
+                            }
+                        },
+                        {
+                            targets: 6,
+                            render: function (data, type, row, meta) {
+                                return (data != null ? data : '')
+                            }
+                        },
+                        {
+                            targets: 7,
+                            render: function (data, type, row, meta) {
+                                return `${splitNumber(data)}<br/>${row.monthCountTitle}`;
+                            }
+                        },
+                        {
+                            targets: 8,
+                            render: function (data, type, row, meta) {
+                                return `${data}<br/>${row.nationalCode}`;
+                            }
+                        },
+                        {
+                            responsivePriority: 3,
+                            targets: 9,
+                            render: function (data, type, row, meta) {
+                                return `<div class="badge badge-pill ${data ? "zl-badge-deposited" : "zl-badge-reject"}">
+                                                            <div class="d-flex align-items-center"><i class="bx bxs-circle font-size-xxsmall mr-25"></i>${data ? "پرداخت شده" : "پرداخت نشده"}</div>
+                                                        </div>`;
+                            }
+                        },
+                        {
+                            targets: 10,
+                            render: function (data, type, row, meta) {
+                                if (row.paymentResult != null)
+                                    return `<button id='transactionDetail' type='button' class='btn btn-info' >مشاهده</button>`;
+                                else
+                                    return '';
+                            }
+                        }],
+                    rowCallback: function (row, data) {
+                        //$('td:eq(0)', row).css('text-align', 'center');
+                        //$('td', row).eq(1).css('color', 'red');
+                    },
+                    ajax: (data, callback, setting) => {
+                        getInstallmentData(data).then(function (_data) {
+                            callback(_data);
+                        });
+                    },
+                    drawCallback: function (settings) {
+                        hideWaiting('installmentList');
+                    },
+                    initComplete: function (settings, json) {
+                    },
+                    rowCallback: (row, data, displayNum, displayIndex, dataIndex) => {
+                        $('td:eq(0)', row).html(displayIndex + 1);
+                        return row;
+                    },
+                    columns: [
+                        //{
+                        //    "data": "Id",
+                        //    render: function (data, type, row, meta) {
+                        //        return meta.settings.oAjaxData.start + meta.row + 1;
+                        //    }
+                        //},
+                        //{
+                        //    "data": "PersonFirstName",
+                        //    render: function (data, type) {
+                        //        //debugger;
+                        //        //if (type === 'display') {
+                        //        //    let link = 'http://datatables.net';
+
+                        //        //    if (data[0] < 'H') {
+                        //        //        link = 'http://cloudtables.com';
+                        //        //    } else if (data[0] < 'S') {
+                        //        //        link = 'http://editor.datatables.net';
+                        //        //    }
+
+                        //        //    return '<a href="' + link + '">' + data + '</a>';
+                        //        //}
+
+                        //        return data;
+                        //    },
+                        //},
+                        { "data": null },
+                        { "data": "amount" },
+                        { "data": "shamsiDueDate" },
+                        { "data": "penaltyDays" },
+                        { "data": "penaltyAmount" },
+                        { "data": "realPayAmount" },
+                        { "data": "shamsiRealPayDate" },
+                        { "data": "facilityAmount" },
+                        { "data": "requester" },
+                        { "data": "paid" },
+                        { "data": null }
+                    ],
+                    language: {
+                        url: '/new-layout/datatables.net/fa.json'
+                    }
+                });
+
+            const getInstallmentData = (data) => {
+                const postData = {
+                    Page: Math.floor(data.start / data.length) + 1,
+                    PageSize: data.length,
+                    SortDirection: null,
+                    SortOrder: null,
+                    FilterList: []
+                };
+
+                fillFilter(postData);
+
+                return new Promise(function (resolve, reject) {
+                    console.log('Loading data');
+                    $.ajax({
+                        type: 'post',
+                        datatype: "json",
+                        data: JSON.stringify(postData),
+                        contentType: "application/json; charset=utf-8",
+                        url: `/api/v1/RequestFacilityInstallment/Search`,
+                        success: function (result) {
+                            if (result != undefined && result.isSuccess == true) {
+                                resolve({
+                                    data: result.data.data,
+                                    recordsTotal: result.data.totalRowCount,
+                                    recordsFiltered: result.data.totalRowCount
+                                });
+                            }
+                        },
+                        error: function (error) {
+                            const exception = getExceptionMessageFromError(error);
+                            if (exception != null)
+                                showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                            else
+                                showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                        },
+                        complete: function () {
+
+                        },
+                    });
+                });
+            }
+
+            $('#installmentList tbody').on('click', 'button#transactionDetail', function (e) {
+                e.preventDefault();
+                let data = dataTableResponsive.row(this).data();
+                if (data == undefined)
+                    data = dataTableResponsive.row($(this).parents('tr')).data();
+
+                $('#amountSpan').html(splitNumber(data.paymentResult.amount));
+                $('#resNumSpan').html(data.paymentResult.resNum);
+                $('#rrnSpan').html(data.paymentResult.rrn);
+                $('#refNumSpan').html(data.paymentResult.refNum);
+                $('#cardPanSpan').html(data.paymentResult.maskedPan);
+                $('#dateSpan').html(data.paymentResult.shamsiStraceDate != null && data.paymentResult.shamsiStraceDate != ''
+                    ? data.paymentResult.shamsiStraceDate
+                    : (data.paymentResult.shamsiUpdateDate != null && data.paymentResult.shamsiUpdateDate != ''
+                        ? data.paymentResult.shamsiUpdateDate
+                        : data.paymentResult.shamsiCreateDate));
+                debugger;
+                $('#transactionDetailModal').modal();
+            });
+        }
+
+        $('#btnSearch').click((e) => {
+            e.preventDefault();
+            dataTableResponsive.page(0);
+            dataTableResponsive.ajax.reload(null, false);
+        });
+
+        $('#btnExportToExcel').click((e) => {
+            e.preventDefault();
+            // if (!$('#filterForm').valid())
+            //     return;
+
+            showWaiting('requestGridDiv', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');;
+
+            const postData = {
+                Page: -1,
+                PageSize: -1,
+                SortDirection: null,
+                SortOrder: null,
+                FilterList: []
+            };
+
+            fillFilter(postData);
+
+            $.ajax({
+                type: 'post',
+                data: JSON.stringify(postData),
+                datatype: "json",
+                contentType: "application/json; charset=utf-8",
+                url: '/api/v1/RequestFacilityInstallment/ExportExcel',
+                success: function (result) {
+                    hideWaiting('requestGridDiv');;
+                    if (result !== undefined && result !== null && result.data != null && result.isSuccess === true) {
+                        const downloadJsonLink = document.createElement("a");
+                        downloadJsonLink.href = `data:application/vnd.ms-excel;base64,${result.data}`;
+                        downloadJsonLink.download = "RequestFacilityInstallment.xlsx";
+                        downloadJsonLink.click();
+                    }
+                },
+                error: function (error) {
+                    hideWaiting('requestGridDiv');;
+                    const exception = getExceptionMessageFromError(error);
+                    if (exception != null)
+                        showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                    else
+                        showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                }
+            });
+        });
+
+        const fillFilter = (postData) => {
+            if ($("#txtStartDueDate").attr("data-gdate") != null && $("#txtStartDueDate").attr("data-gdate") != '')
+                postData.FilterList.push({
+                    PropertyName: 'StartDueDate',
+                    Operator: @((int)Operator.GreaterThanOrEqual),
+                    PropertyValue: $("#txtStartDueDate").attr("data-gdate")
+                });
+
+            if ($("#txtEndDueDate").attr("data-gdate") != null && $("#txtEndDueDate").attr("data-gdate") != '')
+                postData.FilterList.push({
+                    PropertyName: 'EndDueDate',
+                    Operator: @((int)Operator.LesserThanOrEqual),
+                    PropertyValue: $("#txtEndDueDate").attr("data-gdate")
+                });
+
+            if ($("#txtStartRealPaymentDate").attr("data-gdate") != null && $("#txtStartRealPaymentDate").attr("data-gdate") != '')
+                postData.FilterList.push({
+                    PropertyName: 'StartRealPaymentDate',
+                    Operator: @((int)Operator.LesserThanOrEqual),
+                    PropertyValue: $("#txtStartRealPaymentDate").attr("data-gdate")
+                });
+
+            if ($("#txtEndRealPaymentDate").attr("data-gdate") != null && $("#txtEndRealPaymentDate").attr("data-gdate") != '')
+                postData.FilterList.push({
+                    PropertyName: 'EndRealPaymentDate',
+                    Operator: @((int)Operator.LesserThanOrEqual),
+                    PropertyValue: $("#txtEndRealPaymentDate").attr("data-gdate")
+                });
+
+            if ($('#NationalCode').val() != undefined && $('#NationalCode').val() != null && $('#NationalCode').val() != '')
+                postData.FilterList.push({
+                    PropertyName: 'NationalCode',
+                    Operator: @((int)Operator.Equal),
+                    PropertyValue: $('#NationalCode').val()
+                });
+
+            let paidStatusValue = $('input[type="radio"][name="paidStatus"]:checked').val();
+            postData.FilterList.push({
+                PropertyName: 'PaidStatus',
+                Operator: @((int)Operator.Equal),
+                PropertyValue: parseInt(paidStatusValue)
+            });
+        }
+    </script>
+}

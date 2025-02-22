@@ -1,0 +1,81 @@
+﻿@using static Common.Enums;
+@model List<DocumentModel>
+
+<style type="text/css">
+</style>
+<div class="bg-white border rounded p-75">
+    @if (Model != null && Model.Any())
+    {
+        <div class="text-bold-700 dark font-medium-2">
+            تضامین
+        </div>
+        foreach (var item in Model)
+        {
+            if (item.DocumentType == DocumentType.Cheque &&
+                (User.IsInRole(RoleEnum.AdminBankLeasing.ToString()) || User.IsInRole(RoleEnum.BankLeasing.ToString()) || User.IsInRole(RoleEnum.SupervisorLeasing.ToString())))
+                continue;
+
+            var title = string.Empty;
+            switch (item.DocumentType)
+            {
+                case DocumentType.Cheque:
+                    title = "تصویر چک ضمانت";
+                    break;
+                case DocumentType.PromissoryNoteDocument:
+                    title = "فایل PDF سفته";
+                    break;
+            }
+            <div class="mt-2 p-2 edit-user-bg rounded-lg">
+                @* <div class="text-bold-900 secondary darken-4 font-medium-3">
+        @title
+        </div>*@
+                <div class="mt-2">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="d-flex flex-column align-items-start">
+                                <div class="text-bold-700 dark">@title</div>
+                                <div class="w-100 text-center">
+                                    @if (item.DocumentType == DocumentType.Cheque)
+                                    {
+                                        <a href="@item.FilePath" target="_blank">
+                                            <img src="@item.FilePath" class="img-fluid mt-75" />
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <a href="@item.FilePath" target="_blank">
+                                            دانلود @title
+                                        </a>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @if (item.DocumentType == DocumentType.PromissoryNoteDocument)
+                    {
+                        <div class='row'>
+                            <div class="col-12">
+                                <div class="d-flex flex-column align-items-start">
+                                    <div class="text-bold-700 dark">شماره سفته</div>
+                                    <div class="w-100 text-center">@item.DocumentNumber</div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="d-flex flex-column mt-4 mb-2">
+            <img src="/new-layout/images/no-docs-img.svg" class="height-100" />
+            <div class="font-small-3 text-muted text-center mt-3">
+                اطلاعات تضامین آپلود نشده است!
+            </div>
+        </div>
+    }
+</div>
+<script on-content-loaded="true">
+
+</script>

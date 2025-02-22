@@ -1,0 +1,616 @@
+﻿@model RequestFacilityFilterModel
+
+@{
+    ViewData["Title"] = ViewBag.Title;
+    var PendingInquiryWorkFlowStepId = ViewBag.PendingWorkFlowId;//مرحله استعلام اولیه
+    Layout = "~/Views/Shared/_NewLayout.cshtml";
+    var ajaxUrl = "/api/v1/RequestFacility/SearchLeasingRequest";
+}
+@section styles{
+    <link href="~/persianDatePicker/css/persianDatepicker-lightorang.css" rel="stylesheet" />
+    <style type="text/css">
+    </style>
+}
+<div id="requestGridDiv" class="p-2 bg-white rounded-lg">
+    <div class="font-medium-3 secondary darken-4 text-bold-800 d-flex align-items-center">
+        <i class="bx bx-align-right zl-text-secondary mr-25"></i>
+        <span>درخواست های در انتظار استعلام</span>
+    </div>
+    <div class="p-2 rounded-lg">
+        <form id="filterForm" method="post">
+            @await Component.InvokeAsync("RequestFacilityFilter", new { showWaitingStepsFilter = false, showFacilityStatus = false })           
+            <div class="row my-0 my-md-1">
+                <div class="col-md-6 col-xs-12" style="text-align:right">
+                    <div class="form-group">
+                        <button id="btnDownloadGroupOctetExcel" tabindex="5" class="btn btn-outline-info" >
+                            @ResourceFile.DownloadGroupOctetExcel&nbsp;<i class="fal fa-file-excel-o"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class=" col-md-6 col-xs-12" style="text-align:left">
+                    <button type="button" id="btnSearch" class="btn btn-zl-primary">
+                        <span>جستجو</span>
+                    </button>
+                    <button id="btnExportToExcel" tabindex="5" class="btn btn-outline-info">
+                        خروجی اکسل<i class="fal fa-file-excel-o"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="row my-0 my-md-1">
+                <div class="col-md-6 col-xs-12" style="text-align:right">
+                    <div class="form-group">
+                        <button id="btnAssignRequestsToUser" tabindex="5" class="btn btn-outline-info">
+                            تخصیص درخواست(های) انتخاب شده به کارشناسان
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div class="mt-2">
+            <table id="requestList" class="display" style="width:100%">
+                <thead>
+                    <tr>
+                        <th><fieldset><div class='checkbox checkbox-primary'><input type='checkbox' id="checkAll" /><label for="checkAll"></label></div></fieldset></th>
+                        <th>#</th>
+                        <th >اعتبار درخواستی(ريال)</th>
+                        <th >بازه پرداخت</th>
+                        <th >درخواست کننده</th>
+                        <th >کد ملی/شناسه ملی</th>
+                        <th >تاریخ درخواست</th>
+                        <th >تاریخ آخرین اقدام</th>
+                        <th >وضعیت</th>
+                        <th>کارشناس اقدام کننده</th>
+                        <th>اقدام</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="modal fade text-left" id="assignRequestsToUserModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel18" style="display: none;" data-backdrop="static" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-md" role="document">
+        <div class="modal-content rounded-xl modal-md">
+            <div class="modal-header">
+                <h4 class="modal-title dark" id="myModalLabel18">
+                    تخصیص درخواست های تسهیلات به کارشناسان
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="بستن">
+                    <i class="bx bx-x"></i>
+                </button>
+            </div>
+            <form id="frmAssignRequestsToUser" method="post">
+                <div class="modal-body line-height-2">
+                    <div class="row">
+                        <div class="col-md-12 col-xs-12" style="color:red;margin-bottom:15px" id="selectedRequestFacilityDescription">
+                        </div>
+                        <div class="col-md-12 col-xs-12">
+                            <div class="form-group">
+                                <select name="OrganizationUserId" id="OrganizationUserId" class="form-control bg-transparent " asp-items="ViewBag.OrganizationUsers"
+                                        data-val="true" data-val-required="کارشناس را تخصیص درخواست ها انتخاب کنید!">
+                                    <option value="">انتخاب کارشناس</option>
+                                </select>
+                                <span class="text-danger field-validation-valid" data-valmsg-for="OrganizationUserId" data-valmsg-replace="true"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="text-right">
+                        <a href="#" class="btn btn-outline-secondary" data-dismiss="modal">
+                            <span>انصراف</span>
+                        </a>
+                        <button id="btnSave" class="btn btn-zl-primary white">
+                            <span>تخصیص به کارشناس</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    @{
+        await Html.RenderPartialAsync("~/Views/Shared/_ValidationScriptsPartial.cshtml");
+    }
+    <script src="~/persianDatePicker/js/persianDatepicker.min.js"></script>
+    <script>
+        let dataTableResponsive;
+        let requestFacilityIdArray = [];
+        // let startDate = null;
+        // let endDate = null;
+        // $('#StartDate').val('@ViewBag.StartDate');
+        // $('#txtStartDate').val('@ViewBag.PersianStartDate');
+
+        // $('#EndDate').val('@ViewBag.EndDate');
+        // $('#txtEndDate').val('@ViewBag.PersianEndDate');
+        $(document).ready(function () {
+            $('div').removeClass('zl-active');
+            $('#pendingInquiryRequests').addClass('zl-active');
+            loadLeasingRequest();
+        });
+
+        $('#btnSearch').click((e) => {
+            e.preventDefault();
+            dataTableResponsive.page(0);
+            dataTableResponsive.ajax.reload(null, false);
+        });
+
+        $('#btnDownloadGroupOctetExcel').click((e) => {
+            e.preventDefault();
+            debugger;
+            showWaiting('requestGridDiv', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');;
+            const postData = {
+                Page: -1,
+                PageSize: -1,
+                SortDirection: null,
+                SortOrder: null,
+                FilterList: []
+            };
+
+            fillFilter(postData);
+
+            $.ajax({
+                type: 'post',
+                data: JSON.stringify(postData),
+                datatype: "json",
+                contentType: "application/json; charset=utf-8",
+                url: '/api/v1/RequestFacility/DownloadGroupVerifyOctectExcel',
+                success: function (result) {
+                    hideWaiting('requestGridDiv');;
+                    if (result !== undefined && result !== null && result.data != null && result.isSuccess === true) {
+                        debugger;
+                        dataTableResponsive.page(0);
+                        dataTableResponsive.ajax.reload(null, false);
+
+                        const downloadJsonLink = document.createElement("a");
+                        //downloadJsonLink.href = `data:application/octet-stream;base64,${result.data}`;
+                        downloadJsonLink.href = `data:application/vnd.ms-excel;base64,${result.data}`;
+                        downloadJsonLink.download = "GroupVerifyOctect.xlsx";
+                        downloadJsonLink.click();
+                    }
+                    else {
+                        showMessage('@ResourceFile.ErrorTitle', 'کاربر گرامی هیج درخواست تسهیلاتی در مرحله <b>اعتبار سنجی 8 گانه</b> وجود ندارد', icons.warning, '@ResourceFile.Close');
+                    }
+                },
+                error: function (error) {
+                    hideWaiting('requestGridDiv');;
+                    const exception = getExceptionMessageFromError(error);
+                    if (exception != null)
+                        showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                    else
+                        showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                },
+                complete: function () {
+
+                },
+            });
+        });
+
+        const loadLeasingRequest = () => {
+            dataTableResponsive = $('#requestList')
+                .on('preXhr.dt', function (e, settings, data, a, b) {
+                    //trigger before ajax call
+                    //debugger;
+                    //alert('preXhr');
+                    showWaiting('requestList', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                })
+                .on('xhr.dt', function (e, settings, json, xhr) {
+                    //trigger after ajax call
+                    //debugger;
+                    //alert('xhr');
+                })
+                .DataTable({
+                    order: [],
+                    processing: true,
+                    serverSide: true,
+                    responsive: true,
+                    rowReorder: false,
+                    select: true,
+                    searching: false,
+                    paging: true,
+                    ordering: false,
+                    searching: false,
+                    filtering: false,
+                    info: true,
+                    lengthMenu: [
+                        [5, 10, 25, 50],
+                        [5, 10, 25, 50]
+                    ],
+                    pageLength: 5,
+                    columnDefs: [
+                        {
+                            details: false,
+                            breakpoints: [
+                                { name: 'desktop', width: Infinity },
+                                { name: 'tablet-l', width: 1200 },
+                                { name: 'tablet-p', width: 992 },
+                                { name: 'mobile-l', width: 576 },
+                                { name: 'mobile-p', width: 320 }
+                            ]
+                        },
+                        {
+                            targets: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                            className: 'dt-center',
+                        },
+                        {
+                            targets: 0,
+                            render: function (data, type, row, meta) {
+                                return `<div class='checkbox checkbox-primary'><input type='checkbox' class='select-row' value='${data}' id='chk_${data}'/><label for='chk_${data}'></label></div>`;
+                            }
+                        },
+                        {
+                            targets: 2,
+                            render: function (data, type, row, meta) {
+                                return splitNumber(data);
+                            }
+                        },
+                        {
+                            targets: 8,
+                            render: function (data, type, row, meta) {
+                                let waitingStep = '';
+                                if (data.cancelByUser) {
+                                    const cancelByUserDescription = "<span style='color:red'>انصراف توسط کاربر</span>";
+                                    if ('@((short)StatusEnum.Approved)' == data.statusId)
+                                        waitingStep = `${data.lastStatusDescription}(${cancelByUserDescription})`;
+                                    else if ('@((short)StatusEnum.Rejected)' == data.statusId)
+                                        waitingStep = `${data.lastStatusDescription}(${cancelByUserDescription})`;
+                                    else
+                                        waitingStep = `${data.lastStatusDescription}(${cancelByUserDescription})`;
+                                }
+                                else {
+                                    if ('@((short)StatusEnum.Approved)' == data.statusId)
+                                        waitingStep += data.lastStatusDescription;
+                                    else if ('@((short)StatusEnum.Rejected)' == data.statusId)
+                                        waitingStep = data.lastStatusDescription;
+                                    else {
+                                        waitingStep = data.lastStatusDescription;
+                                    }
+                                }
+                                return `<div class="badge badge-pill zl-badge-upload-document"><div class="d-flex align-items-center"><i class="bx bxs-circle font-size-xxsmall mr-25"></i>${waitingStep}</div></div>`;
+                            }
+                        },
+                        {
+                            targets: 10,
+                            responsivePriority: 3,
+                            data: { aa: 'bb' },
+                            render: function (data, type, row, meta) {
+                                let buttonsHtml = `<a class="dropdown-item change-status" href='@Url.Action("Detail","RequestFacility")/${data.id}'><i class="bx bx-detail font-medium-5 secondary darken-4 mr-75"></i>جزئیات</a>`;
+
+                                if (!data.cancelByUser) {
+                                    if (data.formUrl != null)
+                                        buttonsHtml = `<a href='${data.formUrl}' class='dropdown-item change-status'><i class="bx bx-news font-medium-5 secondary darken-4 mr-75"></i>اقدام</a>` + buttonsHtml;
+                                }
+                                buttonsHtml = buttonsHtml + `<a id='requestHistory' class="dropdown-item request-history" data-request-facility-id='${data.id}' href='javascript:void(0)'><i class="bx bx-detail font-medium-5 secondary darken-4 mr-75"></i>تاریخچه مراحل تسهیلات</a>`;
+
+                                return `<div class="btn-group dropright"><a href="#" class="dark" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="bx bx-dots-horizontal"></i></a><div class="dropdown-menu">${buttonsHtml}</div></div>`;
+                            }
+                        }],
+                    rowCallback: function (row, data) {
+                        //$('td:eq(0)', row).css('text-align', 'center');
+                        //$('td', row).eq(1).css('color', 'red');
+                    },
+                    //ajax: {
+                    //    url: `/api/v1/RequestFacilityInstallment/SelectInstallment2/${$('#drpApprovalFacility').val()}`,
+                    //    type: 'POST',
+                    //    dataSrc: function(data) {
+                    //        data.recordsTotal = data.data.length;
+                    //        data.recordsFiltered = data.data.length;
+                    //        return data.data;
+                    //    },
+                    //    datatype: "json",
+                    //    //contentType: "application/json",
+                    //    contentType: "application/json; charset=utf-8",
+                    //    data: function(input) {
+                    //        debugger;
+                    //        //if ($('#FacilityTypeId').val() != '')
+                    //        //    input.FacilityTypeId = $('#FacilityTypeId').val();
+
+                    //        return JSON.stringify(input);
+                    //    },
+                    //},
+                    ajax: (data, callback, setting) => {
+                        getLeasingRequestFacilities(data).then(function (_data) {
+                            callback(_data);
+                        });
+                    },
+                    drawCallback: function (settings) {
+                        hideWaiting('requestList');
+                    },
+                    initComplete: function (settings, json) {
+                    },
+                    rowCallback: (row, data, displayNum, displayIndex, dataIndex) => {
+                        $('td:eq(1)', row).html(displayIndex + 1);
+                        return row;
+                    },
+                    columns: [
+                        { "data": 'id' },
+                        { "data": null },
+                        { "data": "amount" },
+                        { "data": "monthCountTitle" },
+                        { "data": "requester" },
+                        { "data": "nationalCode" },
+                        { "data": "shamsiCreateDate" },
+                        { "data": "shamsiLastActionDate" },
+                        { "data": null },
+                        { "data": "operator" },
+                        { "data": null }
+                    ],
+                    language: {
+                        url: '/new-layout/datatables.net/fa.json'
+                    }
+                });
+
+            const getLeasingRequestFacilities = (data) => {
+                const postData = {
+                    Page: Math.floor(data.start / data.length) + 1,
+                    PageSize: data.length,
+                    SortDirection: null,
+                    SortOrder: null,
+                    FilterList: []
+                };
+
+                fillFilter(postData);
+
+                return new Promise(function (resolve, reject) {
+                    console.log('Loading data');
+
+                    $.ajax({
+                        type: 'post',
+                        datatype: "json",
+                        data: JSON.stringify(postData),
+                        contentType: "application/json; charset=utf-8",
+                        url: `@ajaxUrl`,
+                        success: function (result) {
+                            if (result != undefined && result.isSuccess == true) {
+                                resolve({
+                                    data: result.data.data,
+                                    recordsTotal: result.data.totalRowCount,
+                                    recordsFiltered: result.data.totalRowCount
+                                });
+                            }
+                        },
+                        error: function (error) {
+                            debugger;
+                            const exception = getExceptionMessageFromError(error);
+                            if (exception != null)
+                                showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                            else
+                                showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                        },
+                        complete: function () {
+
+                        },
+                    });
+                });
+            }
+
+            $('#requestList tbody').on('click', 'a#requestHistory', function (e) {
+                e.preventDefault();
+                let data = dataTableResponsive.row(this).data();
+                if (data == undefined)
+                    data = dataTableResponsive.row($(this).parents('tr')).data();
+                loadRequestFacilitySteps(data.id);
+                $('#requestFacilityStepsHistoryModal').modal();
+            });
+
+            $('#requestList tbody').on('change', 'input[type="checkbox"].select-row', function (e) {
+                debugger;
+                if ($(e.target).is(":checked")) {
+                    if (jQuery.inArray(parseInt($(e.target).attr("value")), requestFacilityIdArray) === -1)
+                        requestFacilityIdArray.push(parseInt($(e.target).attr("value")));
+                    if ($("input[type='checkbox'].select-row").length == $("input[type='checkbox'].select-row:checked").length)
+                        $('#checkAll').prop('checked', true);
+                } else {
+                    requestFacilityIdArray.splice(parseInt(jQuery.inArray($(e.target).attr("value")), requestFacilityIdArray), 1);
+                    $('#checkAll').prop('checked', false);
+                }
+                debugger;
+            });
+        }
+
+        $('#btnExportToExcel').click((e) => {
+            e.preventDefault();
+            // if (!$('#filterForm').valid())
+            //     return;
+
+            showWaiting('requestGridDiv', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');;
+
+            const postData = {
+                Page: -1,
+                PageSize: -1,
+                SortDirection: null,
+                SortOrder: null,
+                FilterList: []
+            };
+
+            fillFilter(postData);
+            debugger;
+
+            $.ajax({
+                type: 'post',
+                data: JSON.stringify(postData),
+                datatype: "json",
+                contentType: "application/json; charset=utf-8",
+                url: '/api/v1/RequestFacility/SearchLeasingRequestExport',
+                success: function (result) {
+                    hideWaiting('requestGridDiv');;
+                    if (result !== undefined && result !== null && result.data != null && result.isSuccess === true) {
+                        debugger;
+                        const downloadJsonLink = document.createElement("a");
+                        downloadJsonLink.href = `data:application/vnd.ms-excel;base64,${result.data}`;
+                        downloadJsonLink.download = "PendingInquiryRequests.xlsx";
+                        downloadJsonLink.click();
+                    }
+                },
+                error: function (error) {
+                    hideWaiting('requestGridDiv');;
+                    const exception = getExceptionMessageFromError(error);
+                    if (exception != null)
+                        showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                    else
+                        showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                }
+            });
+        });
+
+        const fillFilter = (postData) => {
+            if ($('#FName').val() != undefined && $('#FName').val() != null && $('#FName').val() != '')
+                postData.FilterList.push({
+                    PropertyName: 'FName',
+                    Operator: @((int)Operator.Contain),
+                    PropertyValue: $('#FName').val()
+                });
+
+            if ($('#LName').val() != undefined && $('#LName').val() != null && $('#LName').val() != '')
+                postData.FilterList.push({
+                    PropertyName: 'LName',
+                    Operator: @((int)Operator.Contain),
+                    PropertyValue: $('#LName').val()
+                });
+
+            if ($('#StartDate').val() != undefined && $('#StartDate').val() != null && $('#StartDate').val() != '')
+                postData.FilterList.push({
+                    PropertyName: 'StartDate',
+                    Operator: @((int)Operator.GreaterThanOrEqual),
+                    PropertyValue: $('#StartDate').val()
+                });
+
+            if ($('#EndDate').val() != undefined && $('#EndDate').val() != null && $('#EndDate').val() != '')
+                postData.FilterList.push({
+                    PropertyName: 'EndDate',
+                    Operator: @((int)Operator.LesserThanOrEqual),
+                    PropertyValue: $('#EndDate').val()
+                });
+
+            if ($('#NationalCode').val() != undefined && $('#NationalCode').val() != null && $('#NationalCode').val() != '')
+                postData.FilterList.push({
+                    PropertyName: 'NationalCode',
+                    Operator: @((int)Operator.Equal),
+                    PropertyValue: $('#NationalCode').val()
+                });
+
+            //if ($('#WaitingStepId').val() != undefined && $('#WaitingStepId').val() != null && $('#WaitingStepId').val() != '')
+            postData.FilterList.push({
+                PropertyName: 'WaitingStepId',
+                Operator: @((int)Operator.Equal),
+                PropertyValue: @PendingInquiryWorkFlowStepId,
+            });
+
+            if ($('#StartAmountThousandSeparator').val() != undefined && $('#StartAmountThousandSeparator').val() != null && $('#StartAmountThousandSeparator').val() != '')
+                postData.FilterList.push({
+                    PropertyName: 'StartAmount',
+                    Operator: @((int)Operator.GreaterThanOrEqual),
+                    PropertyValue: parseInt($('#StartAmountThousandSeparator').val().replaceAll(',', ''))
+                });
+
+            if ($('#EndAmountThousandSeparator').val() != undefined && $('#EndAmountThousandSeparator').val() != null && $('#EndAmountThousandSeparator').val() != '')
+                postData.FilterList.push({
+                    PropertyName: 'EndAmount',
+                    Operator: @((int)Operator.LesserThanOrEqual),
+                    PropertyValue: parseInt($('#EndAmountThousandSeparator').val().replaceAll(',', ''))
+                });
+
+            //let facilityStatusValue = $('input[type="radio"][name="facilityStatus"]:checked').val();
+            postData.FilterList.push({
+                PropertyName: 'FacilityStatus',
+                Operator: @((int)Operator.Equal),
+                PropertyValue: 1
+            });
+
+            if ('@User.IsInRole(RoleEnum.BankLeasing.ToString())' == 'True') {
+                postData.FilterList.push({
+                    PropertyName: 'OperatorId',
+                    Operator: @((int)Operator.Equal),
+                    PropertyValue: '@User.Identity.GetUserId()'
+                });
+            }
+
+            if ('@User.IsInRole(RoleEnum.SupervisorLeasing.ToString())' == 'True' || '@User.IsInRole(RoleEnum.AdminBankLeasing.ToString())' == 'True') {
+                postData.FilterList.push({
+                    PropertyName: 'SearchOperatorId',
+                    Operator: @((int)Operator.Equal),
+                    PropertyValue: $('#SearchOperatorId').val()
+                });
+            }
+        }
+
+        $('#btnSave').click((e) => {
+            e.preventDefault();
+            debugger;
+            const formIsValid = $('#frmAssignRequestsToUser').valid();
+
+            if ($('#OrganizationUserId').val() == '') {
+                showMessage('@ResourceFile.InfoTitle', 'لطفا کارشناس مورد نظر را برای تخصیص درخواست ها انتخاب کنید!', icons.warning, '@ResourceFile.Close');
+                return;
+            }
+
+            if (formIsValid) {
+                showWaiting('frmAssignRequestsToUser', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                const postData = {
+                    requestFacilityIds: requestFacilityIdArray,
+                    operatorId: $('#OrganizationUserId').val()
+                };
+                debugger;
+                $.ajax({
+                    type: 'post',
+                    data: JSON.stringify(postData),
+                    datatype: "json",
+                    contentType: "application/json; charset=utf-8",
+                    url: '/api/v1/RequestFacility/AssignRequestFacilityToUser',
+                    success: function (result) {
+                        hideWaiting('frmAssignRequestsToUser');
+                        debugger;
+                        if (result.isSuccess) {
+                            requestFacilityIdArray = [];
+                            $('#assignRequestsToUserModal').modal('hide');
+                            showMessage('@ResourceFile.InfoTitle', 'درخواست(های) تسهیلات با موفقیت به کارشناس فوق جهت اقدام اختصاص یافت!', icons.success, '@ResourceFile.Close');
+                            $('#checkAll').prop('checked', false);
+                            $('input[type="checkbox"].select-row').prop('checked', false);
+                            dataTableResponsive.page(0);
+                            dataTableResponsive.ajax.reload(null, false);
+                        }
+                    },
+                    error: function (error) {
+                        hideWaiting('frmAssignRequestsToUser');
+                        const exception = getExceptionMessageFromError(error);
+                        if (exception != null)
+                            showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                        else
+                            showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                    }
+                });
+            }
+            else {
+                scrollToFirstError();
+            }
+        });
+
+        $('#btnAssignRequestsToUser').click((e) => {
+            debugger;
+            e.preventDefault();
+            if (requestFacilityIdArray.length == 0) {
+                showMessage('@ResourceFile.InfoTitle', 'هیچ درخواست تسهیلاتی برای انتصاب کارشناس انتخاب نشده است', icons.warning, '@ResourceFile.Close');
+                return;
+            }
+            $('#selectedRequestFacilityDescription').html(`<b>${requestFacilityIdArray.length}</b> درخواست تسهیلات جهت اختصاص به کارشناس انتخاب شده است`);
+            $('#assignRequestsToUserModal').modal();
+        });
+
+        $('#checkAll').change((e) => {
+            const checkAllState = $(e.target).prop('checked');
+            $('input[type="checkbox"].select-row').prop('checked', checkAllState);
+
+            $("input[type='checkbox'].select-row").each(function () {
+                var $this = $(this);
+
+                if ($this.is(":checked")) {
+                    if (jQuery.inArray(parseInt($this.attr("value")), requestFacilityIdArray) === -1)
+                        requestFacilityIdArray.push(parseInt($this.attr("value")));
+                } else {
+                    requestFacilityIdArray.splice(parseInt(jQuery.inArray($this.attr("value")), requestFacilityIdArray), 1);
+                }
+            });
+        });
+    </script>
+}

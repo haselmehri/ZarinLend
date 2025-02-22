@@ -1,0 +1,237 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - PushNotificationInPWA3</title>
+    <link rel="manifest" href="/manifest.json">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/PushNotificationInPWA3.styles.css" asp-append-version="true" />
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container-fluid">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">PushNotificationInPWA3</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="NotifyByFCM">Notify by FCM</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Notify">Push Notification</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="SendSms">Read Otp SMS</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="RecordVideo">Read Video & Audio</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            <div id="installAppBox" style="display:none">
+                For better experience install app,please :
+                <button id="btnInstallApp" type="button">Install App</button>
+            </div>
+            <div id="giveNotificationAccess" style="display:none;">
+                Give access to making notifications :
+                <button id="PromptForAccessBtn">Prompt</button>
+            </div>
+            @*<div id="giveNotificationAccess" style="display:none;">
+                    Give access to making notifications :
+                    <button id="PromptForAccessBtn">Prompt</button>
+                </div>*@
+            <div id="NoSupport" style="display:none;">
+                Your browser does not support Push Notifications or you have blocked notifications
+            </div>
+            <form asp-action="Index" id="form" style="display:none;">
+                <label for="client">Your name: </label>
+                <input id="client" name="client" /><br />
+
+                <input id="endpoint" name="endpoint" hidden />
+                <input id="p256dh" name="p256dh" hidden />
+                <input id="auth" name="auth" hidden />
+
+                <button type="submit">Subscribe</button>
+            </form>
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2023 - PushNotificationInPWA3 - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    @*<script src="https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/11.1.0/firebase-messaging.js"></script>*@
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging.js"></script>
+    @*<script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js';
+        import { getMessaging, getToken } from 'https://www.gstatic.com/firebasejs/11.1.0/firebase-messaging.js';
+        const firebaseConfig = {
+            apiKey: "AIzaSyAadFhrMTSwxiZCKLJx4cH71z4-2ud0QmU",//"your_api_key", - from google-service.json
+            authDomain: "honar-71e36.firebaseapp.com",//from google-service.json
+            projectId: "honar-71e36",// "your_project_id",
+            storageBucket: "honar-71e36.firebasestorage.app",// "your_storage_bucket",
+            messagingSenderId: "383995737204",// "your_messaging_sender_id",
+            appId: "1:383995737204:android:e9d7c774351be2e963cd21",// "your_app_id",
+            measurementId: "G-SPEKNZFB6W"
+        };
+
+        debugger;
+        const app = initializeApp(firebaseConfig);
+        const messaging = getMessaging();
+        async function requestNotificationPermission() {
+            try {
+                await Notification.requestPermission();
+                const token = await getToken(messaging, { vapidKey: 'BNeL-62ri6lipAXxi3CtRxvtWEZTFa8ZLftRoV8aLcW9ObWS5Y9vlLQiiCMoMoJmJUlv8vVvOKdnPmtJQn5raT4' });
+                debugger;
+                console.log("FCM Token:", token);
+                sendTokenToServer(token);
+            } catch (err) {
+                console.log("Error getting permission or token:", err);
+            }
+        }
+        await requestNotificationPermission();
+    </script>*@
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        //let installPrompt = null;
+        //const btnInstallApp = $('#btnInstallApp');
+
+        //window.addEventListener("beforeinstallprompt", (event) => {
+        //    alert("beforeinstallprompt");
+        //    debugger;
+        //    event.preventDefault();
+        //    installPrompt = event;
+        //    $('#installAppBox').show();
+        //});
+
+        //btnInstallApp.click(async (event) => {
+        //    event.preventDefault();
+        //    alert("install app button click");
+        //    if (!installPrompt) {
+        //        return;
+        //    }
+        //    const result = await installPrompt.prompt();
+        //    console.log(`Install prompt was: ${result.outcome}`);
+        //    disableInAppInstallPrompt();
+        //});
+
+        //window.addEventListener("appinstalled", () => {
+        //    alert("appinstalled");
+        //    disableInAppInstallPrompt();
+        //});
+
+        //function disableInAppInstallPrompt() {
+        //    installPrompt = null;
+        //    $('#installAppBox').hide();
+        //}
+        ////====================================================
+        ////Service Workers supported?
+        //if ('serviceWorker' in navigator) {
+        //    window.addEventListener("load", () => {
+        //        navigator.serviceWorker.register("/serviceWorker.js")
+        //            .then((reg) => {
+        //                debugger;
+        //                if (Notification.permission === "granted") {
+        //                    $("#form").show();
+        //                    getSubscription(reg);
+        //                } else if (Notification.permission === "blocked") {
+        //                    unSubscription(reg);
+        //                    $("#NoSupport").show();
+        //                } else {
+        //                    $("#giveNotificationAccess").show();
+        //                    $("#PromptForAccessBtn").click(() => requestNotificationAccess(reg));
+        //                }
+        //            });
+        //    });
+        //} else {
+        //    $("#NoSupport").show();
+        //}
+
+        //function requestNotificationAccess(reg) {
+        //    Notification.requestPermission(function (status) {
+        //        alert(status);
+        //        $("#giveNotificationAccess").hide();
+        //        if (status == "granted") {
+        //            $("#form").show();
+        //            getSubscription(reg);
+        //        }
+        //        else if (status == 'denied') {
+        //            unSubscription(reg);
+        //        } else {
+        //            $("#NoSupport").show();
+        //        }
+        //    });
+        //}
+
+        //function unSubscription(reg) {
+        //    reg.pushManager.getSubscription().then(function (sub) {
+        //        if (sub != null) {
+        //            sub.unsubscribe()
+        //                .then(function (sub) {
+        //                    alert(sub.endpoint);
+        //                }).catch(function (e) {
+        //                    alert('Unable to unsubscribe to push');
+        //                    console.error("Unable to unsubscribe to push", e);
+        //                });
+        //        }
+        //    });
+        //}
+
+        //function getSubscription(reg) {
+        //    reg.pushManager.getSubscription().then(function (sub) {
+        //        if (sub === null) {
+        //            reg.pushManager.subscribe({
+        //                userVisibleOnly: true,
+        //                applicationServerKey: "@ViewBag.applicationServerKey"
+        //            }).then(function (sub) {
+        //                fillSubscribeFields(sub);
+        //            }).catch(function (e) {
+        //                console.error("Unable to subscribe to push", e);
+        //            });
+        //        } else {
+        //            debugger;
+        //            fillSubscribeFields(sub);
+        //        }
+        //    });
+        //}
+
+        //function fillSubscribeFields(sub) {
+        //    $("#endpoint").val(sub.endpoint);
+        //    $("#p256dh").val(arrayBufferToBase64(sub.getKey("p256dh")));
+        //    $("#auth").val(arrayBufferToBase64(sub.getKey("auth")));
+        //}
+
+        //function arrayBufferToBase64(buffer) {
+        //    var binary = '';
+        //    var bytes = new Uint8Array(buffer);
+        //    var len = bytes.byteLength;
+        //    for (var i = 0; i < len; i++) {
+        //        binary += String.fromCharCode(bytes[i]);
+        //    }
+        //    return window.btoa(binary);
+        //}
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

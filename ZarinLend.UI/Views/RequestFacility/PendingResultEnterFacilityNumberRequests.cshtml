@@ -1,0 +1,610 @@
+﻿@model RequestFacilityFilterModel
+
+@{
+    ViewData["Title"] = ViewBag.Title;
+    var PendingEnterFacilityNumberWorkFlowStepId = ViewBag.PendingWorkFlowId;//درخواست های در انتظار ثبت شماره قرارداد
+    Layout = "~/Views/Shared/_NewLayout.cshtml";
+    var ajaxUrl = "/api/v1/RequestFacility/SearchLeasingRequest";
+}
+@section styles{
+    <link href="~/persianDatePicker/css/persianDatepicker-lightorang.css" rel="stylesheet" />
+    <style type="text/css">
+        /*.modal-dialog, .modal-content {
+            max-width: 1330px !important;
+        }*/
+    </style>
+}
+<div id="requestGridDiv" class="p-2 bg-white rounded-lg">
+    <div class="font-medium-3 secondary darken-4 text-bold-800 d-flex align-items-center">
+        <i class="bx bx-align-right zl-text-secondary mr-25"></i>
+        <span>درخواست های در انتظار نتیجه ثبت شماره قرارداد</span>
+    </div>
+    <div class="p-2 rounded-lg">
+        <form id="filterForm" method="post">
+            @await Component.InvokeAsync("RequestFacilityFilter", new { showWaitingStepsFilter = false, showFacilityStatus = false })            
+            <div class="row my-0 my-md-1">
+                <div class="col-md-3 col-xs-12">
+                    <div class="form-group" style="text-align:left">
+                        <input type="file" name="EnterFacilityNumberResultFile" id="EnterFacilityNumberResultFile" class="form-control" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                    </div>
+                </div>
+                <div class="col-md-4 col-xs-12">
+                    <div class="form-group" style="text-align:right">
+                        <button id="btnUploadResultEnterFacilityRequestsExcel" tabindex="5" class="btn btn-outline-primary" >
+                            بارگذاری اکسل نتیجه ثبت قرارداد&nbsp;<i class="fal fa-file-excel-o"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class=" col-md-5 col-xs-12" style="text-align:left">
+                    <button type="button" id="btnSearch" class="btn btn-zl-primary">
+                        <span>جستجو</span>
+                    </button>
+                    <button id="btnExportToExcel" tabindex="5" class="btn btn-outline-info">
+                        خروجی اکسل&nbsp;<i class="fal fa-file-excel-o"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+        <div class="mt-2">
+            <table id="requestList" class="display" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th >اعتبار درخواستی(ريال)</th>
+                        <th >بازه پرداخت</th>
+                        <th >درخواست کننده</th>
+                        <th >کد ملی/شناسه ملی</th>
+                        <th >تاریخ درخواست</th>
+                        <th >تاریخ آخرین اقدام</th>
+                        <th >وضعیت</th>
+                        <th>کارشناس اقدام کننده</th>
+                        <th >اقدام</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade text-left" id="pendingRequestModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel18" style="display: none;" data-backdrop="static" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-md" role="document">
+        <div class="modal-content rounded-xl modal-md">
+            <div class="modal-header">
+                <h4 class="modal-title dark" id="myModalLabel18">
+                    ثبت شماره قرارداد/تسهیلات
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="بستن">
+                    <i class="bx bx-x"></i>
+                </button>
+            </div>
+            <form id="frmVerifyBuyer" method="post">
+                <div class="modal-body line-height-2">
+                    <div class="d-flex align-items-center justify-content-around">
+                        <fieldset>
+                            <div class="radio radio-success radio-glow radio-sm">
+                                <input type="radio" name="requestStatusRadio" id="approveRadio" value="@((int)StatusEnum.Approved)" />
+                                <label class="font-small-3 success darken-4 text-bold-400 line-height-23" for="approveRadio">تایید درخواست</label>
+                            </div>
+                        </fieldset>
+                    </div>
+                    <div class="row" id="facilityNumberRow" style="display:none">
+                        <div class="col-md-12 col-xs-12">
+                            <div class="form-group">
+                                <label class="control-label" for="FacilityNumber">شماره قرارداد/تسهیلات</label>
+                                <input class="form-control" style="text-align:center;direction:ltr;letter-spacing:3px" type="text" placeholder="68__________" data-val="true" data-val-length="شماره قرارداد/تسهیلات حداکثر میتواند عددی سیزده(13) رقمی باشد."
+                                       data-val-length-max="13" data-val-required="شماره تسهیلات اجباری است!" id="FacilityNumber" maxlength="13" name="FacilityNumber" data-val-regex="شماره قرارداد/تسهیلات را با فرمت صحیح وارد کنید"
+                                       data-val-regex-pattern="^68\d{11}">
+                                <span class="text-danger field-validation-valid" data-valmsg-for="FacilityNumber" data-valmsg-replace="true"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group form-group-ex">
+                                <label class="control-label">توضیحات نهاد مالی</label>
+                                <textarea id="description_admin" name="description_admin" class="form-control" placeholder="توضیحات نهاد مالی"></textarea>
+                                <span class="text-danger field-validation-valid" data-valmsg-for="description_admin" data-valmsg-replace="true"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="text-right">
+                        <a href="#" class="btn btn-outline-secondary" data-dismiss="modal">
+                            <span>انصراف</span>
+                        </a>
+                        <button id="btnChangeStatusAndSaveFacilityNumber" class="btn btn-zl-primary white">
+                            <span>ثبت شماره قرارداد/تسهیلات</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    @{
+        await Html.RenderPartialAsync("~/Views/Shared/_ValidationScriptsPartial.cshtml");
+    }
+    <script src="~/persianDatePicker/js/persianDatepicker.min.js"></script>
+    <script>
+        let dataTableResponsive;
+        // let startDate = null;
+        // let endDate = null;
+        // $('#StartDate').val('@ViewBag.StartDate');
+        // $('#txtStartDate').val('@ViewBag.PersianStartDate');
+
+        // $('#EndDate').val('@ViewBag.EndDate');
+        // $('#txtEndDate').val('@ViewBag.PersianEndDate');
+        let parentGridElementId = 'activeFacilityDiv';
+        $(document).ready(function() {
+            $('div').removeClass('zl-active');
+            $('#pendingResultEnterFacilityNumberRequests').addClass('zl-active');
+
+            $('#FacilityNumber').mask('6899999999999', { placeholder: "68___________" });
+            $('input[name=requestStatusRadio]').change((e) => {
+                debugger;
+                if ($(e.target).val() == @((int)StatusEnum.Approved)) {
+                    $('#facilityNumberRow').show();
+                }
+                else {
+                    $('#facilityNumberRow').hide();
+                    //forceDescriptionToBeRequire();
+                }
+            });
+
+            loadLeasingRequest();
+        });
+
+        $('#btnChangeStatusAndSaveFacilityNumber').click(function(e) {
+            e.preventDefault();
+            debugger;
+            const formIsValid = $('#frmVerifyBuyer').valid();
+            const requestStatus = $('input[name=requestStatusRadio]:checked').val();
+            if (requestStatus == undefined) {
+                showMessage('@ResourceFile.InfoTitle', 'لطفا وضعیت درخواست را مشخص کنید!', icons.warning, '@ResourceFile.Close');
+                return;
+            }
+
+            if ($('#FacilityNumber').val() == '') {
+                showMessage('@ResourceFile.InfoTitle', 'لطفا شماره تسهیلات را وارد کنید!', icons.warning, '@ResourceFile.Close');
+                return;
+            }
+
+            if (formIsValid) {
+                debugger;
+                showWaiting('frmVerifyBuyer', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                const postData = {
+                    RequestFacilityId: $(e.currentTarget).data('request-facility-id'),
+                    Status: requestStatus,
+                    FacilityNumber: requestStatus == 2 ? $('#FacilityNumber').val() : null,
+                    StatusDescription: $('#description_admin').val()
+                };
+
+                $.ajax({
+                    type: 'post',
+                    data: JSON.stringify(postData),
+                    datatype: "json",
+                    contentType: "application/json; charset=utf-8",
+                    url: '/api/v1/RequestFacility/EnterFacilityNumber',
+                    success: function(result) {
+                        hideWaiting('frmVerifyBuyer');
+                        debugger;
+                        if (result.isSuccess) {
+                            dataTableResponsive.page(0);
+                            dataTableResponsive.ajax.reload(null, false);
+
+                            $('#pendingRequestModal').modal('hide');
+                            showMessage('@ResourceFile.InfoTitle', 'شماره قرارداد/تسهیلات با موفقیت ثبت شد!', icons.success, '@ResourceFile.Close');
+                        }
+                    },
+                    error: function(error) {
+                        hideWaiting('frmVerifyBuyer');
+                        const exception = getExceptionMessageFromError(error);
+                        if (exception != null)
+                            showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                        else
+                            showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                    }
+                });
+            }
+            else {
+                scrollToFirstError();
+            }
+        });
+
+        $('#btnSearch').click((e) => {
+            e.preventDefault();
+            dataTableResponsive.page(0);
+            dataTableResponsive.ajax.reload(null, false);
+        });
+
+        $('#btnUploadResultEnterFacilityRequestsExcel').click((e) => {
+            e.preventDefault();
+            debugger;
+
+            const EnterFacilityNumberResultFile = $("#EnterFacilityNumberResultFile")[0];
+            if (EnterFacilityNumberResultFile.files.length == 0) {
+                showMessage('@ResourceFile.InfoTitle', 'لطفا فایل اکسل جهت ثبت شماره قراردادها/تسهیلات را جهت بارگذاری،انتخاب کنید', icons.warning, '@ResourceFile.Close');
+                return;
+            }
+            showWaiting('requestGridDiv', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+            let data = new FormData();
+            data.append('enterFacilityNumberResultFile', EnterFacilityNumberResultFile.files[0]);
+            $.ajax({
+                type: 'post',
+                data: data,
+                processData: false,
+                contentType: false,
+                //datatype: "json",
+                //contentType: "application/json; charset=utf-8",
+                url: '/api/v1/RequestFacility/UploadFacilityNumberResult',
+                success: function(result) {
+                    hideWaiting('requestGridDiv');
+                    debugger;
+                    if (result !== undefined && result !== null && result.data != null && result.isSuccess === true) {
+                        dataTableResponsive.page(0);
+                        dataTableResponsive.ajax.reload(null, false);
+
+                        showMessage('@ResourceFile.InfoTitle', 'با توجه به اطلاعات اکسل در صورتی شماره قرارداد/تسهیلات با فرمت صحیح در اکسل وارد شده باشد،شماره قرارداد/تسهیلات ثبت شده و درخواست به مرحله بعد ارجاع داده شدند', icons.info, '@ResourceFile.Close');
+                    }
+                },
+                error: function(error) {
+                    hideWaiting('requestGridDiv');;
+                    const exception = getExceptionMessageFromError(error);
+                    if (exception != null)
+                        showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                    else
+                        showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                }
+            });
+        });
+
+        $('#btnExportToExcel').click((e) => {
+            e.preventDefault();
+            // if (!$('#filterForm').valid())
+            //     return;
+
+            showWaiting('requestGridDiv', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');;
+
+            const postData = {
+                Page: -1,
+                PageSize: -1,
+                SortDirection: null,
+                SortOrder: null,
+                FilterList: []
+            };
+
+            fillFilter(postData);
+            debugger;
+
+            $.ajax({
+                type: 'post',
+                data: JSON.stringify(postData),
+                datatype: "json",
+                contentType: "application/json; charset=utf-8",
+                url: '/api/v1/RequestFacility/SearchLeasingRequestExport',
+                success: function(result) {
+                    hideWaiting('requestGridDiv');;
+                    if (result !== undefined && result !== null && result.data != null && result.isSuccess === true) {
+                        debugger;
+                        const downloadJsonLink = document.createElement("a");
+                        downloadJsonLink.href = `data:application/vnd.ms-excel;base64,${result.data}`;
+                        downloadJsonLink.download = "PendingResultEnterFacilityNumberRequests.xlsx";
+                        downloadJsonLink.click();
+                    }
+                },
+                error: function(error) {
+                    hideWaiting('requestGridDiv');;
+                    if (error.responseJSON != undefined && error.responseJSON.Message != undefined && error.responseJSON.Message != '') {
+                        const exception = JSON.parse(error.responseJSON.Message).Exception;
+                        showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                    }
+                    else {
+                        showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                    }
+                }
+            });
+        });
+
+        const fillFilter = (postData) => {
+            if ($('#FName').val() != undefined && $('#FName').val() != null && $('#FName').val() != '')
+                postData.FilterList.push({
+                    PropertyName: 'FName',
+                    Operator: @((int)Operator.Contain),
+                    PropertyValue: $('#FName').val()
+                });
+
+            if ($('#LName').val() != undefined && $('#LName').val() != null && $('#LName').val() != '')
+                postData.FilterList.push({
+                    PropertyName: 'LName',
+                    Operator: @((int)Operator.Contain),
+                    PropertyValue: $('#LName').val()
+                });
+
+            if ($('#StartDate').val() != undefined && $('#StartDate').val() != null && $('#StartDate').val() != '')
+                postData.FilterList.push({
+                    PropertyName: 'StartDate',
+                    Operator: @((int)Operator.GreaterThanOrEqual),
+                    PropertyValue: $('#StartDate').val()
+                });
+
+            if ($('#EndDate').val() != undefined && $('#EndDate').val() != null && $('#EndDate').val() != '')
+                postData.FilterList.push({
+                    PropertyName: 'EndDate',
+                    Operator: @((int)Operator.LesserThanOrEqual),
+                    PropertyValue: $('#EndDate').val()
+                });
+
+            if ($('#NationalCode').val() != undefined && $('#NationalCode').val() != null && $('#NationalCode').val() != '')
+                postData.FilterList.push({
+                    PropertyName: 'NationalCode',
+                    Operator: @((int)Operator.Equal),
+                    PropertyValue: $('#NationalCode').val()
+                });
+
+            //if ($('#WaitingStepId').val() != undefined && $('#WaitingStepId').val() != null && $('#WaitingStepId').val() != '')
+            postData.FilterList.push({
+                PropertyName: 'WaitingStepId',
+                Operator: @((int)Operator.Equal),
+                PropertyValue: @PendingEnterFacilityNumberWorkFlowStepId
+            });
+
+            if ($('#StartAmountThousandSeparator').val() != undefined && $('#StartAmountThousandSeparator').val() != null && $('#StartAmountThousandSeparator').val() != '')
+                postData.FilterList.push({
+                    PropertyName: 'StartAmount',
+                    Operator: @((int)Operator.GreaterThanOrEqual),
+                    PropertyValue: parseInt($('#StartAmountThousandSeparator').val().replaceAll(',', ''))
+                });
+
+            if ($('#EndAmountThousandSeparator').val() != undefined && $('#EndAmountThousandSeparator').val() != null && $('#EndAmountThousandSeparator').val() != '')
+                postData.FilterList.push({
+                    PropertyName: 'EndAmount',
+                    Operator: @((int)Operator.LesserThanOrEqual),
+                    PropertyValue: parseInt($('#EndAmountThousandSeparator').val().replaceAll(',', ''))
+                });
+
+            //let facilityStatusValue = $('input[type="radio"][name="facilityStatus"]:checked').val();
+            postData.FilterList.push({
+                PropertyName: 'FacilityStatus',
+                Operator: @((int)Operator.Equal),
+                PropertyValue: 1
+            });
+
+            if ('@User.IsInRole(RoleEnum.BankLeasing.ToString())' == 'True') {
+                postData.FilterList.push({
+                    PropertyName: 'OperatorId',
+                    Operator: @((int)Operator.Equal),
+                    PropertyValue: '@User.Identity!.GetUserId()'
+                });
+            }
+
+            if ('@User.IsInRole(RoleEnum.SupervisorLeasing.ToString())' == 'True' || '@User.IsInRole(RoleEnum.AdminBankLeasing.ToString())' == 'True') {
+                postData.FilterList.push({
+                    PropertyName: 'SearchOperatorId',
+                    Operator: @((int)Operator.Equal),
+                    PropertyValue: $('#SearchOperatorId').val()
+                });
+            }
+        }
+
+         const loadLeasingRequest = () => {
+            dataTableResponsive = $('#requestList')
+                .on('preXhr.dt', function (e, settings, data, a, b) {
+                    //trigger before ajax call
+                    //debugger;
+                    //alert('preXhr');
+                    showWaiting('requestList', '@ResourceFile.PleaseWait', '@ResourceFile.Loading');
+                })
+                .on('xhr.dt', function (e, settings, json, xhr) {
+                    //trigger after ajax call
+                    //debugger;
+                    //alert('xhr');
+                })
+                .DataTable({
+                    order: [],
+                    processing: true,
+                    serverSide: true,
+                    responsive: true,
+                    rowReorder: false,
+                    select: true,
+                    searching: false,
+                    paging: true,
+                    ordering: false,
+                    searching: false,
+                    filtering: false,
+                    info: true,
+                    lengthMenu: [
+                        [5, 10, 25, 50],
+                        [5, 10, 25, 50]
+                    ],
+                    pageLength: 5,
+                    columnDefs: [
+                        {
+                            details: false,
+                            breakpoints: [
+                                { name: 'desktop', width: Infinity },
+                                { name: 'tablet-l', width: 1200 },
+                                { name: 'tablet-p', width: 992 },
+                                { name: 'mobile-l', width: 576 },
+                                { name: 'mobile-p', width: 320 }
+                            ]
+                        },
+                        {
+                            targets: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+                            className: 'dt-center',
+                        },
+                        {
+                            targets: 1,
+                            render: function (data, type, row, meta) {
+                                return splitNumber(data);
+                            }
+                        },
+                        {
+                            targets: 7,
+                            render: function (data, type, row, meta) {
+                                let waitingStep = '';
+                                if (data.cancelByUser) {
+                                    const cancelByUserDescription = "<span style='color:red'>انصراف توسط کاربر</span>";
+                                    if ('@((short)StatusEnum.Approved)' == data.statusId)
+                                        waitingStep = `${data.lastStatusDescription}(${cancelByUserDescription})`;
+                                    else if ('@((short)StatusEnum.Rejected)' == data.statusId)
+                                        waitingStep = `${data.lastStatusDescription}(${cancelByUserDescription})`;
+                                    else
+                                        waitingStep = `${data.lastStatusDescription}(${cancelByUserDescription})`;
+                                }
+                                else {
+                                    if ('@((short)StatusEnum.Approved)' == data.statusId)
+                                        waitingStep += data.lastStatusDescription;
+                                    else if ('@((short)StatusEnum.Rejected)' == data.statusId)
+                                        waitingStep = data.lastStatusDescription;
+                                    else {
+                                        waitingStep = data.lastStatusDescription;
+                                    }
+                                }
+                                return `<div class="badge badge-pill zl-badge-upload-document"><div class="d-flex align-items-center"><i class="bx bxs-circle font-size-xxsmall mr-25"></i>${waitingStep}</div></div>`;
+                            }
+                        },
+                        {
+                            targets: 9,
+                            responsivePriority: 3,
+                            data: { aa: 'bb' },
+                            render: function (data, type, row, meta) {
+                                let buttonsHtml = `<a class="dropdown-item change-status" href='@Url.Action("Detail","RequestFacility")/${data.id}'><i class="bx bx-detail font-medium-5 secondary darken-4 mr-75"></i>جزئیات</a>`;
+
+                                if (!data.cancelByUser) {
+                                    if (data.formUrl != null) {
+                                        buttonsHtml = `<a href='javascript:void(0)' class='dropdown-item add-facility-number' data-request-facility-id='${data.id}'>
+                                                            <i class="bx bx-news font-medium-5 secondary darken-4 mr-75"></i>ثبت شماره قرارداد/تسهیلات
+                                                       </a>
+                                                       <a href='${data.formUrl}' class='dropdown-item change-status'>
+                                                            <i class="bx bx-news font-medium-5 secondary darken-4 mr-75"></i>اقدام
+                                                       </a>` + buttonsHtml;
+                                    }
+                                }
+                                buttonsHtml = buttonsHtml + `<a id='requestHistory' class="dropdown-item request-history" data-request-facility-id='${data.id}' href='javascript:void(0)'><i class="bx bx-detail font-medium-5 secondary darken-4 mr-75"></i>تاریخچه مراحل تسهیلات</a>`;
+
+                                return `<div class="btn-group dropright"><a href="#" class="dark" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="bx bx-dots-horizontal"></i></a><div class="dropdown-menu">${buttonsHtml}</div></div>`;
+                            }
+                        }],
+                    rowCallback: function (row, data) {
+                        //$('td:eq(0)', row).css('text-align', 'center');
+                        //$('td', row).eq(1).css('color', 'red');
+                    },
+                    //ajax: {
+                    //    url: `/api/v1/RequestFacilityInstallment/SelectInstallment2/${$('#drpApprovalFacility').val()}`,
+                    //    type: 'POST',
+                    //    dataSrc: function(data) {
+                    //        data.recordsTotal = data.data.length;
+                    //        data.recordsFiltered = data.data.length;
+                    //        return data.data;
+                    //    },
+                    //    datatype: "json",
+                    //    //contentType: "application/json",
+                    //    contentType: "application/json; charset=utf-8",
+                    //    data: function(input) {
+                    //        debugger;
+                    //        //if ($('#FacilityTypeId').val() != '')
+                    //        //    input.FacilityTypeId = $('#FacilityTypeId').val();
+
+                    //        return JSON.stringify(input);
+                    //    },
+                    //},
+                    ajax: (data, callback, setting) => {
+                        getLeasingRequestFacilities(data).then(function (_data) {
+                            callback(_data);
+                        });
+                    },
+                    drawCallback: function (settings) {
+                        hideWaiting('requestList');
+                    },
+                    initComplete: function (settings, json) {
+                    },
+                    rowCallback: (row, data, displayNum, displayIndex, dataIndex) => {
+                        $('td:eq(0)', row).html(displayIndex + 1);
+                        return row;
+                    },
+                    columns: [
+                        { "data": null },
+                        { "data": "amount" },
+                        { "data": "monthCountTitle" },
+                        { "data": "requester" },
+                        { "data": "nationalCode" },
+                        { "data": "shamsiCreateDate" },
+                        { "data": "shamsiLastActionDate" },
+                        { "data": null },
+                        { "data": "operator" },
+                        { "data": null }
+                    ],
+                    language: {
+                        url: '/new-layout/datatables.net/fa.json'
+                    }
+                });
+
+            const getLeasingRequestFacilities = (data) => {
+                const postData = {
+                    Page: Math.floor(data.start / data.length) + 1,
+                    PageSize: data.length,
+                    SortDirection: null,
+                    SortOrder: null,
+                    FilterList: []
+                };
+
+                fillFilter(postData);
+
+                return new Promise(function (resolve, reject) {
+                    console.log('Loading data');
+
+                    $.ajax({
+                        type: 'post',
+                        datatype: "json",
+                        data: JSON.stringify(postData),
+                        contentType: "application/json; charset=utf-8",
+                        url: `@ajaxUrl`,
+                        success: function (result) {
+                            if (result != undefined && result.isSuccess == true) {
+                                resolve({
+                                    data: result.data.data,
+                                    recordsTotal: result.data.totalRowCount,
+                                    recordsFiltered: result.data.totalRowCount
+                                });
+                            }
+                        },
+                        error: function (error) {
+                            debugger;
+                            const exception = getExceptionMessageFromError(error);
+                            if (exception != null)
+                                showMessage('@ResourceFile.ErrorTitle', exception, icons.error, '@ResourceFile.Close');
+                            else
+                                showMessage('@ResourceFile.ErrorTitle', '@ResourceFile.UnhandledError', icons.error, '@ResourceFile.Close');
+                        },
+                        complete: function () {
+
+                        },
+                    });
+                });
+            }
+
+            $('#requestList tbody').on('click', 'a#requestHistory', function (e) {
+                e.preventDefault();
+                let data = dataTableResponsive.row(this).data();
+                if (data == undefined)
+                    data = dataTableResponsive.row($(this).parents('tr')).data();
+                loadRequestFacilitySteps(data.id);
+                $('#requestFacilityStepsHistoryModal').modal();
+            });
+
+             $('#requestList tbody').on('click', 'a.add-facility-number', function (e) {
+                 debugger;
+                e.preventDefault();
+                 let data = dataTableResponsive.row(this).data();
+                 if (data == undefined)
+                     data = dataTableResponsive.row($(this).parents('tr')).data();
+                $('#pendingRequestModal').modal();
+                $('#btnChangeStatusAndSaveFacilityNumber').data('request-facility-id', data.id);
+            });
+        }
+
+    </script>
+}

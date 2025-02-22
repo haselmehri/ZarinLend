@@ -1,0 +1,330 @@
+﻿@{
+    ViewData["Title"] = _loc["WalletChargeList"];  
+}
+@section styles{
+    <style type="text/css">
+
+        ex-h2 {
+            line-height: 30px !important
+        }
+
+        .date-update {
+            float: left;
+            color: wheat !important;
+            font-size: 12pt !important;
+            margin-top: 6px !important;
+        }
+
+        .table-custom th,
+        .table-custom td {
+            text-align: center !important;
+            vertical-align: middle !important;
+        }
+
+        .SelectedCell {
+            font-weight: bold !important;
+            background-color: black;
+            /*background-color: red;*/
+            color: white;
+        }
+
+        .NonSelectedCell {
+            font-weight: normal !important;
+            background-color: black;
+            color: whitesmoke;
+        }
+
+        .card {
+            word-wrap: normal !important;
+        }
+
+        .ex-card-header {
+            text-align: right !important;
+            padding-bottom: 4px !important;
+            padding-top: 4px !important;
+        }
+
+        .ex-btn-link {
+            padding-bottom: 4px !important;
+            padding-top: 4px !important;
+            color: white !important;
+        }
+
+            .ex-btn-link:hover {
+                color: #f7e7e7 !important;
+            }
+
+        .accordion {
+            margin-bottom: 15px !important;
+        }
+
+        .bi {
+            /*color: #fff;*/
+            height: 30px;
+            width: 30px;
+        }
+
+        [type="checkbox"]:not(:checked), [type="checkbox"]:checked,
+        [type="radio"]:not(:checked), [type="radio"]:checked {
+            position: unset !important;
+            right: unset !important;
+            opacity: 1 !important;
+        }
+
+        .header-grid {
+            text-align: center !important;
+            vertical-align: middle !important;
+            min-width: 140px;
+        }
+
+        .detail-grid {
+            text-align: center;
+            padding: 0.65rem !important;
+        }
+
+        [type="checkbox"]:read-only,
+        [type="radio"]:read-only,
+        [type="checkbox"]:-moz-read-only,
+        [type="radio"]:-moz-read-only {
+            opacity: 0.7 !important;
+        }
+
+        .card-body {
+            padding: 1rem !important;
+        }
+
+        .mb-0 {
+            line-height: 30px !important;
+        }
+    </style>
+}
+<div class="card">
+    <div class="card-header" localize-content>WalletChargeList</div>
+    <div class="card-body" id="agentRequestGridDiv">
+        <div class="col-md-12">
+            <div class="form-group">
+                <a class="btn btn-outline-success" href='@Url.Action("AddWalletCharge","AgentRequest")'>
+                    @_loc["WalletChargeRegister"]&nbsp;<i class="fal fa-send"></i>
+                </a>
+            </div>
+        </div>
+        <div class="paging-div"></div>
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover table-custom">
+                <thead>
+                    <tr class="table-secondary">
+                        <th scope="col">#</th>
+                        @*<th scope="col" data-sortorder="date" localize-content>RequestType</th>*@
+                        <th scope="col" data-sortorder="Tedad" localize-content>RequestDate</th>
+                        <th scope="col" data-sortorder="Mablagh" localize-content>RequestStatus</th>
+                        <th scope="col" data-sortorder="Tedad" localize-content>StatusUpdate</th>
+                        <th scope="col" data-sortorder="Mablagh" localize-content>WalletChargeAmount</th>
+                        <th scope="col" data-sortorder="DaftariEghtesadi" localize-content>Attachments</th>
+                    </tr>
+                </thead>
+                <tbody id="agentRequestGridRows" localize-content>
+                    <tr>
+                        <td colspan="6">
+                            NoRows
+                        </td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    @*<tr class="table-primary" style="font-weight:bold">
+                        <td scope="row"></td>
+                        <td></td>
+                        <td></td>
+                        <td>جمع کل</td>
+                        <td id="Mablagh_Sum"></td>
+                        <td id="DaftariEghtesadi_Sum"></td>
+                    </tr>*@
+                </tfoot>
+            </table>
+        </div>
+        <div class="paging-div"></div>
+    </div>
+    <div class="card-footer"></div>
+</div>
+<input type="hidden" id="hdnRequestGridSortOrder" value="CreateDate" />
+<input type="hidden" id="hdnRequestGridSortDirection" value="DESC" />
+@section scripts{
+    <script>
+        const PAGE_SIZE = 10;
+
+        $(document).ready(function () {
+            loadAgentRequest();
+        });
+
+        $('#agentRequestGridDiv').on('click', 'thead th', function () {
+            renderSortColumn(this, 'hdnRequestGridSortOrder', 'hdnRequestGridSortDirection', () => { loadAgentRequest(); })
+        });
+
+        //$('#customerTrendHazine').on('shown.bs.modal', function () {
+        //    if ($('#hdnNewCodeActionSample').val() === '' ||
+        //        $('#hdnErtebatCodeAction').val() === '') {
+        //        loadAgentRequest();
+        //    }
+        //});
+
+       const loadAgentRequest = (sender) => {
+           showWaiting('agentRequestGridDiv', '@_loc["PleaseWait"]', '@_loc["Loading"]');
+
+            const sortDirectionValue = $('#hdnRequestGridSortDirection').val();
+            const sortOrderValue = $('#hdnRequestGridSortOrder').val();
+            let currentPage = 1;
+            if (typeof $(sender).attr('current-page') !== typeof undefined && $(sender).attr('current-page') !== false)
+                currentPage = $(sender).attr('current-page');
+
+            const postData = {
+                Page: currentPage,
+                PageSize: PAGE_SIZE,
+                SortDirection: sortDirectionValue,
+                SortOrder: sortOrderValue
+            };
+
+            $.ajax({
+                type: 'post',
+                data: JSON.stringify(postData),
+                datatype: "json",
+                contentType: "application/json; charset=utf-8",
+                url: '/api/v1/AgentRequest/GetAllWalletChargeRequest',
+                success: function (result) {
+                    hideWaiting('agentRequestGridDiv');
+                    if (result !== undefined && result !== null && result.isSuccess === true) {
+                        renderRequestGrid(result.data.data, result.data.currentPage, PAGE_SIZE);
+                        renderNavigation('agentRequestGridDiv', result.data.totalRowCount, result.data.currentPage, result.data.totalPages);
+                        resetGridStyle('agentRequestGridDiv', 'hdnRequestGridSortOrder', 'hdnRequestGridSortDirection');
+                    }
+                },
+                error: function (error) {
+                    hideWaiting('agentRequestGridDiv');
+                    if (error.responseJSON != undefined && error.responseJSON.Message != undefined && error.responseJSON.Message != '') {
+                        if (IsJsonString(error.responseJSON.Message)) {
+                            const exception = JSON.parse(error.responseJSON.Message).Exception;
+                            showMessage('@_loc["ErrorTitle"]', exception, icons.error, '@_loc["Close"]');
+                        }
+                        else
+                            showMessage('@_loc["ErrorTitle"]', error.responseJSON.Message, icons.error, '@_loc["Close"]');
+                    }
+                    else {
+                        showMessage('@_loc["ErrorTitle"]', '@_loc["UnhandledError"]', icons.error, '@_loc["Close"]');
+                    }
+                },
+                complete: function () {
+
+                },
+            });
+        }
+
+       const renderRequestGrid = (data, currentPage, pageSize) => {
+            let rows = '<tr><td colspan="6">@_loc["NoRows"]</td></tr>';
+            if (data.length > 0) {
+                rows = '';
+                for (var i = 0; i < data.length; i++) {
+                    rows += '<tr class="' + (i % 2 == 0 ? 'table-info' : 'table-light') + '">';
+                    rows += "<td style=''>" + (((currentPage - 1) * pageSize) + i + 1) + "</td>";
+                    @*rows += "<td style=''>" + ('@cultureAccessor.GetCurrentCulture()' == 'fa' ? data[i].requestTypeName : data[i].requestTypeNameAR) + "</td>";*@
+                    rows += "<td style=''>" + ('@cultureAccessor.GetCurrentCulture()' == FA_CULTURE ? data[i].shamsiCreateDate : data[i].createDate) + "</td>";
+                    @*if ('@cultureAccessor.GetCurrentCulture()' == FA_CULTURE)
+                        rows += "<td style=''>" + (data[i].shamsiUpdateDate != '' ? data[i].shamsiUpdateDate : data[i].shamsiCreateDate) + "</td>";
+                    else
+                        rows += "<td style=''>" + ((data[i].updateDate != '' || data[i].updateDate != null) ? data[i].updateDate : data[i].createDate) + "</td>";*@
+
+                    rows += "<td style=''>" +  data[i].statusName + "</td>";
+                    rows += "<td style=''>" + ('@cultureAccessor.GetCurrentCulture()' == FA_CULTURE ? data[i].shamsiUpdateDate : data[i].updateDate) + "</td>";
+                    rows += "<td style='direction:ltr'>" + splitNumber(data[i].amount) + "</td>";
+                    rows += "<td style='direction:rtl'>" + generateDocumentsLink(data[i].documents,'@_loc["DocNumber"]') + "</td>";
+                    rows += '</tr>';
+                }
+            }
+            $('#agentRequestGridRows').html(rows);
+        }
+
+       const resetGridStyle = (parentGridElementId, hdnSortOrderElementId, hdnSortDirectionElementId) => {
+            const sortDirectionValue = $(`#${hdnSortDirectionElementId}`).val();
+            const sortOrderValue = $(`#${hdnSortOrderElementId}`).val();
+
+            $(`#${parentGridElementId} thead th`).removeClass("sorted-column");
+            $(`#${parentGridElementId} thead th`).addClass("not-sorted-column");
+
+            if (sortOrderValue != undefined || sortOrderValue != '') {
+                let sortCell = $(`#${parentGridElementId} *[data-sortorder='${sortOrderValue}']`);
+                $(sortCell).removeClass('not-sorted-column');
+                $(sortCell).addClass('sorted-column');
+
+                if (sortDirectionValue == undefined || sortDirectionValue == '' || sortDirectionValue.toUpperCase() == "DESC") {
+                    $(`#${parentGridElementId}  thead th span`).remove();
+                    //$(sortCell).append("<span class='fa fa-chevron-down' style='color:red;position:absolute;margin-right:3px'></span>");
+                    $(sortCell).append("<span class='fa fa-chevron-down' style='color:red;margin-right:3px'></span>");
+                } else {
+                    $(`#${parentGridElementId}  thead th span`).remove();
+                    //$(sortCell).append("<span class='fa fa-chevron-up' style='color:green;position:absolute;margin-right:3px'></span>");
+                    $(sortCell).append("<span class='fa fa-chevron-up' style='color:green;margin-right:3px'></span>");
+                }
+            }
+        }
+
+       const renderNavigation = (rootElementId, totalRowCount, currentPage, totalPages) => {
+            let pagingHtml = '';
+            if (totalRowCount > PAGE_SIZE) {
+                if (currentPage != 1) {
+                    pagingHtml += '<li class="page-item"><button class="page-link page-link-active" current-page="1">@_loc["First"]</button></li>';
+                    pagingHtml += '<li class="page-item"><button class="page-link page-link-active" current-page="' + (currentPage - 1) + '">@_loc["Prev"]</button></li>';
+                } else {
+                    pagingHtml += '<li class="page-item disabled"><button class="page-link">@_loc["First"]</button></li>';
+                    pagingHtml += '<li class="page-item disabled"><button class="page-link">@_loc["Prev"]</button></li>';
+                }
+
+                let firstPageToDisplay = currentPage - (PAGE_SIZE / 2);
+
+                if (firstPageToDisplay < 1) {
+                    firstPageToDisplay = 1;
+                }
+
+                for (var pageNumber = firstPageToDisplay; pageNumber < (firstPageToDisplay + PAGE_SIZE); pageNumber++) {
+                    if (pageNumber <= totalPages) {
+                        if (currentPage == pageNumber) {
+                            pagingHtml += '<li class="page-item active">' +
+                                '<button class="page-link page-link-active" current-page="' +
+                                pageNumber +
+                                '">' +
+                                pageNumber +
+                                '<span class="sr-only">(current)</span>' +
+                                '</button>' +
+                                '</li>';
+                        } else {
+                            pagingHtml += '<li class="page-item"><button class="page-link page-link-active" current-page="' + pageNumber + '">' + pageNumber + '</button></li>';
+                        }
+                    } else {
+                        break;
+                    }
+                }
+
+                if (currentPage != totalPages) {
+                    pagingHtml += '<li class="page-item"><button class="page-link page-link-active" current-page="' + (currentPage + 1) + '">@_loc["Next"]</button></li>';
+                    pagingHtml += '<li class="page-item"><button class="page-link page-link-active" current-page="' + totalPages + '">@_loc["Last"]</button></li>';
+                } else {
+                    pagingHtml += '<li class="page-item disabled"><button class="page-link">@_loc["Next"]</button></li>';
+                    pagingHtml += '<li class="page-item disabled"><button class="page-link">@_loc["Last"]</button></li>';
+                }
+            }
+            pagingHtml = '<nav aria-label="Page navigation example" style="text-align:center"><ul class="pagination">' +
+                pagingHtml +
+                '</ul><b style="color:#1e88e5">@_loc["TotalRowCount"] : ' +
+                totalRowCount +
+                '</b></nav>';
+
+            $(`#${rootElementId} .paging-div`).html(pagingHtml);
+            $(`#${rootElementId} .paging-div .page-link-active`).off('click');
+            $(`#${rootElementId} .paging-div .page-link-active`).on('click',
+                function (e) {
+                    e.preventDefault();
+                    switch (rootElementId.toLowerCase()) {
+                        case 'agentrequestgriddiv':
+                            loadAgentRequest(this);
+                            break;
+                    }
+                });
+        }
+    </script>
+}

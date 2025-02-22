@@ -1,0 +1,158 @@
+﻿@model CustomerCardInfoModel
+@{
+    ViewData["Title"] = _loc["UploadCustomerSelfiToCard_Title"];
+}
+@section styles
+{
+    <style type="text/css">
+        textarea {
+            height: 120px !important;
+        }
+
+        .table-custom th,
+        .table-custom td {
+            text-align: center !important;
+            vertical-align: middle !important;
+        }
+
+        .button-columns {
+            padding-top: 7px !important;
+            width: 100px;
+            text-align: center;
+        }
+
+        .label-value {
+            /*font-weight: bold;*/
+            color: blueviolet;
+            padding-right: 10px;
+        }
+
+        .form-group-ex {
+            margin-bottom: 10px !important
+        }
+    </style>
+}
+
+<form id="frmCardIssuanceCompletedCustomerSelfiToCard" method="post">
+    <div class="card">
+        <div class="card-header" localize-content>UploadCustomerSelfiToCard_Title</div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <p style="color:red" localize-content>UploadCustomerSelfiToCard_Info</p>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xl-12">
+                    <div class="form-group form-group-ex">
+                        <label class="control-label" localize-content>CardNumber</label>
+                        <label class="control-label label-value">@Model.SplitCardNumber</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xl-12">
+                    <div class="form-group form-group-ex">
+                        <label class="control-label" localize-content>CardType</label>
+                        <label class="control-label label-value">@Model.Title</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xl-12">
+                    <div class="form-group form-group-ex">
+                        <label class="control-label" localize-content>BankCardType</label>
+                        <label class="control-label label-value">@Model.BankName</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xl-12">
+                    <div class="form-group form-group-ex">
+                        <label class="control-label" localize-content>Description</label>
+                        <label class="control-label label-value">@Model.Description</label>
+                    </div>
+                </div>
+            </div>
+            <hr />
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="control-label" localize-content>UploadCustomerSelfiToCard_Title</label>
+                        <input type="file" name="PostedFile" id="PostedFile" class="form-control-file" accept="image/*">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-footer" style="text-align:left">
+            <button id="btnSaveRequest" class="btn btn-outline-success">
+                @_loc["RegisterRequest"]&nbsp;<i class="fal fa-send"></i>
+            </button>
+            <a class="btn btn-outline-secondary" href='@Url.Action("CardIssuanceList","AgentRequest")'>
+                @_loc["Cancel"]&nbsp;<i class="fal fa-close"></i>
+            </a>
+        </div>
+    </div>
+</form>
+@section scripts{
+    @*<partia name="_ValidationScriptsPartial" />*@
+    @{
+        await Html.RenderPartialAsync("~/Views/Shared/_ValidationScriptsPartial.cshtml");
+    }
+    <script>
+        $('#btnSaveRequest').click(function (e) {
+            e.preventDefault();
+            debugger;
+            const formIsValid = $('#frmCardIssuanceCompletedCustomerSelfiToCard').valid();
+            const fileUpload = $("#PostedFile")[0];
+            if (fileUpload == undefined || fileUpload.files.length == 0) {
+                showMessage('@_loc["InfoTitle"]', '@_loc["MessageUploadCustomerSelfiToCard"]', icons.warning, '@_loc["Close"]');
+                return;
+            }
+            if (formIsValid) {
+                let data = new FormData();
+                $.map(fileUpload.files, (item) => {
+                    data.append('PostedFile', item);
+                });
+
+                $.ajax({
+                    type: 'post',
+                    //dataType: 'json',
+                    //contentType: "application/json; charset=utf-8",
+                    processData: false,
+                    contentType: false,
+                    url: `/api/v1/AgentRequest/CardIssuanceCompletedCustomerSelfiToCard/@Model.AgentRequestId`,
+                    data: data,// JSON.stringify(model),
+                    success: function (result) {
+                        debugger;
+                        if (result.isSuccess) {
+                            showMessage('@_loc["InfoTitle"]', '@_loc["MessageSuccess"]', icons.success, '@_loc["Close"]');
+                            setTimeout(function () {
+                                window.location.replace('@Url.Action("CardIssuanceList","AgentRequest")');
+                            }, 1500);
+                        }
+                    },
+                    error: function (error) {
+                        if (error.responseJSON != undefined && error.responseJSON.Message != undefined && error.responseJSON.Message != '') {
+                            if (IsJsonString(error.responseJSON.Message)) {
+                                const exception = JSON.parse(error.responseJSON.Message).Exception;
+                                showMessage('@_loc["ErrorTitle"]', exception, icons.error, '@_loc["Close"]');
+                            }
+                            else
+                                showMessage('@_loc["ErrorTitle"]', error.responseJSON.Message, icons.error, '@_loc["Close"]');
+                        }
+                        else {
+                            showMessage('@_loc["ErrorTitle"]', '@_loc["UnhandledError"]', icons.error, '@_loc["Close"]');
+                        }
+                    }
+                });
+            }
+            else {
+                scrollToFirstError();
+            }
+        });
+    </script>
+}
